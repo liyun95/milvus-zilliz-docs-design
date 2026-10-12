@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="768" height="360" viewBox="0 0 1280 600" role="img" aria-labelledby="title desc">
 <title id="title">首期任务与依赖：1a 与 1b</title>
-<desc id="desc">按泳道列出首期任务。1a：文档工程师完成 Delete Entities 的内容对齐与变量；zdoc 实现获取、定位、变量与 MDX 生成，接入 stage 与 UAT 预览；md2md 实现预处理入口并发版，发版后 zdoc 才能真实集成；zdoc 发布侧完成 Git 来源接入设计。1b：Filtered Search 与 OpenAI 的内容对齐、命名块完成后，zdoc 实现命名块、语言与代码行三级的差异处理和通道包裹，再实现升级 PR；md2md 实现命名块标记清理，上线后才能合并带命名块的原文；发布侧完成混源与同批激活、翻译与恢复接入，最后切换试点页，切换前需文档负责人审核。运行条件从第一天开始核实，切换前必须解决。</desc>
+<desc id="desc">按泳道列出首期任务。1a：文档工程师完成 Delete Entities 的内容对齐与变量；zdoc 实现获取、定位、变量与 MDX 生成，接入 stage 与 UAT 预览；md2md 实现预处理入口并发版，发版后 zdoc 才能真实集成；zdoc 发布侧完成 Git 来源接入设计。1b：Filtered Search 与 OpenAI 的内容对齐、命名块完成后，zdoc 实现命名块、语言与代码行三级的差异处理和双版本通道比较，再实现升级 PR；md2md 实现命名块标记清理，上线后才能合并带命名块的原文；发布侧完成混源与同批激活、翻译与恢复接入，最后切换试点页，切换前需文档负责人审核。运行条件从第一天开始核实，切换前必须解决。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.h{font-size:16px;font-weight:600;text-anchor:middle;}.s{font-size:14px;text-anchor:middle;fill:#64748b;}.lane{font-size:15px;font-weight:600;text-anchor:middle;}.lane2{font-size:13px;text-anchor:middle;fill:#64748b;}.stage{font-size:17px;font-weight:600;text-anchor:middle;}.lbl{font-size:13px;fill:#475569;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
 <rect width="1280" height="600" fill="#ffffff"/>

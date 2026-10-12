@@ -35,7 +35,7 @@
 |---|---|---|
 | [milvus-docs](https://github.com/milvus-io/milvus-docs) | Delete Entities 内容对齐，加变量；固定 CI 中的工具版本 | Filtered Search、OpenAI 内容对齐（OpenAI 先对齐历史漂移）；加命名块；更新贡献说明；撤销旧飞书导入任务对已迁移页的覆盖能力 |
 | [md2md](https://github.com/zilliztech/md2md) | 只做预处理的入口：受控读取、依赖报告、错误检查；发版；旧入口保持兼容 | 命名块标记清理，供 Milvus 发布使用 |
-| [zdoc](https://github.com/zilliztech/zdoc) 生成 | 获取固定源、定位命名块、生成 registry、调用 md2md、生成 Tabs 与 MDX；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；NextChannel 包裹；依赖索引、影响报告与升级 PR |
+| [zdoc](https://github.com/zilliztech/zdoc) 生成 | 获取固定源、定位命名块、生成 registry、调用 md2md、生成 Tabs 与 MDX；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；双版本通道比较；依赖索引、影响报告、升级与提升 PR |
 | [zdoc](https://github.com/zilliztech/zdoc) 发布 | Git 来源接入设计：交接格式、生效配置与来源记录 | 页级混源与同批激活；旧飞书任务隔离；生成结果比对；过滤、通道、翻译与恢复接入 |
 | [web-content](https://github.com/milvus-io/web-content)、[milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布回归 | Milvus 发布回归；首期不新增共享消费能力 |
 
@@ -43,7 +43,7 @@
 
 - **沿用**：Markdown 与 `Variables.json` 写法、Cloud Tabs 等组件、MDX 与链接校验、Docusaurus 构建、产品代码变体、Current / Next 通道、翻译机制。仍需用共享输入验证。
 - **扩展**：md2md 的调用入口；zdoc 的来源模型、Guides 组装、缓存、页面归属与发布恢复。
-- **新增**：命名块扫描与 registry、差异变换（含代码行定位）与通道包裹、Milvus Markdown 到 Cloud MDX 的适配、依赖索引与升级 PR。
+- **新增**：命名块扫描与 registry、差异变换（含代码行定位）、双版本通道比较、Milvus Markdown 到 Cloud MDX 的适配、依赖索引与升级 PR。
 
 影响估算的三个边界：现有 local source 没有 Git 锁定与命名块消费；LarkDocWriter 接收飞书数据，不能解析 Milvus Markdown；发布保护和旧飞书任务的归属检查都要扩展到 Git 输入。[复用审计](../research/md2md-zdoc-reuse-audit.md)
 
@@ -74,22 +74,22 @@
 
 1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤），加命名块。等 Milvus 侧的标记清理上线后再合并。
 2. **md2md**：命名块标记清理，Milvus 站点不出现标记。
-3. **zdoc 生成**：add / replace / remove，目标包括命名块、语言示例和代码中连续的几行；产品过滤器接入 Git 输入（用于 Cloud 内容文件）；把命名块包进 `<NextChannel>`。
-4. **zdoc 生成**：依赖索引、影响报告与升级 PR；按[架构设计第 3 节](./architecture.md#3-上游变化与升级-pr)的规则处理各类上游变化。
+3. **zdoc 生成**：add / replace / remove，目标包括命名块、语言示例和代码中连续的几行；产品过滤器接入 Git 输入（用于 Cloud 内容文件）；lock 记录 current / next 两个 commit，两版各生成一遍，按块比较并成对输出 `<NextChannel>`。
+4. **zdoc 生成**：依赖索引、影响报告、升级 PR 与提升 PR；按[架构设计第 3 节](./architecture.md#3-上游变化与升级-pr)的规则处理各类上游变化。
 5. **zdoc 发布**：页级混源与同批激活；旧飞书任务隔离；CI 重新生成比对；过滤、通道、翻译与恢复接入。
 6. **切换**：核对最新飞书修订，文档负责人审核后切换试点页，更新编辑入口；记录验证结果与后续迁移条件。
 
 **完成标准**
 
 - 【T01】命名块改名或删除时，引用它的页面不能升级，旧版本继续有效。
-- 【T04】内容变换：目标存在性、类型、语言和冲突检查；通道包裹输出正确；多语言内容完整。以 OpenAI 的凭证参数为真实用例，在每种语言中验证代码行的 replace 与 add：缩进正确，不留多余空行，Milvus 输出与原文一致；`lines` 找不到、出现多次、超过上限或与语言项变换冲突时都失败；上游改了被定位的行时不能升级。
+- 【T04】内容变换：目标存在性、类型、语言和冲突检查；多语言内容完整。以 OpenAI 的凭证参数为真实用例，在每种语言中验证代码行的 replace 与 add：缩进正确，不留多余空行，Milvus 输出与原文一致；`lines` 找不到、出现多次、超过上限或与语言项变换冲突时都失败；上游改了被定位的行时不能升级。
 - 【T05】升级 PR：被替换的原文变化仍然提示；上游变化只生成 PR，不自动采用；PR 合并前的生成结果不进入正式发布。
 - 【T07】混源与切换：覆盖[架构设计图 4](./architecture.md#6-按页迁移与正式激活) 中的每一种情况——同步配置不激活；失败或取消保持原状；激活时配置、正文、导航、来源记录同批提交；等待期间基线变化不会覆盖新状态；部署失败不恢复飞书写权；飞书全量抓取、旧缓存、删除清单与恢复任务都不能改变已迁移页，未迁移页照常更新。
 - 【T08】缓存：只有变量、Cloud 内容文件、工具、资源或归属变化时也会重新检查，不会被飞书侧的“未变化”跳过；冷热构建结果一致，损坏的缓存不会发布旧结果。
 - 【T09】翻译：以最终 Cloud 正文为输入，技术内容受保护；输出不变且已有有效译文时不重译；缺译文仍按原规则处理；英文、日文和中文的边界正确。
 - 【T10】恢复：临时 artifact 不可用时，能从 Git 恢复或从固定输入重建；来源记录一致；缺源或缺资源时停止；镜像回滚不恢复飞书写权。
 - 【T12】完整旅程：源 PR → 预览 → 审核 → 发布 → 升级或拒绝 → 恢复；手改生成文件，或连同来源记录一起改，都被拒绝。
-- 【T13】过滤与通道：适用的正文与代码保留，不适用的被排除；Next 内容在 UAT 显示，在 Prod 和静态产物中不出现；Git 页面的整页通道在各语言译文中生效；未迁移飞书页的行为不变。
+- 【T13】过滤与通道：适用的正文与代码保留，不适用的被排除；Next 内容在 UAT 显示，在 Prod 和静态产物中不出现；共享页的两个通道各自显示对应版本的生成结果，Cloud 规则在两个版本上都校验，提升后不留通道标记；`<NextChannel>` 包住列表、提示框和代码 Tabs 时渲染正确；Git 页面的整页通道在各语言译文中生效；未迁移飞书页的行为不变。
 - **发布保护**：实际的 Git 服务端拒绝普通作者直接推送或强推正式生成分支；内容 PR 不能关闭核心检查。隔离环境的回放不能代替真实分支与凭据的权限核验。
 
 T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换前完成。
@@ -104,7 +104,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 |---|---|---|
 | md2md 预处理 API | 调用参数、变量根目录与作用域、读取接口、依赖与错误的返回格式 | 1a 并行开发前；集成前完成发版 |
 | 命名块的解析位置 | 命名块标记的解析、校验代码放在哪个仓库，Milvus CI 怎样复用，清理挂在哪个转换环节 | 1a；带标记的原文合并前 |
-| 消费配置与通道 | 配置目录与字段、链接与图片映射、lock 粒度、跟踪的 Milvus 分支、整页通道与命名块包裹的写法（[草案](./consumption-schema.md)） | 目录在 1a 确定；通道写法在 1b 开发前 |
+| 消费配置与通道 | 配置目录与字段、链接与图片映射、lock 粒度、跟踪的 Milvus 分支、整页通道的写法、`current` / `next` 的字段与提升方式（[草案](./consumption-schema.md)） | 目录在 1a 确定；通道写法在 1b 开发前 |
 | 生成与发布的交接 | 生成结果、资源、来源和依赖记录的格式；Git 来源怎样进入现有来源模型；生效配置的存储与同批提交接口 | 1a 发布接入设计时 |
 | 上游变化的发现 | 定时还是事件触发、执行身份、重复事件合并、失败重试与手动重跑；社区 PR 不提供 Cloud 凭据 | 1b 升级 PR 开发前 |
 | lock 与影响报告 | 字段，以及它们怎样进入既有的发布和恢复数据 | 1b 升级 PR 开发前；恢复接线在切换前 |
@@ -135,6 +135,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 |---|---|---|
 | Delete Entities | 整篇引用、连接变量、三组七语言 Tabs、正文与章节保留 | 真实工具链与 SDK 适用性 |
 | Filtered Search | 产品名与连接变量、两个命名代码组、CLI 补充；专门测试覆盖块、语言项和代码行三级的 add / replace / remove（代码行为合成用例） | 真实工具链与 SDK / CLI 适用性 |
+| Filtered Search 双版本通道 | 两个快照各生成一遍并按块合并；每个通道看到的正好是自己的版本；代码组变化、Cloud 规则只在一侧失效、提升、相同版本无标记（[说明](../examples/filtered-search/two-commit/walkthrough.md)） | zdoc 中 NextChannel 的渲染与目录、真实 Git 读取、翻译 |
 | OpenAI | 尚无样例；两端差异已核对（[核验记录](../research/zdoc-variants-and-channels-audit.md#3-openai-页对照)） | 内容对齐、凭证参数的代码行变换（真实用例）、真实工具链 |
 
 两篇样例都检查了不支持的 schema、缺失输入和手改生成结果等错误；都没有调用真实的 md2md、Docusaurus 或生产发布，也没有实现跨仓升级、翻译和发布保护。
@@ -152,5 +153,7 @@ python -B build_example.py
 python -B test_example.py
 python -B build_example.py --check
 ```
+
+双版本通道原型在 `examples/filtered-search/` 目录执行 `python -B two-commit/build_channels.py --check` 与 `python -B two-commit/test_channels.py`。
 
 `prepare_fixture.py` 会从固定证据重新准备输入并覆盖作者文件，不属于日常步骤。Delete Entities 的预期结果包含拟议补入的 Go APIKey；输出一致不等于 SDK 行为已经验证。

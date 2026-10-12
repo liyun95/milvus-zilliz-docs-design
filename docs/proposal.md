@@ -34,11 +34,11 @@
 
 **共享正文在 milvus-docs 维护一份，以 Git 为准；Cloud 在 zdoc 中维护建在其上的差异层（overlay），飞书按页退出文档生产链。**
 
-![目标协作方式：社区贡献者和文档工程师向 milvus-docs 提交共享内容，Milvus 沿用既有发布；文档工程师在 zdoc 维护 Cloud 差异与配置。上游变化后，工具在 zdoc 自动发起升级 PR，附生成结果与影响提示；Cloud 审核后合并即采用并按 UAT / Prod 发布，暂不合并则保持已批准版本；需要修改时回到对应源文件。](./assets/collaboration-overview.png)
+![目标协作方式：社区贡献者和文档工程师向 milvus-docs 提交共享内容，Milvus 沿用既有发布；文档工程师在 zdoc 维护 Cloud 差异与配置。上游变化后，工具在 zdoc 自动发起升级 PR，附生成结果与影响提示；Cloud 审核后合并，新版本先在 UAT 可见，Cloud 发布时进入 Prod；暂不合并则保持已批准版本；需要修改时回到对应源文件。](./assets/collaboration-overview.png)
 
 图 2 · 目标协作方式
 - **谁改哪里。** 共同内容改 milvus-docs，Cloud 差异和配置改 zdoc。同一位文档工程师可以两边都改；迁移后的页面不再在飞书编辑。
-- **Cloud 怎样控制发布时间（要求 2、5）。** 上游合并后，工具在 zdoc 自动发起升级 PR。合并即采用；不合并，Cloud 就继续使用已批准的版本。
+- **Cloud 怎样控制发布时间（要求 2、5）。** 上游合并后，工具在 zdoc 自动发起升级 PR。合并后新版本先在 UAT 可见，Cloud 发布时才进入 Prod；不合并，两边都继续使用已批准的版本。
 - **共享原文由谁把关。** milvus-docs 的 PR 按 Milvus 既有流程审核，不需要 Cloud 参与。如果混入只适用于 Milvus 的内容，Cloud 在升级 PR 中处理：暂缓采用、请求改成两端通用的写法，或在 zdoc 中移除该段。Milvus 贡献说明届时补充共享页的写法。
 - **生成文件不能手改。** CI 按固定输入重新生成并比对；发现问题时，回到图中对应的源文件修改。
 
@@ -48,7 +48,7 @@
 |---|---|---|
 | 共享页的共同内容 | 在飞书编辑，再导出到 Milvus | 向 milvus-docs 提交 PR |
 | 共享页的 Cloud 差异 | 在飞书正文中直接改写 | 在 zdoc 维护页面配置和 Cloud 内容文件 |
-| 代码的产品差异、Current / Next 标记 | 写在飞书正文和多维表格中 | 共享页的代码行差异改写在页面配置中；其余写法不变，写在 Git 中（见第 4 节） |
+| 代码的产品差异、Current / Next 标记 | 写在飞书正文和多维表格中 | 共享页：代码行差异写在页面配置中，Current / Next 由工具按两个版本自动区分，不再手动标记；其余写法不变，写在 Git 中（见第 4 节） |
 | 审核与预览 | 飞书内审阅，UAT 查看结果 | GitHub PR 审核，PR 预览与 UAT 查看结果 |
 | Cloud 独有页 | 在飞书编辑 | 首期不变；终态在 zdoc 以 Markdown / MDX 维护 |
 
@@ -83,12 +83,23 @@
 
 ### 4.1 Milvus 先上线、Cloud 后上线的内容
 
-举一个场景：Milvus 发布了新参数 X，共享页 A 新增了一段介绍 X 的内容，同一次修改还修正了 A 中的一处错误。Cloud 下个月才支持 X。
+举一个场景：Milvus 发布了新参数 X，共享页 A 新增了一段介绍 X 的内容，同一次修改还改写了 A 中几处已有的说明。Cloud 下个月才支持 X。
 
-- **整页都不想更新**：不合并升级 PR，Cloud 继续使用已批准的版本（要求 2）。
-- **页面要更新，但其中一段 Cloud 尚未上线**：在同一个升级 PR 中，由 zdoc 把这一段包进 `<NextChannel>`，再合并。UAT 能看到，Prod 看不到；Cloud 上线 X 后去掉包裹（要求 3）。前提是原文中这一段有命名块。
+**建议：lock 记录两个 milvus-docs 版本，Prod 读 `current`，UAT 读 `next`。**
 
-这沿用 zdoc 现有的 Current / Next 机制：UAT 与 Prod 使用同一镜像，部署时按通道显示内容；段落用 `<NextChannel>` 包裹，上线时去掉包裹。整页的通道目前记录在飞书多维表格的 `Release Channel` 字段中，迁移后需要在 Git 中有对应的位置，例如页面配置。
+- **升级 PR 只更新 `next`。** 工具用两个版本各生成一遍 Cloud 页面，再按块（段落、标题、列表、整个代码组等）比较：相同的块只输出一次，不同的块输出成一对 `<NextChannel>`，Prod 显示旧文，UAT 显示新文（要求 3）。
+- **Cloud 发布时，把 `current` 改为 `next` 的值。** 重新生成后，成对的标记自动消失，不需要逐处去掉。
+- **原文不需要为通道做任何事。** 新增、修改还是删除，改动多细碎，都不用加命名块或通道标记。
+
+在这个场景中，X 的介绍和改写后的说明都只在 UAT 可见，Prod 保持原样；Cloud 支持 X 并发布后，两者一起进入 Prod。如果连 UAT 也暂时不想更新，就不合并升级 PR（要求 2）。[本地原型](../examples/filtered-search/two-commit/walkthrough.md)已验证：每个通道看到的正好是自己那个版本的生成结果；两个版本相同时，输出不带任何通道标记。
+
+这沿用 zdoc 现有的 Current / Next 机制：UAT 与 Prod 使用同一镜像，部署时按通道显示内容。区别是成对的 `<NextChannel>` 由工具生成，不再手动包裹。整页的通道目前记录在飞书多维表格的 `Release Channel` 字段中，迁移后需要在 Git 中有对应的位置，例如页面配置。
+
+需要确认的前提：
+
+- Cloud 的 Next 对应下一次 Cloud 发布。
+- 共享页的措辞修正默认随下次 Cloud 发布进入 Prod。确需提前上线时，把 `current` 也一并更新，再用命名块把尚未上线的一段包进 `<NextChannel>`，作为例外手段。
+- zdoc 渲染 `<NextChannel>` 包住列表、提示框和代码 Tabs 的效果，以及目录如何处理其中的标题，仍需核实。
 
 ## 5. 试点与路线
 
@@ -114,7 +125,7 @@
 | 1 | 共享原文来源 | 读取 md2md 处理前的 milvus-docs 固定版本原文，不从 web-content 读取 |
 | 2 | 飞书退出方式与终态 | 按页切换；终态是共享页与 Cloud 独有页均在 Git 维护 |
 | 3 | 差异表达原则 | 段落、章节与代码行差异都写在 zdoc；原文只加中性命名块，不写产品指令 |
-| 4 | Current / Next | 沿用 zdoc 渲染时通道过滤；新增“包裹共享命名块”的能力 |
+| 4 | Current / Next | 沿用 zdoc 渲染时的通道过滤；共享页的 lock 记录 current / next 两个版本，差异由工具成对包进 `<NextChannel>`（先确认第 4.1 节的前提） |
 | 5 | 试点候选 | 1a 用 Delete Entities；1b 用 Filtered Search 与 OpenAI |
 | 6 | 首期范围与年底目标 | 首期按 1a、1b 推进；建议年底前完成 1a，并启动 1b |
 | 7 | 共享内容把关 | Cloud 不审核 milvus-docs PR，在升级 PR 中把关；补充 Milvus 贡献说明 |
