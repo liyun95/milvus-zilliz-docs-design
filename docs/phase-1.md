@@ -17,25 +17,25 @@
 
 建议年底前完成 1a 并启动 1b。
 
-**首期不做：** 代码子区域替换（行级差异用产品行指令，差异多时替换整个语言项）、selector、move/copy、变换链、条件模板语言、按业务定义专门的操作、独立的 registry 服务或内容分发链、完整归档、独立编排多个共享命名块的页面、SDK Reference、全量迁移，以及 Cloud 独有页的迁移。
+**首期不做：** 在共享原文中写产品指令、代码中的区域标记（行级差异按连续整行定位，超过 5 行或多处差异时替换整个语言项）、selector、move/copy、变换链、条件模板语言、按业务定义专门的操作、独立的 registry 服务或内容分发链、完整归档、独立编排多个共享命名块的页面、SDK Reference、全量迁移，以及 Cloud 独有页的迁移。
 
 ## 2. 任务全景
 
-![首期任务与依赖：五条泳道分别是内容、zdoc 生成、md2md、zdoc 发布和运行条件。1a 中，Delete Entities 内容对齐后，zdoc 实现获取、定位、变量与 MDX 生成并接入 stage 与 UAT 预览；md2md 的预处理入口发版后 zdoc 才能真实集成；发布侧完成 Git 来源接入设计。1b 中，Filtered Search 与 OpenAI 内容对齐后，zdoc 实现差异与过滤、升级 PR；Milvus 侧过滤上线后才能合并带指令的原文；发布侧完成混源与同批激活、翻译与恢复，在文档负责人审核后切换试点页。运行条件从第一天开始核实，切换前必须解决。](./assets/phase-dependencies.png)
+![首期任务与依赖：五条泳道分别是内容、zdoc 生成、md2md、zdoc 发布和运行条件。1a 中，Delete Entities 内容对齐后，zdoc 实现获取、定位、变量与 MDX 生成并接入 stage 与 UAT 预览；md2md 的预处理入口发版后 zdoc 才能真实集成；发布侧完成 Git 来源接入设计。1b 中，Filtered Search 与 OpenAI 内容对齐后，zdoc 实现差异与通道、升级 PR；Milvus 侧的命名块清理上线后才能合并带命名块的原文；发布侧完成混源与同批激活、翻译与恢复，在文档负责人审核后切换试点页。运行条件从第一天开始核实，切换前必须解决。](./assets/phase-dependencies.png)
 
 图 1 · 首期任务与依赖
 - **关键路径在 md2md 发版。** zdoc 可以先用共同的测试样例开发，但真实集成要等 md2md 新入口发版并固定版本。Milvus CI 目前安装 npm 包时没有固定版本，需要一并处理。
 - **发布接入可以提前开始。** Git 来源接入的设计在 1a 就可以做，与生成能力并行；但联合验证必须使用真实生成结果，替代输入只能帮助开发。
-- **带指令的原文要等 Milvus 侧过滤上线。** 否则 Cloud 的代码行会出现在 Milvus 站点上。
+- **带命名块的原文要等 Milvus 侧的标记清理上线。** 否则命名块注释会留在 Milvus 的转换结果中。
 - **运行条件不能等到最后。** Jenkins、分支权限和资源保留从第一天开始核实，阻碍持续跟踪；本地样例通过不代表这些条件已经具备。
 
 ## 3. 各仓库改动
 
 | 仓库 | 1a | 1b |
 |---|---|---|
-| [milvus-docs](https://github.com/milvus-io/milvus-docs) | Delete Entities 内容对齐，加变量；固定 CI 中的工具版本 | Filtered Search、OpenAI 内容对齐（OpenAI 先对齐历史漂移）；加命名块和代码行指令；更新贡献说明；撤销旧飞书导入任务对已迁移页的覆盖能力 |
-| [md2md](https://github.com/zilliztech/md2md) | 只做预处理的入口：受控读取、依赖报告、错误检查；发版；旧入口保持兼容 | 代码行产品过滤与命名块清理，供 Milvus 发布使用 |
-| [zdoc](https://github.com/zilliztech/zdoc) 生成 | 获取固定源、定位命名块、生成 registry、调用 md2md、生成 Tabs 与 MDX；接入 stage 与预览 | add / replace / remove；产品过滤器接入 Git 输入；NextChannel 包裹；依赖索引、影响报告与升级 PR |
+| [milvus-docs](https://github.com/milvus-io/milvus-docs) | Delete Entities 内容对齐，加变量；固定 CI 中的工具版本 | Filtered Search、OpenAI 内容对齐（OpenAI 先对齐历史漂移）；加命名块；更新贡献说明；撤销旧飞书导入任务对已迁移页的覆盖能力 |
+| [md2md](https://github.com/zilliztech/md2md) | 只做预处理的入口：受控读取、依赖报告、错误检查；发版；旧入口保持兼容 | 命名块标记清理，供 Milvus 发布使用 |
+| [zdoc](https://github.com/zilliztech/zdoc) 生成 | 获取固定源、定位命名块、生成 registry、调用 md2md、生成 Tabs 与 MDX；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；NextChannel 包裹；依赖索引、影响报告与升级 PR |
 | [zdoc](https://github.com/zilliztech/zdoc) 发布 | Git 来源接入设计：交接格式、生效配置与来源记录 | 页级混源与同批激活；旧飞书任务隔离；生成结果比对；过滤、通道、翻译与恢复接入 |
 | [web-content](https://github.com/milvus-io/web-content)、[milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布回归 | Milvus 发布回归；首期不新增共享消费能力 |
 
@@ -43,7 +43,7 @@
 
 - **沿用**：Markdown 与 `Variables.json` 写法、Cloud Tabs 等组件、MDX 与链接校验、Docusaurus 构建、产品代码变体、Current / Next 通道、翻译机制。仍需用共享输入验证。
 - **扩展**：md2md 的调用入口；zdoc 的来源模型、Guides 组装、缓存、页面归属与发布恢复。
-- **新增**：命名块扫描与 registry、差异变换与通道包裹、Milvus Markdown 到 Cloud MDX 的适配、依赖索引与升级 PR。
+- **新增**：命名块扫描与 registry、差异变换（含代码行定位）与通道包裹、Milvus Markdown 到 Cloud MDX 的适配、依赖索引与升级 PR。
 
 影响估算的三个边界：现有 local source 没有 Git 锁定与命名块消费；LarkDocWriter 接收飞书数据，不能解析 Milvus Markdown；发布保护和旧飞书任务的归属检查都要扩展到 Git 输入。[复用审计](../research/md2md-zdoc-reuse-audit.md)
 
@@ -72,9 +72,9 @@
 
 **任务**
 
-1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤），加命名块和代码行指令。等 Milvus 侧过滤上线后再合并。
-2. **md2md**：代码行产品过滤与命名块清理，Milvus 站点只保留 `milvus` 行。
-3. **zdoc 生成**：add / replace / remove；产品过滤器接入 Git 输入；把命名块包进 `<NextChannel>`。
+1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤），加命名块。等 Milvus 侧的标记清理上线后再合并。
+2. **md2md**：命名块标记清理，Milvus 站点不出现标记。
+3. **zdoc 生成**：add / replace / remove，目标包括命名块、语言示例和代码中连续的几行；产品过滤器接入 Git 输入（用于 Cloud 内容文件）；把命名块包进 `<NextChannel>`。
 4. **zdoc 生成**：依赖索引、影响报告与升级 PR；按[架构设计第 3 节](./architecture.md#3-上游变化与升级-pr)的规则处理各类上游变化。
 5. **zdoc 发布**：页级混源与同批激活；旧飞书任务隔离；CI 重新生成比对；过滤、通道、翻译与恢复接入。
 6. **切换**：核对最新飞书修订，文档负责人审核后切换试点页，更新编辑入口；记录验证结果与后续迁移条件。
@@ -82,7 +82,7 @@
 **完成标准**
 
 - 【T01】命名块改名或删除时，引用它的页面不能升级，旧版本继续有效。
-- 【T04】内容变换与行级指令：目标存在性、类型、语言和冲突检查；通道包裹输出正确；多语言内容完整。以 OpenAI 的凭证参数为真实用例，在每种语言中验证 Cloud 只保留 `zilliz` 行、Milvus 只保留 `milvus` 行，两侧都不残留指令行或多余空行；语法错误、未闭合区域和未知目标都失败。
+- 【T04】内容变换：目标存在性、类型、语言和冲突检查；通道包裹输出正确；多语言内容完整。以 OpenAI 的凭证参数为真实用例，在每种语言中验证代码行的 replace 与 add：缩进正确，不留多余空行，Milvus 输出与原文一致；`lines` 找不到、出现多次、超过上限或与语言项变换冲突时都失败；上游改了被定位的行时不能升级。
 - 【T05】升级 PR：被替换的原文变化仍然提示；上游变化只生成 PR，不自动采用；PR 合并前的生成结果不进入正式发布。
 - 【T07】混源与切换：覆盖[架构设计图 4](./architecture.md#6-按页迁移与正式激活) 中的每一种情况——同步配置不激活；失败或取消保持原状；激活时配置、正文、导航、来源记录同批提交；等待期间基线变化不会覆盖新状态；部署失败不恢复飞书写权；飞书全量抓取、旧缓存、删除清单与恢复任务都不能改变已迁移页，未迁移页照常更新。
 - 【T08】缓存：只有变量、Cloud 内容文件、工具、资源或归属变化时也会重新检查，不会被飞书侧的“未变化”跳过；冷热构建结果一致，损坏的缓存不会发布旧结果。
@@ -103,7 +103,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 待确认项 | 要决定什么 | 最晚何时 |
 |---|---|---|
 | md2md 预处理 API | 调用参数、变量根目录与作用域、读取接口、依赖与错误的返回格式 | 1a 并行开发前；集成前完成发版 |
-| 标记与指令的解析位置 | 命名块和产品行指令的解析、校验代码放在哪个仓库，Milvus CI 怎样复用，清理挂在哪个转换环节 | 1a；带标记的原文合并前 |
+| 命名块的解析位置 | 命名块标记的解析、校验代码放在哪个仓库，Milvus CI 怎样复用，清理挂在哪个转换环节 | 1a；带标记的原文合并前 |
 | 消费配置与通道 | 配置目录与字段、链接与图片映射、lock 粒度、跟踪的 Milvus 分支、整页通道与命名块包裹的写法（[草案](./consumption-schema.md)） | 目录在 1a 确定；通道写法在 1b 开发前 |
 | 生成与发布的交接 | 生成结果、资源、来源和依赖记录的格式；Git 来源怎样进入现有来源模型；生效配置的存储与同批提交接口 | 1a 发布接入设计时 |
 | 上游变化的发现 | 定时还是事件触发、执行身份、重复事件合并、失败重试与手动重跑；社区 PR 不提供 Cloud 凭据 | 1b 升级 PR 开发前 |
@@ -134,8 +134,8 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 样例 | 已覆盖 | 尚需验证 |
 |---|---|---|
 | Delete Entities | 整篇引用、连接变量、三组七语言 Tabs、正文与章节保留 | 真实工具链与 SDK 适用性 |
-| Filtered Search | 产品名与连接变量、两个命名代码组、CLI 补充；专门测试覆盖块和语言项的 add / replace / remove | 真实工具链与 SDK / CLI 适用性 |
-| OpenAI | 尚无样例；两端差异已核对（[核验记录](../research/zdoc-variants-and-channels-audit.md#3-openai-页对照)） | 内容对齐、行级指令在两侧的过滤、真实工具链 |
+| Filtered Search | 产品名与连接变量、两个命名代码组、CLI 补充；专门测试覆盖块、语言项和代码行三级的 add / replace / remove（代码行为合成用例） | 真实工具链与 SDK / CLI 适用性 |
+| OpenAI | 尚无样例；两端差异已核对（[核验记录](../research/zdoc-variants-and-channels-audit.md#3-openai-页对照)） | 内容对齐、凭证参数的代码行变换（真实用例）、真实工具链 |
 
 两篇样例都检查了不支持的 schema、缺失输入和手改生成结果等错误；都没有调用真实的 md2md、Docusaurus 或生产发布，也没有实现跨仓升级、翻译和发布保护。
 

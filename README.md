@@ -20,7 +20,7 @@ Milvus × Zilliz Cloud 文档同源设计仓库，维护方案、架构、实施
 - [Delete Entities](examples/delete-entities/walkthrough.md)：整篇复用，仅通过变量处理连接值差异。
 - [Filtered Search](examples/filtered-search/walkthrough.md)：产品名与连接变量、共享多语言代码，以及 Cloud CLI 的补充。
 
-OpenAI embedding 页是第三个试点候选，用于验证前提条件整节替换和凭证参数的代码行指令，尚未制作样例；差异分析见 [zdoc 代码变体与发布通道核验](research/zdoc-variants-and-channels-audit.md#3-openai-页对照)。
+OpenAI embedding 页是第三个试点候选，用于验证前提条件整节替换和凭证参数的代码行替换，尚未制作样例；差异分析见 [zdoc 代码变体与发布通道核验](research/zdoc-variants-and-channels-audit.md#3-openai-页对照)。
 
 每篇样例包含作者输入、生成结果及适用边界，具体说明随样例维护。
 

@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="768" height="516" viewBox="0 0 1280 860" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="768" height="654" viewBox="0 0 1280 1090" role="img" aria-labelledby="title desc">
 <title id="title">OpenAI 页的差异怎样表达</title>
-<desc id="desc">OpenAI 页分三部分。第一部分是共享正文，写在 milvus-docs，产品名写成变量，两端分别绑定。第二部分是前提条件一节：Milvus 原文讲配置 milvus.yaml，Cloud 讲在控制台创建集成；milvus-docs 为这一节加命名块，zdoc 用页面配置和 Cloud 内容文件替换。第三部分是代码中的凭证参数：两行都写在 milvus-docs 的共享代码中，用产品行指令标记；Milvus 发布时删去 zilliz 行，只保留注释掉的可选 credential；Cloud 生成时删去 milvus 行，只保留必填的 integration_id。</desc>
+<desc id="desc">OpenAI 页分三部分。第一部分是共享正文，写在 milvus-docs，产品名写成变量，两端分别绑定。第二部分是前提条件一节：Milvus 原文讲配置 milvus.yaml，Cloud 讲在控制台创建集成；milvus-docs 为这一节加命名块，zdoc 用页面配置和 Cloud 内容文件替换。第三部分是代码中的凭证参数：milvus-docs 的代码不改，只给代码组加命名块；zdoc 页面配置中的一条 replace 规则在这个代码组的 Python 示例里找到连续两行“# Optional parameters:”和“# "credential": "apikey_dev",”，换成 Cloud 必填的 integration_id 一行。Milvus 站点与原文相同，只去掉命名块标记。定位只在指定的代码组和语言内，整行精确匹配且恰好出现一次，最多 5 行；新行沿用原行缩进；上游改了这几行时匹配失败，升级 PR 被拦下。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.h{font-size:20px;font-weight:600;}.t{font-size:17px;fill:#475569;}.s{font-size:15px;fill:#64748b;}.code{white-space:pre;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;fill:#1f2937;}.cmt{white-space:pre;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;fill:#1d4ed8;font-weight:600;}.link{fill:none;stroke:#94a3b8;stroke-width:1.5;stroke-dasharray:4 4;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
-<rect width="1280" height="860" fill="#ffffff"/>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.h{font-size:20px;font-weight:600;}.t{font-size:17px;fill:#475569;}.s{font-size:15px;fill:#64748b;}.code{white-space:pre;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;fill:#1f2937;}.mk{white-space:pre;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;fill:#94a3b8;}.link{fill:none;stroke:#94a3b8;stroke-width:1.5;stroke-dasharray:4 4;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
+<rect width="1280" height="1090" fill="#ffffff"/>
 
 <text x="370" y="28" class="s" style="text-anchor:middle;font-weight:600">OpenAI 页的组成</text>
 <text x="1005" y="28" class="s" style="text-anchor:middle;font-weight:600">写在哪里</text>
@@ -30,43 +30,58 @@
 <text x="790" y="286" class="t">zdoc：页面配置写 replace，</text>
 <text x="790" y="312" class="t">Cloud 的内容放在内容文件中</text>
 
-<rect x="40" y="348" width="1200" height="470" rx="10" fill="#ffffff" stroke="#1d4ed8"/>
+<rect x="40" y="348" width="1200" height="686" rx="10" fill="#ffffff" stroke="#1d4ed8"/>
 <text x="60" y="382" class="h">③ Define the text embedding function · 代码中的凭证参数</text>
-
-<text x="60" y="420" class="s" style="font-weight:600">milvus-docs 原文（共享代码）</text>
-<rect x="60" y="432" width="520" height="210" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-<text x="78" y="462" class="code">params={</text>
-<text x="78" y="486" class="code">    "provider": "openai",</text>
-<rect x="66" y="496" width="508" height="104" rx="4" fill="#dbeafe"/>
-<text x="78" y="518" class="cmt">    # include-next-line zilliz</text>
-<text x="78" y="542" class="code">    "integration_id": "YOUR_INTEGRATION_ID",</text>
-<text x="78" y="566" class="cmt">    # include-next-line milvus</text>
-<text x="78" y="590" class="code">    # "credential": "apikey_dev",</text>
-<text x="78" y="624" class="code">}</text>
-
-<path class="edge" d="M580 500 H650 V490 H703"/>
-<text x="598" y="474" class="s">Milvus 发布</text>
-<path class="edge" d="M580 580 H650 V654 H703"/>
-<text x="598" y="684" class="s">Cloud 生成</text>
-
-<text x="710" y="420" class="s" style="font-weight:600">Milvus 站点</text>
-<rect x="710" y="432" width="510" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-<text x="728" y="462" class="code">params={</text>
-<text x="728" y="486" class="code">    "provider": "openai",</text>
-<text x="728" y="510" class="code">    # "credential": "apikey_dev",</text>
-<text x="728" y="534" class="code">}</text>
-
-<text x="710" y="582" class="s" style="font-weight:600">Cloud 站点</text>
-<rect x="710" y="594" width="510" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-<text x="728" y="624" class="code">params={</text>
-<text x="728" y="648" class="code">    "provider": "openai",</text>
-<text x="728" y="672" class="code">    "integration_id": "YOUR_INTEGRATION_ID",</text>
-<text x="728" y="696" class="code">}</text>
-
-<text x="60" y="756" class="t">两行都写在 milvus-docs 的共享代码中；发布时各自删去不适用的一行和指令，读者只看到自己的一行。</text>
-<text x="60" y="788" class="s">Milvus 的 credential 是可选提示（key 已在 milvus.yaml 中配置）；Cloud 的 integration_id 必填。指令语法沿用 zdoc 代码变体规范。</text>
-
-<rect x="40" y="832" width="16" height="16" rx="3" fill="#fefce8" stroke="#ca8a04"/><text x="64" y="846" class="s">来自共享原文</text>
-<rect x="190" y="832" width="16" height="16" rx="3" fill="#ffedd5" stroke="#c2410c"/><text x="214" y="846" class="s">两端整节不同，Cloud 用内容文件替换</text>
-<rect x="500" y="832" width="16" height="16" rx="3" fill="#dbeafe"/><text x="524" y="846" class="s">产品行指令标记的代码行</text>
+<text x="60" y="420" class="s" style="font-weight:600">milvus-docs 原文（代码不改，只给代码组加命名块）</text>
+<rect x="60" y="432" width="560" height="236" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+<rect x="66" y="540" width="548" height="48" rx="4" fill="#dbeafe"/>
+<text x="78" y="460" class="mk">&lt;!-- doc:block:start id="define-function-code" --&gt;</text>
+<text x="78" y="484" class="code">params={</text>
+<text x="78" y="508" class="code">    "provider": "openai",</text>
+<text x="78" y="532" class="code">    "model_name": "text-embedding-3-small",</text>
+<text x="78" y="556" class="code">    # Optional parameters:</text>
+<text x="78" y="580" class="code">    # "credential": "apikey_dev",</text>
+<text x="78" y="604" class="code">    # "dim": "1536",</text>
+<text x="78" y="628" class="code">}</text>
+<text x="78" y="652" class="mk">&lt;!-- doc:block:end id="define-function-code" --&gt;</text>
+<path class="edge" d="M340 668 V713"/>
+<text x="352" y="697" class="s">Milvus 发布</text>
+<text x="60" y="708" class="s" style="font-weight:600">Milvus 站点</text>
+<rect x="60" y="720" width="560" height="76" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="78" y="750" class="t">与原文相同，只去掉两行命名块标记</text>
+<text x="78" y="778" class="s">可选的 credential 注释照常显示</text>
+<text x="700" y="420" class="s" style="font-weight:600">zdoc 页面配置 · shared-pages/openai/page.yaml</text>
+<rect x="700" y="432" width="520" height="284" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+<rect x="706" y="588" width="508" height="48" rx="4" fill="#dbeafe"/>
+<rect x="706" y="684" width="508" height="24" rx="4" fill="#dcfce7"/>
+<text x="718" y="460" class="code">- operation: replace</text>
+<text x="718" y="484" class="code">  target:</text>
+<text x="718" y="508" class="code">    module: openai</text>
+<text x="718" y="532" class="code">    block: define-function-code</text>
+<text x="718" y="556" class="code">    language: python</text>
+<text x="718" y="580" class="code">    lines: |</text>
+<text x="718" y="604" class="code">      # Optional parameters:</text>
+<text x="718" y="628" class="code">      # "credential": "apikey_dev",</text>
+<text x="718" y="652" class="code">  content:</text>
+<text x="718" y="676" class="code">    lines: |</text>
+<text x="718" y="700" class="code">      "integration_id": "YOUR_INTEGRATION_ID",</text>
+<path class="edge" d="M960 716 V777"/>
+<text x="972" y="752" class="s">按规则替换</text>
+<path class="edge" d="M620 600 H660 V868 H693"/>
+<text x="650" y="892" class="s" style="text-anchor:end">Cloud 生成</text>
+<text x="700" y="772" class="s" style="font-weight:600">Cloud 站点</text>
+<rect x="700" y="784" width="520" height="164" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+<rect x="706" y="866" width="508" height="24" rx="4" fill="#dcfce7"/>
+<text x="718" y="812" class="code">params={</text>
+<text x="718" y="836" class="code">    "provider": "openai",</text>
+<text x="718" y="860" class="code">    "model_name": "text-embedding-3-small",</text>
+<text x="718" y="884" class="code">    "integration_id": "YOUR_INTEGRATION_ID",</text>
+<text x="718" y="908" class="code">    # "dim": "1536",</text>
+<text x="718" y="932" class="code">}</text>
+<text x="60" y="984" class="t">原文只多一对中性的命名块标记；Cloud 的改法写在 zdoc，按原文中连续的整行定位。</text>
+<text x="60" y="1014" class="s">只在指定的代码组和语言内匹配，恰好出现一次，最多 5 行；新行沿用原行缩进。上游改了这几行时匹配失败，升级 PR 被拦下。</text>
+<rect x="40" y="1056" width="16" height="16" rx="3" fill="#fefce8" stroke="#ca8a04"/><text x="64" y="1070" class="s">来自共享原文</text>
+<rect x="190" y="1056" width="16" height="16" rx="3" fill="#ffedd5" stroke="#c2410c"/><text x="214" y="1070" class="s">两端整节不同，Cloud 用内容文件替换</text>
+<rect x="500" y="1056" width="16" height="16" rx="3" fill="#dbeafe"/><text x="524" y="1070" class="s">被替换的原文代码行</text>
+<rect x="690" y="1056" width="16" height="16" rx="3" fill="#dcfce7"/><text x="714" y="1070" class="s">Cloud 的新行</text>
 </svg>

@@ -12,13 +12,13 @@
 三条设计原则：
 
 - **一个编辑源。** 共享原文只在 milvus-docs 维护；Cloud 从 md2md 处理前的固定 commit 读取，不从 web-content 或站点 HTML 反推。
-- **差异放在 zdoc。** Cloud 的章节与段落差异写在 zdoc 的 overlay（页面配置、变量、Cloud 内容文件）中，原文只提供中性的命名块。唯一例外是代码行级的产品差异（[第 2.3 节](#23-代码行产品指令)）。
+- **差异放在 zdoc。** Cloud 的章节与段落差异写在 zdoc 的 overlay（页面配置、变量、Cloud 内容文件）中，原文只提供中性的命名块，代码行级的差异也写在 zdoc（[第 2.3 节](#23-代码行差异)）。
 - **新增只在前端。** 新增工作是 zdoc 的共享获取与生成，以及 md2md 的预处理入口；校验、过滤、翻译与发布沿用 zdoc 现有流程，只扩展 Git 输入。不新增在线 registry、内容包分发服务或另一条发布队列。
 
 | 仓库 | 负责什么 | 首期改动 |
 |---|---|---|
-| [milvus-docs](https://github.com/milvus-io/milvus-docs) | 共享原文、命名块、默认变量、代码行产品指令 | 加变量、命名块与指令；更新贡献说明 |
-| [md2md](https://github.com/zilliztech/md2md) | 变量与片段 include 的展开 | 新增只做预处理的入口；新增产品行过滤与命名块清理，供 Milvus 发布使用 |
+| [milvus-docs](https://github.com/milvus-io/milvus-docs) | 共享原文、命名块、默认变量 | 加变量与命名块；更新贡献说明 |
+| [md2md](https://github.com/zilliztech/md2md) | 变量与片段 include 的展开 | 新增只做预处理的入口；新增命名块标记清理，供 Milvus 发布使用 |
 | [zdoc](https://github.com/zilliztech/zdoc) | Cloud overlay、页面生成、升级 PR、发布 | 新增共享获取与生成；扩展来源、通道与发布接入 |
 | [web-content](https://github.com/milvus-io/web-content) → [milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布；SDK Reference 原文 | 不变，只做回归验证 |
 
@@ -28,7 +28,7 @@
 
 ## 2. 页面生成
 
-![Cloud 页面生成流水线：①按 lock 中的 commit 获取 milvus-docs 原文；②定位命名块与代码组并生成 registry；③按页面配置执行 add、replace、remove 并包裹 NextChannel；④调用 md2md 预处理入口展开变量与片段；⑤用 zdoc 现有过滤器处理产品行指令，只保留 zilliz 行；⑥站点适配并输出 MDX。下方对照 Milvus 侧：md2md 用 Milvus 变量展开，只保留 milvus 行并清除命名块标记。](./assets/generation-pipeline.png)
+![Cloud 页面生成流水线：①按 lock 中的 commit 获取 milvus-docs 原文；②定位命名块与代码组并生成 registry；③按页面配置对命名块、语言示例或连续的代码行执行 add、replace、remove，并包裹 NextChannel；④调用 md2md 预处理入口展开变量与片段；⑤沿用 zdoc 现有的产品过滤，只处理 Cloud 内容中的指令；⑥站点适配并输出 MDX。下方对照 Milvus 侧：md2md 用 Milvus 变量展开并清除命名块标记。](./assets/generation-pipeline.png)
 
 图 2 · Cloud 页面生成流水线
 - **顺序是约束，不是实现细节。** 命名块必须在变量展开之前定位，因为标记只存在于原文中；Cloud 内容文件在第 3 步插入后，与原文一起在第 4 步展开变量。本地原型也按这个顺序实现。
@@ -51,7 +51,7 @@
 
 ### 2.2 差异与变量
 
-页面配置对命名块只做三种动作：`add`（在块前后或代码组中增加）、`replace`、`remove`，另可把命名块包进 `<NextChannel>`（第 4 节）。动作写法和冲突规则见[消费配置草案](./consumption-schema.md)。
+页面配置只做三种动作：`add`、`replace`、`remove`。目标可以是一个命名块、代码组中的一个语言示例，或语言示例中连续的几行（第 2.3 节）。另可把命名块包进 `<NextChannel>`（第 4 节）。动作写法和冲突规则见[消费配置草案](./consumption-schema.md)。
 
 变量沿用 md2md 的 `Variables.json` 与 `{{var.xxx}}`：
 
@@ -60,24 +60,34 @@
 - 变量只放小粒度的值，不放整行代码。缺少 Cloud 绑定时失败，不静默使用 Milvus 的值。
 - 接入时核实 md2md 原有的目录与页面作用域，保持旧入口兼容；新约定使用显式根目录，首期不引入多层隐式继承。
 
-### 2.3 代码行产品指令
+### 2.3 代码行差异
 
-同一段代码中只有个别行因产品而不同时，例如 embedding 函数参数中 Milvus 的 `credential` 与 Cloud 的 `integration_id`，在共享原文中沿用 zdoc 的[代码变体语法](https://github.com/zilliztech/zdoc/blob/dev/packages/docs-tooling/src/lark/CODE_VARIANTS.md)。示意见方案总览图 5。
+同一段代码中只有个别行因产品而不同时，例如 embedding 函数参数中 Milvus 的可选 `credential` 注释与 Cloud 必填的 `integration_id`，原文的代码不改，只给代码组加命名块；zdoc 在页面配置中按原文里连续的整行定位并修改。示意见方案总览图 5。
 
-```python
-    # include-next-line zilliz
-    "integration_id": "YOUR_INTEGRATION_ID",
-    # include-next-line milvus
-    # "credential": "apikey_dev",
+```yaml
+- operation: replace
+  target:
+    module: openai
+    block: define-function-code
+    language: python
+    lines: |
+      # Optional parameters:
+      # "credential": "apikey_dev",
+  content:
+    lines: |
+      "integration_id": "YOUR_INTEGRATION_ID",
 ```
 
-- 只用于代码块内的整行；段落和章节差异仍用命名块与 Cloud 内容文件。
-- 只删除整行，不插入代码，因此不涉及缩进处理。
-- Cloud 侧复用 zdoc 现有过滤器处理 Git 输入；Milvus 侧在 md2md 中新增同语法的过滤，Milvus 站点不得出现 `zilliz` 行或指令行。
-- 语法错误、未闭合区域和未知目标直接失败。
-- 一段代码中被指令控制的行过多时，改为由 zdoc 替换整个语言项，不在原文中堆叠条件。
+- **定位规则。** 只在已经定位的代码组和语言示例内查找；`lines` 是一行或连续的几行，比较时忽略行首缩进和行尾空格，其余必须完全一致，并且恰好出现一次。最多 5 行。
+- **三种动作照旧。** `replace` 换掉这几行，`remove` 删掉，`add` 配合 `position: before | after` 在这几行前后插入。
+- **缩进。** 新内容以被定位的第一行的缩进为基准，保留各行之间的相对缩进。
+- **失败关闭。** 匹配不到、出现多次、超过上限或目标语言不存在，都直接失败。上游改了被定位的行时，引用它的页面不能升级，旧版本继续有效。
+- **超出范围就替换整个语言示例。** 一段代码中有多处不同，或连续超过 5 行，改为替换该语言示例（`language` 级）。
 
-不采用代码子区域替换：它需要在源代码中标记区域、在插入点处理缩进，并为每种语言维护替换内容，成本高于行级指令。
+原文中不写任何产品指令，Milvus 侧也不需要新增产品过滤；md2md 只清除命名块标记。不采用以下做法：
+
+- **在原文中写 zdoc 产品行指令**（`include-next-line zilliz|milvus`）：Cloud 的代码会进入 Milvus 原文，Milvus 作者修改代码时要同时照顾 Cloud 的行，Milvus 发布链还要新增一套与 zdoc 理解一致的过滤。
+- **在代码中加区域标记再替换**：标记要按每种语言写成注释，在代码内部清理，替换时还要按标记位置处理缩进。
 
 ### 2.4 页面类型
 
@@ -105,16 +115,17 @@
 | 移动块或修改标题，ID 不变 | 身份保持，检查内容和上下文变化 |
 | 块改名或删除 | 引用它的页面不能升级，旧版本继续有效，需要显式迁移 |
 | 被 Cloud 替换的原文发生变化 | 即使 Cloud 输出不变，也提示复核 |
+| 被 Cloud 按行定位的代码行被修改 | 匹配失败，引用它的页面不能升级，旧版本继续有效 |
 | 类型、上下文或语言变化 | 检查兼容性，不静默组装 |
 | 只新增标记，正文未变 | 更新身份与依赖，不触发重译 |
 
-影响报告按页汇总：代码组报告完整代码组的上下文，Markdown 块报告页面上下文，代码行指令的变化按所在代码组报告。摘要只能发现变化，不能判断语义是否一致，首期提示可以保守。
+影响报告按页汇总：代码组报告完整代码组的上下文，Markdown 块报告页面上下文，按行定位的规则随所在代码组报告。摘要只能发现变化，不能判断语义是否一致，首期提示可以保守。
 
 ## 4. 发布通道与内容过滤
 
 zdoc 已有两套互不干扰的过滤，共享内容直接复用：
 
-- **产品过滤**（zilliz、saas、paas、milvus 等目标）在 Fetch 阶段执行。对共享内容，它处理第 2.3 节的代码行指令，处理对象从飞书输入扩展到 Git 输入。
+- **产品过滤**（zilliz、saas、paas、milvus 等目标）在 Fetch 阶段执行。共享原文不写产品指令；Cloud 内容文件迁入 Git 后仍可使用现有指令，处理对象从飞书输入扩展到 Git 输入。
 - **发布通道**（Current / Next）在渲染阶段执行：UAT 与 Prod 使用同一镜像，部署时注入通道，按通道显示内容。
 
 | 需要只在 Next 显示的内容 | 写在哪里 |

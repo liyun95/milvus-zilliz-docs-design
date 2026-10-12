@@ -226,6 +226,107 @@ class ExampleChecks(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'MISSING_LANGUAGE'):
             self.with_rules(rules)
 
+    def line_rule(self, operation, lines, language='python', content=None, position=None):
+        target = {'module': 'filtered-search', 'block': 'standard-filtering-code', 'language': language, 'lines': lines}
+        rule = {'operation': operation, 'target': target}
+        if content is not None:
+            rule['content'] = {'lines': content}
+        if position is not None:
+            rule['position'] = position
+        return rule
+
+    def standard_tab(self, result, language):
+        start = result.index(f'<TabItem value="{language}">')
+        return result[start:result.index('</TabItem>', start)]
+
+    def test_replace_consecutive_lines_keeps_indentation(self):
+        rule = self.line_rule('replace', 'filter=\'color like "red%" and likes > 50\',\noutput_fields=["color", "likes"]\n',
+                              content='filter=build_filter(\n    "red%",\n),\noutput_fields=["color"]\n')
+        python = self.standard_tab(self.with_rules([rule]), 'python')
+        self.assertIn('    limit=5,\n    # highlight-start\n    filter=build_filter(\n        "red%",\n    ),\n'
+                      '    output_fields=["color"]\n    # highlight-end\n', python)
+        self.assertNotIn('likes > 50', python)
+
+    def test_match_ignores_indentation_and_trailing_spaces(self):
+        rule = self.line_rule('replace', 'limit=5,   \n', content='limit=10,')
+        python = self.standard_tab(self.with_rules([rule]), 'python')
+        self.assertIn('\n    limit=10,\n', python)
+
+    def test_add_lines_before_and_after_an_anchor(self):
+        after = self.line_rule('add', '.topK(5)', language='java', position='after',
+                               content='.consistencyLevel(ConsistencyLevel.STRONG)')
+        before = self.line_rule('add', '.topK(5)', language='java', position='before', content='// Cloud only')
+        java = self.standard_tab(self.with_rules([after, before]), 'java')
+        self.assertIn('        // Cloud only\n        .topK(5)\n        .consistencyLevel(ConsistencyLevel.STRONG)\n', java)
+
+    def test_repeated_insertions_and_adjacent_replace_keep_order(self):
+        rules = [self.line_rule('add', 'limit=5,', position='after', content='a=1,'),
+                 self.line_rule('add', 'limit=5,', position='after', content='b=2,'),
+                 self.line_rule('replace', '# highlight-start', content='c=3,')]
+        python = self.standard_tab(self.with_rules(rules), 'python')
+        self.assertIn('    limit=5,\n    a=1,\n    b=2,\n    c=3,\n    filter=', python)
+
+    def test_remove_lines_leaves_no_blank_line(self):
+        python = self.standard_tab(self.with_rules([self.line_rule('remove', '# highlight-end')]), 'python')
+        self.assertIn('    output_fields=["color", "likes"]\n)\n', python)
+        self.assertNotIn('highlight-end', python)
+
+    def test_line_rules_only_touch_their_language_and_group(self):
+        result = self.with_rules([self.line_rule('replace', 'limit=5,', content='limit=10,')])
+        self.assertIn('limit=10,', self.standard_tab(result, 'python'))
+        iterative = result[result.index('<Tabs ', result.index('</Tabs>')):]
+        self.assertNotIn('limit=10,', iterative)
+        milvus = build.products()['milvus-filtered-search.md']
+        self.assertNotIn('limit=10,', milvus)
+
+    def test_upstream_edit_to_matched_lines_blocks_the_build(self):
+        rule = self.line_rule('replace', 'limit=5,', content='limit=10,')
+        page = copy.deepcopy(self.page)
+        page['transforms'] = [rule]
+        changed = self.source.replace('    limit=5,\n', '    limit=6,\n', 1)
+        with self.assertRaisesRegex(ValueError, 'LINES_NOT_FOUND'):
+            self.compose(source=changed, page=page)
+
+    def test_line_rule_records_matched_position(self):
+        page = copy.deepcopy(self.page)
+        page['transforms'] = [self.line_rule('replace', 'limit=5,', content='limit=10,')]
+        consumed = self.compose(page=page)[2]
+        self.assertEqual(consumed[0]['matched_lines'], [13, 13])
+        self.assertIn('content_digest', consumed[0])
+
+    def test_invalid_line_rules_fail(self):
+        cases = [
+            (self.line_rule('replace', 'limit=7,', content='x'), 'LINES_NOT_FOUND'),
+            (self.line_rule('remove', ')'), 'LINES_NOT_UNIQUE'),
+            (self.line_rule('remove', 'a\nb\nc\nd\ne\nf'), 'LINES_TOO_LONG'),
+            (self.line_rule('remove', 'limit=5,\n\n# highlight-start'), 'INVALID_LINES'),
+            (self.line_rule('replace', 'limit=5,'), 'CONTENT_LINES_REQUIRED'),
+            ({**self.line_rule('replace', 'limit=5,'), 'content': {'file': 'x.md'}}, 'CONTENT_LINES_REQUIRED'),
+            (self.line_rule('replace', 'limit=5,', content='```python'), 'INVALID_CONTENT_LINES'),
+            (self.line_rule('add', 'limit=5,', content='x'), 'ADD_POSITION_REQUIRED'),
+            (self.line_rule('replace', 'limit=5,', content='x', position='after'), 'UNEXPECTED_POSITION'),
+            (self.line_rule('remove', 'echo', language='shell'), 'MISSING_LANGUAGE'),
+        ]
+        no_language = self.line_rule('remove', 'limit=5,')
+        del no_language['target']['language']
+        cases.append((no_language, 'LINES_REQUIRE_LANGUAGE'))
+        for rule, error in cases:
+            with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
+                self.with_rules([rule])
+
+    def test_line_rules_conflicting_with_each_other_or_the_language_fail(self):
+        overlap = [self.line_rule('replace', 'limit=5,\n# highlight-start', content='x'),
+                   self.line_rule('remove', '# highlight-start')]
+        anchor_removed = [self.line_rule('remove', 'limit=5,'),
+                          self.line_rule('add', 'limit=5,', position='after', content='x')]
+        language_level = [self.line_rule('remove', 'limit=5,'),
+                          {'operation': 'replace', 'content': {'file': 'example.md'},
+                           'target': {'module': 'filtered-search', 'block': 'standard-filtering-code', 'language': 'python'}}]
+        for rules, error in [(overlap, 'OVERLAPPING_LINE_TARGETS'), (anchor_removed, 'OVERLAPPING_LINE_TARGETS'),
+                             (language_level, 'LINE_LANGUAGE_CONFLICT')]:
+            with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
+                self.with_rules(rules, {'example.md': '```python\nprint(1)\n```\n'})
+
     def test_schema_version_and_unknown_fields_fail_explicitly(self):
         for version in [None, 0, 2, 3, '1']:
             page = copy.deepcopy(self.page)
