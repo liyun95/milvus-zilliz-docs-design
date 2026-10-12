@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="384" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+<title id="title">一个共享页面涉及哪些文件</title>
+<desc id="desc">以 OpenAI 页为例，文件名为草案。milvus-docs 中有两类文件：每页一份的共享原文，包含正文、变量、命名块和代码行指令；共用的 Milvus 默认变量。zdoc 中有五类文件：共用注册文件，每篇加一行；每页一份的页面配置，说明引用哪篇、做哪些变换以及标题和路由；按需提供的差异片段；共用的 Cloud 变量；工程维护的语言 Tabs 规则。生成的 Cloud 页面中，标题、导航与路由来自页面配置；正文来自共享原文并绑定 Cloud 变量；Before you start 一节来自片段，由页面配置的 replace 指定；代码 Tabs 来自共享原文的代码，经产品行过滤后按 Tabs 规则生成。写作者通常只改共享原文、页面配置和片段。</desc>
+<defs><style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.grp{font-size:18px;font-weight:600;}.file{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;fill:#1f2937;}.d{font-size:14px;fill:#64748b;}.num{font-size:14px;font-weight:600;fill:#ffffff;text-anchor:middle;}.chip{font-size:13px;font-weight:600;text-anchor:middle;}.sec{font-size:17px;font-weight:600;}.from{font-size:14px;fill:#475569;}.note{font-size:15px;fill:#475569;}</style></defs>
+<rect width="1280" height="640" fill="#ffffff"/>
+
+<text x="40" y="28" class="d" style="font-weight:600">作者维护的文件（以 OpenAI 页为例，文件名为草案）</text>
+<text x="770" y="28" class="d" style="font-weight:600">生成的 Cloud 页面</text>
+
+<rect x="40" y="40" width="640" height="150" rx="12" fill="#ffffff" stroke="#b45309"/>
+<text x="60" y="68" class="grp">milvus-docs</text>
+<g>
+<circle cx="74" cy="100" r="12" fill="#b45309"/><text x="74" y="105" class="num">1</text>
+<text x="96" y="98" class="file">site/en/userGuide/…/openai.md</text>
+<text x="96" y="120" class="d">共享原文：正文、变量、命名块、代码行指令</text>
+<rect x="584" y="88" width="80" height="24" rx="12" fill="#fef3c7" stroke="#b45309"/><text x="624" y="105" class="chip" style="fill:#92400e">每页一份</text>
+</g>
+<g>
+<circle cx="74" cy="152" r="12" fill="#b45309"/><text x="74" y="157" class="num">2</text>
+<text x="96" y="150" class="file">site/en/Variables.json</text>
+<text x="96" y="172" class="d">Milvus 的默认值</text>
+<rect x="584" y="140" width="80" height="24" rx="12" fill="#f1f5f9" stroke="#94a3b8"/><text x="624" y="157" class="chip" style="fill:#475569">共用</text>
+</g>
+
+<rect x="40" y="206" width="640" height="320" rx="12" fill="#ffffff" stroke="#6d28d9"/>
+<text x="60" y="234" class="grp">zdoc（overlay）</text>
+<g>
+<circle cx="74" cy="266" r="12" fill="#6d28d9"/><text x="74" y="271" class="num">3</text>
+<text x="96" y="264" class="file">shared/modules.yaml</text>
+<text x="96" y="286" class="d">登记要读取的源文件</text>
+<rect x="584" y="254" width="80" height="24" rx="12" fill="#f1f5f9" stroke="#94a3b8"/><text x="624" y="271" class="chip" style="fill:#475569">每篇一行</text>
+</g>
+<g>
+<circle cx="74" cy="318" r="12" fill="#6d28d9"/><text x="74" y="323" class="num">4</text>
+<text x="96" y="316" class="file">openai.page.yaml</text>
+<text x="96" y="338" class="d">引用哪篇、做哪些变换；标题、导航与路由</text>
+<rect x="584" y="306" width="80" height="24" rx="12" fill="#fef3c7" stroke="#b45309"/><text x="624" y="323" class="chip" style="fill:#92400e">每页一份</text>
+</g>
+<g>
+<circle cx="74" cy="370" r="12" fill="#6d28d9"/><text x="74" y="375" class="num">5</text>
+<text x="96" y="368" class="file">fragments/openai/before-you-start.md</text>
+<text x="96" y="390" class="d">Cloud 用来替换或新增的内容</text>
+<rect x="584" y="358" width="80" height="24" rx="12" fill="#fef3c7" stroke="#b45309"/><text x="624" y="375" class="chip" style="fill:#92400e">按需</text>
+</g>
+<g>
+<circle cx="74" cy="422" r="12" fill="#6d28d9"/><text x="74" y="427" class="num">6</text>
+<text x="96" y="420" class="file">Variables.json</text>
+<text x="96" y="442" class="d">Cloud 的产品值</text>
+<rect x="584" y="410" width="80" height="24" rx="12" fill="#f1f5f9" stroke="#94a3b8"/><text x="624" y="427" class="chip" style="fill:#475569">共用</text>
+</g>
+<g>
+<circle cx="74" cy="474" r="12" fill="#6d28d9"/><text x="74" y="479" class="num">7</text>
+<text x="96" y="472" class="file">presentation/cloud-sdk-tabs.yaml</text>
+<text x="96" y="494" class="d">多语言 Tabs 的顺序与必选语言</text>
+<rect x="584" y="462" width="80" height="24" rx="12" fill="#f1f5f9" stroke="#94a3b8"/><text x="624" y="479" class="chip" style="fill:#475569">工程维护</text>
+</g>
+
+<path d="M700 280 H740" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 4"/>
+<path d="M732 272 L742 280 L732 288" fill="none" stroke="#94a3b8" stroke-width="2"/>
+
+<rect x="760" y="40" width="480" height="486" rx="12" fill="#ffffff" stroke="#64748b"/>
+<rect x="780" y="58" width="440" height="72" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="796" y="86" class="sec">front matter</text>
+<text x="796" y="112" class="from">标题、导航、路由 ← ④</text>
+
+<rect x="780" y="144" width="440" height="88" rx="8" fill="#fefce8" stroke="#ca8a04"/>
+<text x="796" y="172" class="sec">OpenAI · Model choices</text>
+<text x="796" y="198" class="from">正文 ← ①，产品名绑定 ⑥</text>
+<text x="796" y="220" class="from" style="fill:#94a3b8">“… with Zilliz Cloud”</text>
+
+<rect x="780" y="246" width="440" height="88" rx="8" fill="#ffedd5" stroke="#c2410c"/>
+<text x="796" y="274" class="sec">Before you start</text>
+<text x="796" y="300" class="from">内容 ← ⑤</text>
+<text x="796" y="322" class="from">由 ④ 中的 replace 指定替换 ① 的哪一节</text>
+
+<rect x="780" y="348" width="440" height="160" rx="8" fill="#fefce8" stroke="#ca8a04"/>
+<text x="796" y="376" class="sec">Define the text embedding function</text>
+<text x="796" y="402" class="from">代码 ← ① 中的各语言代码</text>
+<text x="796" y="426" class="from">经产品行过滤，只保留 zilliz 行</text>
+<text x="796" y="450" class="from">按 ⑦ 生成多语言 Tabs</text>
+<rect x="796" y="466" width="300" height="26" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="808" y="484" class="from" style="font-size:13px">Python | Java | NodeJS | Go | cURL | C++</text>
+
+<text x="40" y="572" class="note">写作者日常只改 ①、④、⑤：共同内容改 ①，Cloud 的差异改 ④ 和 ⑤。</text>
+<text x="40" y="600" class="note">②、⑥ 是共用变量，新增变量时才改；③ 每接入一篇加一行；⑦ 由工程维护者统一调整。</text>
+</svg>
