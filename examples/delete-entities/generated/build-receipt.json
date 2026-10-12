@@ -3,14 +3,14 @@
   "source_commit": null,
   "inputs": {
     "zdoc/shared/modules.yaml": "sha256:cfd5334bad76d5f6ed81dff5bb56348327cdf05c2c58cc4c5a1e9e2701e35b00",
-    "zdoc/delete-entities.page.yaml": "sha256:5cbcb328c59bec7e5e5abe1f109ceeabe3526bd580c6fafc6f097abfc51414b4",
+    "zdoc/shared-pages/delete-entities/page.yaml": "sha256:5cbcb328c59bec7e5e5abe1f109ceeabe3526bd580c6fafc6f097abfc51414b4",
     "milvus-docs/site/en/userGuide/insert-and-delete/delete-entities.md": "sha256:de5b46272b83a8af29fb6381381749aa55c134bfefbf89be9e39dca913016b7a",
     "zdoc/presentation/cloud-sdk-tabs.yaml": "sha256:13c4ad99f54d346b224cd4d1c14a533f02a399cee11aed8eb28513e3630251a6",
-    "evidence/provenance.json": "sha256:a1947a7e8aa35bbcaef871c722229d70d46cbc45b62118ba1b691108c163bb8e",
+    "evidence/provenance.json": "sha256:2fda07ac005a3a4bd0e0220a239ad350261daf75dcf143da380f69fb3524e26f",
     "milvus-docs/site/en/Variables.json": "sha256:b3493df97acaeea3a456db17ad7ba5bff94bf453959395bc3d9a3955b4662141",
     "zdoc/Variables.json": "sha256:89c366830c25259403c930778d1c3a862995d05be8501702d8a8824451f14ef5"
   },
-  "builder_digest": "sha256:180c02d7453e82de52d7862d6eb74b342f8e474cbca6dc8d4fc92965b997e019",
+  "builder_digest": "sha256:7625bad6a958d0ed98c02be4a0ce4c8cc487eb9e8e9c712bfd3aebe68859c931",
   "code_groups": [
     [
       "python",

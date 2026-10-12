@@ -11,16 +11,17 @@
 - **变量沿用 md2md**：`Variables.json` 与 `{{var.xxx}}`；缺少 Cloud 绑定时报错，不静默使用 Milvus 的值。
 - **代码行差异写在原文里**：沿用 zdoc 的产品行指令，不通过配置表达；段落和章节差异不在原文中写条件。
 - **生成文件不能手改**：发现问题回到对应的源文件。
-- **作者成本**：每个共享页一份页面配置，差异片段按需提供，共用规则在站点范围维护一次。
+- **作者成本**：每个共享页一份页面配置，Cloud 内容文件按需提供，共用规则在站点范围维护一次。
 
 ## 2. 一个页面涉及哪些文件
 
-![一个共享页面涉及的文件：milvus-docs 中的共享原文（每页一份）和 Milvus 默认变量（共用）；zdoc 中的注册文件（每篇一行）、页面配置（每页一份）、差异片段（按需）、Cloud 变量（共用）和 Tabs 规则（工程维护）。生成页面的 front matter 来自页面配置，正文来自共享原文并绑定 Cloud 变量，替换的一节来自片段，代码 Tabs 来自共享原文的代码，经产品行过滤后按 Tabs 规则生成。](./assets/file-relationships.png)
+![一个共享页面涉及的文件：milvus-docs 中的共享原文（每页一份）和 Milvus 默认变量（共用）；zdoc 中的注册文件（每篇一行）、页面配置（每页一份）、Cloud 内容文件（按需，与页面配置放在同一目录）、Cloud 变量（共用）和 Tabs 规则（工程维护）。生成页面的 front matter 来自页面配置，正文来自共享原文并绑定 Cloud 变量，替换的一节来自 Cloud 内容文件，代码 Tabs 来自共享原文的代码，经产品行过滤后按 Tabs 规则生成。](./assets/file-relationships.png)
 
 图 1 · 一个共享页面涉及哪些文件（以 OpenAI 页为例）
-- **日常只改三类文件**：共同内容改共享原文 ①；Cloud 的差异改页面配置 ④ 和片段 ⑤。
+- **日常只改三类文件**：共同内容改共享原文 ①；Cloud 的差异改页面配置 ④ 和 Cloud 内容文件 ⑤。一个页面的 ④ 和 ⑤ 放在同一目录 `shared-pages/<页面>/` 中。
 - **共用文件很少动**：变量 ② ⑥ 只在新增变量时改；注册文件 ③ 每接入一篇加一行；Tabs 规则 ⑦ 由工程维护者统一调整。
-- 两篇样例的实际文件：[Delete Entities](../examples/delete-entities/zdoc/delete-entities.page.yaml)（整篇复用）和 [Filtered Search](../examples/filtered-search/zdoc/filtered-search.page.yaml)（加 CLI 示例），作者操作见各自的 walkthrough。
+- **“片段”只指 milvus-docs 的片段。** milvus-docs 现有的 `site/en/fragments/` 由正文用 `{{fragments/xxx.md}}` 引用、md2md 展开，与 Cloud 内容文件是两回事。Cloud 内容文件中也可以写 `{{fragments/xxx.md}}`，路径同样指 milvus-docs 的片段。
+- 两篇样例的实际文件：[Delete Entities](../examples/delete-entities/zdoc/shared-pages/delete-entities/page.yaml)（整篇复用）和 [Filtered Search](../examples/filtered-search/zdoc/shared-pages/filtered-search/page.yaml)（加 CLI 示例），作者操作见各自的 walkthrough。
 
 ## 3. 按任务写
 
@@ -40,7 +41,7 @@ modules:
 再写一份页面配置：
 
 ```yaml
-# delete-entities.page.yaml
+# shared-pages/delete-entities/page.yaml
 schema_version: 1
 page: cloud.delete-entities
 source:
@@ -94,19 +95,20 @@ client = MilvusClient(
 <!-- doc:block:end id="before-you-start" -->
 ```
 
-再在页面配置中声明替换，Cloud 的内容写在片段文件中：
+再在页面配置中声明替换，Cloud 的内容写在同一目录的内容文件中：
 
 ```yaml
+# shared-pages/openai/page.yaml
 transforms:
   - operation: replace
     target:
       module: openai
       block: before-you-start
     content:
-      file: fragments/openai/before-you-start.md
+      file: before-you-start.md   # 即 shared-pages/openai/before-you-start.md
 ```
 
-片段提供完整的替换内容，包括这一节的标题。
+内容文件提供完整的替换内容，包括这一节的标题。
 
 ### 3.4 在一节前后增加内容
 
@@ -118,7 +120,7 @@ transforms:
       block: setup
     position: before        # 或 after
     content:
-      file: fragments/some-guide/cloud-prerequisites.md
+      file: cloud-prerequisites.md
 ```
 
 可以增加前置条件、提示、列表或带代码块的 Markdown。原文中必须有 `setup` 这个命名块，工具不会根据标题猜位置。同一块旁可以有多条 add，同一方向按列表顺序输出。
@@ -147,11 +149,11 @@ transforms:
       block: standard-filtering-code
       language: shell
     content:
-      file: fragments/filtered-search/standard-filtering-cli.md
+      file: standard-filtering-cli.md
 ```
 
 - add 时该语言必须还不存在；replace 和 remove 时必须已经存在。
-- 片段包含一个语言匹配的完整代码块。语言在 Tabs 中的顺序由 Tabs 规则决定，不在配置中写。
+- 内容文件包含一个语言匹配的完整代码块。语言在 Tabs 中的顺序由 Tabs 规则决定，不在配置中写。
 - 不再需要 Cloud 自己加的示例时，直接删掉那条 add，不要再加一条 remove。
 
 ### 3.7 代码中的个别行不同
@@ -174,7 +176,7 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 
 | 内容 | 写法 |
 |---|---|
-| Cloud 自己新增或替换的片段 | 在片段里直接用 `<NextChannel action="include">` 包住 |
+| Cloud 内容文件中新增或替换的内容 | 在文件里直接用 `<NextChannel action="include">` 包住 |
 | 整个页面 | 页面配置中的通道字段（**写法待定**，用来替代飞书多维表格中的 `Release Channel`） |
 | 共享原文中的一段 | 原文为这一段加命名块，在页面配置中声明它只在 Next 显示（**写法待定**） |
 
@@ -184,14 +186,14 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 
 工具先校验全部配置，再生成页面。以下情况直接失败，不会静默跳过：
 
-- 未知的动作、字段或 `schema_version`；目标命名块、语言或片段文件不存在。
+- 未知的动作、字段或 `schema_version`；目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外。
 - 同一个目标被多次变换；整块的 replace 或 remove 与该块的语言项变换、前后增加同时出现。
-- 在片段中再写命名块标记或手写 Tabs；试图对本轮刚插入的内容再做变换。
+- 在内容文件中再写命名块标记或手写 Tabs；试图对本轮刚插入的内容再做变换。
 - 删除了 Tabs 规则要求必须存在的语言或默认语言。
 - 缺少 Cloud 变量绑定；产品行指令语法错误或区域未闭合。
 - 生成结果被手动修改过。
 
-新增和替换的片段同样参与变量绑定和依赖记录。原文中被替换的一节发生变化时，即使 Cloud 输出不变，升级 PR 也会提示复核。
+新增和替换的内容同样参与变量绑定和依赖记录。原文中被替换的一节发生变化时，即使 Cloud 输出不变，升级 PR 也会提示复核。
 
 ## 5. 待与 zdoc 维护者确定
 
@@ -199,6 +201,7 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 |---|---|
 | 链接与图片映射 | 样例在每页配置中手工维护 `links`、`assets`，页数增多后成本线性增长；可以考虑由 registry 推导或用站点级规则 |
 | 页面元数据 | 样例的 `metadata` 与 zdoc 现有的 front matter 和导航配置重复，应挂接现有手册注册，而不是重新定义 |
+| 页面目录 | 样例为每个共享页面建一个 `shared-pages/<页面>/` 目录，放页面配置和 Cloud 内容文件；它在 zdoc 中的位置，以及是否与现有内容目录或手册注册对应 |
 | 注册文件 | `shared/modules.yaml` 让文件改名时模块 ID 不变，但多一个共用文件；试点阶段是否可以简化 |
 | lock 粒度与跟踪分支 | 每页独立采用还是全仓统一；Cloud 跟踪哪个 Milvus 版本分支 |
 | 发布通道 | 整页通道迁出飞书多维表格后放在哪里；命名块只在 Next 显示的写法；Git 页面的整页通道怎样传递到译文 |
@@ -217,10 +220,10 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 | `transforms[].operation` | `add`、`replace` 或 `remove` |
 | `transforms[].target` | `module`、`block`，可选 `language` |
 | `transforms[].position` | 只在命名块旁 add 时使用：`before` 或 `after` |
-| `transforms[].content.file` | 新增或替换内容的片段文件；remove 不提供 |
+| `transforms[].content.file` | 新增或替换内容的 Cloud 内容文件，相对于页面目录；remove 不提供 |
 
-- `variables.file`、`content.file` 和 `presentation.code_groups` 都相对于 zdoc 的消费配置根目录解析，不做递归查找或多层继承。
-- 片段统一放在 `fragments/` 下，目录名不决定动作，配置才决定。
+- 每个共享页面一个目录 `shared-pages/<页面>/`，放 `page.yaml` 和这一页的 Cloud 内容文件。`content.file` 相对于这个目录解析，不能指向目录之外；文件名不决定动作，配置才决定。
+- `variables.file` 和 `presentation.code_groups` 是站点共用文件，相对于 zdoc 的消费配置根目录解析。不做递归查找或多层继承。
 - 模块 ID 在 registry 内唯一，块 ID 在模块内唯一，语言在代码组内唯一。目标的类型由原文结构决定，不由作者指定。
 
 ## 7. 首期不支持
@@ -230,6 +233,6 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 - move、copy、嵌套变换，以及对本轮插入内容的再次变换。
 - 变量表达式、循环、条件模板，或把整段代码放进变量。
 - 用脚本动态生成内容、插件式的自定义操作、自动判断不同语言示例是否等价。
-- 独立编排多个共享片段的页面：保留为扩展路径。
+- 独立编排多个共享命名块的页面：保留为扩展路径。
 
 本地样例目前覆盖 Markdown 块和语言项的 add / replace / remove；Next 包裹、代码行指令过滤以及真实的 md2md、Docusaurus 构建仍需工程实现。验证状态见[首期实施计划](./phase-1.md#7-当前证据本地样例)。

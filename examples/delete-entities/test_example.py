@@ -14,7 +14,7 @@ import build_example as build
 
 class ExampleChecks(unittest.TestCase):
     def setUp(self):
-        self.page = build.read_yaml(build.ROOT / 'zdoc/delete-entities.page.yaml')
+        self.page = build.read_yaml(build.ROOT / 'zdoc/shared-pages/delete-entities/page.yaml')
         self.source = (build.ROOT / 'milvus-docs/site/en/userGuide/insert-and-delete/delete-entities.md').read_text()
         self.profile = build.read_yaml(build.ROOT / 'zdoc/presentation/cloud-sdk-tabs.yaml')
         self.read = lambda p: (build.ROOT / 'zdoc' / p).read_text()
@@ -65,10 +65,10 @@ class ExampleChecks(unittest.TestCase):
         self.assertEqual((build.ROOT / 'evidence/cloud.expected.mdx').read_text(),
                          build.products()['delete-entities.mdx'])
 
-    def test_whole_page_needs_no_blocks_or_fragments(self):
+    def test_whole_page_needs_no_blocks_or_cloud_content_files(self):
         self.assertNotIn('doc:block:', self.source)
         self.assertNotIn('transforms', self.page)
-        self.assertEqual(list((build.ROOT / 'zdoc/fragments').glob('**/*.md')), [])
+        self.assertEqual(sorted(p.name for p in (build.ROOT / 'zdoc/shared-pages/delete-entities').iterdir()), ['page.yaml'])
         self.assertEqual(json.loads(build.products()['registry.json'])['modules']['delete-entities']['blocks'], {})
 
     def test_missing_or_unexported_variable_fails(self):

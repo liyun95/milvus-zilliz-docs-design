@@ -3,16 +3,16 @@
   "source_commit": null,
   "inputs": {
     "zdoc/shared/modules.yaml": "sha256:f3a707766821fc9919c668fd04a82f5f8bdab87b2d94694359f9b81f25a7cbf7",
-    "zdoc/filtered-search.page.yaml": "sha256:87a861ba75e7e1b8b12e440dad23fb39bb5d9c717adf0103c6f7d68bf8ee617a",
+    "zdoc/shared-pages/filtered-search/page.yaml": "sha256:17414bdb83c0bae5cce116de9539e583845234fe317801a3b871f673f7650e4d",
     "milvus-docs/site/en/userGuide/search-query-get/filtered-search.md": "sha256:8fe97c3a5e8101866249dd8bbf017304855c62ac93ff9743053a85814a7d13e0",
     "milvus-docs/site/en/Variables.json": "sha256:85b13c6fe0e70449b9f9559cebc771de5bfd4f3cde5466044e501d39b1e4ba0b",
     "zdoc/Variables.json": "sha256:c10c4a7dd3c7ead1d173afe11511fd2578aadea134a0658d35201b5dc14b2a25",
     "zdoc/presentation/cloud-sdk-tabs.yaml": "sha256:13c4ad99f54d346b224cd4d1c14a533f02a399cee11aed8eb28513e3630251a6",
     "evidence/provenance.json": "sha256:a355f9e8abc9b32f0feabbc079b27386e3893a4e05fe6df6dcc1ea5dccb63acf",
-    "zdoc/fragments/filtered-search/standard-filtering-cli.md": "sha256:b26d31dbe5ec9301f5a4cca058815f1b4edf1b415a69a9da66ab828ea1c01dc4",
-    "zdoc/fragments/filtered-search/iterative-filtering-cli.md": "sha256:d55ed97759104aa8ea954e3e746bcd2aa73d68264800e1b8d90349366be3abf7"
+    "zdoc/shared-pages/filtered-search/standard-filtering-cli.md": "sha256:b26d31dbe5ec9301f5a4cca058815f1b4edf1b415a69a9da66ab828ea1c01dc4",
+    "zdoc/shared-pages/filtered-search/iterative-filtering-cli.md": "sha256:d55ed97759104aa8ea954e3e746bcd2aa73d68264800e1b8d90349366be3abf7"
   },
-  "builder_digest": "sha256:9cfa6ab69dfe6c62b437fd0daaccf9bd375200cd9a09c486a4c19d8ec35f4aaa",
+  "builder_digest": "sha256:314a7ba45ad02db8ef29f3b154de25698bcddc85e4082972d8fc12210321f19b",
   "transforms": [
     {
       "operation": "add",
@@ -21,8 +21,8 @@
         "block": "standard-filtering-code",
         "language": "shell"
       },
-      "file": "fragments/filtered-search/standard-filtering-cli.md",
-      "fragment_digest": "sha256:b26d31dbe5ec9301f5a4cca058815f1b4edf1b415a69a9da66ab828ea1c01dc4",
+      "file": "standard-filtering-cli.md",
+      "content_digest": "sha256:b26d31dbe5ec9301f5a4cca058815f1b4edf1b415a69a9da66ab828ea1c01dc4",
       "source_block_digest": "sha256:5bcb4c09f47b529fb829678e3294a1d85059238e91d2b4991bbb61f1bea371d5"
     },
     {
@@ -32,8 +32,8 @@
         "block": "iterative-filtering-code",
         "language": "shell"
       },
-      "file": "fragments/filtered-search/iterative-filtering-cli.md",
-      "fragment_digest": "sha256:d55ed97759104aa8ea954e3e746bcd2aa73d68264800e1b8d90349366be3abf7",
+      "file": "iterative-filtering-cli.md",
+      "content_digest": "sha256:d55ed97759104aa8ea954e3e746bcd2aa73d68264800e1b8d90349366be3abf7",
       "source_block_digest": "sha256:670d1479634dcf93d81283903fc524861dbe7b3420a2edbbd51a28845eea47b6"
     }
   ],

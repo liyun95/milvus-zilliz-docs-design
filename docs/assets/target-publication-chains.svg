@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="768" height="540" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
 <title id="title">目标工具链：zdoc 前端新增共享接入，后端沿用现有发布流程</title>
-<desc id="desc">Milvus 沿用 milvus-docs、md2md、web-content、milvus.io 的发布链，md2md 新增预处理入口和代码行过滤。zdoc 在 md2md 处理之前直接读取 milvus-docs 的固定版本原文，结合页面配置、Variables.json 和差异片段生成 Cloud 页面，这部分是新增工作。生成结果以升级 PR 审核合并后，进入 zdoc 既有的校验、过滤、Current/Next、翻译与发布流程。过渡期未迁移的飞书页继续经 Fetch 进入，Cloud 独有页后续以 Git 原文直接接入。</desc>
+<desc id="desc">Milvus 沿用 milvus-docs、md2md、web-content、milvus.io 的发布链，md2md 新增预处理入口和代码行过滤。zdoc 在 md2md 处理之前直接读取 milvus-docs 的固定版本原文，结合页面配置、Variables.json 和 Cloud 内容文件生成 Cloud 页面，这部分是新增工作。生成结果以升级 PR 审核合并后，进入 zdoc 既有的校验、过滤、Current/Next、翻译与发布流程。过渡期未迁移的飞书页继续经 Fetch 进入，Cloud 独有页后续以 Git 原文直接接入。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:20px;font-weight:600;text-anchor:middle;}.sub{font-size:17px;text-anchor:middle;fill:#64748b;}.lbl{font-size:17px;text-anchor:middle;fill:#475569;}.new{font-size:17px;font-weight:600;text-anchor:middle;fill:#c2410c;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}.weak{fill:none;stroke:#94a3b8;stroke-width:2;stroke-dasharray:6 5;marker-end:url(#arrow);}</style></defs>
 <rect width="1280" height="900" fill="#ffffff"/>
@@ -44,7 +44,7 @@
 <rect x="145" y="528" width="245" height="98" rx="10" fill="#fef3c7" stroke="#b45309"/>
 <text x="267" y="558" class="head">页面配置与变量</text><text x="267" y="588" class="sub">引用哪篇、应用哪些差异</text><text x="267" y="613" class="sub">Variables.json：产品值</text>
 <rect x="435" y="528" width="245" height="98" rx="10" fill="#fef3c7" stroke="#b45309"/>
-<text x="557" y="558" class="head">Cloud 差异片段</text><text x="557" y="588" class="sub">按需提供</text><text x="557" y="613" class="sub">替换的章节、新增的示例</text>
+<text x="557" y="558" class="head">Cloud 内容文件</text><text x="557" y="588" class="sub">按需提供</text><text x="557" y="613" class="sub">替换的章节、新增的示例</text>
 <path class="edge" d="M267 528 V492 H500 V453"/>
 <path class="edge" d="M557 528 V453"/>
 

@@ -15,12 +15,12 @@ Delete Entities 介绍按条件删除、按主键删除和从分区删除。本�
 | 位置与文件 | 本次操作 |
 |---|---|
 | Milvus：[delete-entities.md](milvus-docs/site/en/userGuide/insert-and-delete/delete-entities.md) | 将连接值写成两个变量，保留共同正文与代码 |
-| zdoc：[delete-entities.page.yaml](zdoc/delete-entities.page.yaml) | 新增本页整篇消费配置 |
+| zdoc：[shared-pages/delete-entities/page.yaml](zdoc/shared-pages/delete-entities/page.yaml) | 新增本页整篇消费配置 |
 | zdoc：[shared/modules.yaml](zdoc/shared/modules.yaml) | 增加本页源文件条目 |
 | 两端的 `Variables.json` 及注册规则中的变量导出声明 | 已有变量直接复用；首次引入时补默认值、导出声明与 Cloud 绑定 |
 | zdoc：[presentation/cloud-sdk-tabs.yaml](zdoc/presentation/cloud-sdk-tabs.yaml) | 引用站点共用展示规则，由工程维护者统一维护 |
 
-本页无需命名块或差异片段。样例中的共用配置副本用于独立演示，正式接入按站点维护一份。
+本页无需命名块或 Cloud 内容文件。样例中的共用配置副本用于独立演示，正式接入按站点维护一份。
 
 ```mermaid
 flowchart LR
@@ -77,7 +77,7 @@ modules:
 
 `delete-entities` 是模块 ID，`export_page` 允许整篇引用。`export_blocks: marked` 表示按需扫描已有标记，本页没有命名块也可以正常使用。
 
-再新增 [delete-entities.page.yaml](zdoc/delete-entities.page.yaml)：
+再新增 [shared-pages/delete-entities/page.yaml](zdoc/shared-pages/delete-entities/page.yaml)：
 
 ```yaml
 schema_version: 1
@@ -99,7 +99,7 @@ links:
 
 `source.module` 对应刚登记的模块，`take: page` 读取整篇，再用 Cloud 变量绑定连接值、用共用规则生成 Tabs。正文没有局部增删替换，因此不写 `transforms`。
 
-**整篇复用指正文共享。** Cloud 仍在 `metadata` 中维护站点标题、导航与路由，在 `links` 中指定站内链接映射。文件路径相对于 zdoc 消费配置根目录解析。
+**整篇复用指正文共享。** Cloud 仍在 `metadata` 中维护站点标题、导航与路由，在 `links` 中指定站内链接映射。变量文件和 Tabs 规则的路径相对于 zdoc 消费配置根目录解析。
 
 ## 4. 检查生成的 Cloud 页面
 

@@ -1,6 +1,6 @@
 """One-time construction of the proposed writer inputs from pinned evidence.
 
-Not part of consumption: writers edit the resulting source/config/fragment files.
+Not part of consumption: writers edit the resulting source, config and Cloud content files.
 Running this script again overwrites those example inputs.
 """
 from pathlib import Path
@@ -78,7 +78,7 @@ def main():
                     'Cloud Rust/C++ examples proposed as shared content, compatibility pending',
                     'All SDKs share example_token; proposed Go authentication now matches other SDK examples, runtime review pending',
                     'Go local address standardized to http://localhost:19530 (supported by ClientConfig.parse)',
-                    'Two scalar variables; zero named regions or replacement fragments'],
+                    'Two scalar variables; zero named regions or Cloud content files'],
         'go_sdk_reference': json.loads((ROOT / 'evidence/go-sdk-reference.json').read_text()),
         'sdk_execution_verified': False,
     }, indent=2) + '\n')
@@ -88,7 +88,7 @@ def main():
         'variables': {'source_file': 'site/en/Variables.json', 'exports': {key: {'type': 'text'} for key in defaults}},
         'modules': {'delete-entities': {'file': SOURCE_PATH, 'export_page': True, 'export_blocks': 'marked'}},
     }))
-    write('zdoc/delete-entities.page.yaml', '# Proposed consumption schema; executed by the local fixture builder only.\n' + dump({
+    write('zdoc/shared-pages/delete-entities/page.yaml', '# Proposed consumption schema; executed by the local fixture builder only.\n' + dump({
         'schema_version': 1, 'page': 'cloud.delete-entities',
         'source': {'take': 'page', 'module': 'delete-entities'},
         'presentation': {'code_groups': 'presentation/cloud-sdk-tabs.yaml'},

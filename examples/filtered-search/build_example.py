@@ -11,6 +11,7 @@ import re
 import yaml
 
 ROOT = Path(__file__).resolve().parent
+PAGE = 'zdoc/shared-pages/filtered-search'
 FENCE = re.compile(r'^```([^\n]+)\n(.*?)^```[ \t]*(?:\n|$)', re.M | re.S)
 VAR = re.compile(r'{{var\.([a-z][a-z0-9_]*)}}')
 START = re.compile(r'^<!-- doc:block:start id="([a-z][a-z0-9-]*)" -->\n', re.M)
@@ -165,7 +166,7 @@ def transform_rules(page, blocks):
     return rules
 
 
-def compose(source, page, profile, values, exports, read_fragment):
+def compose(source, page, profile, values, exports, read_content):
     blocks = scan(source)
     rules = transform_rules(page, blocks)
     states = {bid: {'kind': block['kind'], 'codes': dict(block['codes']), 'body': block['content'],
@@ -175,32 +176,32 @@ def compose(source, page, profile, values, exports, read_fragment):
         target = rule['target']
         bid, lang, op = target['block'], target.get('language'), rule['operation']
         state = states[bid]
-        fragment = None
+        insert = None
         if op != 'remove':
-            fragment = read_fragment(rule['content']['file'])
-            if not fragment.strip() or 'doc:block:' in fragment or '<Tabs' in fragment or '<TabItem' in fragment:
-                raise ValueError('INVALID_FRAGMENT')
+            insert = read_content(rule['content']['file'])
+            if not insert.strip() or 'doc:block:' in insert or '<Tabs' in insert or '<TabItem' in insert:
+                raise ValueError('INVALID_CONTENT_FILE')
         if lang is not None:
             if op == 'remove':
                 del state['codes'][lang]
             else:
-                fence = FENCE.fullmatch(fragment.strip() + '\n')
+                fence = FENCE.fullmatch(insert.strip() + '\n')
                 if not fence or fence[1] != lang or '```' in fence[2] or not fence[2].strip():
-                    raise ValueError('INVALID_LANGUAGE_FRAGMENT')
+                    raise ValueError('INVALID_LANGUAGE_CONTENT')
                 state['codes'][lang] = fence[2].rstrip('\n')
         elif op == 'add':
-            if 'multipleCode' in fragment:
+            if 'multipleCode' in insert:
                 raise ValueError('INSERTED_CODE_GROUP_NOT_SUPPORTED')
-            state[rule['position']].append(fragment.strip() + '\n\n')
+            state[rule['position']].append(insert.strip() + '\n\n')
         elif op == 'remove':
             state['removed'] = True
         else:
-            state['kind'] = 'code-group' if NAV.match(fragment) else 'markdown'
-            state['body'] = fragment
-            state['codes'] = code_group(fragment) if state['kind'] == 'code-group' else {}
+            state['kind'] = 'code-group' if NAV.match(insert) else 'markdown'
+            state['body'] = insert
+            state['codes'] = code_group(insert) if state['kind'] == 'code-group' else {}
         consumed.append({'operation': op, 'target': target,
                          **({'position': rule['position']} if 'position' in rule else {}),
-                         **({'file': rule['content']['file'], 'fragment_digest': sha(fragment)} if fragment is not None else {}),
+                         **({'file': rule['content']['file'], 'content_digest': sha(insert)} if insert is not None else {}),
                          'source_block_digest': blocks[bid]['digest']})
     result = source
     for bid, block in sorted(blocks.items(), key=lambda item: item[1]['start'], reverse=True):
@@ -217,6 +218,15 @@ def compose(source, page, profile, values, exports, read_fragment):
     if 'multipleCode' in result or 'doc:block:' in result:
         raise ValueError('UNCONSUMED_CODE_GROUP')
     return result, blocks, consumed
+
+
+def content_path(file):
+    """Cloud content files live next to the page config and resolve only inside that directory."""
+    page_dir = (ROOT / PAGE).resolve()
+    path = (page_dir / file).resolve()
+    if not path.is_relative_to(page_dir):
+        raise ValueError('CONTENT_OUTSIDE_PAGE_DIR')
+    return path
 
 
 def split_frontmatter(text):
@@ -238,7 +248,7 @@ def products():
     reg = yaml.safe_load(read(ROOT / 'zdoc/shared/modules.yaml'))
     if reg.get('schema_version') != 1:
         raise ValueError('UNSUPPORTED_SCHEMA_VERSION')
-    page = yaml.safe_load(read(ROOT / 'zdoc/filtered-search.page.yaml'))
+    page = yaml.safe_load(read(ROOT / PAGE / 'page.yaml'))
     if page['source'] != {'take': 'page', 'module': 'filtered-search'}:
         raise ValueError('UNSUPPORTED_SOURCE')
     module = reg['modules']['filtered-search']
@@ -248,7 +258,7 @@ def products():
     profile = yaml.safe_load(read(ROOT / 'zdoc' / page['presentation']['code_groups']))
     provenance = json.loads(read(ROOT / 'evidence/provenance.json'))
     result, blocks, consumed = compose(source, page, profile, values, reg['variables']['exports'],
-                                       lambda file: read(ROOT / 'zdoc' / file))
+                                       lambda file: read(content_path(file)))
     frontmatter, body = split_frontmatter(result)
     for old, new in {**page['links'], **page['assets']}.items():
         body = body.replace('](' + old + ')', '](' + new + ')')

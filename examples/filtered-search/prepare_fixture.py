@@ -38,7 +38,7 @@ def main():
     for bid, group in zip(GROUPS, groups):
         codes = dict(FENCE.findall(group))
         assert set(codes) == set(LANGS) | {'shell'}
-        write(f'zdoc/fragments/filtered-search/{bid.removesuffix("-code")}-cli.md',
+        write(f'zdoc/shared-pages/filtered-search/{bid.removesuffix("-code")}-cli.md',
               '```shell\n' + codes['shell'].rstrip() + '\n```\n')
         nav = '<div class="multipleCode">\n' + ''.join(
             f'    <a href="#{lang}">{label}</a>\n' for lang, label in zip(LANGS, LABELS)) + '</div>\n\n'
@@ -84,7 +84,7 @@ def main():
     m_images = re.findall(r'!\[[^\]]*\]\(([^)]+)\)', m)
     c_images = re.findall(r'!\[[^\]]*\]\(([^)]+)\)', c)
     assert len(m_images) == len(c_images) == 2
-    write('zdoc/filtered-search.page.yaml', '# Proposed whole-page consumption plus explicit Cloud-only tabs.\n' + dump({
+    write('zdoc/shared-pages/filtered-search/page.yaml', '# Proposed whole-page consumption plus explicit Cloud-only tabs.\n' + dump({
         'schema_version': 1, 'page': 'cloud.filtered-search',
         'source': {'take': 'page', 'module': 'filtered-search'},
         'variables': {'file': 'Variables.json'},
@@ -95,7 +95,7 @@ def main():
         'transforms': [
             {'operation': 'add',
              'target': {'module': 'filtered-search', 'block': bid, 'language': 'shell'},
-             'content': {'file': f'fragments/filtered-search/{bid.removesuffix("-code")}-cli.md'}}
+             'content': {'file': f'{bid.removesuffix("-code")}-cli.md'}}
             for bid in GROUPS],
     }))
     write('zdoc/presentation/cloud-sdk-tabs.yaml', '# Site policy: shell is optional and appears only when explicitly supplied.\n' + dump({

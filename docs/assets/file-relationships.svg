@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="768" height="384" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
 <title id="title">一个共享页面涉及哪些文件</title>
-<desc id="desc">以 OpenAI 页为例，文件名为草案。milvus-docs 中有两类文件：每页一份的共享原文，包含正文、变量、命名块和代码行指令；共用的 Milvus 默认变量。zdoc 中有五类文件：共用注册文件，每篇加一行；每页一份的页面配置，说明引用哪篇、做哪些变换以及标题和路由；按需提供的差异片段；共用的 Cloud 变量；工程维护的语言 Tabs 规则。生成的 Cloud 页面中，标题、导航与路由来自页面配置；正文来自共享原文并绑定 Cloud 变量；Before you start 一节来自片段，由页面配置的 replace 指定；代码 Tabs 来自共享原文的代码，经产品行过滤后按 Tabs 规则生成。写作者通常只改共享原文、页面配置和片段。</desc>
+<desc id="desc">以 OpenAI 页为例，文件名为草案。milvus-docs 中有两类文件：每页一份的共享原文，包含正文、变量、命名块和代码行指令；共用的 Milvus 默认变量。zdoc 中有五类文件：共用注册文件，每篇加一行；每页一份的页面配置，说明引用哪篇、做哪些变换以及标题和路由；按需提供的 Cloud 内容文件，与页面配置放在同一目录；共用的 Cloud 变量；工程维护的语言 Tabs 规则。生成的 Cloud 页面中，标题、导航与路由来自页面配置；正文来自共享原文并绑定 Cloud 变量；Before you start 一节来自 Cloud 内容文件，由页面配置的 replace 指定；代码 Tabs 来自共享原文的代码，经产品行过滤后按 Tabs 规则生成。写作者通常只改共享原文、页面配置和 Cloud 内容文件。</desc>
 <defs><style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.grp{font-size:18px;font-weight:600;}.file{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;fill:#1f2937;}.d{font-size:14px;fill:#64748b;}.num{font-size:14px;font-weight:600;fill:#ffffff;text-anchor:middle;}.chip{font-size:13px;font-weight:600;text-anchor:middle;}.sec{font-size:17px;font-weight:600;}.from{font-size:14px;fill:#475569;}.note{font-size:15px;fill:#475569;}</style></defs>
 <rect width="1280" height="640" fill="#ffffff"/>
 
@@ -32,14 +32,14 @@
 </g>
 <g>
 <circle cx="74" cy="318" r="12" fill="#6d28d9"/><text x="74" y="323" class="num">4</text>
-<text x="96" y="316" class="file">openai.page.yaml</text>
+<text x="96" y="316" class="file">shared-pages/openai/page.yaml</text>
 <text x="96" y="338" class="d">引用哪篇、做哪些变换；标题、导航与路由</text>
 <rect x="584" y="306" width="80" height="24" rx="12" fill="#fef3c7" stroke="#b45309"/><text x="624" y="323" class="chip" style="fill:#92400e">每页一份</text>
 </g>
 <g>
 <circle cx="74" cy="370" r="12" fill="#6d28d9"/><text x="74" y="375" class="num">5</text>
-<text x="96" y="368" class="file">fragments/openai/before-you-start.md</text>
-<text x="96" y="390" class="d">Cloud 用来替换或新增的内容</text>
+<text x="96" y="368" class="file">shared-pages/openai/before-you-start.md</text>
+<text x="96" y="390" class="d">Cloud 内容文件：用来替换或新增的内容</text>
 <rect x="584" y="358" width="80" height="24" rx="12" fill="#fef3c7" stroke="#b45309"/><text x="624" y="375" class="chip" style="fill:#92400e">按需</text>
 </g>
 <g>
