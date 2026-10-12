@@ -67,6 +67,10 @@
 
 ## 4. 差异怎样表达
 
+Milvus 与 Cloud 的差异分两类：内容不同（4.1），上线时间不同（4.2）。
+
+### 4.1 内容差异：写在 zdoc，原文只加命名块
+
 ![三类页面：无差异的页面整篇复用，如 Delete Entities，原文把产品值写成变量，zdoc 只需一份页面配置；有差异的页面在共享正文上叠加 Cloud 差异，如 OpenAI 与 Filtered Search，原文只加命名块，zdoc 维护页面配置与 Cloud 内容文件；Cloud 独有页在 zdoc 维护完整原文，首期不迁移。](./assets/page-types.png)
 
 图 4 · 三类页面
@@ -81,7 +85,7 @@
 - **③ 的定位范围很窄，出错时不会悄悄跳过。** 只在指定的代码组和语言内匹配，整行一致、恰好出现一次、最多 5 行，新行沿用原行缩进。上游改了这几行时匹配失败，升级 PR 被拦下，旧版本继续有效。差异更大时替换整个语言示例。
 - **不在原文中写 zdoc 的产品行指令**（`include-next-line`）。那样 Milvus 作者改代码时要照顾 Cloud 的行，Milvus 发布链也要新增一套与 zdoc 理解一致的过滤。
 
-### 4.1 Milvus 先上线、Cloud 后上线的内容
+### 4.2 上线时间差异：Prod 与 UAT 各固定一个 commit
 
 **Milvus 先改了共享页，Cloud 还没上线。** 例如，Milvus 发布小版本时，文档工程师改写了共享页 A 中 Introduction 的措辞，又新增一段介绍新参数 X。Cloud 下个月才支持 X。在此之前，Prod 应继续显示旧的 Introduction，不出现 X；UAT 则要能提前看到新内容。
 
@@ -143,7 +147,7 @@
 | 1 | 共享原文来源 | 读取 md2md 处理前的 milvus-docs 固定版本原文，不从 web-content 读取 |
 | 2 | 飞书退出方式与终态 | 按页切换；终态是共享页与 Cloud 独有页均在 Git 维护 |
 | 3 | 差异表达原则 | 段落、章节与代码行差异都写在 zdoc；原文只加中性命名块，不写产品指令 |
-| 4 | Current / Next | 沿用 zdoc 渲染时的通道过滤；共享页的 Prod 与 UAT 各固定在 milvus-docs 的一个 commit 上，差异由工具自动包进 `<NextChannel>`（第 4.1 节） |
+| 4 | Current / Next | 沿用 zdoc 渲染时的通道过滤；共享页的 Prod 与 UAT 各固定在 milvus-docs 的一个 commit 上，差异由工具自动包进 `<NextChannel>`（第 4.2 节） |
 | 5 | 试点候选 | 1a 用 Delete Entities；1b 用 Filtered Search 与 OpenAI |
 | 6 | 首期范围与年底目标 | 首期按 1a、1b 推进；建议年底前完成 1a，并启动 1b |
 | 7 | 共享内容把关 | Cloud 不审核 milvus-docs PR，在升级 PR 中把关；补充 Milvus 贡献说明 |
