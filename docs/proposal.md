@@ -54,7 +54,7 @@
 
 **终态是 Cloud 文档全部在 Git 中维护。** 首期只迁移试点页。切换前需要为文档工程师准备 Markdown、配置写法和 PR 流程的说明，预览页提供跳转到源文件的编辑入口。
 
-## 3. 工具链：在 zdoc 前端新增共享接入
+## 3. 工具链：在 zdoc 新增共享接入
 
 ![目标工具链：Milvus 侧沿用 milvus-docs → md2md → web-content → milvus.io。zdoc 从 milvus-docs 直接读取固定版本原文，结合页面配置、Variables.json 和差异片段生成 Cloud 页面，经升级 PR 采用后进入 zdoc 既有的校验、过滤、Current / Next、翻译与发布流程。过渡期未迁移的飞书页和后续迁入的 Cloud 独有页也进入同一流程。虚线框标出新增工作的范围。](./assets/target-publication-chains.png)
 
