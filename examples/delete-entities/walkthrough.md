@@ -4,7 +4,7 @@ Delete Entities 介绍按条件删除、按主键删除和从分区删除。本�
 
 **演示从整理后的拟议共享原文开始。** [本地原文](milvus-docs/site/en/userGuide/insert-and-delete/delete-entities.md)已吸收共同代码修订并补齐部分语言，尚未合入上游，仍需内容与 SDK 适用性审核。
 
-整理后，Cloud 复用整篇正文、三个章节和七种语言示例，只通过变量绑定 endpoint、token；站点标题、导航和链接由 Cloud 配置。本文没有需要替换的正文产品名；产品名与 CLI 补充的用法见 [Filtered Search](../filtered-search/walkthrough.md)。以下配置采用 [schema v1](../../docs/consumption-schema.md)，生产接入仍待实现。
+整理后，Cloud 复用整篇正文、三个章节和七种语言示例，只通过变量绑定 endpoint、token；站点标题、导航和链接由 Cloud 配置。本文没有需要替换的正文产品名；产品名与 CLI 补充的用法见 [Filtered Search](../filtered-search/walkthrough.md)。以下配置采用[消费配置草案](../../docs/consumption-schema.md)的 schema v1 样例格式，生产接入仍待实现。
 
 ## 1. 首次接入：哪些文件需要修改
 
