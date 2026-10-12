@@ -6,16 +6,16 @@
 
 ## 1. 需要对齐的约束
 
-- **只按整页或命名块定位。** 不使用行号、正则、文本搜索或标题选择器。
+- **按身份定位。** 先按整页、命名块和语言定位；只有代码行可以在已定位的语言示例内按连续整行的原文定位。不使用行号、正则、全文搜索或标题选择器。
 - **差异只有三种动作**：add、replace、remove，另可让命名块只在 Next 显示；不按业务类型增加专门的操作。
 - **变量沿用 md2md**：`Variables.json` 与 `{{var.xxx}}`；缺少 Cloud 绑定时报错，不静默使用 Milvus 的值。
-- **代码行差异写在原文里**：沿用 zdoc 的产品行指令，不通过配置表达；段落和章节差异不在原文中写条件。
+- **原文不写 Cloud 的内容**：段落、章节和代码行的差异都写在 zdoc，原文只加中性的命名块，不写产品指令或条件。
 - **生成文件不能手改**：发现问题回到对应的源文件。
 - **作者成本**：每个共享页一份页面配置，Cloud 内容文件按需提供，共用规则在站点范围维护一次。
 
 ## 2. 一个页面涉及哪些文件
 
-![一个共享页面涉及的文件：milvus-docs 中的共享原文（每页一份）和 Milvus 默认变量（共用）；zdoc 中的注册文件（每篇一行）、页面配置（每页一份）、Cloud 内容文件（按需，与页面配置放在同一目录）、Cloud 变量（共用）和 Tabs 规则（工程维护）。生成页面的 front matter 来自页面配置，正文来自共享原文并绑定 Cloud 变量，替换的一节来自 Cloud 内容文件，代码 Tabs 来自共享原文的代码，经产品行过滤后按 Tabs 规则生成。](./assets/file-relationships.png)
+![一个共享页面涉及的文件：milvus-docs 中的共享原文（每页一份）和 Milvus 默认变量（共用）；zdoc 中的注册文件（每篇一行）、页面配置（每页一份）、Cloud 内容文件（按需，与页面配置放在同一目录）、Cloud 变量（共用）和 Tabs 规则（工程维护）。生成页面的 front matter 来自页面配置，正文来自共享原文并绑定 Cloud 变量，替换的一节来自 Cloud 内容文件，代码 Tabs 来自共享原文的代码，凭证参数行按页面配置中的规则替换，再按 Tabs 规则生成。](./assets/file-relationships.png)
 
 图 1 · 一个共享页面涉及哪些文件（以 OpenAI 页为例）
 - **日常只改三类文件**：共同内容改共享原文 ①；Cloud 的差异改页面配置 ④ 和 Cloud 内容文件 ⑤。一个页面的 ④ 和 ⑤ 放在同一目录 `shared-pages/<页面>/` 中。
@@ -158,19 +158,40 @@ transforms:
 
 ### 3.7 代码中的个别行不同
 
-这种差异**不写配置**，直接在共享原文的代码中用产品行指令标记：
+共享原文的代码**不改**，只给整个代码组加命名块（写法同 3.3）。差异写在页面配置中：在 `target` 里加上 `lines`，写出原文中要处理的连续几行。下面是 OpenAI 页：Python 把两行可选的 credential 注释换成必填的 `integration_id`，Java 在 `model_name` 一行后面加一行。
 
-```python
-params={
-    "provider": "openai",
-    # include-next-line zilliz
-    "integration_id": "YOUR_INTEGRATION_ID",
-    # include-next-line milvus
-    # "credential": "apikey_dev",
-}
+```yaml
+transforms:
+  - operation: replace
+    target:
+      module: openai
+      block: define-function-code
+      language: python
+      lines: |
+        # Optional parameters:
+        # "credential": "apikey_dev",
+    content:
+      lines: |
+        "integration_id": "YOUR_INTEGRATION_ID",
+
+  - operation: add
+    position: after
+    target:
+      module: openai
+      block: define-function-code
+      language: java
+      lines: |
+        .param("model_name", "text-embedding-3-small")
+    content:
+      lines: |
+        .param("integration_id", "YOUR_INTEGRATION_ID")
 ```
 
-Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行在两边都会被删除。语法沿用 zdoc 的[代码变体规范](https://github.com/zilliztech/zdoc/blob/dev/packages/docs-tooling/src/lark/CODE_VARIANTS.md)。如果一段代码里需要标记的行很多，改为用 3.6 节替换整个语言示例。
+- `lines` 从原文直接复制。比较时忽略行首缩进和行尾空格，其余必须一致；在这个语言示例中必须恰好出现一次，最多 5 行。
+- 新内容写在 `content.lines` 中，不需要写缩进：工具以被定位的第一行的缩进为基准，保留各行之间的相对缩进。`remove` 不提供内容。
+- 定位行尽量选不常改的行。上游改了这几行时匹配失败，这一页的升级 PR 被拦下，从新原文复制后更新 `lines` 即可。
+- 一段代码中有多处不同，或连续超过 5 行，改为用 3.6 节替换整个语言示例。
+- 共享原文中不写产品指令（如 `include-next-line`），Milvus 站点上看到的就是原文的代码。
 
 ### 3.8 让内容只在 Next 显示
 
@@ -187,10 +208,11 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 工具先校验全部配置，再生成页面。以下情况直接失败，不会静默跳过：
 
 - 未知的动作、字段或 `schema_version`；目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外。
-- 同一个目标被多次变换；整块的 replace 或 remove 与该块的语言项变换、前后增加同时出现。
+- 同一个目标被多次变换；整块的 replace 或 remove 与该块的语言项变换、前后增加同时出现；语言项的 replace 或 remove 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。
 - 在内容文件中再写命名块标记或手写 Tabs；试图对本轮刚插入的内容再做变换。
 - 删除了 Tabs 规则要求必须存在的语言或默认语言。
-- 缺少 Cloud 变量绑定；产品行指令语法错误或区域未闭合。
+- 缺少 Cloud 变量绑定。
+- `lines` 在目标语言示例中找不到、出现多次或超过 5 行；`lines` 用在没有 `language` 的目标上。
 - 生成结果被手动修改过。
 
 新增和替换的内容同样参与变量绑定和依赖记录。原文中被替换的一节发生变化时，即使 Cloud 输出不变，升级 PR 也会提示复核。
@@ -218,9 +240,10 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 | `metadata` | 标题、路由、导航标签等 front matter（待与 zdoc 现有配置对齐） |
 | `links` / `assets` | 原文链接与图片到 Cloud 地址的映射（待定是否改为站点级规则） |
 | `transforms[].operation` | `add`、`replace` 或 `remove` |
-| `transforms[].target` | `module`、`block`，可选 `language` |
-| `transforms[].position` | 只在命名块旁 add 时使用：`before` 或 `after` |
+| `transforms[].target` | `module`、`block`，可选 `language`；有 `language` 时可选 `lines`（连续整行，最多 5 行） |
+| `transforms[].position` | 在命名块或代码行旁 add 时使用：`before` 或 `after` |
 | `transforms[].content.file` | 新增或替换内容的 Cloud 内容文件，相对于页面目录；remove 不提供 |
+| `transforms[].content.lines` | 目标有 `lines` 时使用：新增或替换的代码行，直接写在配置中 |
 
 - 每个共享页面一个目录 `shared-pages/<页面>/`，放 `page.yaml` 和这一页的 Cloud 内容文件。`content.file` 相对于这个目录解析，不能指向目录之外；文件名不决定动作，配置才决定。
 - `variables.file` 和 `presentation.code_groups` 是站点共用文件，相对于 zdoc 的消费配置根目录解析。不做递归查找或多层继承。
@@ -228,11 +251,12 @@ Milvus 站点只保留 `milvus` 行，Cloud 只保留 `zilliz` 行，指令行�
 
 ## 7. 首期不支持
 
-- 行号、正则、文本搜索、标题选择器，以及任意语法树路径或下标定位。
-- 代码子区域替换和任意插入代码行：行级差异用产品行指令，差异多时替换整个语言示例。
+- 行号、正则、全文搜索、标题选择器，以及任意语法树路径或下标定位。
+- 代码中的区域标记、超过 5 行或跨多处的行级修改：改为替换整个语言示例。
+- 在共享原文中写产品指令或条件。
 - move、copy、嵌套变换，以及对本轮插入内容的再次变换。
 - 变量表达式、循环、条件模板，或把整段代码放进变量。
 - 用脚本动态生成内容、插件式的自定义操作、自动判断不同语言示例是否等价。
 - 独立编排多个共享命名块的页面：保留为扩展路径。
 
-本地样例目前覆盖 Markdown 块和语言项的 add / replace / remove；Next 包裹、代码行指令过滤以及真实的 md2md、Docusaurus 构建仍需工程实现。验证状态见[首期实施计划](./phase-1.md#7-当前证据本地样例)。
+本地样例目前覆盖 Markdown 块和语言项的 add / replace / remove；代码行级的变换、Next 包裹以及真实的 md2md、Docusaurus 构建仍需工程实现。验证状态见[首期实施计划](./phase-1.md#7-当前证据本地样例)。
