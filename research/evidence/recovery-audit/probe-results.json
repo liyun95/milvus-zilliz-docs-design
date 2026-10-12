@@ -1,0 +1,50 @@
+{
+  "scope": "Git objects and synthetic local probes; no deployment or full site build",
+  "dev_sha": "96d7a73cc0ae9f3882269000eae2ac750e418386",
+  "tooling_sha": "3777ec0b322546d716485e8f88da8412b0265e71",
+  "node": "v24.18.0",
+  "tracked_counts": {
+    "content/en/": 2133,
+    "i18n/ja-JP/": 2024,
+    ".translation-cache/": 1,
+    "generated/en/": 21,
+    "packages/docs-tooling/src/lark/meta/assembly/": 1,
+    "packages/docs-tooling/src/lark/meta/snapshots/": 8
+  },
+  "openai_blobs": [
+    {
+      "path": "content/en/guides/tutorials/development/function/text-embedding-funcs/openai.md",
+      "bytes": 27001,
+      "sha256": "5f0e937cfff2c8dc9011c949056649918111ab1644fc05ea18a407bf25fce4bb"
+    },
+    {
+      "path": "i18n/ja-JP/docusaurus-plugin-content-docs/current/tutorials/development/function/text-embedding-funcs/openai.md",
+      "bytes": 28787,
+      "sha256": "4582c2b9c8fb7d6cdb8c9ecad664174ba54c8bb585c5e7b637aee535c8a95b94"
+    }
+  ],
+  "master_dev_same_blob": {
+    "deploy/contracts/README.md": true,
+    "deploy/contracts/verify-image.mjs": true,
+    "deploy/en/Dockerfile": true,
+    "scripts/restore-generated-state.sh": true,
+    "scripts/docs-workflow/guides-media-prefetch.js": true,
+    "packages/docs-tooling/src/lark/larkImageDownloader.js": true
+  },
+  "isolated_git_restore": {
+    "passed": 5,
+    "checks": {
+      "content/en/guides/openai.md": true,
+      "i18n/ja-JP/openai.md": true,
+      "generated/en/sidebars/guides.sidebar.js": true,
+      ".translation-cache/test.json": true,
+      "new_only_page_removed": true
+    },
+    "remote_configured": false,
+    "ci_artifact_used": false
+  },
+  "rollback_verifier": {
+    "passed": 4,
+    "scope": "pure rollback verifier with synthetic trusted provider; no registry access"
+  }
+}

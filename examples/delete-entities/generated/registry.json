@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "local-proposal-not-published",
+  "source_commit": null,
+  "based_on_commit": "7d87b0bf26d7cbc713f40af6453ea2f925367901",
+  "modules": {
+    "delete-entities": {
+      "file": "site/en/userGuide/insert-and-delete/delete-entities.md",
+      "page_digest": "sha256:de5b46272b83a8af29fb6381381749aa55c134bfefbf89be9e39dca913016b7a",
+      "blocks": {},
+      "variables_used": [
+        "example_endpoint",
+        "example_token"
+      ]
+    }
+  }
+}

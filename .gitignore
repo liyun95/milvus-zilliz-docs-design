@@ -1,0 +1,10 @@
+# Local editor/runtime files
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+
+# Read-only upstream checkouts used during audits, not part of this design repo.
+/research/evidence/build-audit/milvus-docs/
+/research/evidence/build-audit/md2md/
+/research/evidence/build-audit/zdoc/

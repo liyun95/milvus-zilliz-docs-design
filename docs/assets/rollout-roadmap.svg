@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="210" viewBox="0 0 1280 350" role="img" aria-labelledby="title desc">
+<title id="title">首期完成试点，后续分批扩大迁移</title>
+<desc id="desc">首期依次核对内容、接入工具链并完成验证、审核切换试点页并验证更新与恢复；后续分批扩大共享页与独有页迁移，待相关依赖清零后让飞书退出范围内生产链。</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:22px;font-weight:600;text-anchor:middle;}.sub{font-size:18px;fill:#64748b;text-anchor:middle;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
+<rect width="1280" height="350" fill="#ffffff"/>
+<rect x="15" y="20" width="740" height="300" rx="14" fill="#ffffff" stroke="#64748b"/>
+<rect x="785" y="20" width="480" height="300" rx="14" fill="#ffffff" stroke="#64748b"/>
+<text x="385" y="64" class="head">首期 · 完成试点</text>
+<text x="1025" y="64" class="head">后续 · 扩大迁移</text>
+<text x="140" y="122" class="head">核对内容</text>
+<text x="380" y="122" class="head">接入与验证</text>
+<text x="620" y="122" class="head">试点切换</text>
+<text x="915" y="122" class="head">分批迁移</text>
+<text x="1160" y="122" class="head">飞书退出</text>
+<circle cx="140" cy="159" r="7" fill="#64748b"/>
+<circle cx="380" cy="159" r="7" fill="#64748b"/>
+<circle cx="620" cy="159" r="7" fill="#64748b"/>
+<circle cx="915" cy="159" r="7" fill="#64748b"/>
+<circle cx="1160" cy="159" r="7" fill="#64748b"/>
+<path class="edge" d="M152 159 H365"/><path class="edge" d="M392 159 H605"/><path class="edge" d="M632 159 H900"/><path class="edge" d="M927 159 H1145"/>
+<text x="140" y="208" class="sub">确认共同修订</text><text x="140" y="237" class="sub">与产品差异</text>
+<text x="380" y="208" class="sub">页面生成与升级</text><text x="380" y="237" class="sub">发布、翻译与恢复</text>
+<text x="620" y="208" class="sub">审核后正式发布</text><text x="620" y="237" class="sub">验证更新与恢复</text>
+<text x="915" y="208" class="sub">共享页与独有页</text><text x="915" y="237" class="sub">连同导航、媒体</text>
+<text x="1160" y="208" class="sub">范围内依赖清零</text><text x="1160" y="237" class="sub">停止抓取与调度</text>
+</svg>

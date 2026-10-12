@@ -1,0 +1,42 @@
+# Proposed whole-page consumption plus explicit Cloud-only tabs.
+schema_version: 1
+page: cloud.filtered-search
+source:
+  take: page
+  module: filtered-search
+variables:
+  file: Variables.json
+presentation:
+  code_groups: presentation/cloud-sdk-tabs.yaml
+metadata:
+  title: Filtered Search | Cloud
+  slug: /filtered-search
+  sidebar_label: Filtered Search
+  beta: false
+  added_since: false
+  last_modified: false
+  deprecate_since: false
+  notebook: false
+  sidebar_position: 4
+  displayed_sidebar: default
+links:
+  primary-key-search.md: ./primary-key-search
+  filtering: ./filtering-overview
+assets:
+  https://milvus-docs.s3.us-west-2.amazonaws.com/assets/filtered-search.png: https://zdoc-images.s3.us-west-2.amazonaws.com/QIeKwvDN1h7lTnb9iJ7cPubknrb.png
+  https://milvus-docs.s3.us-west-2.amazonaws.com/assets/iterative-filtering.png: https://zdoc-images.s3.us-west-2.amazonaws.com/AOJ0wZxInhw0z8bZJtWcHMpfnCh.png
+transforms:
+- operation: add
+  target:
+    module: filtered-search
+    block: standard-filtering-code
+    language: shell
+  content:
+    file: fragments/filtered-search/standard-filtering-cli.md
+- operation: add
+  target:
+    module: filtered-search
+    block: iterative-filtering-code
+    language: shell
+  content:
+    file: fragments/filtered-search/iterative-filtering-cli.md

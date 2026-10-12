@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "status": "local-proposal-not-published",
+  "source_commit": null,
+  "based_on_commit": "7d87b0bf26d7cbc713f40af6453ea2f925367901",
+  "modules": {
+    "filtered-search": {
+      "file": "site/en/userGuide/search-query-get/filtered-search.md",
+      "page_digest": "sha256:8fe97c3a5e8101866249dd8bbf017304855c62ac93ff9743053a85814a7d13e0",
+      "variables_used": [
+        "example_endpoint",
+        "example_token",
+        "product_name"
+      ],
+      "blocks": {
+        "standard-filtering-code": {
+          "kind": "code-group",
+          "languages": [
+            "python",
+            "java",
+            "go",
+            "rust",
+            "c++",
+            "javascript",
+            "bash"
+          ],
+          "content_digest": "sha256:5bcb4c09f47b529fb829678e3294a1d85059238e91d2b4991bbb61f1bea371d5"
+        },
+        "iterative-filtering-code": {
+          "kind": "code-group",
+          "languages": [
+            "python",
+            "java",
+            "go",
+            "rust",
+            "c++",
+            "javascript",
+            "bash"
+          ],
+          "content_digest": "sha256:670d1479634dcf93d81283903fc524861dbe7b3420a2edbbd51a28845eea47b6"
+        }
+      }
+    }
+  }
+}

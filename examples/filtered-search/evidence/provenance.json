@@ -1,0 +1,20 @@
+{
+  "status": "local-proposal-not-published",
+  "source_commit": null,
+  "milvus_base_commit": "7d87b0bf26d7cbc713f40af6453ea2f925367901",
+  "cloud_base_commit": "05e31600f14326073a2c25c1a1eeda8e8d8fcc81",
+  "changes": [
+    "Common SDK fixes retained from Cloud; Go v3 compatibility requires review",
+    "Cloud Rust/C++ proposed as shared source; applicability requires review",
+    "Three shared product variables; Go uses the same token",
+    "Two stable code-group markers for Cloud CLI insertion",
+    "JSON output punctuation fixed without changing data",
+    "Filtering link label harmonized; Cloud image URLs retained"
+  ],
+  "known_content_review": [
+    "Prose says top-K 3 while requests use limit 5",
+    "Result distances and language output comments require runtime verification",
+    "Images have not been compared visually"
+  ],
+  "sdk_cli_execution_verified": false
+}

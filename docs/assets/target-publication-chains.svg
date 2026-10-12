@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="540" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+<title id="title">目标工具链：共享内容生成与 Cloud 独有文档的接入路径</title>
+<desc id="desc">Milvus 沿用既有发布链。zdoc 新增共享源获取和候选生成，复用 md2md 变量与 include 实现并为其增加独立预处理入口；Cloud 配置包括页面 YAML 和共用 Variables.json；差异内容以 Markdown 或代码片段提供。组装输出 Markdown/MDX 候选。右侧沿用常规内容流程并扩展 Git 输入。无共享引用的 Cloud 独有页以完整 Markdown/MDX 原文进入常规流程，批量迁移安排在后续。独立章节编排不属于首期。</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:20px;font-weight:600;text-anchor:middle;}.sub{font-size:17px;text-anchor:middle;fill:#64748b;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
+<rect width="1280" height="900" fill="#ffffff"/>
+<rect x="15" y="20" width="1250" height="188" rx="14" fill="#ffffff" stroke="#64748b"/>
+<rect x="15" y="280" width="1250" height="492" rx="14" fill="#ffffff" stroke="#64748b"/>
+<path d="M125 20 V208 M125 280 V772" stroke="#64748b"/>
+<text x="69" y="120" class="head">Milvus 侧</text>
+<text x="69" y="525" class="head">Cloud 侧</text>
+<a href="https://github.com/milvus-io/milvus-docs"><rect x="145" y="63" width="185" height="105" rx="10" fill="#fef3c7" stroke="#b45309"/><text x="238" y="95" class="head">milvus-docs</text><text x="238" y="126" class="sub">Markdown 共享原文</text><text x="238" y="152" class="sub">共同内容的唯一编辑源</text></a>
+<a href="https://github.com/zilliztech/md2md"><rect x="367" y="63" width="185" height="105" rx="10" fill="#ddd6fe" stroke="#6d28d9"/><text x="460" y="95" class="head">md2md</text><text x="460" y="126" class="sub">展开变量与引用片段</text><text x="460" y="152" class="sub">转换为 Milvus 发布格式</text></a>
+<a href="https://github.com/milvus-io/web-content"><rect x="589" y="63" width="185" height="105" rx="10" fill="#fef3c7" stroke="#b45309"/><text x="682" y="95" class="head">web-content</text><text x="682" y="126" class="sub">Milvus 站点正文与导航</text><text x="682" y="152" class="sub">供 milvus.io 构建读取</text></a>
+<a href="https://github.com/milvus-io/milvus.io"><rect x="811" y="63" width="205" height="105" rx="10" fill="#ddd6fe" stroke="#6d28d9"/><text x="913" y="95" class="head">milvus.io</text><text x="913" y="126" class="sub">构建 Milvus 站点</text><text x="913" y="152" class="sub">部署上线</text></a>
+<a href="https://milvus.io/docs"><rect x="1053" y="63" width="185" height="105" rx="10" fill="#ffffff" stroke="#64748b"/><text x="1145" y="111" class="head">Milvus 文档站</text><text x="1145" y="142" class="sub">milvus.io/docs</text></a>
+<path class="edge" d="M330 115 H360"/><path class="edge" d="M552 115 H582"/><path class="edge" d="M774 115 H804"/><path class="edge" d="M1016 115 H1046"/>
+<path class="edge" d="M238 168 V318"/><text x="386" y="248" class="sub">直接读取固定版本原文</text>
+
+<text x="470" y="307" class="sub">新增 · zdoc 共享接入</text>
+<text x="865" y="307" class="sub">沿用 · 扩展 Git 输入</text>
+<rect x="145" y="325" width="215" height="110" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="252" y="358" class="head">获取共享内容</text><text x="252" y="390" class="sub">读取固定版本原文</text><text x="252" y="417" class="sub">识别命名区域与来源</text>
+<rect x="435" y="325" width="245" height="110" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="557" y="358" class="head">生成 Cloud 候选页面</text><text x="557" y="390" class="sub">绑定变量、应用差异</text><text x="557" y="417" class="sub">输出 Markdown / MDX 候选</text>
+<path class="edge" d="M360 380 H428"/>
+<path class="edge" d="M680 380 H748"/>
+<text x="715" y="364" class="sub">审核采用</text>
+<rect x="755" y="325" width="220" height="110" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="865" y="358" class="head">zdoc 常规内容流程</text><text x="865" y="390" class="sub">校验、翻译与内容过滤</text><text x="865" y="417" class="sub">站点构建、审核与发布 *</text>
+<path class="edge" d="M975 380 H1046"/>
+<a href="https://docs.zilliz.com"><rect x="1053" y="325" width="185" height="110" rx="10" fill="#ffffff" stroke="#64748b"/><text x="1145" y="373" class="head">Cloud 文档站</text><text x="1145" y="405" class="sub">docs.zilliz.com</text></a>
+
+<rect x="145" y="530" width="245" height="98" rx="10" fill="#fef3c7" stroke="#b45309"/>
+<text x="267" y="560" class="head">Cloud 配置</text><text x="267" y="590" class="sub">页面 YAML：引用与增删替换</text><text x="267" y="615" class="sub">Variables.json：产品值</text>
+<rect x="435" y="530" width="245" height="98" rx="10" fill="#fef3c7" stroke="#b45309"/>
+<text x="557" y="560" class="head">Cloud 差异片段（按需）</text><text x="557" y="590" class="sub">Markdown / 代码片段</text><text x="557" y="615" class="sub">提供新增或替换的内容</text>
+<path class="edge" d="M267 530 V484 H480 V442"/>
+<path class="edge" d="M557 530 V442"/>
+
+
+<rect x="145" y="651" width="275" height="98" rx="10" fill="#fef3c7" stroke="#b45309"/>
+<text x="282" y="680" class="head">Cloud 独有文档</text><text x="282" y="711" class="sub">完整 Markdown / MDX 原文</text><text x="282" y="737" class="sub">无共享引用，直接接入</text>
+<path class="edge" d="M420 703 H865 V442"/>
+<text x="632" y="688" class="sub">批量迁移在后续</text>
+
+<rect x="28" y="793" width="16" height="16" rx="3" fill="#fef3c7" stroke="#b45309"/><text x="53" y="807" font-size="16">源文件 / 发布内容</text>
+<rect x="335" y="793" width="16" height="16" rx="3" fill="#ddd6fe" stroke="#6d28d9"/><text x="360" y="807" font-size="16">工具处理</text>
+<path class="edge" d="M465 801 H507"/><text x="522" y="807" font-size="16">内容消费或处理关系</text>
+<text x="28" y="840" font-size="16">md2md 复用变量 / include 实现，需新增独立预处理入口。两端保留文档翻译能力。</text>
+<text x="28" y="871" font-size="16">* 外部 Jenkins 运行配置仍待核验，详见 §2.1。共享版本由 Cloud 审核采用。</text>
+</svg>

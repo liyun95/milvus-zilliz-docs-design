@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="420" viewBox="0 0 1280 700" role="img" aria-labelledby="title desc">
+<title id="title">目标维护方式：共享正文只改一处，两端分别采用和发布</title>
+<desc id="desc">文档工程师和社区贡献者通过 PR 维护 milvus-docs 的 User Guide 共享原文。Milvus 沿既有流程发布。Cloud 侧蓝色节点表示文档工程师，黄色节点表示其在 zdoc 维护的消费配置、产品变量和按需提供的差异内容。工具结合这些输入生成 Cloud 候选及变更提示，人工审核采用和发布。目标是正文以 Git 为权威来源，飞书按页退出文档维护与发布链。</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:22px;font-weight:600;text-anchor:middle;}.sub{font-size:18px;text-anchor:middle;fill:#64748b;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
+<rect width="1280" height="700" fill="#ffffff"/>
+<rect x="15" y="20" width="1250" height="190" rx="14" fill="#ffffff" stroke="#64748b"/>
+<rect x="15" y="265" width="1250" height="380" rx="14" fill="#ffffff" stroke="#64748b"/>
+<path d="M170 20 V210 M170 265 V645" stroke="#64748b"/>
+<text x="92" y="124" class="head">Milvus 侧</text>
+<text x="92" y="463" class="head">Cloud 侧</text>
+
+<rect x="210" y="49" width="205" height="51" rx="9" fill="#93c5fd" stroke="#1e3a5f"/><text x="312" y="82" class="head">文档工程师</text>
+<rect x="210" y="131" width="205" height="51" rx="9" fill="#a7f3d0" stroke="#047857"/><text x="312" y="164" class="head">社区贡献者</text>
+<rect x="610" y="67" width="270" height="100" rx="10" fill="#fef3c7" stroke="#b45309"/><text x="745" y="106" class="head">共享正文 · milvus-docs</text><text x="745" y="140" class="sub">Markdown · 唯一编辑源</text>
+<path class="edge" d="M415 75 H490 V99 H603"/><path class="edge" d="M415 157 H490 V139 H603"/>
+<text x="517" y="58" class="sub">提交 PR</text>
+<rect x="985" y="78" width="240" height="78" rx="10" fill="#ffffff" stroke="#64748b"/><text x="1105" y="109" class="head">Milvus 文档</text><text x="1105" y="139" class="sub">沿用现有发布流程</text>
+<path class="edge" d="M880 117 H978"/>
+
+<rect x="210" y="310" width="205" height="51" rx="9" fill="#93c5fd" stroke="#1e3a5f"/><text x="312" y="344" class="head">文档工程师</text>
+<rect x="455" y="287" width="250" height="110" rx="10" fill="#fef3c7" stroke="#b45309"/><text x="580" y="320" class="head">zdoc</text><text x="580" y="351" class="sub">消费配置 · 产品变量</text><text x="580" y="380" class="sub">差异内容（按需）</text>
+<path class="edge" d="M415 336 H448"/>
+<rect x="610" y="441" width="270" height="91" rx="10" fill="#ddd6fe" stroke="#6d28d9"/><text x="745" y="477" class="head">工具自动生成</text><text x="745" y="509" class="sub">Cloud 候选 / 变更提示</text>
+<path class="edge" d="M745 167 V434"/>
+<text x="854" y="246" class="sub">读取共享正文</text>
+<path class="edge" d="M580 397 V487 H603"/>
+<rect x="985" y="441" width="240" height="91" rx="10" fill="#93c5fd" stroke="#1e3a5f"/><text x="1105" y="477" class="head">人工审核</text><text x="1105" y="509" class="sub">决定采用及发布时间</text>
+<path class="edge" d="M880 487 H978"/>
+<rect x="985" y="572" width="240" height="53" rx="10" fill="#ffffff" stroke="#64748b"/><text x="1105" y="606" class="head">Cloud 文档</text>
+<path class="edge" d="M1105 532 V565"/>
+<text x="745" y="591" class="sub">暂缓采用：继续已批准版本</text>
+<text x="640" y="682" class="sub">目标：正文以 Git 为权威来源，飞书按页退出现有文档维护与发布链。</text>
+</svg>

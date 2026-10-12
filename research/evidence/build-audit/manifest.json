@@ -1,0 +1,38 @@
+{
+  "audit_date": "2026-10-11",
+  "method": "Pinned source inspection; not production workflow execution",
+  "repositories": [
+    {
+      "repository": "zilliztech/md2md",
+      "branch": "master",
+      "commit": "635da07276e80fb2a6efdf667686df3913d5de4c"
+    },
+    {
+      "repository": "milvus-io/milvus-docs",
+      "branch": "v3.0.x",
+      "commit": "7d87b0bf26d7cbc713f40af6453ea2f925367901"
+    },
+    {
+      "repository": "zilliztech/zdoc",
+      "branch": "master",
+      "commit": "3777ec0b322546d716485e8f88da8412b0265e71"
+    }
+  ],
+  "zdoc_dev_tip_observed": "96d7a73cc0ae9f3882269000eae2ac750e418386",
+  "runtime_unknowns": [
+    "production tooling synchronization status",
+    "Actions repository variable values",
+    "external Jenkins configuration",
+    "live deployed artifact identity"
+  ],
+  "verification": {
+    "codeVariantFilter_test": {
+      "tests": 10,
+      "passed": 10,
+      "failed": 0
+    },
+    "md2md_runtime": "not run",
+    "zdoc_full_build": "not run",
+    "paid_translation": "not run"
+  }
+}

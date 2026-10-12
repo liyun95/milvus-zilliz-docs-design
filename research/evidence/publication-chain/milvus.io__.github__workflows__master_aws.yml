@@ -1,0 +1,139 @@
+name: Build and deploy to production
+
+on:
+  repository_dispatch:
+    types: [prod-deploy]
+
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  NODE_OPTIONS: '--max_old_space_size=8192'
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    outputs:
+      docker-image-tag: ${{ steps.generate-tag-name.outputs.docker_tag }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Free up disk space (comprehensive)
+        run: |
+          echo "=== Before cleanup ==="
+          df -h / 
+
+          # Essential cleanup for GitHub Actions runner
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /usr/local/lib/android || true
+
+          echo "=== After cleanup ==="
+          df -h / 
+          echo "Root filesystem available: $(df -h / | awk 'NR==2{print $4}')"
+
+      - uses: azure/docker-login@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME}}
+          password: ${{ secrets.DOCKER_PWD}}
+
+      - uses: actions/checkout@v7
+        with:
+          ref: 'master'
+          fetch-depth: 1
+
+      - name: Verify Nginx configuration
+        if: always()
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/conf/conf.d/client.conf:/etc/nginx/conf.d/client.conf \
+            zilliz/zilliz-web-runner \
+            sh -c 'if nginx -t -c /etc/nginx/nginx.conf; then echo "Nginx configuration is valid."; else echo "Nginx configuration is invalid."; exit 1; fi'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: update submodules
+        run: |
+          git submodule init
+          git submodule update --remote
+
+      - name: Check disk space after submodule update
+        run: |
+          echo "=== Disk Space Information ==="
+          df -h
+          echo ""
+          echo "=== Disk Usage Summary ==="
+          df -h --total | grep total
+          echo ""
+          echo "=== Available Space on Root Filesystem ==="
+          df -h / | awk 'NR==2{printf "Total: %s, Used: %s, Available: %s, Usage: %s\n", $2, $3, $4, $5}'
+
+      - name: Clean up unnecessary version folders
+        run: |
+          # Remove old version folders from /docs/localization/
+          rm -rf src/docs/localization/v2.0.x
+          rm -rf src/docs/localization/v2.1.x
+
+          # Remove old version folders from /docs/
+          rm -rf src/docs/v0.x
+          rm -rf src/docs/v1.1.1
+          rm -rf src/docs/v2.0.x
+          rm -rf src/docs/v2.1.x
+
+      - name: Remove enterprise pages before build
+        run: |
+          # Remove enterprise pages that should not be deployed to production
+          rm -f src/pages/tools/sizing-v250-enterprise.tsx
+          rm -f src/pages/tools/sizing-enterprise.tsx
+
+      - name: Generate docker image tag name
+        id: generate-tag-name
+        run: |
+          export tag=${{ github.sha }}-$GITHUB_RUN_NUMBER
+          echo $tag
+          echo "docker_tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Building Milvus site and push to docker hub
+        id: build-image
+        uses: nick-invision/retry@v4
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_on: error
+          command: |
+            docker build "$GITHUB_WORKSPACE/" -f "Builder.Dockerfile" \
+            --build-arg MSERVICE_URL=${{ secrets.MSERVICE_URL }} \
+            --build-arg CMS_BASE_URL=${{ secrets.CMS_BASE_URL }} \
+            --build-arg REPO_STATICS_KEY=${{ secrets.REPO_STATICS_KEY }} \
+            --build-arg INKEEP_API_KEY=${{ secrets.INKEEP_API_KEY }} \
+            -t milvusdb/milvus-io-dev:${{ steps.generate-tag-name.outputs.docker_tag }}
+            docker push milvusdb/milvus-io-dev:${{ steps.generate-tag-name.outputs.docker_tag }}
+      #         env:
+      #           GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES: true
+      #           CI: true
+      - name: Check disk space after build
+        run: |
+          echo "=== Disk Space Information ==="
+          df -h
+          echo ""
+          echo "=== Disk Usage Summary ==="
+          df -h --total | grep total
+          echo ""
+          echo "=== Available Space on Root Filesystem ==="
+          df -h / | awk 'NR==2{printf "Total: %s, Used: %s, Available: %s, Usage: %s\n", $2, $3, $4, $5}'
+
+  deploy:
+    runs-on: amazon-linux-2
+    needs: build
+    steps:
+      - name: Deploy to cluster
+        run: |
+          echo ${{ secrets.kubeconfig }} > config64
+          base64 -d config64 > kubeconfig
+          kubectl set image deployment/milvus-io-prod milvus-io-prod=milvusdb/milvus-io-dev:${{ needs.build.outputs.docker-image-tag }} -n ued --kubeconfig=kubeconfig

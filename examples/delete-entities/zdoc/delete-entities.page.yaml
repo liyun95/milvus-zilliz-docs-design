@@ -1,0 +1,16 @@
+# Proposed consumption schema; executed by the local fixture builder only.
+schema_version: 1
+page: cloud.delete-entities
+source:
+  take: page
+  module: delete-entities
+presentation:
+  code_groups: presentation/cloud-sdk-tabs.yaml
+metadata:
+  title: Delete Entities | Cloud
+  slug: /delete-entities
+  sidebar_label: Delete
+links:
+  boolean.md: ./filtering-overview
+variables:
+  file: Variables.json

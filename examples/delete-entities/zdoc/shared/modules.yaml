@@ -1,0 +1,17 @@
+# Shared registration rules: one entry per source file, not per block.
+schema_version: 1
+source:
+  repository: https://github.com/milvus-io/milvus-docs
+  track: refs/heads/v3.0.x
+variables:
+  source_file: site/en/Variables.json
+  exports:
+    example_endpoint:
+      type: text
+    example_token:
+      type: text
+modules:
+  delete-entities:
+    file: site/en/userGuide/insert-and-delete/delete-entities.md
+    export_page: true
+    export_blocks: marked

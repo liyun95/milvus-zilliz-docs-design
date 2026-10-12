@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-11",
+  "method": "Pinned source inspection; no workflow execution",
+  "repositories": [
+    {
+      "repo": "milvus-io/web-content",
+      "commit": "c2fa9c8fc04b071dc320ca6279810f94bdcbeaa8",
+      "files": [
+        ".github/workflows/master.yml",
+        "tools/generate-en.js",
+        "package.json",
+        "tools/translate.js",
+        ".github/workflows/translate.yml"
+      ]
+    },
+    {
+      "repo": "milvus-io/milvus.io",
+      "commit": "1df6c2a9dbfb14a1aafbb1dd0563de3d51aad67c",
+      "files": [
+        ".github/workflows/master_aws.yml",
+        ".gitmodules",
+        "Builder.Dockerfile"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Shared registration rules: one file entry, no manual block inventory.
+schema_version: 1
+source:
+  repository: https://github.com/milvus-io/milvus-docs
+  track: refs/heads/v3.0.x
+variables:
+  source_file: site/en/Variables.json
+  exports:
+    product_name:
+      type: text
+    example_endpoint:
+      type: text
+    example_token:
+      type: text
+modules:
+  filtered-search:
+    file: site/en/userGuide/search-query-get/filtered-search.md
+    export_page: true
+    export_blocks: marked

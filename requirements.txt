@@ -1,0 +1,2 @@
+# Local design examples only; not the production docs toolchain.
+PyYAML==6.0.3

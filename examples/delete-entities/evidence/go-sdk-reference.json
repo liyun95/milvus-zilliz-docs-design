@@ -1,0 +1,7 @@
+{
+  "commit": "f7727377fd1e4c5a8cc66bb744d5b0137c5bd923",
+  "files": {
+    "client.go": "https://github.com/milvus-io/milvus/blob/f7727377fd1e4c5a8cc66bb744d5b0137c5bd923/client/milvusclient/client.go",
+    "client_config.go": "https://github.com/milvus-io/milvus/blob/f7727377fd1e4c5a8cc66bb744d5b0137c5bd923/client/milvusclient/client_config.go"
+  }
+}

@@ -1,0 +1,28 @@
+# Site policy: shell is optional and appears only when explicitly supplied.
+group_id: code
+default: python
+languages:
+- label: Python
+  value: python
+  required: true
+- label: Java
+  value: java
+  required: true
+- label: Go
+  value: go
+  required: true
+- label: Rust
+  value: rust
+  required: true
+- label: C++
+  value: c++
+  required: true
+- label: NodeJS
+  value: javascript
+  required: true
+- label: cURL
+  value: bash
+  required: true
+- label: Zilliz CLI
+  value: shell
+  required: false

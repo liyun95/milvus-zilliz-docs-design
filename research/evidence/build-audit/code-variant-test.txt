@@ -1,0 +1,18 @@
+✔ filters indented hash next-line directives without blank lines (2.153041ms)
+✔ filters indented slash next-line exclusions (0.131708ms)
+✔ filters nested regions while preserving intentional active blank lines (0.492125ms)
+✔ recognizes supported whole-line comment wrappers (0.105666ms)
+✔ does not parse directive words embedded in ordinary code or comments (0.053ms)
+✔ rejects malformed comment directives with line diagnostics (0.232666ms)
+✔ filters standalone legacy tags without directive gaps (0.164292ms)
+✔ removes an inline legacy parameter line without leaving indentation (0.056417ms)
+✔ preserves mixed inline legacy fragments on retained code lines (0.065958ms)
+✔ rejects reserved release-channel targets on product directives (0.188791ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 50.503083

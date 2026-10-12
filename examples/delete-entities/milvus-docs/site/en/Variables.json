@@ -1,0 +1,4 @@
+{
+  "example_endpoint": "http://localhost:19530",
+  "example_token": "root:Milvus"
+}

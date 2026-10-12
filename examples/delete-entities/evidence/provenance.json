@@ -1,0 +1,26 @@
+{
+  "status": "local-design-fixture-not-upstream",
+  "source_commit": null,
+  "milvus_base_commit": "7d87b0bf26d7cbc713f40af6453ea2f925367901",
+  "cloud_base_commit": "05e31600f14326073a2c25c1a1eeda8e8d8fcc81",
+  "original_hashes": {
+    "milvus": "6885815e09e8fafe5b2070e29bf4c8b187898fe6f100a880517f764c1854e119",
+    "cloud": "a99687f96203657ca3f1b80d286172b08c62a709e9dce9e21a82496d494dc43f"
+  },
+  "changes": [
+    "Cloud corrections for common code retained",
+    "Go v3 imports retained from Cloud, compatibility pending",
+    "Cloud Rust/C++ examples proposed as shared content, compatibility pending",
+    "All SDKs share example_token; proposed Go authentication now matches other SDK examples, runtime review pending",
+    "Go local address standardized to http://localhost:19530 (supported by ClientConfig.parse)",
+    "Two scalar variables; zero named regions or replacement fragments"
+  ],
+  "go_sdk_reference": {
+    "commit": "f7727377fd1e4c5a8cc66bb744d5b0137c5bd923",
+    "files": {
+      "client.go": "https://github.com/milvus-io/milvus/blob/f7727377fd1e4c5a8cc66bb744d5b0137c5bd923/client/milvusclient/client.go",
+      "client_config.go": "https://github.com/milvus-io/milvus/blob/f7727377fd1e4c5a8cc66bb744d5b0137c5bd923/client/milvusclient/client_config.go"
+    }
+  },
+  "sdk_execution_verified": false
+}
