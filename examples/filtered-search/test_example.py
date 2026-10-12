@@ -16,10 +16,10 @@ import build_example as build
 class ExampleChecks(unittest.TestCase):
     def setUp(self):
         self.source = (build.ROOT / 'milvus-docs/site/en/userGuide/search-query-get/filtered-search.md').read_text()
-        self.page = yaml.safe_load((build.ROOT / 'zdoc/filtered-search.page.yaml').read_text())
+        self.page = yaml.safe_load((build.ROOT / 'zdoc/shared-pages/filtered-search/page.yaml').read_text())
         self.profile = yaml.safe_load((build.ROOT / 'zdoc/presentation/cloud-sdk-tabs.yaml').read_text())
         self.values = json.loads((build.ROOT / 'zdoc/Variables.json').read_text())
-        self.read = lambda file: (build.ROOT / 'zdoc' / file).read_text()
+        self.read = lambda file: (build.ROOT / build.PAGE / file).read_text()
 
     def compose(self, source=None, page=None):
         return build.compose(self.source if source is None else source, self.page if page is None else page,
@@ -148,13 +148,19 @@ class ExampleChecks(unittest.TestCase):
         after = build.scan(self.source.replace('limit=5,', 'limit=6,', 1))['standard-filtering-code']['digest']
         self.assertNotEqual(before, after)
 
-    def with_rules(self, rules, fragments=None, profile=None):
+    def test_content_files_resolve_only_inside_the_page_directory(self):
+        self.assertEqual(build.content_path('standard-filtering-cli.md').parent, (build.ROOT / build.PAGE).resolve())
+        for file in ['../../Variables.json', '/etc/hosts']:
+            with self.assertRaisesRegex(ValueError, 'CONTENT_OUTSIDE_PAGE_DIR'):
+                build.content_path(file)
+
+    def with_rules(self, rules, contents=None, profile=None):
         source = self.source + '\n<!-- doc:block:start id="product-notes" -->\nShared note.\n<!-- doc:block:end id="product-notes" -->\n'
         page = copy.deepcopy(self.page)
         page['transforms'] = rules
-        fragments = fragments or {}
+        contents = contents or {}
         return build.compose(source, page, profile or self.profile, self.values, self.values,
-            lambda file: fragments[file] if file in fragments else self.read(file))[0]
+            lambda file: contents[file] if file in contents else self.read(file))[0]
 
     def test_add_markdown_before_and_after_uses_same_operation(self):
         target = {'module': 'filtered-search', 'block': 'product-notes'}
@@ -178,7 +184,7 @@ class ExampleChecks(unittest.TestCase):
         rule = {'operation': 'replace', 'target': target, 'content': {'file': 'example.md'}}
         result = self.with_rules([rule], {'example.md': '```python\nprint("changed")\n```\n'})
         self.assertIn('print("changed")', result)
-        with self.assertRaisesRegex(ValueError, 'INVALID_LANGUAGE_FRAGMENT'):
+        with self.assertRaisesRegex(ValueError, 'INVALID_LANGUAGE_CONTENT'):
             self.with_rules([rule], {'example.md': '```java\nchanged();\n```\n'})
         rule['target']['language'] = 'shell'
         with self.assertRaisesRegex(ValueError, 'MISSING_LANGUAGE'):
@@ -214,7 +220,7 @@ class ExampleChecks(unittest.TestCase):
             with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
                 self.with_rules([rule], {'x': 'Text.'})
 
-    def test_new_fragments_are_not_targets_for_later_rules(self):
+    def test_inserted_content_is_not_a_target_for_later_rules(self):
         rules = copy.deepcopy(self.page['transforms'])
         rules.append({'operation': 'remove', 'target': dict(rules[0]['target'])})
         with self.assertRaisesRegex(ValueError, 'MISSING_LANGUAGE'):

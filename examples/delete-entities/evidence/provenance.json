@@ -13,7 +13,7 @@
     "Cloud Rust/C++ examples proposed as shared content, compatibility pending",
     "All SDKs share example_token; proposed Go authentication now matches other SDK examples, runtime review pending",
     "Go local address standardized to http://localhost:19530 (supported by ClientConfig.parse)",
-    "Two scalar variables; zero named regions or replacement fragments"
+    "Two scalar variables; zero named regions or Cloud content files"
   ],
   "go_sdk_reference": {
     "commit": "f7727377fd1e4c5a8cc66bb744d5b0137c5bd923",

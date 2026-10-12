@@ -110,7 +110,7 @@ def products():
         return text
 
     reg = yaml.safe_load(read(ROOT / 'zdoc/shared/modules.yaml'))
-    page = yaml.safe_load(read(ROOT / 'zdoc/delete-entities.page.yaml'))
+    page = yaml.safe_load(read(ROOT / 'zdoc/shared-pages/delete-entities/page.yaml'))
     validate_page(page)
     if reg.get('schema_version') != 1:
         raise ValueError('UNSUPPORTED_SCHEMA_VERSION')

@@ -32,11 +32,11 @@ transforms:
     block: standard-filtering-code
     language: shell
   content:
-    file: fragments/filtered-search/standard-filtering-cli.md
+    file: standard-filtering-cli.md
 - operation: add
   target:
     module: filtered-search
     block: iterative-filtering-code
     language: shell
   content:
-    file: fragments/filtered-search/iterative-filtering-cli.md
+    file: iterative-filtering-cli.md

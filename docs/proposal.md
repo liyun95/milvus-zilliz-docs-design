@@ -47,7 +47,7 @@
 | 事项 | 现在 | 迁移后 |
 |---|---|---|
 | 共享页的共同内容 | 在飞书编辑，再导出到 Milvus | 向 milvus-docs 提交 PR |
-| 共享页的 Cloud 差异 | 在飞书正文中直接改写 | 在 zdoc 维护页面配置和差异片段 |
+| 共享页的 Cloud 差异 | 在飞书正文中直接改写 | 在 zdoc 维护页面配置和 Cloud 内容文件 |
 | 代码的产品差异、Current / Next 标记 | 写在飞书正文和多维表格中 | 写法不变，写在 Git 中（见第 4 节） |
 | 审核与预览 | 飞书内审阅，UAT 查看结果 | GitHub PR 审核，PR 预览与 UAT 查看结果 |
 | Cloud 独有页 | 在飞书编辑 | 首期不变；终态在 zdoc 以 Markdown / MDX 维护 |
@@ -56,7 +56,7 @@
 
 ## 3. 工具链：在 zdoc 新增共享接入
 
-![目标工具链：Milvus 侧沿用 milvus-docs → md2md → web-content → milvus.io。zdoc 从 milvus-docs 直接读取固定版本原文，结合页面配置、Variables.json 和差异片段生成 Cloud 页面，经升级 PR 采用后进入 zdoc 既有的校验、过滤、Current / Next、翻译与发布流程。过渡期未迁移的飞书页和后续迁入的 Cloud 独有页也进入同一流程。虚线框标出新增工作的范围。](./assets/target-publication-chains.png)
+![目标工具链：Milvus 侧沿用 milvus-docs → md2md → web-content → milvus.io。zdoc 从 milvus-docs 直接读取固定版本原文，结合页面配置、Variables.json 和 Cloud 内容文件生成 Cloud 页面，经升级 PR 采用后进入 zdoc 既有的校验、过滤、Current / Next、翻译与发布流程。过渡期未迁移的飞书页和后续迁入的 Cloud 独有页也进入同一流程。虚线框标出新增工作的范围。](./assets/target-publication-chains.png)
 
 图 3 · 目标工具链（待实施）
 - **读取点在 md2md 之前。** web-content 中的内容已经按 Milvus 的值展开了变量、清理了命名块标记，Cloud 从那里读取就无法绑定自己的值，也找不到需要差异处理的位置。所以 Cloud 直接读 milvus-docs，与 Milvus 发布链并行。
@@ -67,13 +67,13 @@
 
 ## 4. 差异怎样表达
 
-![三类页面：无差异的页面整篇复用，如 Delete Entities，原文把产品值写成变量，zdoc 只需一份页面配置；有差异的页面在共享正文上叠加 Cloud 差异，如 OpenAI 与 Filtered Search，原文加命名块和代码行指令，zdoc 维护页面配置与差异片段；Cloud 独有页在 zdoc 维护完整原文，首期不迁移。](./assets/page-types.png)
+![三类页面：无差异的页面整篇复用，如 Delete Entities，原文把产品值写成变量，zdoc 只需一份页面配置；有差异的页面在共享正文上叠加 Cloud 差异，如 OpenAI 与 Filtered Search，原文加命名块和代码行指令，zdoc 维护页面配置与 Cloud 内容文件；Cloud 独有页在 zdoc 维护完整原文，首期不迁移。](./assets/page-types.png)
 
 图 4 · 三类页面
 - **首期只处理前两类。** 无差异的页面最省事：原文把产品名等写成变量，zdoc 写一份页面配置即可。
-- **有差异的页面按差异的粒度选择写法**（要求 4），下面以 OpenAI 页展开。另一种常见差异是 Cloud 独有的整个代码示例，例如 Filtered Search 的 CLI，以片段加入对应的代码组。
+- **有差异的页面按差异的粒度选择写法**（要求 4），下面以 OpenAI 页展开。另一种常见差异是 Cloud 独有的整个代码示例，例如 Filtered Search 的 CLI，写成 Cloud 内容文件加入对应的代码组。
 
-![OpenAI 页的差异：①共享正文整篇复用，产品名写成变量；②“Before you start”一节两端不同，milvus-docs 为这一节加命名块，zdoc 用片段替换；③代码中的凭证参数，两行都写在 milvus-docs 的共享代码中并用产品行指令标记，Milvus 站点只保留注释掉的可选 credential，Cloud 站点只保留必填的 integration_id。](./assets/page-anatomy.png)
+![OpenAI 页的差异：①共享正文整篇复用，产品名写成变量；②“Before you start”一节两端不同，milvus-docs 为这一节加命名块，zdoc 用 Cloud 内容文件替换；③代码中的凭证参数，两行都写在 milvus-docs 的共享代码中并用产品行指令标记，Milvus 站点只保留注释掉的可选 credential，Cloud 站点只保留必填的 integration_id。](./assets/page-anatomy.png)
 
 图 5 · OpenAI 页的差异怎样表达
 - **① 和 ② 不需要在原文中写 Cloud 的内容。** 原文只给需要替换的一节加命名块（block ID），Cloud 的内容和替换规则都在 zdoc。
