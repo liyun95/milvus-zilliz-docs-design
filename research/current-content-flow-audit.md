@@ -34,4 +34,4 @@
 
 [`revisionInventory.ts`](https://github.com/zilliztech/zdoc/blob/3777ec0b322546d716485e8f88da8412b0265e71/packages/docs-tooling/src/lark/revisionInventory.ts) 定义并保留 `revisionId`、编辑时间等字段，比较新旧 inventory，并生成修订差异。它追踪飞书输入变化，不自动等于 Milvus Git 与飞书两套正文的分叉检测，也不证明组织采用了怎样的飞书人工评审。
 
-[上次会议逐字稿](./evidence/meeting-2026-10-10/transcript.md)支持“人工同步负担”和“内容过滤、版本控制不能丢”的描述。回同步提醒和冲突优先规则则以本轮用户补充为准。
+[上次会议纪要](https://zilliverse.feishu.cn/docx/D6zidlbaTo6DfYxdnleceiUtnlX)支持“人工同步负担”和“内容过滤、版本控制不能丢”的描述。回同步提醒和冲突优先规则则以本轮用户补充为准。
