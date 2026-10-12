@@ -1,6 +1,6 @@
-# 两篇共享文档样例的内容基线
+# 共享文档试点候选的内容基线
 
-当前用于方案与工程验证的样例是 Filtered Search 和 Delete Entities。二者覆盖不同作者成本，不将简单页强行拆块，也不为体现差异而复制每种 SDK 的连接代码。
+当前已制作本地样例的是 Filtered Search 和 Delete Entities。OpenAI embedding 页是第三个候选，覆盖前提条件整节替换与凭证参数的代码行差异，尚未制作样例；两端差异见 [zdoc 代码变体与发布通道核验](./zdoc-variants-and-channels-audit.md#3-openai-页对照)。二者覆盖不同作者成本，不将简单页强行拆块，也不为体现差异而复制每种 SDK 的连接代码。
 
 | 样例 | 展示内容 | 尚需内容审核 |
 |---|---|---|

@@ -2,168 +2,164 @@
 
 **第一次方案对齐会 · 讨论稿**
 
-本文从维护问题出发，说明目标流程、工具链接入和试点安排。当前方案尚未接入生产，两篇样例已做本地生成验证；具体配置和工程要求通过链接按需查看。
+本文说明为什么改、改完后大家怎样协作、工具链怎样接入，以及先从哪些页面试点。本次会议对齐方向与范围，需要拍板的事项见[第 6.2 节](#62-本次需要拍板的事项)；配置字段、接口签名等实现设计留到后续会议。
 
-## 1. 为什么改，以及希望怎样维护文档
+范围是 User Guide 等功能文档的共享与试点迁移。SDK Reference（原文仍在 web-content 维护）、全量迁移及飞书全面退役不属于首期。
 
-本次讨论 User Guide 等功能文档的共享与试点迁移。SDK Reference、全量迁移及飞书全面退役不属于首期；SDK Reference 原文仍在 web-content 维护。
+> **当前验证状态。** 方案尚未接入生产。Delete Entities 与 Filtered Search 两篇样例已在本地生成验证；真实 md2md / zdoc 接入、站点构建、发布保护与翻译接入尚未实现。现有工具链按固定源码修订核对，外部 Jenkins 的运行配置、生产权限和恢复保留策略仍待核验。依据见 [research/](../research/)。
 
-文中的“多语言代码示例”指 Python、Java 等 SDK/API 示例；“翻译”指文档的自然语言翻译。
+## 1. 现状与改造要求
 
-### 1.1 内容维护：双向同步依赖人工，缺少同步与冲突处理规则
+### 1.1 现状：两份正文都能改，靠人工同步
 
-Milvus 和 Zilliz Cloud 的部分功能文档可以共用。目前，这些内容分别维护在**飞书正文**和 **[milvus-docs](https://github.com/milvus-io/milvus-docs)** 中：前者用于 Cloud 文档发布，后者用于 Milvus 文档发布，两份正文都可以独立修改。
+![现状维护关系：飞书正文与 milvus-docs 正文都可以独立编辑。文档工程师可以编辑飞书后导出到 Milvus（①），社区和文档工程师可以直接向 milvus-docs 提交 PR（②），Milvus 的修改需要文档工程师人工核对后抄回飞书（③，虚线）。](./assets/current-content-flow.png)
 
-Cloud 侧由文档工程师维护；Milvus 侧由文档工程师和社区贡献者共同维护。
+图 1 · 现状：共享内容的三条维护路径。[查看矢量图](./assets/current-content-flow.svg)
 
-![共享正文的三条维护路径：飞书正文、共同维护角色中的文档工程师、Milvus 正文纵向排列；①编辑飞书并导出提 PR，②直接提 PR，③核对共享变更再编辑飞书。两份正文均可独立编辑。](./assets/current-content-flow.png)
+- 三条路径中，只有 ③“把 Milvus 的修改抄回飞书”是虚线：它没有提醒，也没有固定检查，两边冲突时也没有约定以哪一侧为准。
+- 社区修订尚未抄回飞书时，下次从飞书导出可能把旧说明带回 Milvus，覆盖社区的修改。现有流程允许这种情况发生，尚未核实是否出现过事故。[核验依据](../research/current-content-flow-audit.md)
+- 长期分开维护会造成漂移。例如 OpenAI embedding 页，两端的真实差异只有前提条件和凭证参数，但标题、示例语言和覆盖步骤也已经不同（见第 4 节）。
 
-图 1 · 内容维护与同步关系。[查看矢量图](./assets/current-content-flow.svg)
+### 1.2 改造需要满足的要求
 
-- ① **从飞书发起修改**：文档工程师编辑飞书正文，借助工具导出适用于 Milvus 的内容并提交 PR，经审核合并后更新 milvus-docs。
-- ② **直接修改 Milvus 文档**：文档工程师或社区贡献者直接提交 PR，无需先修改飞书。PR 合并后，飞书中的对应正文不会随之更新。
-- ③ **将共享修订同步回 Cloud**：文档工程师核对 Milvus 已合并的修改，将适用于 Cloud 的内容手动更新到飞书。图中虚线表示这一步需要另行人工跟进。
+1. **共享内容只有一个编辑源**，社区仍可直接提交 PR。
+2. **Cloud 自主决定何时采用上游修改**，而不是 Milvus 一合并就跟着变。
+3. **Milvus 已上线、Cloud 尚未上线的内容可以先隐藏**：沿用单镜像下的 Current / Next，UAT 可见，Prod 不显示。
+4. **能表达真实的产品差异**，例如前提条件、凭证参数和 Cloud 独有的示例。
+5. **上游新增或修改页面时，Cloud 能自动得知**，而不是靠人工发现。
+6. **不再经过飞书中转**，同时保留多语言代码、内容过滤、翻译、UAT / Prod 审核和恢复能力。
 
-问题在于，回同步没有提醒或固定检查，双方修改冲突时也没有约定以哪一侧为准。两端是否一致依赖人工发现、判断和回抄，长期难以维持。已检查流程中未发现跨源分叉检测，是否另有内部工具仍需确认。
+后文的设计逐条对应这些要求。
 
-例如，社区修订尚未回同步到飞书时，下次导出可能把旧说明带入新的 PR。若审核漏掉这处回退并合并，就会覆盖社区的有效修改。这是现有实现支持的风险，尚未核实发生过此类事故。[核验依据](../research/current-content-flow-audit.md)
+## 2. 目标：共享正文只改一处，Cloud 以 overlay 维护差异
 
-### 1.2 目标维护方式：共享正文只改一处，Cloud 差异单独维护
+**共享正文在 milvus-docs 维护一份，以 Git 为准；Cloud 在 zdoc 中维护建在其上的差异层（overlay），飞书按页退出文档生产链。**
 
-**目标是共享正文只有一份可信来源，以 Git 为准，让飞书按页退出文档生产链。**
+![目标协作方式：社区贡献者和文档工程师向 milvus-docs 提交共享内容，Milvus 沿用既有发布；文档工程师在 zdoc 维护 Cloud 差异与配置。上游变化后，工具在 zdoc 自动发起升级 PR，附生成结果与影响提示；Cloud 审核后合并即采用并按 UAT / Prod 发布，暂不合并则保持已批准版本；需要修改时回到对应源文件。](./assets/collaboration-overview.png)
 
-共享原文以 Markdown 在 milvus-docs 维护；Cloud 在 zdoc 中维护消费配置、产品变量和必要的差异内容。工具生成 Cloud 候选页面，由文档工程师审核采用并安排发布。
+图 2 · 目标协作方式。[查看矢量图](./assets/collaboration-overview.svg)
 
-![图 2：目标维护方式。Milvus 侧维护唯一 Markdown 共享原文；Cloud 侧的文档工程师维护 zdoc 中的消费配置、产品变量和按需提供的差异内容，工具生成候选，再由人工决定采用与发布。飞书按页退出文档生产链。](./assets/target-maintenance-overview.png)
+- **谁改哪里。** 共同内容改 milvus-docs，Cloud 差异和配置改 zdoc。同一位文档工程师可以两边都改；迁移后的页面不再在飞书编辑。
+- **Cloud 怎样控制发布时间（要求 2、5）。** 上游合并后，工具在 zdoc 自动发起升级 PR。合并即采用；不合并，Cloud 就继续使用已批准的版本。
+- **共享原文由谁把关。** milvus-docs 的 PR 按 Milvus 既有流程审核，不需要 Cloud 参与。如果混入只适用于 Milvus 的内容，Cloud 在升级 PR 中处理：暂缓采用、请求改成两端通用的写法，或在 zdoc 中移除该段。Milvus 贡献说明届时补充共享页的写法。
+- **生成文件不能手改。** CI 按固定输入重新生成并比对；发现问题时，回到图中对应的源文件修改。
 
-图 2 · 目标内容维护流程，适用于已迁移的共享页面。[查看矢量图](./assets/target-maintenance-overview.svg)
+### 2.1 Cloud 文档工程师的工作方式变化
 
-相对于图 1，工作方式有三个变化：
+| 事项 | 现在 | 迁移后 |
+|---|---|---|
+| 共享页的共同内容 | 在飞书编辑，再导出到 Milvus | 向 milvus-docs 提交 PR |
+| 共享页的 Cloud 差异 | 在飞书正文中直接改写 | 在 zdoc 维护页面配置和差异片段 |
+| 代码的产品差异、Current / Next 标记 | 写在飞书正文和多维表格中 | 写法不变，写在 Git 中（见第 4 节） |
+| 审核与预览 | 飞书内审阅，UAT 查看结果 | GitHub PR 审核，PR 预览与 UAT 查看结果 |
+| Cloud 独有页 | 在飞书编辑 | 首期不变；终态在 zdoc 以 Markdown / MDX 维护 |
 
-- **共同内容只改一处。** 文档工程师和社区贡献者都向共享原文提交 PR，共享修订不再回抄飞书。
-- **工具发现变化并生成候选。** 上游修改后，工具提示受影响页面并提供预览，文档工程师判断是否采用。
-- **Cloud 控制产品差异和发布时间。** 两端可以采用不同的源版本，采用记录可追溯；Cloud 暂缓采用时继续使用已批准版本。
+**终态是 Cloud 文档全部在 Git 中维护。** 首期只迁移试点页。切换前需要为文档工程师准备 Markdown、配置写法和 PR 流程的说明，预览页提供跳转到源文件的编辑入口。
 
-Cloud 只单独维护产品能力、配置或适用版本造成的真实差异。历史维护不同步造成的差异应先核对，两端都适用的修订合入共享原文。
+## 3. 工具链：在 zdoc 前端新增共享接入
 
-图中蓝色节点表示人，黄色节点表示维护的输入；同一位文档工程师可以参与两侧工作。Cloud 独有页面在 zdoc 维护自己的原文，按页迁移安排见第 5 节。
+![目标工具链：Milvus 侧沿用 milvus-docs → md2md → web-content → milvus.io。zdoc 从 milvus-docs 直接读取固定版本原文，结合页面配置、Variables.json 和差异片段生成 Cloud 页面，经升级 PR 采用后进入 zdoc 既有的校验、过滤、Current / Next、翻译与发布流程。过渡期未迁移的飞书页和后续迁入的 Cloud 独有页也进入同一流程。虚线框标出新增工作的范围。](./assets/target-publication-chains.png)
 
-[上次会议](https://zilliverse.feishu.cn/docx/E10LdFMUHo39nixa9eecd3Pjndg)已讨论这一方向，并要求保留内容过滤和版本控制能力。
+图 3 · 目标工具链（待实施）。[查看矢量图](./assets/target-publication-chains.svg)
 
-## 2. 怎样落地：从现有工具链到目标接入方案
+- **读取点在 md2md 之前。** web-content 中的内容已经按 Milvus 的值展开了变量、清理了命名块标记，Cloud 从那里读取就无法绑定自己的值，也找不到需要差异处理的位置。所以 Cloud 直接读 milvus-docs，与 Milvus 发布链并行。
+- **新增工作只在虚线框内**：zdoc 的获取与生成，以及 md2md 的预处理入口和代码行过滤。右侧的校验、过滤、Current / Next、翻译和发布沿用现有流程，只扩展 Git 输入（要求 3、6）。
+- **过渡期两种来源并存。** 未迁移的页面继续从飞书进入，已迁移的页面从 Git 进入，同一页任一时刻只有一个来源。
 
-为实现上述目标，Cloud 工具链需要增加读取共享原文、应用差异和生成候选的能力。
+现有工具链的对照见[附录 A](#附录-a现有发布工具链)。
 
-### 2.1 现有工具链：两份正文分别构建和发布
+## 4. 差异怎样表达
 
-图 3 的两个“发布输入”就是图 1 中的两份可编辑正文：Milvus 读取 milvus-docs 原始 Markdown；Cloud 从飞书生成 Markdown / MDX。两份正文各自进入一条发布链。
+![三类页面：无差异的页面整篇复用，如 Delete Entities，原文把产品值写成变量，zdoc 只需一份页面配置；有差异的页面在共享正文上叠加 Cloud 差异，如 OpenAI 与 Filtered Search，原文加命名块和代码行指令，zdoc 维护页面配置与差异片段；Cloud 独有页在 zdoc 维护完整原文，首期不迁移。](./assets/page-types.png)
 
-![图 3：Milvus 与 Cloud 发布工具链按五个阶段对齐。黄色为内容，紫色为处理与构建，白色为站点或外部系统；Cloud 的外部 Jenkins 用虚线框标出待核验状态。翻译触发从各自的工作流发出。](./assets/current-publication-chains.png)
+图 4 · 三类页面。[查看矢量图](./assets/page-types.svg)
 
-图 3 · 现有发布工具链。实线表示内容消费或处理顺序，点线表示工作流触发。[查看矢量图](./assets/current-publication-chains.svg)
+- **首期只处理前两类。** 无差异的页面最省事：原文把产品名等写成变量，zdoc 写一份页面配置即可。
+- **有差异的页面按差异的粒度选择写法**（要求 4），下面以 OpenAI 页展开。另一种常见差异是 Cloud 独有的整个代码示例，例如 Filtered Search 的 CLI，以片段加入对应的代码组。
+
+![OpenAI 页的差异：①共享正文整篇复用，产品名写成变量；②“Before you start”一节两端不同，milvus-docs 为这一节加命名块，zdoc 用片段替换；③代码中的凭证参数，两行都写在 milvus-docs 的共享代码中并用产品行指令标记，Milvus 站点只保留注释掉的可选 credential，Cloud 站点只保留必填的 integration_id。](./assets/page-anatomy.png)
+
+图 5 · OpenAI 页的差异怎样表达。[查看矢量图](./assets/page-anatomy.svg)
+
+- **① 和 ② 不需要在原文中写 Cloud 的内容。** 原文只给需要替换的一节加命名块（block ID），Cloud 的内容和替换规则都在 zdoc。
+- **③ 是需要讨论的原则调整：Cloud 专用的一行写在 Milvus 原文中。** 凭证这类差异只有一行，但每种 SDK 都有；如果改为在 zdoc 替换整段代码，Cloud 要为每种语言复制一份几乎相同的代码，漂移问题又会出现。
+- **③ 的风险可控。** 指令语法沿用 zdoc 的[代码变体规范](https://github.com/zilliztech/zdoc/blob/dev/packages/docs-tooling/src/lark/CODE_VARIANTS.md)，Cloud 现有流程中已经在用；只删除整行、不插入代码；只用于代码，段落差异仍写在 zdoc。需要补的工作是 Milvus 发布链增加同语法的过滤，确保 Cloud 的行不出现在 Milvus 站点。
+
+### 4.1 Milvus 先上线、Cloud 后上线的内容
+
+举一个场景：Milvus 发布了新参数 X，共享页 A 新增了一段介绍 X 的内容，同一次修改还修正了 A 中的一处错误。Cloud 下个月才支持 X。
+
+- **整页都不想更新**：不合并升级 PR，Cloud 继续使用已批准的版本（要求 2）。
+- **页面要更新，但其中一段 Cloud 尚未上线**：在同一个升级 PR 中，由 zdoc 把这一段包进 `<NextChannel>`，再合并。UAT 能看到，Prod 看不到；Cloud 上线 X 后去掉包裹（要求 3）。前提是原文中这一段有命名块。
+
+这沿用 zdoc 现有的 Current / Next 机制：UAT 与 Prod 使用同一镜像，部署时按通道显示内容；段落用 `<NextChannel>` 包裹，上线时去掉包裹。整页的通道目前记录在飞书多维表格的 `Release Channel` 字段中，迁移后需要在 Git 中有对应的位置，例如页面配置。[核验记录](../research/zdoc-variants-and-channels-audit.md)
+
+## 5. 试点与路线
+
+![项目路线：首期分 1a 与 1b。1a 用 Delete Entities 跑通整篇复用，从固定源生成到 UAT 预览，建议年底前完成；1b 用 Filtered Search 与 OpenAI 验证差异与升级 PR，接入正式发布、翻译与恢复，并切换试点页。后续分批迁移共享页与 Cloud 独有页，依赖清零后飞书退出。](./assets/rollout-roadmap.png)
+
+图 6 · 项目路线。[查看矢量图](./assets/rollout-roadmap.svg)
+
+- **1a 只走最短路径**：用不需要差异的 Delete Entities 验证真实工具链能生成完整页面，生成结果只进入预览，不写生产。
+- **1b 才正式切换。** 一页切换意味着：从 Git 输入生成并上线，旧飞书任务不能再写入或删除这一页；切换前核对最新的飞书修订。部署失败按既有机制重试或回滚，编辑来源仍是 Git。[切换约束](./architecture.md#6-按页迁移与正式激活)
+- **未迁移页面照常走飞书。** 范围内的页面和导航、媒体等依赖迁完后，再停用相应的飞书抓取与调度。
+
+| 候选 | 验证什么 | 状态 |
+|---|---|---|
+| [Delete Entities](../examples/delete-entities/walkthrough.md) | 整篇复用：变量绑定连接值，生成多语言代码 Tabs | 本地样例已验证 |
+| [Filtered Search](../examples/filtered-search/walkthrough.md) | 产品名变量；在共享代码组中加入 Cloud CLI | 本地样例已验证 |
+| OpenAI（[Milvus](https://milvus.io/docs/openai.md) / [Cloud](https://docs.zilliz.com/docs/openai)） | 前提条件整节替换；凭证参数的代码行指令；先对齐历史漂移 | 候选，未制作样例 |
+
+两篇样例的共享原文含有尚未合入 Milvus 的共同修订和语言补齐，内容与 SDK 适用性仍需审核。OpenAI 跑通后，Cohere、Voyage AI 等同类页面可以照搬。实施细节与验收见 [phase-1](./phase-1.md)。
+
+## 6. 项目推进与本次决策
+
+### 6.1 推进方式
+
+- **推动者**：负责方案、实现与跨仓协调，在每个评审节点准备可演示的结果。
+- **文档负责人**：评审 zdoc 接入设计（配置、来源模型、Current / Next 与发布），审核试点页内容并批准切换。
+- **工程顾问**：评审 md2md 预处理入口与代码行过滤、Milvus 构建回归，以及上游发现与升级 PR 的自动化。
+
+评审节点：本次对齐方向 → 实现设计会（配置字段、md2md / zdoc 接口）→ 1a 完成评审 → 1b 切换评审。
+
+### 6.2 本次需要拍板的事项
+
+| # | 事项 | 建议 |
+|---|---|---|
+| 1 | 共享原文来源 | 读取 md2md 处理前的 milvus-docs 固定版本原文，不从 web-content 读取 |
+| 2 | 飞书退出方式与终态 | 按页切换；终态是共享页与 Cloud 独有页均在 Git 维护 |
+| 3 | 差异表达原则 | 段落与章节差异在 zdoc；代码行差异在共享代码中沿用 zdoc 产品行指令 |
+| 4 | Current / Next | 沿用 zdoc 渲染时通道过滤；新增“包裹共享命名块”的能力 |
+| 5 | 试点候选 | 1a 用 Delete Entities；1b 用 Filtered Search 与 OpenAI |
+| 6 | 首期范围与年底目标 | 首期按 1a、1b 推进；建议年底前完成 1a，并启动 1b |
+| 7 | 共享内容把关 | Cloud 不审核 milvus-docs PR，在升级 PR 中把关；补充 Milvus 贡献说明 |
+| 8 | 分工与评审节点 | 按 6.1 |
+
+### 6.3 请文档负责人帮助确认
+
+- 共享页中需要标为 Next 的内容出现得多频繁，通常是整页、段落还是代码行？整页的 `Release Channel` 目前在飞书多维表格中维护，迁移后放进页面配置是否合适？
+- 产品行指令目前在 Fetch 阶段处理飞书输入，能否直接用于 Git 输入？`saas`、`paas` 等目标在 Cloud 文档中的实际用法是什么？
+- 除内容过滤与 Current / Next 之外，是否还有其他依赖飞书的发布或审核环节？
+
+配置字段（[草案](./consumption-schema.md)）、md2md 与 zdoc 的接口、发布接入细节，在方向确认后另行讨论。
+
+## 附录 A：现有发布工具链
+
+<details>
+<summary>展开查看现有工具链与各阶段对照</summary>
+
+![现有工具链：Milvus 从 milvus-docs 经 md2md、web-content、milvus.io 发布；Cloud 从飞书经 zdoc Fetch、zdoc dev 分支、Docusaurus 站点与外部 Jenkins 发布。两侧各有翻译支路。](./assets/current-publication-chains.png)
+
+图 A · 现有发布工具链。实线表示内容处理顺序，点线表示工作流触发。[查看矢量图](./assets/current-publication-chains.svg)
 
 | 阶段 | Milvus | Cloud |
 |---|---|---|
-| 发布输入 | milvus-docs 的 `site/` 目录存放原始 Markdown。 | 飞书提供正文和媒体，是当前 Cloud 内容生产的输入。 |
-| 正文处理 | [md2md](https://github.com/zilliztech/md2md) 展开变量、引用片段并转换 Milvus 格式。 | [zdoc](https://github.com/zilliztech/zdoc) 的 Fetch 工作流抓取飞书正文和媒体，完成渲染、组装与校验。 |
-| 中间内容 | [web-content](https://github.com/milvus-io/web-content) 接收转换结果，生成站点需要的正文和导航数据。 | 生成正文、导航和译文保存到 zdoc 的 Git **`dev` 分支**，供后续流程读取。 |
-| 站点构建与发布 | [milvus.io](https://github.com/milvus-io/milvus.io) 读取 web-content 内容，构建并部署 Milvus 站点。 | Docusaurus 站点代码位于 zdoc 的 `apps/docs`；仓库说明描述了外部 Jenkins 的 UAT / Prod 发布路径。 |
-| 文档站 | [Milvus 文档站](https://milvus.io/docs)。 | [Cloud 文档站](https://docs.zilliz.com)。 |
-| 翻译支路 | 新文件处理、每周定时或手动任务触发翻译；译文保存到 web-content。 | Fetch 在源内容成功写入 dev 且启用翻译时发起翻译，译文写回 dev。 |
+| 发布输入 | milvus-docs 的 `site/` 目录存放原始 Markdown | 飞书提供正文和媒体 |
+| 正文处理 | [md2md](https://github.com/zilliztech/md2md) 展开变量、引用片段并转换 Milvus 格式 | [zdoc](https://github.com/zilliztech/zdoc) 的 Fetch 工作流抓取飞书正文和媒体，完成渲染、组装与校验 |
+| 中间内容 | [web-content](https://github.com/milvus-io/web-content) 保存站点正文和导航数据 | 生成的正文、导航和译文保存到 zdoc 的 `dev` 分支 |
+| 站点构建与发布 | [milvus.io](https://github.com/milvus-io/milvus.io) 构建并部署 | zdoc 的 `apps/docs`（Docusaurus）；外部 Jenkins 负责 UAT / Prod |
+| 翻译 | 新文件、每周定时或手动触发，译文保存到 web-content | Fetch 写入 dev 后触发，译文写回 dev |
 
-当前所查 Cloud Guides 链使用 zdoc 的飞书处理工具，未调用 md2md；Git 共享原文需要新增接入。
+当前 Cloud Guides 链没有调用 md2md。仓库实现已按固定修订核对，Jenkins 的外部配置和线上运行版本未核验。[发布工具链核验](../research/current-publication-chains-audit.md)
 
-**核验范围。** 仓库实现已按固定修订核对；外部 Jenkins 的运行配置、触发、审批和环境切换待核验，图中以虚线框标注。尚未验证生产发布或线上运行版本，详细依据见[发布工具链核验附件](../research/current-publication-chains-audit.md)。
-
-### 2.2 目标工具链：共享原文分流，Cloud 按内容来源接入
-
-图 4 展示迁移到 Git 后的目标工具链。首期实现共享页的整篇复用和局部差异；Cloud 独有页标出目标路径，批量迁移留待后续。
-
-![图 4：Milvus 共享 Markdown 由 zdoc 获取，与 Cloud 页面 YAML、Variables.json 和按需提供的 Markdown 或代码片段合成 Cloud Markdown/MDX 候选。Cloud 独有页以完整 Markdown/MDX 原文直接接入既有流程。图中保留新增共享接入与既有流程扩展的边界。](./assets/target-publication-chains.png)
-
-图 4 · 目标发布工具链（待实施）。下方标明新增共享接入与既有流程扩展的边界。[查看矢量图](./assets/target-publication-chains.svg)
-
-沿图 4 从原文与配置读到生成、发布：
-
-**milvus-docs → 获取共享内容。** Milvus 继续经 md2md、web-content 和 milvus.io 发布。Cloud 从 milvus-docs 直接读取固定版本的原文，按[注册规则](./architecture.md#3-最少注册规则与自动-registry)获取共享文件并识别命名区域；登记示例见 [modules.yaml](../examples/filtered-search/zdoc/shared/modules.yaml)。
-
-**Cloud 配置与差异片段 → 生成 Cloud 候选页面。** [页面 YAML](../examples/filtered-search/zdoc/filtered-search.page.yaml)说明怎样引用和应用差异，共用的 [Variables.json](../examples/filtered-search/zdoc/Variables.json)提供产品值；需要新增或替换内容时，再提供 Markdown 或代码片段，例如这份 [CLI 片段](../examples/filtered-search/zdoc/fragments/filtered-search/standard-filtering-cli.md)。工具结合这些输入，生成可审核的 [Cloud Markdown / MDX 候选](../examples/filtered-search/generated/filtered-search.mdx)。这部分是新增的 zdoc 接入能力，其中变量和文件引用复用 md2md，需增加独立预处理入口。
-
-**Cloud 独有文档 → 常规内容流程。** 无共享引用的页面在 zdoc 维护完整 Markdown / MDX，从图下方直接接入右侧流程。未迁移页继续使用飞书输入。
-
-**两条 Cloud 路径 → 文档站。** 共享候选经审核采用后，与独有页面汇入既有校验、文档翻译、内容过滤和站点发布流程。这些流程需要扩展 Git 输入及相关保护，保留 UAT / Prod 和发布审核。
-
-三种使用方式对应图中的两条 Cloud 路径：
-
-| 使用方式 | 经过哪些处理 |
-|---|---|
-| **整篇复用** | 获取原文、绑定变量、生成候选；无需命名块或差异片段 |
-| **整篇复用并局部增删替换** | 同一条共享路径，在指定位置应用差异后生成候选 |
-| **Cloud 独有文档，无共享引用** | 完整原文直接进入常规内容流程 |
-
-配置写法见[消费配置规范](./consumption-schema.md)。独立组织 Cloud 章节并引用多个共享片段属于后续扩展。
-
-## 3. 作者工作方式：首次接入与日常维护
-
-首次接入要核对内容、建立共享关系；日常维护沿图 5 修改对应源内容、检查预览并审核采用。
-
-![图 5：修改 Milvus 共同内容或 zdoc 的 Cloud 内容与配置，工具生成候选和变更提示，人工审核后确认采用版本，按既有节奏安排发布；需要修改时返回对应源内容。](./assets/writer-files-and-feedback.png)
-
-图 5 · 日常维护：修改源内容，审核生成结果。[查看矢量图](./assets/writer-files-and-feedback.svg)
-
-| 情境 | 文档工程师做什么 | 工具做什么 |
-|---|---|---|
-| **第一次接入共享页** | 核对两端正文，合并共同修订并确认产品差异；登记来源、建立页面引用，按需绑定变量和提供差异内容；检查完整页面 | 生成候选、预览与对照，供审核后切换 |
-| **接入后的日常维护** | 共同内容改 milvus-docs；Cloud 内容与配置改 zdoc；检查预览，决定采用和发布时间 | 提示受影响页面，重新生成候选，记录采用版本 |
-
-普通正文修订无需重新登记或重写整套配置。确认采用版本后，仍按既有发布审核和节奏上线。具体文件及操作见第 4 节样例。
-
-**生成文件不作为编辑源，手动修改不能进入正式发布。** 发现问题后，沿图中反馈箭头回到源文件修改，预览应提供编辑入口。生产保护要求见[架构设计](./architecture.md#5-生成结果与发布保护)，仍待实施。
-
-## 4. 两篇验证样例：检查复用效果与作者成本
-
-两篇样例都以完整共享原文为基础，分别验证整篇复用和局部差异。点击样例可查看原文、作者维护的文件和生成结果。
-
-| 样例入口 | 用来验证什么 | 本页额外维护的输入 |
-|---|---|---|
-| [Delete Entities](../examples/delete-entities/walkthrough.md) | 连接值通过变量绑定，整篇正文复用并生成多语言代码 Tabs | 一份消费配置；不需要命名块或差异文件 |
-| [Filtered Search](../examples/filtered-search/walkthrough.md) | 产品名和连接值使用变量；在共享代码中补充 Cloud CLI | 一份消费配置、两份 CLI 片段；原文标记两个代码组 |
-
-除表中输入外，两篇都需在共用注册规则中增加文件条目，并使用站点共用的变量和展示规则。
-
-**验证边界：** 共享原文包含共同修订和部分编程语言示例补齐，尚未合入 Milvus。目前仅做本地生成验证，内容与 SDK 适用性、真实站点、发布保护和翻译接入仍需验证。
-
-## 5. 首期与迁移路线：先完成试点，再逐步扩大
-
-**首期包括真实工具链接入和试点页的正式切换。** 两篇样例作为验证候选，切换页面和顺序待内容与工程验证通过后批准。
-
-![图 6：首期完成内容核对、工具链接入与验证、试点页切换；后续再扩大迁移，最终让飞书退出范围内的文档生产链。](./assets/rollout-roadmap.png)
-
-图 6 · 项目推进路线。首期完成试点，后续分批扩大。[查看矢量图](./assets/rollout-roadmap.svg)
-
-首期交付如下，仓库改动、实施依赖和验收要求见 [phase-1](./phase-1.md)：
-
-| 交付 | 预期结果 |
-|---|---|
-| **内容与写作约定** | 共同原文、产品变量、必要命名边界及 Cloud 差异经内容审核确认 |
-| **页面生成能力** | zdoc 能生成内容完整、可预览的 Cloud 页面；Milvus 继续正常发布 |
-| **上游变更与采用流程** | 上游修改后提示影响，Cloud 审核采用；暂缓时保留已批准版本 |
-| **正式发布接入** | 接入既有发布、翻译与恢复，完成批准页面的切换，旧飞书任务不能再覆盖它们 |
-
-图 6 中的“试点切换”按页推进：**任一时刻只有一个正式生成来源。**
-
-| 单页状态 | 正式发布从哪里生成 | 文档工程师在哪里修改 |
-|---|---|---|
-| 准备中 | 飞书仍是该 Cloud 页的正式输入；Git 输入暂时只为该 Cloud 页生成候选预览，Milvus 继续正常发布 | 按现有流程维护，同时整理 Git 输入；切换前核对最新飞书修订 |
-| 确认切换 | 完成验证并获批准后，配置、正文和来源记录同批提交到 dev，激活 Git 来源 | 确认后续 Git 编辑入口，以及飞书退出该页生产链 |
-| 切换后 | 从批准的 Git 输入生成；旧飞书任务不能写入或删除该页 | 共同内容改 milvus-docs，Cloud 内容与配置改 zdoc；Cloud 独有页原文也在 zdoc |
-
-提交配置或生成预览都不代表已切换。来源切换后再进行站点部署；部署失败按既有机制重试或回滚，编辑来源仍为 Git。其他未迁移页面继续原流程。**首期完成时，批准的试点页应已部署上线，并通过后续更新、翻译与恢复验证。**
-
-首期保留社区 PR、产品/版本过滤、完整多语言代码示例、链接与导航、文档翻译、UAT/Prod 审核和恢复能力。后续再分批迁移共享页、Cloud 独有页及导航、媒体等依赖；范围内依赖清零后，停用相应飞书抓取与调度。按页切换的工程约束见[架构设计](./architecture.md#6-按页迁移与正式激活)。
-
-## 6. 讨论重点
-
-- 这套维护方式是否可行，是否还有遗漏的使用场景？
-- 两篇样例是否适合作为试点，作者的维护成本是否可以接受？
-- 下一步先验证哪些工程问题，需要哪些同事一起参与？
+</details>

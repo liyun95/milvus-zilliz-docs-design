@@ -13,12 +13,14 @@ Milvus × Zilliz Cloud 文档同源设计仓库，维护方案、架构、实施
 | [方案总览](docs/proposal.md) | 为什么改、目标工作方式是什么、怎样逐步演进？ |
 | [架构设计](docs/architecture.md) | 各仓库负责什么，如何管理来源、版本、发布与迁移？ |
 | [首期实施与验收](docs/phase-1.md) | 首期交付什么，怎样判断完成，还有哪些条件待核实？ |
-| [消费配置规范](docs/consumption-schema.md) | 如何注册和引用共享内容，怎样绑定变量与表达差异？ |
+| [消费配置草案](docs/consumption-schema.md) | 共享内容怎样引用、绑定变量与表达差异？（字段为草案，待与 zdoc 维护者共同确定） |
 
 ## 设计样例
 
 - [Delete Entities](examples/delete-entities/walkthrough.md)：整篇复用，仅通过变量处理连接值差异。
 - [Filtered Search](examples/filtered-search/walkthrough.md)：产品名与连接变量、共享多语言代码，以及 Cloud CLI 的补充。
+
+OpenAI embedding 页是第三个试点候选，用于验证前提条件整节替换和凭证参数的代码行指令，尚未制作样例；差异分析见 [zdoc 代码变体与发布通道核验](research/zdoc-variants-and-channels-audit.md#3-openai-页对照)。
 
 每篇样例包含作者输入、生成结果及适用边界，具体说明随样例维护。
 
@@ -28,6 +30,6 @@ Milvus × Zilliz Cloud 文档同源设计仓库，维护方案、架构、实施
 - `examples/`：用于验证约定的独立样例。
 - `research/`：行业调研与现有工程能力的核验依据。
 
-调研入口：[行业实践](research/open-source-and-cloud-docs-practices.md)、[现有工具链](research/current-publication-chains-audit.md)、[能力复用](research/md2md-zdoc-reuse-audit.md)、[恢复能力](research/recovery-capability-audit.md)。事实核验以各文档记录的日期和固定修订为准。
+调研入口：[行业实践](research/open-source-and-cloud-docs-practices.md)、[现有工具链](research/current-publication-chains-audit.md)、[能力复用](research/md2md-zdoc-reuse-audit.md)、[恢复能力](research/recovery-capability-audit.md)、[代码变体与发布通道](research/zdoc-variants-and-channels-audit.md)。事实核验以各文档记录的日期和固定修订为准。
 
 设计结论更新到对应文档，接口变更同步检查受影响样例，会议安排和评审问题留在具体提案中。生产原文与工具实现仍在各产品仓库维护，本仓库保留设计及其验证材料。

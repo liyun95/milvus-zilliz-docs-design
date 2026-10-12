@@ -1,8 +1,29 @@
-# 首期共享内容消费配置（schema v1）
+# 共享内容消费配置（草案）
 
-本约定用于首期工程评估，版本为 `schema_version: 1`。实际配置见 [Filtered Search](../examples/filtered-search/zdoc/filtered-search.page.yaml)，作者操作见[样例说明](../examples/filtered-search/walkthrough.md)。[Delete Entities](../examples/delete-entities/zdoc/delete-entities.page.yaml)使用相同版本的整篇消费子集。生产流水线尚未接入；架构与发布要求见[架构设计](./architecture.md)，实施验收见[首期方案](./phase-1.md)。
+**状态：草案，用于说明设计和驱动本地样例，不是定稿接口。** 字段名、文件位置和目录布局将在实现设计中与 zdoc 维护者共同确定，并与 zdoc 现有的手册注册、front matter 和导航配置对齐。本次方向对齐只需确认下面的概念约束。
 
-`schema_version` 标识配置格式，首期为 `1`，与 Milvus 产品版本无关。正式使用后，若配置发生不兼容变化，再升级版本；不支持的版本应明确报错。
+## 0. 需要对齐的概念约束
+
+- 只按整页或源内命名块定位；不使用行号、正则、文本搜索或标题选择器。
+- 内容变换只有 add、replace、remove 三种动作，另可把命名块包进 `<NextChannel>`；不按业务类型增加专用操作。
+- 变量沿用 md2md 的 `Variables.json` 与 `{{var.xxx}}`；缺少 Cloud 绑定时报错，不静默使用 Milvus 的值。
+- 代码行的产品差异沿用 zdoc 的产品行指令，写在共享代码中，不通过配置表达；段落与章节差异不在共享原文中写条件。
+- 生成文件不作为编辑源。
+- 作者成本：每个共享页一份页面配置，差异片段按需提供，共用规则在站点范围维护一次。
+
+## 待与 zdoc 维护者共同确定
+
+| 问题 | 现状与考虑 |
+|---|---|
+| 链接与图片映射 | 样例在每页配置中手工维护 `links`、`assets`，页数增多后成本线性增长；可考虑由 registry 推导或站点级规则 |
+| 页面元数据 | 样例的 `metadata` 与 zdoc 现有 front matter、导航配置重复；应挂接现有手册注册，而不是重新定义 |
+| 注册文件 | `shared/modules.yaml` 让文件改名时模块 ID 不变，但多一个共用文件；试点阶段是否可以简化 |
+| lock 粒度与跟踪分支 | 每页独立采用还是全仓统一；Cloud 跟踪哪个 Milvus 版本分支 |
+| 发布通道 | 整页通道目前在飞书多维表格的 `Release Channel` 字段中维护，迁移后在 Git 中的位置（例如页面配置）；命名块包裹的写法；Git 页面的整页通道如何传递到译文 |
+
+以下内容记录本地样例使用的草案字段。实际配置见 [Filtered Search](../examples/filtered-search/zdoc/filtered-search.page.yaml)，作者操作见[样例说明](../examples/filtered-search/walkthrough.md)。[Delete Entities](../examples/delete-entities/zdoc/delete-entities.page.yaml)使用相同版本的整篇消费子集。架构与发布要求见[架构设计](./architecture.md)，实施验收见[首期方案](./phase-1.md)。
+
+`schema_version` 标识配置格式，样例为 `1`，与 Milvus 产品版本无关；不支持的版本应明确报错。
 
 ## 1. 首期范围
 
@@ -16,14 +37,16 @@
 | 替换命名 Markdown 块 | 产品说明或步骤内容不同 | 通用 replace 的本地测试通过 |
 | 删除命名块 | 消费方不适用的段落或完整代码组 | 通用 remove 的本地测试通过 |
 | 增加、替换、删除代码组中的语言项 | CLI 或其他语言示例的覆盖差异 | 三个动作均有本地测试；实际页只使用 add |
-| 替换命名代码区域 | 认证流程等真正的代码结构差异 | 首期工程目标；当前两篇样例未覆盖，需补正式实现与契约测试 |
+| 用 `<NextChannel>` 包裹命名块 | 共享内容中 Cloud 尚未上线的部分 | 首期工程目标；样例未覆盖 |
+
+代码行的产品差异（如 `credential` 与 `integration_id`）不在本配置中表达，而是在共享代码中使用 zdoc 产品行指令，见[架构设计](./architecture.md#代码行产品指令)。
 
 不同业务内容不对应不同 operation。没有 add_cli、add_prerequisite、replace_credentials 等专用操作。
 
 首期暂不新增：
 
 - 行号、正则、文本搜索、标题 selector；任意 AST/DOM 路径或数组下标定位。
-- 任意代码行插入/删除。代码内部变动先使用命名区域整体 replace，确保片段是可审核的语法单元。
+- 代码子区域替换和任意代码行插入。行级差异使用产品行指令；差异较多时替换整个语言项。
 - move/copy、任意嵌套变换，以及继续寻址本轮刚插入的内容。
 - 变量表达式、循环、条件模板、把整段代码塞进 JSON 变量。
 - 动态执行脚本生成内容、任意插件式 operation、自动判断 SDK/CLI 语义等价。
@@ -118,7 +141,6 @@ transforms:
 - Markdown 块：文件提供完整替换 Markdown。
 - 语言项：target 再加 language，文件包含一个匹配语言的完整代码围栏。
 - 完整代码组：文件提供完整组结构，再执行相同的语言校验。
-- 命名代码区域：文件为相应语言的纯代码片段，沿用去基础缩进、保留内部层级、按插入点缩进的规则。此项尚未接入 本地构建器，不能将 Markdown 替换冒充代码区域支持。
 
 ### remove：删除已有内容
 
@@ -154,6 +176,6 @@ transforms:
 
 构建器应明确拒绝不支持的版本和未知字段。语言展示规则、链接映射、图片适配和站点元数据仍各有明确配置，不扩展成正文专用 operation，也不重写既有发布或翻译机制。
 
-变量文件、片段路径和消费 YAML 已统一，两篇样例均提供可重建的 Cloud MDX 和检查脚本。当前本地验证覆盖 Markdown 块和语言项；代码区域的集成、真实 md2md/Docusaurus/SDK/CLI 构建运行、跨仓升级和生产门禁仍需工程实现或验证。
+变量文件、片段路径和消费 YAML 已统一，两篇样例均提供可重建的 Cloud MDX 和检查脚本。当前本地验证覆盖 Markdown 块和语言项；通道包裹、代码行指令过滤、真实 md2md/Docusaurus/SDK/CLI 构建运行、跨仓升级和生产门禁仍需工程实现或验证。
 
 站点展示规则由工程维护者共用维护。两篇样例使用相同的 `cloud-sdk-tabs.yaml`：语言项以 `required` 声明是否必须存在；可选语言只在页面提供内容时显示，默认语言必须存在。Cloud 的页面标题、导航标签和路由由 `metadata` 配置，正文标题与章节结构随共享原文引用。
