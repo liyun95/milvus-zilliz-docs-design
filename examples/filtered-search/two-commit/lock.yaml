@@ -1,0 +1,12 @@
+# Proposed two-commit lock for one shared page. Prod renders `current`, UAT renders `next`.
+# A real lock names milvus-docs commit SHAs; this offline fixture stands each commit in
+# with a directory snapshot (paths are relative to examples/filtered-search).
+schema_version: 1
+page: cloud.filtered-search
+channels:
+  current:
+    commit: fixture-current
+    snapshot: milvus-docs
+  next:
+    commit: fixture-next
+    snapshot: two-commit/milvus-docs-next

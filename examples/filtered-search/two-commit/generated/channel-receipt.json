@@ -1,0 +1,82 @@
+{
+  "status": "local-demo-not-a-release-authorization",
+  "channels": {
+    "current": {
+      "commit": "fixture-current",
+      "cloud_output_digest": "sha256:b81a8a773dd887602837ab25b33722be3f209f3f673038b5e7b0a677b05b1e0d"
+    },
+    "next": {
+      "commit": "fixture-next",
+      "cloud_output_digest": "sha256:e4e84c66319ed1e6bcfa79040a0c369ec66652483be44028c80947a49087b1ac"
+    }
+  },
+  "builder_digest": "sha256:2cfb584ddf4b98e25536bb6b25aee83102d3c4e36cd6168bf07c9dd2f8e54ece",
+  "pairs": [
+    {
+      "change": "changed",
+      "current": [
+        {
+          "kind": "paragraph",
+          "text": "In Zilliz Cloud, filtered searches are categorized into two types — **standard filtering** and **iterative filtering** — depending on the stage at which the filtering is applied."
+        }
+      ],
+      "next": [
+        {
+          "kind": "paragraph",
+          "text": "In Zilliz Cloud, filtered searches are categorized into two types — **standard filtering** and **iterative filtering** — depending on when the filter is applied relative to the vector search."
+        }
+      ]
+    },
+    {
+      "change": "changed",
+      "current": [
+        {
+          "kind": "list",
+          "text": "- Filter entities that match the filtering conditions carried in the search request.\n\n- Conduct the ANN search within the filtered entities.\n\n- Returns top-K entities."
+        }
+      ],
+      "next": [
+        {
+          "kind": "list",
+          "text": "- Filter entities that match the filtering conditions carried in the search request.\n\n- Conduct the ANN search within the filtered entities.\n\n- Return the top-K entities."
+        }
+      ]
+    },
+    {
+      "change": "changed",
+      "current": [
+        {
+          "kind": "paragraph",
+          "text": "This section demonstrates how to conduct a filtered search. Code snippets in this section assume  you already have the following entities in your collection. Each entity has four fields, namely **id**, **vector**, **color**, and **likes**."
+        }
+      ],
+      "next": [
+        {
+          "kind": "paragraph",
+          "text": "This section demonstrates how to conduct a filtered search. Code snippets in this section assume you already have the following entities in your collection. Each entity has four fields, namely **id**, **vector**, **color**, and **likes**."
+        }
+      ]
+    },
+    {
+      "change": "changed",
+      "current": [
+        {
+          "kind": "paragraph",
+          "text": "To conduct a filtered search with iterative filtering, you can do as follows:"
+        }
+      ],
+      "next": [
+        {
+          "kind": "paragraph",
+          "text": "To conduct a filtered search with iterative filtering, set the `hints` search parameter to `iterative_filter`."
+        },
+        {
+          "kind": "paragraph",
+          "text": "The following code snippets use the same filtering condition as the standard filtering example."
+        }
+      ]
+    }
+  ],
+  "warnings": [],
+  "output_digest": "sha256:26b9ef11e9f23898e6950910311ea1a8888c1ef2123a97ec4674ccbf15bc0307"
+}
