@@ -134,8 +134,8 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 样例 | 已覆盖 | 尚需验证 |
 |---|---|---|
 | Delete Entities | 整篇引用、连接变量、三组七语言 Tabs、正文与章节保留 | 真实工具链与 SDK 适用性 |
-| Filtered Search | 产品名与连接变量、两个命名代码组、CLI 补充；专门测试覆盖块和语言项的 add / replace / remove | 真实工具链与 SDK / CLI 适用性 |
-| OpenAI | 尚无样例；两端差异已核对（[核验记录](../research/zdoc-variants-and-channels-audit.md#3-openai-页对照)） | 内容对齐、代码行级的变换、真实工具链 |
+| Filtered Search | 产品名与连接变量、两个命名代码组、CLI 补充；专门测试覆盖块、语言项和代码行三级的 add / replace / remove（代码行为合成用例） | 真实工具链与 SDK / CLI 适用性 |
+| OpenAI | 尚无样例；两端差异已核对（[核验记录](../research/zdoc-variants-and-channels-audit.md#3-openai-页对照)） | 内容对齐、凭证参数的代码行变换（真实用例）、真实工具链 |
 
 两篇样例都检查了不支持的 schema、缺失输入和手改生成结果等错误；都没有调用真实的 md2md、Docusaurus 或生产发布，也没有实现跨仓升级、翻译和发布保护。
 

@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import re
+import textwrap
 import yaml
 
 ROOT = Path(__file__).resolve().parent
@@ -17,6 +18,7 @@ VAR = re.compile(r'{{var\.([a-z][a-z0-9_]*)}}')
 START = re.compile(r'^<!-- doc:block:start id="([a-z][a-z0-9-]*)" -->\n', re.M)
 END = re.compile(r'^<!-- doc:block:end id="([a-z][a-z0-9-]*)" -->[ \t]*(?:\n|$)', re.M)
 NAV = re.compile(r'<div class="multipleCode">\n(.*?)</div>\s*', re.S)
+MAX_LINES = 5
 
 
 def sha(text):
@@ -113,7 +115,7 @@ def transform_rules(page, blocks):
         raise ValueError('UNSUPPORTED_SCHEMA_VERSION')
     if set(page) - {'schema_version', 'page', 'source', 'variables', 'presentation', 'metadata', 'links', 'assets', 'transforms'}:
         raise ValueError('UNKNOWN_PAGE_FIELD')
-    seen, by_block = set(), {}
+    seen, by_block, line_rules = set(), {}, []
     rules = page.get('transforms', [])
     if not isinstance(rules, list):
         raise ValueError('TRANSFORMS_MUST_BE_LIST')
@@ -124,7 +126,7 @@ def transform_rules(page, blocks):
         if op not in ('add', 'replace', 'remove'):
             raise ValueError('UNKNOWN_OPERATION')
         target = rule.get('target')
-        if not isinstance(target, dict) or set(target) - {'module', 'block', 'language'} or not {'module', 'block'} <= set(target):
+        if not isinstance(target, dict) or set(target) - {'module', 'block', 'language', 'lines'} or not {'module', 'block'} <= set(target):
             raise ValueError('INVALID_TARGET')
         if target['module'] != page['source']['module']:
             raise ValueError('TARGET_OUTSIDE_SOURCE')
@@ -134,6 +136,9 @@ def transform_rules(page, blocks):
         if 'language' in target and (not isinstance(language, str) or not language):
             raise ValueError('INVALID_LANGUAGE')
         block = blocks[bid]
+        if 'lines' in target:
+            line_rules.append(line_rule(rule, block))
+            continue
         if op == 'remove':
             if 'content' in rule or 'position' in rule:
                 raise ValueError('REMOVE_HAS_CONTENT_OR_POSITION')
@@ -163,12 +168,112 @@ def transform_rules(page, blocks):
         destructive = [r for r in entries if 'language' not in r['target'] and r['operation'] in ('replace', 'remove')]
         if destructive and len(entries) > 1:
             raise ValueError('PARENT_CHILD_CONFLICT')
-    return rules
+    for rule in line_rules:
+        target = rule['target']
+        if target['block'] in by_block and any(
+                r['operation'] in ('replace', 'remove') and r['target'].get('language') in (None, target['language'])
+                for r in by_block[target['block']]):
+            raise ValueError('LINE_LANGUAGE_CONFLICT')
+    return [rule for rule in rules if 'lines' not in rule['target']], line_rules
+
+
+def split_lines(text, error):
+    if not isinstance(text, str):
+        raise ValueError(error)
+    lines = text.rstrip('\n').split('\n')
+    if not text.strip() or any(not line.strip() for line in lines):
+        raise ValueError(error)
+    return lines
+
+
+def line_rule(rule, block):
+    """Validate a rule that targets consecutive whole lines inside one language example."""
+    target, op = rule['target'], rule['operation']
+    language = target.get('language')
+    if language is None:
+        raise ValueError('LINES_REQUIRE_LANGUAGE')
+    if block['kind'] != 'code-group':
+        raise ValueError('LANGUAGE_TARGET_NOT_CODE_GROUP')
+    if language not in block['codes']:
+        raise ValueError('MISSING_LANGUAGE')
+    lines = split_lines(target['lines'], 'INVALID_LINES')
+    if len(lines) > MAX_LINES:
+        raise ValueError('LINES_TOO_LONG')
+    if op == 'remove':
+        if 'content' in rule or 'position' in rule:
+            raise ValueError('REMOVE_HAS_CONTENT_OR_POSITION')
+        content = None
+    else:
+        if not isinstance(rule.get('content'), dict) or set(rule['content']) != {'lines'}:
+            raise ValueError('CONTENT_LINES_REQUIRED')
+        content = split_lines(textwrap.dedent(rule['content']['lines']) if isinstance(rule['content']['lines'], str) else None,
+                              'INVALID_CONTENT_LINES')
+        if any('```' in line or 'doc:block:' in line for line in content):
+            raise ValueError('INVALID_CONTENT_LINES')
+    if op == 'add':
+        if rule.get('position') not in ('before', 'after'):
+            raise ValueError('ADD_POSITION_REQUIRED')
+    elif 'position' in rule:
+        raise ValueError('UNEXPECTED_POSITION')
+    return {**rule, 'match': [line.strip() for line in lines], 'new_lines': content}
+
+
+def reject_overlaps(spans):
+    """Replaced or removed lines may not overlap each other or another rule's anchor."""
+    edits = [span for span in spans if span[2]['operation'] != 'add']
+    for i, (start, end, _) in enumerate(edits):
+        if any(start < other_end and other_start < end for other_start, other_end, _ in edits[i + 1:]):
+            raise ValueError('OVERLAPPING_LINE_TARGETS')
+    for start, end, rule in spans:
+        if rule['operation'] == 'add' and any(s < end and start < e for s, e, _ in edits):
+            raise ValueError('OVERLAPPING_LINE_TARGETS')
+
+
+def apply_line_rules(code, rules):
+    """Match every rule against the original code, reject overlaps, then edit from the bottom up."""
+    original = code.split('\n')
+    spans = []
+    for rule in rules:
+        size = len(rule['match'])
+        hits = [i for i in range(len(original) - size + 1)
+                if [line.strip() for line in original[i:i + size]] == rule['match']]
+        if not hits:
+            raise ValueError('LINES_NOT_FOUND')
+        if len(hits) > 1:
+            raise ValueError('LINES_NOT_UNIQUE')
+        spans.append((hits[0], hits[0] + size, rule))
+    reject_overlaps(spans)
+
+    def position(i):
+        start, end, rule = spans[i]
+        is_add = rule['operation'] == 'add'
+        at = end if is_add and rule['position'] == 'after' else start
+        return at, 0 if is_add else 1, i
+
+    lines = list(original)
+    # Bottom-up by the real edit position keeps earlier indices valid. At the same position,
+    # replace/remove run before insertions, and insertions keep configuration order.
+    for i in sorted(range(len(spans)), key=position, reverse=True):
+        start, end, rule = spans[i]
+        indent = re.match(r'[ \t]*', original[start])[0]
+        new = [indent + line for line in rule['new_lines'] or []]
+        if rule['operation'] == 'replace':
+            lines[start:end] = new
+        elif rule['operation'] == 'remove':
+            del lines[start:end]
+        else:
+            at = start if rule['position'] == 'before' else end
+            lines[at:at] = new
+    report = [{'operation': r['operation'], 'target': r['target'], 'matched_lines': [s + 1, e],
+               **({'position': r['position']} if 'position' in r else {}),
+               **({'content_digest': sha('\n'.join(r['new_lines']))} if r['new_lines'] else {})}
+              for s, e, r in spans]
+    return '\n'.join(lines), report
 
 
 def compose(source, page, profile, values, exports, read_content):
     blocks = scan(source)
-    rules = transform_rules(page, blocks)
+    rules, line_rules = transform_rules(page, blocks)
     states = {bid: {'kind': block['kind'], 'codes': dict(block['codes']), 'body': block['content'],
                     'before': [], 'after': [], 'removed': False} for bid, block in blocks.items()}
     consumed = []
@@ -203,6 +308,12 @@ def compose(source, page, profile, values, exports, read_content):
                          **({'position': rule['position']} if 'position' in rule else {}),
                          **({'file': rule['content']['file'], 'content_digest': sha(insert)} if insert is not None else {}),
                          'source_block_digest': blocks[bid]['digest']})
+    by_language = {}
+    for rule in line_rules:
+        by_language.setdefault((rule['target']['block'], rule['target']['language']), []).append(rule)
+    for (bid, lang), group in by_language.items():
+        states[bid]['codes'][lang], report = apply_line_rules(states[bid]['codes'][lang], group)
+        consumed.extend({**entry, 'source_block_digest': blocks[bid]['digest']} for entry in report)
     result = source
     for bid, block in sorted(blocks.items(), key=lambda item: item[1]['start'], reverse=True):
         state = states[bid]
