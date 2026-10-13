@@ -77,6 +77,12 @@
 
 Cloud 复用共享内容时要回答三个问题：哪里和 Milvus 不同（[4.1](#41-内容差异cloud-的改动写在-zdocmilvus-原文只加命名块)），上游的修改要不要采用（[4.2](#42-是否采用上游修改经更新-pr-审核)），采用之后什么时候进入 Prod（[4.3](#43-何时上线prod-与-uat-各固定一个-commit)）。
 
+三个问题中，人和工具的分工如下：
+
+- **文档工程师手写**：milvus-docs 中的共享原文和命名块；zdoc 中的页面配置（YAML）、Cloud 内容文件，以及 Variables.json 中 Cloud 的值。4.1 讲的都是这一部分。
+- **zdoc 新增的共享接入自动完成**：发现 milvus-docs 的新提交，发起上游更新 PR；记录 Prod 与 UAT 各用 milvus-docs 的哪个 commit；生成 Cloud 页面，包括其中的 `<NextChannel>` 标记，即图 3 的 ③。
+- **人做决定**：是否合并上游更新 PR，也就是 UAT 是否采用；Cloud 发布时让 Prod 跟上 UAT。
+
 ### 4.1 内容差异：Cloud 的改动写在 zdoc，Milvus 原文只加命名块
 
 按 Cloud 与 Milvus 的差异多少，页面分三类：
@@ -93,8 +99,12 @@ Cloud 复用共享内容时要回答三个问题：哪里和 Milvus 不同（[4.
 ![OpenAI 页的差异：①共享正文整篇复用，产品名写成变量；②“Before you start”一节两端不同，milvus-docs 为这一节加命名块，zdoc 用 Cloud 内容文件替换；③代码中的凭证参数，milvus-docs 的代码不改，只给代码组加命名块；zdoc 页面配置中的一条 replace 规则按原文中连续的两行定位，把可选的 credential 注释换成 Cloud 必填的 integration_id。Milvus 站点与原文相同，只去掉命名块标记。](./assets/page-anatomy.png)
 
 图 5 · OpenAI 页的差异怎样表达
-- **Milvus 原文只加中性的命名块。** Cloud 的内容和规则都在 zdoc，Milvus 作者不需要照顾 Cloud 的写法。原文也不写 `include-next-line` 这类产品指令，否则 Milvus 发布链也要跟着过滤。
-- **按差异的粒度选写法。** ① 只有产品名不同：写成变量。② 整节不同：给这一节加命名块，用 Cloud 内容文件（Markdown）替换。③ 每种 SDK 只差一两行：在页面配置（YAML）中用 `lines` 匹配这几行，只改这几行。Cloud 独有的示例，如 Filtered Search 的 CLI，也写成 Cloud 内容文件，加进对应的代码组。
+- **Milvus 原文只加中性的命名块。** Cloud 的内容和规则都在 zdoc，Milvus 作者不需要照顾 Cloud 的写法。原文也不写 `include-next-line` 这类产品指令，否则 Milvus 发布链也要跟着过滤。命名块是一对 HTML 注释，只用来定位：zdoc 生成 Cloud 页面时按页面配置处理它，Milvus 发布时 md2md 把它清掉。
+- **按差异的粒度选写法。**
+  - ① 只有产品名不同：写成变量，例如把 "Milvus" 写成 `{{var.product_name}}`，两端各自给值。
+  - ② 整节不同：例如 Before you start，Milvus 讲配置 `milvus.yaml`，Cloud 讲在控制台创建集成。用一对 HTML 注释把这一节标成命名块，在页面配置中声明用 Cloud 内容文件（Markdown）替换它。
+  - ③ 代码只差一两行：例如 Python 示例中，Milvus 用两行注释说明 `credential` 是可选参数，Cloud 则必须填 `integration_id`。命名块加在整个代码组上，代码本身不改；页面配置用 `lines` 匹配这两行，只改这两行。
+  - Cloud 独有的示例，如 Filtered Search 的 CLI，也写成 Cloud 内容文件，加进对应的代码组。
 - **匹配失败时直接报错。** 上游改了 `lines` 匹配的那几行，上游更新 PR 会被拦下（[第 4.2 节](#42-是否采用上游修改经更新-pr-审核)）；差异更大时，替换整个语言示例。
 
 ### 4.2 是否采用：上游修改经更新 PR 审核
@@ -103,20 +113,23 @@ Cloud 复用共享内容时要回答三个问题：哪里和 Milvus 不同（[4.
 
 - **谁发起：** zdoc 新增的自动任务。它跟踪 milvus-docs 的新提交，只为改动涉及的已接入页面发起 PR。
 - **PR 改什么：** 把 UAT 使用的 milvus-docs commit 更新为新提交。zdoc 记录的是具体的提交编号，由工具维护；上游合并新提交不会让它变。
-- **审核看什么：** 新生成的页面和差异。Cloud 替换过的段落如果在上游有变化，即使 Cloud 页面看起来没变，也会提示复核。
+- **审核看什么：** 新生成的 Cloud 页面和差异。有两种变化在差异中看不出来或容易漏，工具会单独提示：
+  - 一是 Cloud 替换过的一节在上游有修改。例如上游在 Before you start 中补充了一条要求，Cloud 页面因为整节替换而没有变化，需要确认 Cloud 内容文件是否同步。
+  - 二是正文中残留只属于 Milvus 的说法，例如没写成变量的 "In Milvus"。
 - **出错时不放过：** 命名块被删除或改名，或 `lines` 匹配的代码行被改动时，PR 直接报错，Cloud 继续使用已批准的内容。
 
 合不合并由 Cloud 决定：
 
 | 这次上游修改 | 怎么处理 |
 |---|---|
-| 适用于 Cloud，包括还没上线的功能 | 合并。UAT 先看到，何时进入 Prod 见[第 4.3 节](#43-何时上线prod-与-uat-各固定一个-commit) |
-| 不适用于 Cloud | 请 Milvus 改成两端通用的写法，或在 zdoc 中移除、替换这一段（[第 4.1 节](#41-内容差异cloud-的改动写在-zdocmilvus-原文只加命名块)）。不要靠不合并来挡住它，否则同一页的其他修改也会被挡住 |
-| 暂时判断不了 | 先不合并，UAT 和 Prod 都保持原样 |
+| 适用于 Cloud，包括还没上线的功能。例如新增参数 X，Cloud 下月支持 | 合并。UAT 先看到，何时进入 Prod 见[第 4.3 节](#43-何时上线prod-与-uat-各固定一个-commit) |
+| 内容 Cloud 也需要，只是写法只适合 Milvus。例如新增一句 "In Milvus, you can …" | 在 milvus-docs 把 "Milvus" 改成变量。修正合并后，下一个上游更新 PR 自然带上，zdoc 不用改 |
+| 内容只属于 Milvus。例如新增一段 `milvus.yaml` 配置说明 | 在 milvus-docs 用一对 HTML 注释把这段标成命名块，在 zdoc 页面配置中加一条 `remove`（[第 4.1 节](#41-内容差异cloud-的改动写在-zdocmilvus-原文只加命名块)）。这条规则加进包含命名块的新上游更新 PR，一起合并 |
+| 暂时判断不了 | 先不合并，UAT 和 Prod 保持原样。但后来的 commit 包含这次修改，之后的上游修改也会一起等待，所以要尽快按上面几行做出决定 |
 
 ### 4.3 何时上线：Prod 与 UAT 各固定一个 commit
 
-Prod 用上次 Cloud 发布时的 commit，UAT 用最新批准的 commit；两者不同的段落，由工具自动包进 `<NextChannel>`。
+Prod 用上次 Cloud 发布时的 commit，UAT 用最新批准的 commit；两者不同的段落，由工具自动包进 `<NextChannel>`。这两个 commit 由工具记录在 zdoc 中，不写在页面配置里，文档工程师不用手填。
 
 **为什么需要。** 例如 Milvus 发布小版本时，文档工程师改写了共享页 A 中 Introduction 的措辞，又新增一段介绍新参数 X，而 Cloud 下个月才支持 X。在此之前，Prod 应继续显示旧的 Introduction、不出现 X，UAT 则要能提前看到新内容。只给改动的段落打标记做不到：原文里已经只剩新文，包进 `<NextChannel>` 后，Prod 上这一段会直接消失；改动零碎时，逐处加标记也难以维护。
 
@@ -140,10 +153,12 @@ Prod 用上次 Cloud 发布时的 commit，UAT 用最新批准的 commit；两�
 
 `exclude` 中的内容只在 Prod 显示，`include` 中的内容只在 UAT 显示，这是 zdoc 现有的用法；这些标记由工具生成，不需要手写。
 
-| 时间点 | UAT | Prod |
-|---|---|---|
-| 合并上游更新 PR 后 | 新的 Introduction 和 X | 旧的 Introduction |
-| Cloud 发布，Prod 改用 UAT 的 commit | 不变 | 与 UAT 一致，成对的标记自动消失 |
+| 时间点 | Prod 用的 commit | UAT 用的 commit | 页面上 |
+|---|---|---|---|
+| 起始 | a1 | a1 | 两者相同，没有 `<NextChannel>` |
+| 合并上游更新 PR（b2：改写 Introduction，新增 X） | a1 | b2 | Prod 显示旧的 Introduction；UAT 显示新的 Introduction 和 X |
+| 再合并一个上游更新 PR（c3：修正一处错字） | a1 | c3 | Prod 不变；UAT 也带上这处修正 |
+| Cloud 发布 | c3 | c3 | 两者又相同，成对的标记自动消失 |
 
 **两种例外：**
 
