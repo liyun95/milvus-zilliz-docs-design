@@ -12,7 +12,7 @@
     "zdoc/shared-pages/filtered-search/standard-filtering-cli.md": "sha256:b26d31dbe5ec9301f5a4cca058815f1b4edf1b415a69a9da66ab828ea1c01dc4",
     "zdoc/shared-pages/filtered-search/iterative-filtering-cli.md": "sha256:d55ed97759104aa8ea954e3e746bcd2aa73d68264800e1b8d90349366be3abf7"
   },
-  "builder_digest": "sha256:4f5bcaeb79e9a0bfa4cece2aa55add20181987135f7e0cc2dae652102bc50320",
+  "builder_digest": "sha256:de53dad4d09fae1dad5eb7e2a4b3dcc8f127fb734498f4417882e881f2406140",
   "transforms": [
     {
       "operation": "add",

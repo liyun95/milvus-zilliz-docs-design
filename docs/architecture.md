@@ -28,7 +28,7 @@
 
 ## 2. 页面生成
 
-![Cloud 页面生成流水线：①按 lock 中的 commit 获取 milvus-docs 原文；②定位命名块与代码组并生成 registry；③按页面配置对命名块、语言示例或连续的代码行执行 add、replace、remove，并包裹 NextChannel；④调用 md2md 预处理入口展开变量与片段；⑤沿用 zdoc 现有的产品过滤，只处理 Cloud 内容中的指令；⑥站点适配并输出 MDX。下方对照 Milvus 侧：md2md 用 Milvus 变量展开并清除命名块标记。](./assets/generation-pipeline.png)
+![Cloud 页面生成流水线：①按 lock 中 current / next 两个 commit 获取 milvus-docs 原文；②定位命名块与代码组并生成 registry；③按页面配置对命名块、语言示例或连续的代码行执行 add、replace、remove；④调用 md2md 预处理入口展开变量与片段；⑤沿用 zdoc 现有的产品过滤，只处理 Cloud 内容中的指令；⑥站点适配。两个版本各走一遍，按块比较后把不同的块成对包进 NextChannel，输出一份 MDX。下方对照 Milvus 侧：md2md 用 Milvus 变量展开并清除命名块标记。](./assets/generation-pipeline.png)
 
 图 2 · Cloud 页面生成流水线
 - **顺序是约束，不是实现细节。** 命名块必须在变量展开之前定位，因为标记只存在于原文中；Cloud 内容文件在第 3 步插入后，与原文一起在第 4 步展开变量。本地原型也按这个顺序实现。
@@ -51,7 +51,7 @@
 
 ### 2.2 差异与变量
 
-页面配置只做三种动作：`add`、`replace`、`remove`。目标可以是一个命名块、代码组中的一个语言示例，或语言示例中连续的几行（第 2.3 节）。另可把命名块包进 `<NextChannel>`（第 4 节）。动作写法和冲突规则见[消费配置草案](./consumption-schema.md)。
+页面配置只做三种动作：`add`、`replace`、`remove`。目标可以是一个命名块、代码组中的一个语言示例，或语言示例中连续的几行（第 2.3 节）。Current / Next 不在这里声明，由 lock 中的两个版本自动区分（第 4 节）。动作写法和冲突规则见[消费配置草案](./consumption-schema.md)。
 
 变量沿用 md2md 的 `Variables.json` 与 `{{var.xxx}}`：
 
@@ -100,12 +100,13 @@
 
 ## 3. 上游变化与升级 PR
 
-![上游变化成为 Cloud 升级 PR 的过程：milvus-docs 的 PR 经 CI 检查后合并；zdoc 工具发现新提交，固定 commit 重新生成并比较变化，在 zdoc 发起附 lock、生成差异和影响报告的升级 PR；命名块被删除或改名时阻止升级，旧版本继续有效。Cloud 文档工程师审核：修改则回到源文件，暂缓则保持旧版本，合并则采用新版本并进入既有发布流程。](./assets/upgrade-pr-flow.png)
+![上游变化成为 Cloud 升级 PR 的过程：milvus-docs 的 PR 经 CI 检查后合并；zdoc 工具发现新提交，固定 commit 重新生成并比较变化，在 zdoc 发起附 lock、生成差异和影响报告的升级 PR；命名块被删除或改名时阻止升级，旧版本继续有效。Cloud 文档工程师审核：修改则回到源文件，暂缓则保持旧版本，合并则更新 lock 的 next，新版本先在 UAT 可见；Cloud 发布时把 current 改为 next，Prod 采用新版本。](./assets/upgrade-pr-flow.png)
 
 图 3 · 上游变化怎样成为 Cloud 的升级 PR
-- **升级就是一个普通的 zdoc PR。** PR 中更新 lock，附生成结果的差异、预览和影响报告；审核与批准沿用 GitHub PR，不另建审批记录。lock 和依赖索引由工具生成，写作者不手填 hash。
+- **升级就是一个普通的 zdoc PR。** PR 中更新 lock 的 `next`，附生成结果的差异、预览和影响报告；审核与批准沿用 GitHub PR，不另建审批记录。lock 和依赖索引由工具生成，写作者不手填 hash。
+- **Cloud 发布时提升。** 把 lock 的 `current` 改为 `next` 的值，Prod 采用 UAT 已经在显示的版本。提升也是一个普通 PR，可由工具一次覆盖所有页面。
 - **跟踪分支只用于发现变化。** 正式生成始终使用 lock 中固定的 commit。
-- **待定：** lock 的粒度（每页独立采用还是全仓统一）、Cloud 跟踪哪个 Milvus 版本分支、发现方式（定时或事件触发）及其执行身份。
+- **待定：** lock 的粒度（每页独立采用还是全仓统一）、Cloud 跟踪哪个 Milvus 版本分支、发现方式（定时或事件触发）及其执行身份、提升由谁在发布流程的哪一步发起。
 
 不同的上游变化，工具应有的行为：
 
@@ -116,6 +117,7 @@
 | 块改名或删除 | 引用它的页面不能升级，旧版本继续有效，需要显式迁移 |
 | 被 Cloud 替换的原文发生变化 | 即使 Cloud 输出不变，也提示复核 |
 | 被 Cloud 按行定位的代码行被修改 | 匹配失败，引用它的页面不能升级，旧版本继续有效 |
+| Cloud 规则只在 `next` 上失效 | 升级 PR 失败并指出通道，`current` 与 Prod 不受影响 |
 | 类型、上下文或语言变化 | 检查兼容性，不静默组装 |
 | 只新增标记，正文未变 | 更新身份与依赖，不触发重译 |
 
@@ -132,9 +134,22 @@ zdoc 已有两套互不干扰的过滤，共享内容直接复用：
 |---|---|
 | Cloud 内容文件中新增或替换的内容 | 在文件里直接使用 `<NextChannel>` |
 | 整个 Cloud 页面 | 页面配置中的通道字段（待定） |
-| 共享原文中的一段 | 原文为这一段加命名块，zdoc 把它包进 `<NextChannel>` |
+| 共享原文中的变化 | 不需要写。lock 记录 `current` 与 `next` 两个版本，工具自动区分 |
 
-共享原文不写通道标记。Milvus 先上线、Cloud 后上线的功能，处理方式见[方案总览第 4.1 节](./proposal.md#41-milvus-先上线cloud-后上线的内容)：整页暂不更新就不合并升级 PR；只有一段尚未上线，就在同一个升级 PR 中包裹这一段，Cloud 上线后去掉包裹。
+共享原文不写通道标记，也不为通道加命名块。场景说明见[方案总览第 4.2 节](./proposal.md#42-上线时间差异prod-与-uat-各固定一个-commit)。
+
+**共享原文按两个版本生成。**
+
+- lock 记录两个 milvus-docs commit：Prod 读 `current`，UAT 读 `next`。升级 PR 只改 `next`；Cloud 发布时把 `current` 改为 `next`（提升）。
+- 两个版本各自走完第 2 节的生成流程。Cloud 规则在两边都必须成立，失败时指出是哪个通道。
+- 结果按顶层块比较：标题、段落、整个列表、表格、提示框各算一块，代码组整体算一块。相同的块只输出一次；连续的不同块输出成 `exclude`（旧）与 `include`（新）一对；只在一侧存在的块只输出那一侧。
+- 两个版本相同时，输出不带通道标记，与单版本生成的结果逐字相同。提升之后即是这种状态。
+- front matter 无法按通道区分，两版不同时沿用 `current`，并记录在 receipt 中。
+- 标题变化会让两个通道的目录与锚点不同，生成时给出提示。
+- Cloud 内容文件中手写的 `<NextChannel>` 若落在成对的区域内，生成失败，避免嵌套。
+- 例外：一部分修改需要提前进入 Prod 时，把 `current` 一并更新，再用命名块把尚未上线的一段包进 `<NextChannel>`。
+
+规则与测试见[本地原型](../examples/filtered-search/two-commit/walkthrough.md)。仍需在 zdoc 中核实：`<NextChannel>` 包住列表、提示框和代码 Tabs 时的渲染，以及目录是否过滤其中的标题。
 
 **一项飞书依赖。** 整页通道目前记录在飞书多维表格的 `Release Channel` 字段中（新记录默认 `NEXT`），并通过飞书文档 token 传递到译文。Git 来源的页面需要等价的通道字段与页面身份，例如写在页面配置中；接入时与翻译流程一并验证。[核验记录](../research/zdoc-variants-and-channels-audit.md)
 
@@ -192,7 +207,8 @@ Git 中的图片按同一源修订读取；实际使用的外部图片需要固�
 - **Cloud 内容文件**：一个共享页面中 Cloud 用来新增或替换的内容，与页面配置放在 zdoc 的同一目录（`shared-pages/<页面>/`），由页面配置的 `content.file` 指定。
 - **命名块（block ID）**：原文中用 `doc:block` 注释标出的一段 Markdown 或一个完整代码组，是 Cloud 做差异处理的定位点。
 - **registry**：工具扫描已登记文件后生成的命名块清单，包括类型、语言、摘要和来源。
-- **lock**：一个页面当前采用的固定输入，包括 milvus-docs 的 commit 和各输入的摘要。升级 PR 修改的就是它。
+- **lock**：一个页面当前采用的固定输入，包括 milvus-docs 的 `current` 与 `next` 两个 commit 和各输入的摘要。升级 PR 修改 `next`，提升修改 `current`。
+- **提升（promotion）**：Cloud 发布时把 lock 的 `current` 改为 `next` 的值，Prod 采用 UAT 已在显示的版本。沿用 zdoc 对上线的叫法；共享页不需要逐处去掉标记。
 - **receipt**：一次构建实际用到的输入、lock 和输出摘要，用于追溯和恢复一致性检查。
 - **manifest**：来源版本、文件及摘要的清单，不能代替实际内容。
 - **artifact**：构建产出的实际文件或包。

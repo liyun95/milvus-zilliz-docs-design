@@ -39,6 +39,8 @@
 
 **对共享方案的结论：** Cloud 自有片段可以直接使用 `<NextChannel>`；整页通道可放在 Cloud 页面配置中；共享原文中需要只在 Next 显示的内容，由 zdoc 用 `<NextChannel>` 包裹对应命名块，原文不写通道标记。仍需与文档负责人确认此类情况的频率与常见粒度。
 
+**后续建议（2026-10-12）：** 包裹命名块只适合“新增一段”；修改已有内容时 Prod 无法保留旧文，细碎改动也难以逐处加命名块。建议改为 lock 记录 `current` 与 `next` 两个版本，由工具按块比较并成对生成 `<NextChannel>`，见[架构设计第 4 节](../docs/architecture.md#4-发布通道与内容过滤)。上面的结论保留为核验记录。
+
 ## 3. OpenAI 页对照
 
 对照 [Milvus 原文](https://github.com/milvus-io/milvus-docs/blob/7d87b0bf26d7cbc713f40af6453ea2f925367901/site/en/userGuide/embeddings-reranking/embedding-function/openai.md)与 [Cloud 页面](https://github.com/zilliztech/zdoc/blob/3777ec0b322546d716485e8f88da8412b0265e71/content/en/guides/tutorials/development/function/text-embedding-functions/openai.md)：

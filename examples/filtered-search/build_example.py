@@ -345,7 +345,8 @@ def split_frontmatter(text):
     return yaml.safe_load(header), body.lstrip('\n')
 
 
-def products():
+def products(milvus_root='milvus-docs'):
+    """Build every output from one milvus-docs snapshot; `milvus_root` stands for a locked commit."""
     inputs = {}
 
     def read(path):
@@ -363,8 +364,8 @@ def products():
     if page['source'] != {'take': 'page', 'module': 'filtered-search'}:
         raise ValueError('UNSUPPORTED_SOURCE')
     module = reg['modules']['filtered-search']
-    source = read(ROOT / 'milvus-docs' / module['file'])
-    defaults = json.loads(read(ROOT / 'milvus-docs' / reg['variables']['source_file']))
+    source = read(ROOT / milvus_root / module['file'])
+    defaults = json.loads(read(ROOT / milvus_root / reg['variables']['source_file']))
     values = json.loads(read(ROOT / 'zdoc' / page['variables']['file']))
     profile = yaml.safe_load(read(ROOT / 'zdoc' / page['presentation']['code_groups']))
     provenance = json.loads(read(ROOT / 'evidence/provenance.json'))

@@ -22,7 +22,7 @@
 <text x="64" y="372" class="item">zdoc：一份页面配置</text>
 
 <rect x="450" y="48" width="380" height="350" rx="14" fill="#ffffff" stroke="#64748b"/>
-<text x="474" y="88" class="head">有差异：共享 + overlay</text>
+<text x="474" y="88" class="head">有差异：共享 + Cloud 差异</text>
 <rect x="474" y="104" width="250" height="30" rx="15" fill="#fef3c7" stroke="#b45309"/><text x="599" y="125" class="chip" style="fill:#92400e">OpenAI · Filtered Search</text>
 <rect x="474" y="152" width="120" height="150" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
 <rect x="486" y="166" width="96" height="28" rx="4" fill="#fefce8" stroke="#ca8a04"/>
