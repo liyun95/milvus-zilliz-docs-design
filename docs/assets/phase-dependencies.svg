@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="768" height="360" viewBox="0 0 1280 600" role="img" aria-labelledby="title desc">
 <title id="title">首期任务与依赖：1a 与 1b</title>
-<desc id="desc">按泳道列出首期任务。1a：文档工程师完成 Delete Entities 的内容对齐与变量；zdoc 实现获取、定位、变量与 MDX 生成，接入 stage 与 UAT 预览；md2md 实现预处理入口并发版，发版后 zdoc 才能真实集成；zdoc 发布侧完成 Git 来源接入设计。1b：Filtered Search 与 OpenAI 的内容对齐、命名块完成后，zdoc 实现命名块、语言与代码行三级的差异处理和双版本通道比较，再实现升级 PR；md2md 实现命名块标记清理，上线后才能合并带命名块的原文；发布侧完成混源与同批激活、翻译与恢复接入，最后切换试点页，切换前需文档负责人审核。运行条件从第一天开始核实，切换前必须解决。</desc>
+<desc id="desc">按泳道列出首期任务。1a：文档工程师完成 Delete Entities 的内容对齐与变量；zdoc 实现获取、定位、变量与 MDX 生成，接入 stage 与 UAT 预览；md2md 实现预处理入口并发版，发版后 zdoc 才能真实集成；zdoc 发布侧完成 Git 来源接入设计。1b：Filtered Search 与 OpenAI 的内容对齐、命名块完成后，zdoc 实现命名块、语言与代码行三级的差异处理和双版本通道比较，再实现上游更新 PR；md2md 实现命名块标记清理，上线后才能合并带命名块的原文；发布侧完成混源与同批激活、翻译与恢复接入，最后切换试点页，切换前需文档负责人审核。运行条件从第一天开始核实，切换前必须解决。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.h{font-size:16px;font-weight:600;text-anchor:middle;}.s{font-size:14px;text-anchor:middle;fill:#64748b;}.lane{font-size:15px;font-weight:600;text-anchor:middle;}.lane2{font-size:13px;text-anchor:middle;fill:#64748b;}.stage{font-size:17px;font-weight:600;text-anchor:middle;}.lbl{font-size:13px;fill:#475569;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
 <rect width="1280" height="600" fill="#ffffff"/>
@@ -8,7 +8,7 @@
 <rect x="200" y="14" width="500" height="36" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
 <text x="450" y="38" class="stage">1a · 整篇复用跑通（Delete Entities）</text>
 <rect x="720" y="14" width="540" height="36" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
-<text x="990" y="38" class="stage">1b · 差异、升级与切换（Filtered Search · OpenAI）</text>
+<text x="990" y="38" class="stage">1b · 差异、上游更新与切换（Filtered Search · OpenAI）</text>
 
 <rect x="20" y="60" width="1240" height="90" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
 <rect x="20" y="160" width="1240" height="90" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
@@ -16,7 +16,7 @@
 <rect x="20" y="360" width="1240" height="90" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
 <rect x="20" y="460" width="1240" height="76" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
 <text x="100" y="100" class="lane">内容</text><text x="100" y="122" class="lane2">milvus-docs · 文档</text>
-<text x="100" y="200" class="lane">zdoc 生成</text><text x="100" y="222" class="lane2">获取 · 组装 · 升级</text>
+<text x="100" y="200" class="lane">zdoc 生成</text><text x="100" y="222" class="lane2">获取 · 组装 · 更新</text>
 <text x="100" y="300" class="lane">md2md</text><text x="100" y="322" class="lane2">预处理与标记清理</text>
 <text x="100" y="400" class="lane">zdoc 发布</text><text x="100" y="422" class="lane2">来源 · 激活 · 翻译</text>
 <text x="100" y="496" class="lane">运行条件</text><text x="100" y="516" class="lane2">运维 · 权限</text>
@@ -37,7 +37,7 @@
 <rect x="730" y="172" width="160" height="66" rx="8" fill="#ddd6fe" stroke="#6d28d9"/>
 <text x="810" y="199" class="h">差异与通道</text><text x="810" y="222" class="s">块 · 语言 · 行 · 通道</text>
 <rect x="910" y="172" width="160" height="66" rx="8" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="990" y="199" class="h">升级 PR</text><text x="990" y="222" class="s">lock · 影响报告</text>
+<text x="990" y="199" class="h">上游更新 PR</text><text x="990" y="222" class="s">lock · 影响报告</text>
 
 <rect x="210" y="272" width="220" height="66" rx="8" fill="#ddd6fe" stroke="#6d28d9"/>
 <text x="320" y="299" class="h">预处理入口</text><text x="320" y="322" class="s">受控读取 · 依赖报告</text>

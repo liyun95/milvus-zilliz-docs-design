@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="768" height="444" viewBox="0 0 1280 740" role="img" aria-labelledby="title desc">
 <title id="title">Cloud 页面生成流水线</title>
-<desc id="desc">Cloud 侧按六步生成页面，current 与 next 两个版本各执行一遍：按 lock 中的 commit 获取 milvus-docs 原文；在原文中定位命名块与代码组；按页面配置对命名块、语言示例或代码中连续的几行执行 add、replace、remove；调用 md2md 新的预处理入口，用 Cloud 的 Variables.json 展开变量与片段；沿用 zdoc 现有的产品过滤，处理 Cloud 内容文件中的产品指令，共享原文不含产品指令；最后做站点适配，生成多语言 Tabs、链接与图片映射和 front matter，然后按块比较两个版本，把不同的块成对包进 NextChannel，输出一份 MDX 候选页面与依赖记录，交给升级 PR。命名块在变量展开之前定位，Cloud 内容与原文一起展开变量。Milvus 侧沿用 md2md 发布，用 Milvus 变量展开并清除命名块标记。</desc>
+<desc id="desc">Cloud 侧按六步生成页面，current 与 next 两个版本各执行一遍：按 lock 中的 commit 获取 milvus-docs 原文；在原文中定位命名块与代码组；按页面配置对命名块、语言示例或代码中连续的几行执行 add、replace、remove；调用 md2md 新的预处理入口，用 Cloud 的 Variables.json 展开变量与片段；沿用 zdoc 现有的产品过滤，处理 Cloud 内容文件中的产品指令，共享原文不含产品指令；最后做站点适配，生成多语言 Tabs、链接与图片映射和 front matter，然后按块比较两个版本，把不同的块成对包进 NextChannel，输出一份 MDX 候选页面与依赖记录，交给上游更新 PR。命名块在变量展开之前定位，Cloud 内容与原文一起展开变量。Milvus 侧沿用 md2md 发布，用 Milvus 变量展开并清除命名块标记。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:20px;font-weight:600;text-anchor:middle;}.sub{font-size:16px;text-anchor:middle;fill:#64748b;}.num{font-size:15px;font-weight:600;text-anchor:middle;fill:#ffffff;}.chip{font-size:14px;font-weight:600;text-anchor:middle;}.note{font-size:15px;fill:#475569;}.lane{font-size:18px;font-weight:600;fill:#374151;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
 <rect width="1280" height="740" fill="#ffffff"/>
@@ -58,9 +58,9 @@
 <path class="edge" d="M1150 310 V333"/>
 <rect x="980" y="340" width="260" height="96" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
 <text x="1110" y="368" class="head" style="font-size:18px">通道合并</text><text x="1110" y="396" class="sub">按块比较两个版本</text><text x="1110" y="420" class="sub">不同的块成对包进 NextChannel</text>
-<path class="edge" d="M1110 436 V459"/>
-<rect x="980" y="466" width="260" height="76" rx="10" fill="#ffffff" stroke="#64748b"/>
-<text x="1110" y="496" class="head" style="font-size:18px">Cloud 候选页面</text><text x="1110" y="522" class="sub">MDX + lock + 依赖记录 → 升级 PR</text>
+<path class="edge" d="M1110 436 V455"/>
+<rect x="980" y="462" width="260" height="98" rx="10" fill="#ffffff" stroke="#64748b"/>
+<text x="1110" y="490" class="head" style="font-size:18px">Cloud 候选页面</text><text x="1110" y="516" class="sub">MDX + lock + 依赖记录</text><text x="1110" y="542" class="sub">交给上游更新 PR</text>
 
 <text x="52" y="350" class="note">· 第 2 步在变量展开之前：命名块标记仍在原文中，才能可靠定位。</text>
 <text x="52" y="378" class="note">· 第 3 步插入的 Cloud 内容与原文一起在第 4 步展开变量；缺少 Cloud 绑定直接失败。</text>
