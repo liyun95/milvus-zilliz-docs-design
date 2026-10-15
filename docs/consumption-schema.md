@@ -65,7 +65,7 @@ publish:
 # metadata:                             # 都可以不写
 #   title:       不写就用 Milvus 原文的 title
 #   description: 不写就用 Milvus 原文的 summary
-#   beta:        不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE
+#   beta:        标题下的标签，不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE，只影响 Guides
 ```
 
 - 正文的标题和章节结构随原文引用，不需要在配置中重复。

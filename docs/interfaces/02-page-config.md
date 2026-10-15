@@ -49,7 +49,7 @@ publish:
 # metadata:                             # 都可以不写
 #   title:       不写就用 Milvus 原文的 title
 #   description: 不写就用 Milvus 原文的 summary
-#   beta:        不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE
+#   beta:        标题下的标签，不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE
 # 导航中的位置、顺序和标签首期由飞书目录决定（见 05b）
 
 # transforms:                           # Cloud 的差异，见下文“变换”；Delete Entities 没有
@@ -63,7 +63,7 @@ publish:
 | `publish[].path` | 是 | 页面在该手册中的路径，决定输出位置。首期必须与飞书节点生成的路径一致，不一致时生成失败（见 [05b](./05b-cutover-and-ownership.md#导航首期)） |
 | `metadata.title` | 否 | 默认取 Milvus 原文的 `title` |
 | `metadata.description` | 否 | 默认取 Milvus 原文的 `summary`（变量展开后）；两边不同时在这里改写 |
-| `metadata.beta` | 否 | Cloud 的预览标签，默认 `FALSE`，不沿用 Milvus 原文的 `beta` |
+| `metadata.beta` | 否 | 页面标题下的标签，只影响 Guides；BYOC 的页面一律显示 “Contact Sales”。可选值：`FALSE`（默认，不显示）、`PUBLIC`（Public Beta）、`PRIVATE`（Private Beta）、`NEAR DEPRECATE`（Near Deprecation）。不沿用 Milvus 原文的 `beta` |
 | `transforms` | 否 | Cloud 的差异，见下文“变换” |
 
 其余 front matter 由工具生成，作者不写：
@@ -281,6 +281,7 @@ Cloud 内容文件是 `add`、`replace` 要放进页面的新内容，放在这�
 - 用脚本动态生成内容、插件式的自定义操作、自动判断不同语言示例是否等价。
 - 独立编排多个共享命名块的页面：保留为扩展路径。
 - front matter 中的 `keywords`、`hide_title`、`hide_table_of_contents`。
+- `metadata.beta` 的 `DEPRECATED`：zdoc 支持，但目前没有页面使用，需要时再开放。
 
 </details>
 
@@ -290,7 +291,7 @@ Cloud 内容文件是 `add`、`replace` 要放进页面的新内容，放在这�
 
 | 类别 | 生成失败的情况 |
 |---|---|
-| 页面与字段 | 页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册 |
+| 页面与字段 | 页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册；`metadata.beta` 不是上述可选值（zdoc 遇到不认识的值会不显示标签、也不报错，所以在生成前拦下） |
 | 目标 | 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外 |
 | `position` 与内容 | 在块旁或代码行旁 `add` 时没写 `position`；给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容 |
 | 冲突（同一个通道中） | 同一个目标被多次变换；整块的 `replace` 或 `remove` 与该块的语言项变换、前后增加同时出现；语言项的 `replace` 或 `remove` 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。不带 `channel` 的规则同时计入两个通道 |
