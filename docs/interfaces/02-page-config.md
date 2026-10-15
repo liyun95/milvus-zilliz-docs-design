@@ -1,8 +1,8 @@
 # 02 共享页配置
 
-本篇定义 Cloud 文档工程师在 zdoc 中为一个共享页写什么：文件放在哪里、页面怎样标识、`page.yaml` 有哪些字段，以及怎样用 add、replace、remove 表达 Cloud 的差异。链接与图片由工具处理，见 [02b](./02b-links-and-images.md)。按任务的写法见[共享页面的写法与配置](../consumption-schema.md)。
+本篇定义 文档工程师在 zdoc 中为一个共享页写什么：文件放在哪里、页面怎样标识、`page.yaml` 有哪些字段，以及怎样用 add、replace、remove 表达 Cloud 的差异。链接与图片由工具处理，见 [02b](./02b-links-and-images.md)。按任务的写法见[共享页面的写法与配置](../consumption-schema.md)。
 
-**参与方**：Cloud 文档工程师（编写）、zdoc 生成（读取与校验）。
+**参与方**：文档工程师（编写）、zdoc 生成（读取与校验）。
 
 **状态**：已定义，待文档负责人确认。
 

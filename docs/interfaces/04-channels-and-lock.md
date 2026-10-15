@@ -2,7 +2,7 @@
 
 Cloud 要能在 UAT 提前看到上游的修改，同时让 Prod 保持已上线的版本。本篇定义每个共享页怎样记录 Prod 与 UAT 各用 milvus-docs 的哪个 commit（lock），lock 由哪些 PR、怎样写入，以及两个版本怎样合并成一份页面。场景说明见[方案总览第 4.3 节](../proposal.md#43-何时上线prod-与-uat-各固定一个-commit)。
 
-**参与方**：zdoc 生成（读取 lock、按两个版本生成）、接入、下线、上游更新与提升 PR（写入 lock）、Cloud 文档工程师（发起下线与提升）、zdoc 发布（按通道显示）。
+**参与方**：zdoc 生成（读取 lock、按两个版本生成）、接入、下线、上游更新与提升 PR（写入 lock）、文档工程师（发起下线与提升）、zdoc 发布（按通道显示）。
 
 **状态**：已定义，待文档负责人确认。
 
@@ -56,18 +56,18 @@ lock 只由工具写入，人不手改。改 lock 的 PR 共四种：
 
 | PR | 谁发起、怎样发起 | 改 lock 的什么 | 何时 |
 |---|---|---|---|
-| 接入一页 | 作者开 PR 新增页面配置，工具自动写入 lock | `current` 与 `next` 都设为跟踪分支的最新提交；功能还没上线时 `current` 写 `none` | 1a |
-| 下线一页 | Cloud 文档工程师手动运行工作流 | 把 `next` 改为 `none` | 1b，按需 |
+| 接入一页 | 文档工程师开 PR 新增页面配置，工具自动写入 lock | `current` 与 `next` 都设为跟踪分支的最新提交；功能还没上线时 `current` 写 `none` | 1a |
+| 下线一页 | 文档工程师手动运行工作流 | 把 `next` 改为 `none` | 1b，按需 |
 | 上游更新 | 工具每天自动发起 | 只改 `next` | 1b，见 [06](./06-upstream-changes.md) |
-| 提升 | Cloud 文档工程师手动运行工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | 1b |
+| 提升 | 文档工程师手动运行工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | 1b |
 
 **提升**是指：把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。新页面（`current: none`）提升后在 Prod 上线；下线页面（`next: none`）的提升 PR 直接删除这一页的目录，两边都不再有这一页。
 
 #### 接入一页
 
-1. 作者在 zdoc 中开 PR，新增 `shared-docs/pages/<页面标识>/` 下的 `page.yaml` 与 Cloud 内容文件，不写 lock。
+1. 文档工程师在 zdoc 中开 PR，新增 `shared-docs/pages/<页面标识>/` 下的 `page.yaml`，需要时加 Cloud 内容文件，不写 lock。
 2. 工具在 PR 中自动运行：发现新页面没有 lock，就取跟踪分支的最新提交写入 `lock.yaml`，提交到这个 PR，再触发校验（见 [05](./05-publish-handoff.md#pr-校验)）。
-3. 这一页对应的功能还没上线时，作者给 PR 加标签 `shared-docs: not-launched`，工具把 `current` 重写为 `none`。合并前去掉或加上标签，lock 随之重写。
+3. 这一页对应的功能还没上线时，文档工程师给 PR 加标签 `shared-docs: not-launched`，工具把 `current` 重写为 `none`。合并前去掉或加上标签，lock 随之重写。
 4. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
 
 - lock 写入后就固定在那个提交上，之后的上游修改由每天的上游更新 PR 处理。要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可。
@@ -103,7 +103,7 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 | `current` 与 `next` 相同（没有待发布的内容） | ① 手动运行上游更新，指定这一页和修正所在的提交，合并后 UAT 先看到修正；② 单独提升这一页，Prod 跟上 |
 | `current` 与 `next` 不同（有还不能上线的内容） | 在页面配置中加一条 `channel: current` 的规则，替换出错的那一段；下次提升时工具自动删掉这条规则（见 [02](./02-page-config.md#只对一个通道生效的规则)） |
 
-规则只能对准命名块。出错的一段在 Prod 的版本中不在任何命名块里时，只能等下次发布，或者提前提升整页（未上线的内容会一起进入 Prod），由 Cloud 文档工程师判断。
+规则只能对准命名块。出错的一段在 Prod 的版本中不在任何命名块里时，只能等下次发布，或者提前提升整页（未上线的内容会一起进入 Prod），由 文档工程师判断。
 
 ### 两个版本怎样合并
 
@@ -123,7 +123,7 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 
 | 链接所在位置 | 处理 |
 |---|---|
-| milvus-docs 中的其他页 | 报告提示改名与受影响的链接，由作者判断是否回上游修改 |
+| milvus-docs 中的其他页 | 报告提示改名与受影响的链接，由文档工程师判断是否回上游修改 |
 | zdoc 中 Git 来源的页面，包括 Cloud 内容文件 | 提升 PR 中由工具自动改为新锚点 |
 | 仍在飞书的页面 | 报告列出，由文档工程师在飞书中修改；首期不拦截提升 |
 | 站外链接 | 首期不处理 |
@@ -155,7 +155,7 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 <details>
 <summary>Delete Entities 接入（1a）与 OpenAI 的更新和提升（1b）</summary>
 
-Delete Entities 在 1a 接入时，作者开 PR 新增 `page.yaml`，工具写入 lock，`current` 与 `next` 都是跟踪分支当时的最新提交，如上面的 lock 示例。生成结果与只读一个版本时逐字相同。
+Delete Entities 在 1a 接入时，文档工程师开 PR 新增 `page.yaml`，工具写入 lock，`current` 与 `next` 都是跟踪分支当时的最新提交，如上面的 lock 示例。生成结果与只读一个版本时逐字相同。
 
 OpenAI 在 1b 中：
 

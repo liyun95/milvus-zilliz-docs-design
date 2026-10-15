@@ -2,7 +2,7 @@
 
 milvus-docs 合并新提交后，Cloud 要自动得知，并自己决定是否采用、何时采用。本篇定义怎样发现上游变化、怎样发起上游更新 PR，以及 PR 中给审核人看的影响报告。
 
-**参与方**：milvus-docs（新提交）、zdoc 中的“上游更新”工作流（发现、生成、发起 PR）、Cloud 文档工程师（审核）。
+**参与方**：milvus-docs（新提交）、zdoc 中的“上游更新”工作流（发现、生成、发起 PR）、文档工程师（审核）。
 
 **状态**：已定义，待文档负责人确认。接入、下线与提升这几种由 Cloud 发起的 PR 见 [04](./04-channels-and-lock.md#写入与提升)。
 
@@ -10,7 +10,7 @@ milvus-docs 合并新提交后，Cloud 要自动得知，并自己决定是否�
 
 ### 流程
 
-![上游变化成为 Cloud 上游更新 PR 的过程：milvus-docs 的 PR 经 CI 检查后合并；zdoc 工具发现新提交，固定 commit 重新生成并比较变化，在 zdoc 发起附 lock、生成差异和影响报告的上游更新 PR；命名块被删除或改名时阻止更新，旧版本继续有效。Cloud 文档工程师审核：修改则回到源文件，暂缓则保持旧版本，合并则更新 lock 的 next，新版本先在 UAT 可见；Cloud 发布时把 current 改为 next，Prod 采用新版本。](../assets/upgrade-pr-flow.png)
+![上游变化成为 Cloud 上游更新 PR 的过程：milvus-docs 的 PR 经 CI 检查后合并；zdoc 工具发现新提交，固定 commit 重新生成并比较变化，在 zdoc 发起附 lock、生成差异和影响报告的上游更新 PR；命名块被删除或改名时阻止更新，旧版本继续有效。文档工程师审核：修改则回到源文件，暂缓则保持旧版本，合并则更新 lock 的 next，新版本先在 UAT 可见；Cloud 发布时把 current 改为 next，Prod 采用新版本。](../assets/upgrade-pr-flow.png)
 
 图 1 · 上游变化怎样成为 Cloud 的上游更新 PR
 

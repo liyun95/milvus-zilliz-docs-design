@@ -22,7 +22,7 @@
 - **Prod / UAT**：zdoc 的正式站点与预发布站点。两者由同一个 dev 提交构建，部署时才区分。
 - **lock**：每个共享页一份，记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升、下线四类 PR 写入，人不手改（见 [04](./04-channels-and-lock.md#写入与提升)）。
 - **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，由 lock 决定，作者不写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./02-page-config.md#只对一个通道生效的规则)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
-- **接入**：作者开 PR 新增页面配置，工具写入 lock。接入后只生成候选结果，不改变网站（见 [04](./04-channels-and-lock.md#接入一页)）。
+- **接入**：文档工程师开 PR 新增页面目录（`page.yaml`，需要时加 Cloud 内容文件），工具在同一个 PR 中写入 `lock.yaml`。接入后只生成候选结果，不改变网站（见 [04](./04-channels-and-lock.md#接入一页)）。
 - **激活**：一页从飞书切换到 Git 生成，由文档负责人先比较、再触发，一页只做一次（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。与提升无关。
 - **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面；由 Fetch 写入，激活时加入、下线完成时移除，人不手改（见 [05b](./05b-cutover-and-ownership.md#归属与生效配置)）。
 - **提升（promotion）**：功能上线时，按页把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。沿用 zdoc 对上线的叫法。
