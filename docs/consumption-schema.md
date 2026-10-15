@@ -169,7 +169,7 @@ transforms:
 
 ### 3.6 增加、替换或删除一个语言示例
 
-在目标中加上 `language`。命名块的内容恰好是一个代码组时，才能按语言处理。下面是 Filtered Search 中为一个代码组增加 Cloud CLI 示例：
+在目标中加上 `language`。命名块的内容恰好是一个代码组时，才能按语言处理；多语言代码组要连语言切换栏一起包住（见[接口设计 01](./interfaces/01-named-blocks.md#两种命名块)）。下面是 Filtered Search 中为一个代码组增加 Cloud CLI 示例：
 
 ```yaml
 transforms:

@@ -23,9 +23,9 @@ const output = stripBlockMarkers(content);   // 只删除标记所在的整行�
 
 | 能力 | 使用方 | 行为 |
 |---|---|---|
-| `parseBlocks` | zdoc | 返回块的 ID 与起止行；错误一次收集全部，错误码见 [01](./01-named-blocks.md#出错时) |
-| `stripBlockMarkers` | zdoc、`goover` | 只删除代码块之外的标记行；`goover` 在写文件前对每篇文档执行，遇到错误时构建失败 |
-| 命令行检查（如 `md2md-blocks check site/en`） | Milvus PR 检查（`check.yml`） | 检查全部页面与片段文件，有错误时以非零状态退出 |
+| `parseBlocks` | zdoc，每次生成读入原文后 | 返回块的 ID 与起止行；错误一次收集全部，错误码见 [01](./01-named-blocks.md#出错时) |
+| `stripBlockMarkers` | zdoc，按页面配置完成变换后；`goover`（milvus-docs 的 CI 构建时运行的 md2md 命令） | 只删除代码块之外的标记行；`goover` 在写文件前对每篇文档执行，遇到错误时构建失败 |
+| 命令行检查（如 `md2md-blocks check site/en`） | milvus-docs 的 PR 检查（`check.yml`） | 检查全部页面与片段文件，有错误时以非零状态退出 |
 
 zdoc 在流水线第 ③ 步完成变换后调用 `stripBlockMarkers`，再调用下文的 `preprocess`。
 

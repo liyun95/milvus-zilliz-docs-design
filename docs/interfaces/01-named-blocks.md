@@ -1,14 +1,20 @@
 # 01 命名块的定义与解析
 
-Cloud 要替换、删除或补充 Milvus 原文中的某一段时，需要一个稳定的定位点。本篇定义这个定位点（命名块）在原文中怎样写、什么算写错，以及在流水线的哪一步由谁处理。
+Cloud 要替换、删除或补充 Milvus 原文中的某一段时，需要一个稳定的定位点。本篇定义这个定位点（命名块）在原文中怎样写、分哪两类、什么算写错。
 
-**参与方**：milvus-docs 原文（写标记）、md2md（解析、校验与清除，接口见 [03](./03-md2md-interfaces.md#命名块的解析与清除)）、zdoc 生成（扫描并生成命名块清单）、Milvus CI（PR 检查与发布）。
+**参与方**：milvus-docs 原文（写标记）、md2md（解析、校验与清除，接口见 [03](./03-md2md-interfaces.md#命名块的解析与清除)）、zdoc 生成（识别命名块并按页面配置处理）、Milvus CI（PR 检查与发布）。
 
 **状态**：已定义，待文档负责人确认。
 
 ## 约定
 
-### 标记写法
+### 两种命名块
+
+用一对 HTML 注释把原文中的一段包起来，就是一个命名块。命名块按包住的内容分两种，类型决定 Cloud 能把这一块改得多细（变换写法见 [02](./02-page-config.md#变换)）。
+
+#### Markdown 块
+
+包住任意一段 Markdown，例如一节标题和正文、几个段落、一个列表：
 
 ```markdown
 <!-- doc:block:start id="before-you-start" -->
@@ -17,28 +23,88 @@ Cloud 要替换、删除或补充 Milvus 原文中的某一段时，需要一个
 <!-- doc:block:end id="before-you-start" -->
 ```
 
+Cloud 只能整块替换、删除，或在块的前后添加内容。
+
+#### 代码组
+
+只包住示例代码，不包说明文字。按原文中代码的样子分两种情况：
+
+**情况一：只有一种语言。** 原文中就是一个单独的代码块，没有切换栏。直接包住这个代码块：
+
+````markdown
+<!-- doc:block:start id="install-cmd" -->
+```shell
+pip install pymilvus
+```
+<!-- doc:block:end id="install-cmd" -->
+````
+
+**情况二：多种语言。** milvus-docs 中的多语言代码由语言切换栏 `<div class="multipleCode">` 和紧跟其后的各语言代码块组成，milvus.io 上显示为可以切换的标签页。标记要把**切换栏和全部代码块**一起包住：
+
+````markdown
+<!-- doc:block:start id="delete-code" -->
+<div class="multipleCode">
+    <a href="#python">Python</a>
+    <a href="#java">Java</a>
+</div>
+
+```python
+client.delete(collection_name="quick_setup", ids=[0, 1, 2])
+```
+
+```java
+// ……
+```
+<!-- doc:block:end id="delete-code" -->
+````
+
+两种情况下，Cloud 除了整块替换、删除或在前后添加，还可以只改其中某种语言（包括增删语言），或某种语言中的某几行。包的时候注意：
+
+- **多种语言时，切换栏必须在块内。** 它列出这组代码有哪些语言；Cloud 增删语言时，工具要同步改它。
+- **只包代码，不包说明文字。** 把前后的说明文字也包进去，这一块就成了 Markdown 块，只能整块处理。
+- **不能只包一部分。** 只包了其中几个代码块，或包了代码块却漏了切换栏，都报错（`BLOCK_PARTIAL_CODE_GROUP`）：否则整块删除或替换后，会留下没有代码的切换栏，或没有切换栏的代码。
+
+<details>
+<summary>报错的包法</summary>
+
+只包了 Python 代码块，切换栏和 Java 代码块在块外：
+
+````markdown
+<div class="multipleCode">
+……
+</div>
+
+<!-- doc:block:start id="delete-python" -->
+```python
+……
+```
+<!-- doc:block:end id="delete-python" -->
+
+```java
+……
+```
+````
+
+</details>
+
+### 标记的写法规则
+
+两种命名块都遵守：
+
 - 标记必须独占一行。ID 由小写字母、数字和连字符组成，以字母或数字开头，在同一文件内唯一。
-- 代码块（三个反引号围起的部分）中出现的标记只是普通文字，不识别也不清除，例如贡献说明中给出的写法示例。
+- 写在代码块（三个反引号围起的示例代码）中的标记不算数：工具不把它当作命名块，不报错，也不清除，页面上原样显示。这样文档才能展示标记本身的写法，例如 Milvus 贡献说明中教人写命名块的示例。
 - 首期不允许嵌套。
 - 标记只能写在页面文件中，不能写在片段文件（`fragments/`）中。
 - 只在需要差异处理的位置命名；无差异的页面整篇复用，不需要任何命名块。
 
-### 谁在什么时候处理
+### 写错时与网站上的表现
 
-| 环节 | 做什么 | 标记写错时 |
-|---|---|---|
-| Milvus PR 检查（`check.yml`） | 检查全部页面与片段文件中的标记 | PR 检查失败 |
-| Milvus 构建（`goover`） | 写文件前清除每篇文档中的标记 | 构建失败 |
-| zdoc 生成第 ② 步 | 解析标记，得到命名块清单 | 该页生成失败 |
-| zdoc 生成第 ③ 步之后 | 完成变换后清除标记，再展开变量与片段 | — |
+| 写原文的人关心的 | 结果 |
+|---|---|
+| 写错了在哪里发现 | milvus-docs 的 PR 检查失败，PR 不能合并；万一漏过，Cloud 这一页生成失败（见[出错时](#出错时)） |
+| 标记会不会出现在网站上 | 不会。Milvus 发布和 Cloud 生成时都会清除标记；同一篇原文加命名块前后，Milvus 侧的输出逐字相同 |
 
-解析、校验与清除都由 md2md 提供，两端用同一套规则，调用方式见 [03](./03-md2md-interfaces.md#命名块的解析与清除)。同一篇原文加命名块前后，Milvus 侧的转换结果必须逐字相同。
-
-### 命名块清单与块的类型
-
-zdoc 扫描源文件后，在内部得到每页的命名块清单：块 ID、类型、语言、所在行和内容摘要。它供 [02](./02-page-config.md) 校验变换目标、[05](./05-publish-handoff.md) 写入记录文件、[06](./06-upstream-changes.md) 比较上游变化。清单的具体结构在实现时确定；写入记录文件与影响报告的部分在 05、06 中定义。
-
-块的类型由内容决定：块的内容恰好是一个代码组（`<div class="multipleCode">` 加连续的代码块，或单个代码块）时为**代码组**，可以按语言或代码行做变换；否则为 **Markdown 块**，只能整块变换。
+标记的解析、检查与清除都由 md2md 提供，Milvus 与 Cloud 两端用同一套规则；milvus-docs 的 CI 与 zdoc 在哪一步调用，见 [03](./03-md2md-interfaces.md#命名块的解析与清除)。
 
 ## 出错时
 
@@ -51,8 +117,9 @@ zdoc 扫描源文件后，在内部得到每页的命名块清单：块 ID、类
 | `BLOCK_EMPTY` | 块内没有内容 |
 | `BLOCK_MALFORMED` | 代码块之外出现格式不对的标记，例如 ID 没加引号、含大写字母，或与正文写在同一行 |
 | `BLOCK_IN_FRAGMENT` | 片段文件中出现标记 |
+| `BLOCK_PARTIAL_CODE_GROUP` | 只包住多语言代码组的一部分：切换栏与紧跟其后的代码块没有全部在同一个块内 |
 
-在 Milvus 侧，这些错误让 PR 检查失败；在 zdoc 侧，让该页生成失败。命名块被改名或删除后，引用它的页面怎样处理见 [06](./06-upstream-changes.md)。
+在 Milvus 侧，这些错误让 PR 检查失败，漏过时构建也会失败；在 zdoc 侧，让该页生成失败。命名块被改名或删除后，引用它的页面怎样处理见 [06](./06-upstream-changes.md)。
 
 ## 例子
 
@@ -76,7 +143,7 @@ OpenAI 在内容对齐时加两个命名块：
 <!-- doc:block:end id="define-function-code" -->
 ````
 
-命名块清单中，`before-you-start` 是 Markdown 块，`define-function-code` 是代码组，语言为 python。Milvus 侧的输出与不加标记时逐字相同。
+工具识别出 `before-you-start` 是 Markdown 块，`define-function-code` 是代码组，语言为 python。Milvus 侧的输出与不加标记时逐字相同。
 
 </details>
 
@@ -101,5 +168,5 @@ OpenAI 在内容对齐时加两个命名块：
 
 ## 验收
 
-- **T01**：无命名块的整页可以正常扫描和生成；重复、空块、交叉、伪标记和嵌套都报错。
+- **T01**：无命名块的整页可以正常扫描和生成；重复、空块、交叉、伪标记、嵌套和只包住代码组的一部分都报错。
 - 加命名块前后 Milvus 侧输出逐字相同，见 [03](./03-md2md-interfaces.md#验收) 的 T11。
