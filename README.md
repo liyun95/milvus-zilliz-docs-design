@@ -10,20 +10,20 @@ Milvus × Zilliz Cloud 文档同源设计仓库，维护方案、架构、实施
 
 | 文档 | 回答的问题 |
 |---|---|
-| [方案总览](docs/proposal.md) | 为什么改、目标工作方式是什么、怎样逐步演进？ |
-| [架构设计](docs/architecture.md) | 系统怎样搭建、边界在哪里？（面向 zdoc 与 md2md 维护者） |
-| [首期实施计划](docs/phase-1.md) | 首期做什么、按什么顺序、怎样算完成？（面向实施者与评审人） |
-| [共享页面的写法与配置](docs/consumption-schema.md) | 一个共享页面要写哪些文件、怎么写？（面向 Cloud 文档工程师；字段为草案） |
+| [方案总览](docs/proposal.md) | 为什么改、目标工作方式是什么、怎样逐步演进？（2026-10-13 对齐会材料，已冻结） |
+| [接口设计](docs/interfaces/README.md) | 首期 6 个接口（8 篇）怎样约定、实现时遵守哪些规则？（面向 zdoc 与 md2md 维护者；接口评审的议程） |
+| [首期实施计划](docs/phase-1.md) | 首期做什么、按什么顺序、怎样算完成？含待确认事项的唯一清单（面向实施者与评审人） |
+| [共享页面的写法与配置](docs/consumption-schema.md) | 一个共享页面要写哪些文件、怎么写？（面向 Cloud 文档工程师的手册） |
 
 ## 设计样例
 
 - [Delete Entities](examples/delete-entities/walkthrough.md)：整篇复用，仅通过变量处理连接值差异。
 - [Filtered Search](examples/filtered-search/walkthrough.md)：产品名与连接变量、共享多语言代码，以及 Cloud CLI 的补充。
-- [双 commit 通道](examples/filtered-search/two-commit/walkthrough.md)（讨论中）：Prod 与 UAT 各读一个 milvus-docs 版本，不同的块自动包进 NextChannel。
+- [双 commit 通道](examples/filtered-search/two-commit/walkthrough.md)（原型，规则见接口设计 04）：Prod 与 UAT 各读一个 milvus-docs 版本，不同的块自动包进 NextChannel。
 
 OpenAI embedding 页是第三个试点候选，用于验证前提条件整节替换和凭证参数的代码行替换，尚未制作样例；差异分析见 [zdoc 代码变体与发布通道核验](research/zdoc-variants-and-channels-audit.md#3-openai-页对照)。
 
-每篇样例包含作者输入、生成结果及适用边界，具体说明随样例维护。
+每篇样例包含作者输入、生成结果及适用边界，具体说明随样例维护。样例仍是接口定义之前的草案写法，与[接口设计](docs/interfaces/README.md)不一致处以接口设计为准，待接口确认后更新。
 
 ## 目录与维护
 
