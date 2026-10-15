@@ -1,6 +1,6 @@
 # 02 共享页配置
 
-本篇定义 文档工程师在 zdoc 中为一个共享页写什么：文件放在哪里、页面怎样标识、`page.yaml` 有哪些字段，以及怎样用 add、replace、remove 表达 Cloud 的差异。链接与图片由工具处理，见 [02b](./02b-links-and-images.md)。按任务的写法见[共享页面的写法与配置](../consumption-schema.md)。
+本篇定义文档工程师在 zdoc 中为一个共享页写什么：文件放在哪里、页面怎样标识、`page.yaml` 有哪些字段，以及怎样用 add、replace、remove 表达 Cloud 的差异。链接与图片由工具处理，见 [02b](./02b-links-and-images.md)。按任务的写法见[共享页面的写法与配置](../consumption-schema.md)。
 
 **参与方**：文档工程师（编写）、zdoc 生成（读取与校验）。
 
@@ -8,7 +8,9 @@
 
 ## 约定
 
-### 目录
+### 一个共享页由哪些文件组成
+
+`shared-docs/` 位于 zdoc 仓库根目录，在 master 分支上维护：所有修改都向 master 开 PR，合并后发布流程直接从 master 读取（见 [05](./05-publish-handoff.md#运行位置与触发)）。
 
 ```
 shared-docs/
@@ -26,9 +28,7 @@ shared-docs/
       before-you-start.md            # Cloud 内容文件，按需提供
 ```
 
-### 页面标识
-
-页面标识就是 `pages/` 下的目录名，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`、供翻译清单与路由插件使用，见 [05](./05-publish-handoff.md#页面身份token)。
+**页面标识**就是 `pages/` 下的目录名，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`、供翻译清单与路由插件使用，见 [05](./05-publish-handoff.md#页面身份token)。
 
 ### 页面配置 `page.yaml`
 
@@ -64,9 +64,12 @@ publish:
 | `metadata.title` | 否 | 默认取 Milvus 原文的 `title` |
 | `metadata.description` | 否 | 默认取 Milvus 原文的 `summary`（变量展开后）；两边不同时在这里改写 |
 | `metadata.beta` | 否 | Cloud 的预览标签，默认 `FALSE`，不沿用 Milvus 原文的 `beta` |
-| `transforms` | 否 | Cloud 的差异，见下文 |
+| `transforms` | 否 | Cloud 的差异，见下文“变换” |
 
 其余 front matter 由工具生成，作者不写：
+
+<details>
+<summary>工具生成的 front matter</summary>
 
 | front matter | 生成方式 |
 |---|---|
@@ -79,42 +82,70 @@ publish:
 | `token` | 由页面标识代替，见 [05](./05-publish-handoff.md#页面身份token) |
 | `channel` | 整页通道，由 lock 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面) |
 
+</details>
+
 ### 变换
 
-`transforms` 是 `page.yaml` 中的一个列表，每一项是一条变换。目标分三级：整个命名块、代码组中的一个语言、语言中连续的几行。下面列出常见写法（取自不同页面，仅示意写法）：
+`transforms` 是 `page.yaml` 中的一个列表，每一项是一条变换，表达 Cloud 与 Milvus 原文的一处差异。一条变换回答三个问题：改哪里（`target`）、怎么改（`operation`）、改成什么（`content`）；需要时再写加在前面还是后面（`position`），以及只对哪个通道生效（`channel`，见下文）。
+
+#### 目标与操作
+
+目标分三级，越往下越细：
+
+| 级别 | `target` 写什么 | 适用于 |
+|---|---|---|
+| 整个命名块 | `block`：命名块 ID | 两种命名块（见 [01](./01-named-blocks.md#两种命名块)） |
+| 代码组中的一种语言 | `block` 加 `language` | 只限代码组 |
+| 一种语言中连续的几行 | `block`、`language` 加 `lines` | 只限代码组 |
+
+- **`language`** 是代码块开头三个反引号后面的语言名，如 ```` ```python ```` 中的 `python`。它不一定等于标签页上显示的名字：NodeJS 写 `javascript`，cURL 写 `bash`，Zilliz CLI 写 `shell`。可用的值以 Tabs 规则文件 `presentation/cloud-sdk-tabs.yaml` 为准。同一个代码组中，每种语言只有一个代码块。
+- **`lines`** 是从原文复制的一行或连续几行，最多 5 行，怎样匹配见下文。
+
+每级目标都能做三种操作：
+
+| 目标 | `add` | `replace` | `remove` | 新内容写在哪 |
+|---|---|---|---|---|
+| 整个命名块 | 在块前或块后插入，必须写 `position` | 换掉整块 | 删掉整块 | `content.file`：Cloud 内容文件（见下文）。替换代码组时写完整的代码组，多语言时是切换栏加各语言代码块 |
+| 一种语言 | 给代码组加一种原来没有的语言；不写 `position`，顺序由 Tabs 规则决定 | 换掉这种语言的代码 | 删掉这种语言 | `content.file`：只写一个该语言的代码块，不加切换栏 |
+| 几行 | 在这几行前或后插入，必须写 `position` | 换掉这几行 | 删掉这几行 | `content.lines`：直接写在配置中，不用写缩进 |
+
+`position` 取 `before` 或 `after`，只在上表注明的两种 `add` 中写。`remove` 不写内容。
+
+#### 写法示例
+
+每一级各举一两例（取自不同页面，仅示意写法）：
 
 ```yaml
 transforms:
-  # ① 替换一个命名块（OpenAI）
+  # 整个命名块：替换（OpenAI）
   - operation: replace
     target:
       block: before-you-start
     content:
-      file: before-you-start.md          # 同一页面目录下的 Cloud 内容文件
+      file: before-you-start.md
 
-  # ② 在一个命名块后面增加内容
+  # 整个命名块：在块后增加
   - operation: add
     target:
       block: choose-model
-    position: after                      # 加在块后；before 加在块前
+    position: after
     content:
       file: cloud-regions.md
 
-  # ③ 删除一个命名块：只写目标，不提供内容
+  # 整个命名块：删除，只写目标
   - operation: remove
     target:
       block: product-notes
 
-  # ④ 给代码组增加一个语言（Filtered Search 加 Zilliz CLI）
+  # 一种语言：增加（Filtered Search 加 Zilliz CLI）
   - operation: add
     target:
       block: standard-filtering-code
       language: shell                    # 原来没有这个语言
     content:
       file: standard-filtering-cli.md    # 文件中是一个 shell 代码块
-    # 不写 position：语言顺序由 Tabs 规则决定
 
-  # ⑤ 在代码行后面增加一行（OpenAI 的 Java 示例）
+  # 几行：在后面增加一行（OpenAI 的 Java 示例）
   - operation: add
     target:
       block: define-function-code
@@ -123,68 +154,49 @@ transforms:
         .param("model_name", "text-embedding-3-small")
     position: after
     content:
-      lines: |                           # 新的代码行，不用写缩进
+      lines: |
         .param("integration_id", "YOUR_INTEGRATION_ID")
 ```
 
-替换或删除一个语言、替换或删除几行代码，写法分别同 ④、⑤，把 `operation` 换成 `replace` 或 `remove`；`remove` 不写 `content`，`replace` 不写 `position`。完整的页面示例见下文“例子”。
+其余组合照上表换 `operation` 即可。完整的页面示例见下文“例子”。
 
-| 字段 | 必填 | 说明 |
-|---|---|---|
-| `operation` | 是 | `add`、`replace` 或 `remove` |
-| `target.block` | 是 | 命名块 ID |
-| `target.language` | 否 | 只处理代码组中的这个语言；块的内容恰好是一个代码组时才能使用 |
-| `target.lines` | 否 | 只处理这个语言中连续的几行，必须同时写 `language` |
-| `position` | 视情况 | 在命名块或代码行旁 `add` 时必填，取 `before` 或 `after`；给代码组增加语言时不写，顺序由 Tabs 规则决定；`replace`、`remove` 不写 |
-| `content.file` | `add` / `replace` 时 | Cloud 内容文件，相对于页面目录，不能指向目录之外 |
-| `content.lines` | 目标有 `lines` 时 | 新的代码行，直接写在配置中，代替 `content.file` |
-| `channel` | 否 | `current` 或 `next`：这条规则只对 Prod 或只对 UAT 的版本生效；不写则两个版本都生效。见下文“只对一个通道生效的规则” |
+<details>
+<summary>代码行怎样匹配（<code>lines</code>）</summary>
 
-- 变换对 `publish` 中的所有手册都生效。SaaS 与 BYOC 之间的差异，用 Cloud 内容文件中 zdoc 现有的产品过滤写法表达。
-- 同一位置有多条 `add` 时，按列表顺序输出。
-- 块 ID 在源文件内唯一，语言在代码组内唯一。目标的类型由原文结构决定（见 [01](./01-named-blocks.md#两种命名块)）；文件名不决定动作，配置才决定。
-- 共享原文在 Prod 与 UAT 两个版本之间的变化不需要在变换中声明，由 lock 的两个版本自动区分（见 [04](./04-channels-and-lock.md#两个版本怎样合并)）。
-
-### 代码行定位（`lines`）
-
-- **定位。** 只在已经定位的代码组和语言示例内查找；`lines` 是一行或连续的几行，每行去掉行首缩进和行尾空格后比较，其余（包括行尾注释前的空格）必须完全一致，并且恰好出现一次。最多 5 行。
-- **三种动作。** `replace` 换掉这几行，`remove` 删掉，`add` 配合 `position: before | after` 在这几行前后插入。
+- **定位。** 只在目标代码组的目标语言中查找；`lines` 是一行或连续的几行，每行去掉行首缩进和行尾空格后比较，其余（包括行尾注释前的空格）必须完全一致，并且恰好出现一次。最多 5 行。
 - **缩进。** 先去掉 `content.lines` 各行共同的行首空白，再在每行前加上原文中被替换或被定位的第一行的缩进，原样复制空格或 Tab；各行之间的相对缩进保留。新内容整体对齐到定位行，所以要选与新内容同一层级的行作定位。
 - **不能有空行。** `lines` 与 `content.lines` 中都不能有空行，也不能有代码块的三个反引号或命名块标记。
-- **超出范围就替换整个语言示例。** 一段代码中有多处不同，或连续超过 5 行，改为替换该语言示例。
+- **超出范围就替换整种语言。** 一段代码中有多处不同，或连续超过 5 行，改为替换这种语言的代码。
 
-### Cloud 内容文件
+</details>
 
-Cloud 内容文件与 Milvus 原文使用同一种 Markdown 写法（如提示框写成 `<div class="alert note">`，多语言代码组写成 `<div class="multipleCode">` 加代码块），与原文一起在流水线第 ⑥ 步转换为 Cloud 组件。
+#### 只对一个通道生效的规则
 
-| 可以使用 | 不可以使用 |
-|---|---|
-| 变量 `{{var.xxx}}`、片段 `{{fragments/xxx.md}}` | 命名块标记 |
-| `<NextChannel>` | 手写的 `<Tabs>`、`<Admonition>` 等 Cloud 站点组件 |
-| zdoc 现有的产品过滤写法 | |
-| 页面目录下的图片文件，或外部图片地址 | |
+**lock 管原文的版本，`page.yaml` 管怎样加工。** 生成一页 Cloud 页面分两段：先按 lock 取 Milvus 原文（见 [04](./04-channels-and-lock.md)），再按 `page.yaml` 中的变换和 Cloud 内容文件加工。Prod 与 UAT 可能要显示不同版本的原文，所以每次生成跑两遍：
 
-代码相关的内容文件按变换目标写：
+| | 原文 | 修改清单 | 结果 |
+|---|---|---|---|
+| 第一遍 | lock 中 `current` 的版本 | `page.yaml` | Prod 显示的版本 |
+| 第二遍 | lock 中 `next` 的版本 | 同一份 `page.yaml` | UAT 显示的版本 |
 
-| 变换目标 | 内容文件里写什么 |
-|---|---|
-| 整个代码组（目标只写 `block`） | 与 Milvus 原文相同：`<div class="multipleCode">` 加各语言的代码块 |
-| 代码组中的一个语言（目标写了 `language`） | 只写一个该语言的代码块，不加 `multipleCode` 外壳，工具把它放进对应的代码组 |
+原文有两个版本，原文本身在两版之间的变化由此自动区分，不需要在变换中声明（见 [04](./04-channels-and-lock.md#两个版本怎样合并)）。但加工用的 `page.yaml`、Cloud 内容文件和 `Variables.json` 却只有一份，不受 lock 控制，合并后两遍立刻都用上（见 [04](./04-channels-and-lock.md#设计理由)）。默认每条变换两遍都执行，在两版原文上都必须成立；大多数时候这没有问题。
 
-转换为 Cloud 组件的规则（如多语言代码组的语言顺序与必选语言）由工程维护的 Tabs 规则文件 `presentation/cloud-sdk-tabs.yaml` 与工具共同决定，作者写配置和内容文件时不用考虑。
+**`channel` 让某一条只在其中一遍执行。**
 
-新增和替换的内容与原文一起展开变量与片段，并记入依赖。
+| 写法 | 在哪一遍执行 | 影响 |
+|---|---|---|
+| 不写 | 两遍都执行 | Prod 与 UAT |
+| `channel: current` | 只在第一遍 | 只影响 Prod |
+| `channel: next` | 只在第二遍 | 只影响 UAT |
 
-**内容文件、`Variables.json` 与页面配置都只有一份，不按 lock 分两个版本。** Prod 与 UAT 由同一个 dev 提交构建，这些文件的修改合并后两边都会变（见 [04](./04-channels-and-lock.md#设计理由)）。还不能在 Prod 显示的内容，在内容文件中用 `<NextChannel>` 包住；Prod 要继续显示 Milvus 原文时，给规则加 `channel: next`（见下文）。
+**什么时候用。**
 
-### 只对一个通道生效的规则
+| 场景 | 默认写法为什么不行 | 写法 |
+|---|---|---|
+| Milvus 改了 Cloud 正在修改的那一行，上游更新 PR 把 `next` 指向了新原文 | 旧原文中有这一行，新原文中没有；同一条变换在第二遍找不到目标，上游更新 PR 无法合并 | 原来那条加 `channel: current`；按新原文另写一条，加 `channel: next` |
+| 原文现在对 Cloud 也成立，Cloud 下次发布后才不同。示意：原文写每个 collection 最多 4 个向量字段，Cloud 下次发布提到 10 | 即使 lock 不变，替换规则一合并，第一遍也会执行，Prod 就提前换成了还没上线的说法 | 替换规则加 `channel: next`：UAT 先显示新说法，Prod 照常显示原文 |
 
-变换默认对 `current`（Prod）与 `next`（UAT）两个版本都生效，在两个版本上都必须成立。有两种情况需要一条规则只对一个通道生效，这时写 `channel`：
-
-| 情况 | 写法 |
-|---|---|
-| 上游修改了 Cloud 定位的内容（如 `lines` 指定的代码行），过渡期内旧写法只在 `current` 中存在，新写法只在 `next` 中存在 | 原规则加 `channel: current`，另加一条按新原文写的规则，标 `channel: next` |
-| Cloud 要在下次发布时才用自己的内容替换 Milvus 的某一节，Prod 继续显示 Milvus 原文 | 这条规则标 `channel: next` |
+以第一种场景为例：
 
 ```yaml
 transforms:
@@ -213,11 +225,53 @@ transforms:
         "integration_id": "YOUR_INTEGRATION_ID",
 ```
 
-- 带 `channel` 的规则只在对应版本上校验与生效；不带 `channel` 的规则在两个版本上都必须成立。
-- **提升时由工具清理**：提升 PR 删除 `channel: current` 的规则，去掉 `channel: next` 规则上的标记（见 [04](./04-channels-and-lock.md#写入与提升)）。作者不用回头清理。
-- 上游更新 PR 因上游修改而失败时，报告直接给出按上述写法修改的建议（见 [06](./06-upstream-changes.md#出错时)）。
+<details>
+<summary>第二种场景按时间走一遍</summary>
+
+lock 一直是 `current: A`、`next: A`，两遍读同一版原文，原文写“最多 4 个”：
+
+| 时间点 | `page.yaml` | 第一遍（Prod） | 第二遍（UAT） |
+|---|---|---|---|
+| 一开始 | 没有关于 Limits 的规则 | 4 个 | 4 个 |
+| 合并替换规则，不加 `channel` | 多了“Limits 换成 10 个” | 10 个，功能还没上线 ❌ | 10 个 |
+| 合并替换规则，加 `channel: next` | 同上，但只在第二遍执行 | 4 个 ✅ | 10 个 ✅ |
+| 功能上线，提升 | 工具去掉 `channel` 标记 | 10 个 | 10 个 |
+
+两遍结果不同，完全来自这条规则只在第二遍执行；原文一字未变。
+
+</details>
+
+**提升后自动收尾。** 功能上线时提升，lock 的 `current` 改成 `next` 的值，两遍从此用同一版原文。提升 PR 删除标 `channel: current` 的变换（它对准的旧原文已经用不上），去掉 `channel: next` 的标记（之后两遍都执行），见 [04](./04-channels-and-lock.md#写入与提升)。所以 `channel` 只是过渡期的临时标记，作者不用回头清理。上游更新 PR 因上游修改而失败时，报告会直接给出按上面写法修改的建议（见 [06](./06-upstream-changes.md#出错时)）。
+
+**与 `<NextChannel>` 的分工。** `<NextChannel>` 写在 Cloud 内容文件中，只能让 Cloud 新写的一段只在 UAT 显示（见下文“Cloud 内容文件”）；要替换或删除 Milvus 原文、并且只在一边生效，就用 `channel`。第二种场景在飞书中的写法，是用 `<NextChannel action="exclude">` 包住旧说法、`action="include"` 包住新说法；共享页的旧说法在两边共用的 Milvus 原文中，Cloud 不能在原文里加标签，所以改用 `channel: next`。
+
+#### 其他规则
+
+- 变换对 `publish` 中的所有手册都生效。SaaS 与 BYOC 之间的差异，用 Cloud 内容文件中 zdoc 现有的产品过滤写法表达。
+- 同一位置有多条 `add` 时，按列表顺序输出。
+- 目标的类型由原文结构决定，不由文件名决定；动作只由配置决定。
+
+### Cloud 内容文件
+
+Cloud 内容文件是 `add`、`replace` 要放进页面的新内容，放在这一页的目录中，由 `content.file` 指定。
+
+**写法与 Milvus 原文相同。** 例如提示框写成 `<div class="alert note">`，多语言代码组写成切换栏加代码块。内容文件插入原文后，和原文一起往下处理：展开变量与片段、产品过滤，最后在站点适配中转换为 Cloud 组件（见[接口地图](./README.md#接口地图)）；用到的变量和片段一并记入依赖。所以作者只需要会一种写法。
+
+| 写法 | 能否使用 | 说明 |
+|---|---|---|
+| 变量 `{{var.xxx}}`、片段 `{{fragments/xxx.md}}` | 可以 | 与原文一起展开，变量取 Cloud 的值 |
+| zdoc 现有的产品过滤写法 | 可以 | 表达 SaaS 与 BYOC 之间的差异 |
+| `<NextChannel>` | 可以 | 让一段内容只在 UAT 显示，见下文 |
+| 页面目录下的图片文件，或外部图片地址 | 可以 | 见 [02b](./02b-links-and-images.md) |
+| 命名块标记 | 不可以 | 命名块只用来定位 Milvus 原文 |
+| 手写的 `<Tabs>`、`<Admonition>` 等 Cloud 组件 | 不可以 | 由工具在站点适配中生成；Tabs 的语言顺序与必选语言由工程维护的 Tabs 规则文件 `presentation/cloud-sdk-tabs.yaml` 决定 |
+
+代码相关的内容文件怎样写（完整的代码组，或单种语言的一个代码块），见上文“目标与操作”。
 
 ### 首期不支持
+
+<details>
+<summary>首期不支持的写法</summary>
 
 - 行号、正则、全文搜索、标题选择器，以及任意语法树路径或下标定位。
 - 代码中的区域标记、超过 5 行或跨多处的行级修改：改为替换整个语言示例。
@@ -228,19 +282,21 @@ transforms:
 - 独立编排多个共享命名块的页面：保留为扩展路径。
 - front matter 中的 `keywords`、`hide_title`、`hide_table_of_contents`。
 
+</details>
+
 ## 出错时
 
 工具先校验全部配置，再生成页面。以下情况该页生成失败，不会静默跳过：
 
-- 页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`。
-- `source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册。
-- 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外。
-- `position` 缺失或多余：在块旁或代码行旁 `add` 时没写，给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容。
-- 在同一个通道中：同一个目标被多次变换；整块的 replace 或 remove 与该块的语言项变换、前后增加同时出现；语言项的 replace 或 remove 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。不带 `channel` 的规则同时计入两个通道。
-- `channel` 不是 `current` 或 `next`；页面在该通道中不存在（lock 中为 `none`）。
-- `lines` 在目标语言示例中找不到、出现多次或超过 5 行；`lines` 用在没有 `language` 的目标上；`lines` 或 `content.lines` 中有空行。
-- 内容文件中出现命名块标记或手写的 Tabs；试图对本轮刚插入的内容再做变换。
-- 删除了 Tabs 规则要求必须存在的语言或默认语言。
+| 类别 | 生成失败的情况 |
+|---|---|
+| 页面与字段 | 页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册 |
+| 目标 | 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外 |
+| `position` 与内容 | 在块旁或代码行旁 `add` 时没写 `position`；给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容 |
+| 冲突（同一个通道中） | 同一个目标被多次变换；整块的 `replace` 或 `remove` 与该块的语言项变换、前后增加同时出现；语言项的 `replace` 或 `remove` 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。不带 `channel` 的规则同时计入两个通道 |
+| `channel` | 不是 `current` 或 `next`；页面在该通道中不存在（lock 中为 `none`） |
+| 代码行 | `lines` 在目标语言中找不到、出现多次或超过 5 行；`lines` 用在没有 `language` 的目标上；`lines` 或 `content.lines` 中有空行 |
+| 内容文件与 Tabs | 内容文件中出现命名块标记或手写的 Tabs；试图对本轮刚插入的内容再做变换；删除了 Tabs 规则要求必须存在的语言或默认语言 |
 
 链接与图片的错误见 [02b](./02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./03-md2md-interfaces.md#出错时)，生成结果被手动修改见 [05](./05-publish-handoff.md#发布保护)。
 

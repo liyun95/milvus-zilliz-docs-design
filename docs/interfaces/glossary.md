@@ -3,7 +3,7 @@
 ## 页面与配置
 
 - **共享页**：正文引用 milvus-docs 原文、在 zdoc 中只维护差异的 Cloud 页面。每个共享页对应 `shared-docs/pages/` 下的一个目录。
-- **页面标识**：共享页目录的名字，等于这一页现有的 slug（见 [02](./02-page-config.md#页面标识)）。
+- **页面标识**：共享页目录的名字，等于这一页现有的 slug（见 [02](./02-page-config.md#一个共享页由哪些文件组成)）。
 - **页面配置**：每个共享页目录中的 `page.yaml`，说明引用哪篇原文、发布到哪些手册、做哪些变换（见 [02](./02-page-config.md)）。
 - **Cloud 内容文件**：一个共享页面中 Cloud 用来新增或替换的内容，与页面配置放在同一目录，由页面配置的 `content.file` 指定。
 - **overlay**：zdoc 中只记录 Cloud 差异的一层文件，即 `shared-docs/` 中的页面配置、`Variables.json` 和 Cloud 内容文件。用于[接口地图](./README.md#接口地图)的图 1。是本次新建的，与 zdoc 现有的 `sidebar-overrides` 或部署仓库的 Kubernetes overlays 无关。

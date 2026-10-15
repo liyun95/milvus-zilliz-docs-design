@@ -27,7 +27,7 @@ const output = stripBlockMarkers(content);   // 只删除标记所在的整行�
 | `stripBlockMarkers` | zdoc，按页面配置完成变换后；`goover`（milvus-docs 的 CI 构建时运行的 md2md 命令） | 只删除代码块之外的标记行；`goover` 在写文件前对每篇文档执行，遇到错误时构建失败 |
 | 命令行检查（如 `md2md-blocks check site/en`） | milvus-docs 的 PR 检查（`check.yml`） | 检查全部页面与片段文件，有错误时以非零状态退出 |
 
-zdoc 在流水线第 ③ 步完成变换后调用 `stripBlockMarkers`，再调用下文的 `preprocess`。
+zdoc 按页面配置完成变换后调用 `stripBlockMarkers`，再调用下文的 `preprocess`（生成的各步见[接口地图](./README.md#接口地图)）。
 
 ### 预处理
 
@@ -41,7 +41,7 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 
 | 参数 | 必填 | 说明 |
 |---|---|---|
-| `content` | 是 | 待处理的整页 Markdown，即完成流水线第 ③ 步变换、并清除命名块标记后的文本 |
+| `content` | 是 | 待处理的整页 Markdown，即按页面配置完成变换、并清除命名块标记后的文本 |
 | `fragmentRoot` | 是 | 同一 commit 的 milvus-docs 检出中 `site/en` 的绝对路径；`{{fragments/x.md}}` 解析为 `<fragmentRoot>/fragments/x.md` |
 | `variables` | 是 | 完整的变量表；md2md 不按目录查找，也不合并其他来源的值。Cloud 的变量表只来自 `shared-docs/Variables.json` |
 | `sourceName` | 否 | 报错时显示的文件名 |
