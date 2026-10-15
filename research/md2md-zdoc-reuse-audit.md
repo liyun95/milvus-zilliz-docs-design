@@ -52,7 +52,7 @@ zdoc Guides：Fetch 获取飞书源与媒体 → 分表渲染 → Guides 组装 
 
 ### 3.1 实测补充（2026-10-14）
 
-为定义预处理入口（[接口设计 03《md2md 预处理》](../docs/interfaces/03-md2md-preprocess.md)），在 md2md [`635da07`](https://github.com/zilliztech/md2md/tree/635da07276e80fb2a6efdf667686df3913d5de4c) 上用小样例实际运行了 `goover`，并统计了 milvus-docs `v3.0.x`（[`1997ce9`](https://github.com/milvus-io/milvus-docs/tree/1997ce96782b31f8628f22d31fad11007e4b924b)）`site/en` 的实际用法。
+为定义预处理入口（[接口设计 03《md2md 提供的接口》](../docs/interfaces/03-md2md-interfaces.md)），在 md2md [`635da07`](https://github.com/zilliztech/md2md/tree/635da07276e80fb2a6efdf667686df3913d5de4c) 上用小样例实际运行了 `goover`，并统计了 milvus-docs `v3.0.x`（[`1997ce9`](https://github.com/milvus-io/milvus-docs/tree/1997ce96782b31f8628f22d31fad11007e4b924b)）`site/en` 的实际用法。
 
 | 原有行为 | 实测 | 新入口的处理 |
 |---|---|---|

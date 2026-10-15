@@ -70,9 +70,9 @@ publish:
 
 - 正文的标题和章节结构随原文引用，不需要在配置中重复。
 - `slug`、标题后缀和其余 front matter 由工具生成，不要写。
-- **导航仍在飞书中调整。** 首期，这一页在飞书知识库目录中的节点保留，导航中的位置、顺序和标签都由它决定；要移动这一页或改导航标签，和其他页面一样在飞书目录中操作（[接口设计 05b《页面切换与归属》](./interfaces/05b-cutover-and-ownership.md#导航首期)）。
+- **导航仍在飞书中调整。** 首期，这一页在飞书知识库目录中的节点保留，导航中的位置、顺序和标签都由它决定；`publish` 中的 `path` 要与飞书节点的位置一致，不一致时报错。要移动这一页或改导航标签，在飞书目录中操作，并同步修改 `path`（[接口设计 05b《页面切换与归属》](./interfaces/05b-cutover-and-ownership.md#导航首期)）。
 - 提交 PR 后，工具在同一目录写入 `lock.yaml`，不要自己写。这一页对应的功能还没上线时，给 PR 加标签 `shared-docs: not-launched`，工具会让它先只在 UAT 显示（3.9 节）。
-- PR 合并后，这一页只生成候选结果；由文档负责人激活后才正式发布。
+- PR 合并后，这一页只生成候选结果；由文档负责人激活后才正式发布。只能接入在飞书目录中已有节点的页面。
 
 ### 3.2 把产品名或连接值写成变量
 
@@ -96,7 +96,7 @@ client = MilvusClient(
 | `example_token` | `root:Milvus` | `YOUR_CLUSTER_TOKEN` |
 
 - 同一产品的各语言共用连接变量；各语言的参数名、引号和代码结构仍写在原文中。
-- Cloud 只读 `shared-docs/Variables.json`，不合并 Milvus 的值；片段和 Cloud 内容文件中的变量同样按 Cloud 的值展开（[接口设计 03《md2md 预处理》](./interfaces/03-md2md-preprocess.md)）。
+- Cloud 只读 `shared-docs/Variables.json`，不合并 Milvus 的值；片段和 Cloud 内容文件中的变量同样按 Cloud 的值展开（[接口设计 03《md2md 提供的接口》](./interfaces/03-md2md-interfaces.md)）。
 - `MilvusClient`、`pymilvus` 等真实名称，以及明确讨论 Milvus 本身的文字，不要写成变量。产品功能或流程不同时，不能靠改名掩盖，要用命名块和页面配置处理。
 - 变量只放小粒度的值，不放整行代码。新增变量时，要同时在 milvus-docs 的 `site/en/Variables.json` 和 `shared-docs/Variables.json` 中给值。
 
@@ -129,7 +129,7 @@ transforms:
 | 可以用 | 不可以用 |
 |---|---|
 | 变量 `{{var.xxx}}`、片段 `{{fragments/xxx.md}}` | 命名块标记 |
-| `<NextChannel>`（只在 Next 显示的内容，3.9 节） | 手写的 `<Tabs>`、`<Admonition>` 等 Cloud 站点组件 |
+| `<NextChannel>`（只在 UAT 显示的内容，3.9 节） | 手写的 `<Tabs>`、`<Admonition>` 等 Cloud 站点组件 |
 | zdoc 现有的产品过滤写法，用来区分 SaaS 与 BYOC | |
 | 图片：页面目录下的文件，或外部地址 | |
 
@@ -282,6 +282,7 @@ transforms:
 | 外部网站、milvus.io 的完整地址 | 原样保留 |
 | Milvus 站内页面，如 `primary-key-search.md` | 依次查找：目标也是共享页 → 链接映射表 → Cloud 的同名页面 |
 | 以 `/` 开头的站内路径 | 报错 |
+| 不属于以上任何一类，如漏写 `.md` | 报错 |
 
 只有当工具报错“找不到 Cloud 对应页面”时，才需要在 `shared-docs/links.yaml` 中补一行。每个 Milvus 页面全站只登记一次：
 
@@ -292,17 +293,49 @@ ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，�
 
 以 `/` 开头的站内路径（如 `/api-reference/...`），回 milvus-docs 改成完整地址，或在映射表中处理。指向 Milvus 站点的做法尚待文档负责人确认。完整规则见[接口设计 02b《链接与图片》](./interfaces/02b-links-and-images.md)。
 
-### 3.9 让内容只在 Next 显示
+### 3.9 让内容只在 UAT 显示
 
 | 内容 | 写法 |
 |---|---|
-| Cloud 内容文件中新增或替换的内容 | 在文件里直接用 `<NextChannel action="include">` 包住 |
-| 共享原文中的变化 | 不需要写。lock 中 `current` 与 `next` 两个版本的差异由工具成对包进 `<NextChannel>` |
+| Cloud 内容文件中新增或替换的内容 | 在文件里直接用 `<NextChannel action="include">` 包住；功能上线时由作者去掉包裹（3.10 节） |
+| 共享原文中的变化 | 不需要写。lock 中 `current` 与 `next` 两个版本的差异由工具成对包进 `<NextChannel>`，提升后自动消失 |
 | 用 Cloud 内容替换原文的某一节，但只在下次发布时生效 | 这条变换规则标 `channel: next`，Prod 继续显示原文；提升时工具去掉标记 |
-| 整个页面（新页面还没上线，或要下线的页面） | 不在页面配置中写。新页面：接入 PR 加标签 `shared-docs: not-launched`，工具把 `current` 写成 `none`；下线：Cloud 文档工程师运行下线工作流，工具开 PR 把 `next` 改为 `none`（[接口设计 04](./interfaces/04-channels-and-lock.md#写入与提升)） |
+| 整个新页面，功能还没上线 | 接入 PR 加标签 `shared-docs: not-launched`，工具把 `current` 写成 `none`（3.1 节） |
 
-共享原文本身不写通道标记。Cloud 上线时，Cloud 内容文件去掉包裹；共享原文的差异和整页的上线、下线，都通过提升 lock 完成，规则见[接口设计 04《通道与 commit 记录》](./interfaces/04-channels-and-lock.md)。场景说明见[方案总览第 4.3 节](./proposal.md#43-何时上线prod-与-uat-各固定一个-commit)。
+Cloud 内容文件、`Variables.json` 和页面配置都只有一份，Prod 与 UAT 读的是同一份：合并后两边都会变。所以还不能在 Prod 显示的 Cloud 内容，一定要用上面的写法。共享原文本身不写通道标记。规则见[接口设计 04《通道与 commit 记录》](./interfaces/04-channels-and-lock.md)，场景说明见[方案总览第 4.3 节](./proposal.md#43-何时上线prod-与-uat-各固定一个-commit)。
+
+### 3.10 功能上线时提升
+
+在 zdoc 中手动运行“下线与提升”工作流，选择“提升”，填写这次上线的页面，或选“全部待提升”。工具开一个 PR，同一次上线的页面一起审核：
+
+- 每页 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 采用 UAT 已在显示的版本；
+- Git 页面中指向旧锚点的链接改为新锚点；
+- 删除 `channel: current` 的规则，去掉 `channel: next` 的标记；
+- 已下线的页面删除目录（3.11 节）。
+
+PR 说明会列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`。对应的功能也在这次上线时，在这个 PR 中删掉包裹；工具不会自动删，因为它不知道每段包裹属于哪个功能。完整规则见[接口设计 04](./interfaces/04-channels-and-lock.md#下线一页与提升)。
+
+### 3.11 下线一页
+
+只用于已经激活的页面。运行同一个工作流，选择“下线”，填写页面标识。工具开 PR 把这一页的 `next` 改为 `none`：合并后 UAT 不再显示，Prod 照常。
+
+1. 下次提升时，工具删除这一页的目录。
+2. 提升 PR 合并后，删除这一页的飞书节点。
+3. 下一次 Fetch 把这一页从网站上移除；飞书节点没删时，网站维持原样，并提醒删除节点。
+
+还没激活的页面不走这个流程：用普通 PR 删除页面目录；网站上显示的是飞书版本，照现在的做法在飞书中处理。详见[接口设计 05b](./interfaces/05b-cutover-and-ownership.md#下线完成)。
+
+### 3.12 处理上游更新 PR
+
+milvus-docs 有新提交时，工具每天为受影响的页面开或更新一个上游更新 PR，只改 lock 中的 `next`。合并后新版本先在 UAT 显示，Prod 要等提升。
+
+- **审核影响报告**：UAT 将看到的变化、需要复核的地方（例如被 Cloud 替换的原文有变化，Cloud 内容文件可能也要跟着改）、新增或变化的图片。
+- **校验失败时**，在同一个 PR 中修改页面配置或 Cloud 内容文件：代码行被上游改了，按 3.7 节加一对 `channel` 规则；命名块被改名，改规则中的块 ID；原文被改名，改 `source.file`；原文被删除，考虑下线这一页。
+- **暂缓**：PR 留着不合并，之后的上游修改继续累积到这个 PR 中，不影响其他页面。
+- **急需上线的修正**：Milvus 已修好的错误要马上进 Prod 时，`current` 与 `next` 相同，就手动运行上游更新、指定修正所在的提交，合并后单独提升这一页；两者不同，就加一条 `channel: current` 的规则替换出错的一段，下次提升时自动删除。
+
+完整规则见[接口设计 06](./interfaces/06-upstream-changes.md)与[接口设计 04](./interfaces/04-channels-and-lock.md#急需上线的修正)。
 
 ## 4. 什么情况会报错
 
-工具先校验全部配置，再生成页面；出错时直接失败，不会静默跳过。完整的出错情形、字段定义和首期不支持的写法见[接口设计 02《共享页配置》](./interfaces/02-page-config.md)；链接与图片的错误见 [02b](./interfaces/02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./interfaces/03-md2md-preprocess.md#出错时)。
+工具先校验全部配置，再生成页面；出错时直接失败，不会静默跳过。完整的出错情形、字段定义和首期不支持的写法见[接口设计 02《共享页配置》](./interfaces/02-page-config.md)；命名块标记的错误见 [01](./interfaces/01-named-blocks.md#出错时)，链接与图片的错误见 [02b](./interfaces/02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./interfaces/03-md2md-interfaces.md#出错时)。

@@ -28,7 +28,7 @@ shared-docs/
 
 ### 页面标识
 
-页面标识就是 `pages/` 下的目录名，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`，接入翻译与路由清单，见 [05](./05-publish-handoff.md)。
+页面标识就是 `pages/` 下的目录名，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`、供翻译清单与路由插件使用，见 [05](./05-publish-handoff.md#页面身份token)。
 
 ### 页面配置 `page.yaml`
 
@@ -60,7 +60,7 @@ publish:
 | `schema_version` | 是 | 固定为 `1` |
 | `source.file` | 是 | 共享原文路径 |
 | `publish[].manual` | 是 | zdoc 现有的手册 ID，如 `guides`、`guides-byoc`。每个手册各生成一份，产品过滤与标题、描述的后缀按手册处理 |
-| `publish[].path` | 是 | 页面在该手册中的路径，决定输出位置与导航层级，与飞书目录生成的路径一致 |
+| `publish[].path` | 是 | 页面在该手册中的路径，决定输出位置。首期必须与飞书节点生成的路径一致，不一致时生成失败（见 [05b](./05b-cutover-and-ownership.md#导航首期)） |
 | `metadata.title` | 否 | 默认取 Milvus 原文的 `title` |
 | `metadata.description` | 否 | 默认取 Milvus 原文的 `summary`（变量展开后）；两边不同时在这里改写 |
 | `metadata.beta` | 否 | Cloud 的预览标签，默认 `FALSE`，不沿用 Milvus 原文的 `beta` |
@@ -71,13 +71,13 @@ publish:
 | front matter | 生成方式 |
 |---|---|
 | `slug` | `/` 加页面标识 |
-| `sidebar_label`、`sidebar_position` | 首期按飞书目录中保留的节点填写，与导航一致（见 [05](./05b-cutover-and-ownership.md#导航首期)） |
+| `sidebar_label`、`sidebar_position` | 首期按飞书节点填写，见 [05b](./05b-cutover-and-ownership.md#导航首期) |
 | `title`、`description` 的后缀 | 按手册，如 `\| Cloud`、`\| BYOC` |
 | `notebook`、`added_since`、`last_modified`、`deprecate_since` | 固定为 `FALSE` |
 | `type` | `origin` |
 | `displayed_sidebar` | `default` |
-| `token` | 由页面标识代替（见 05） |
-| `channel` | 由 lock 决定（见 04） |
+| `token` | 由页面标识代替，见 [05](./05-publish-handoff.md#页面身份token) |
+| `channel` | 整页通道，由 lock 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面) |
 
 ### 变换
 
@@ -143,7 +143,15 @@ transforms:
 - 变换对 `publish` 中的所有手册都生效。SaaS 与 BYOC 之间的差异，用 Cloud 内容文件中 zdoc 现有的产品过滤写法表达。
 - 同一位置有多条 `add` 时，按列表顺序输出。
 - 块 ID 在源文件内唯一，语言在代码组内唯一。目标的类型由原文结构决定（见 [01](./01-named-blocks.md#命名块清单与块的类型)）；文件名不决定动作，配置才决定。
-- 共享原文在 Current / Next 之间的变化不需要在变换中声明，由 lock 的两个版本自动区分（见 04）。
+- 共享原文在 Prod 与 UAT 两个版本之间的变化不需要在变换中声明，由 lock 的两个版本自动区分（见 [04](./04-channels-and-lock.md#两个版本怎样合并)）。
+
+### 代码行定位（`lines`）
+
+- **定位。** 只在已经定位的代码组和语言示例内查找；`lines` 是一行或连续的几行，每行去掉行首缩进和行尾空格后比较，其余（包括行尾注释前的空格）必须完全一致，并且恰好出现一次。最多 5 行。
+- **三种动作。** `replace` 换掉这几行，`remove` 删掉，`add` 配合 `position: before | after` 在这几行前后插入。
+- **缩进。** 先去掉 `content.lines` 各行共同的行首空白，再在每行前加上原文中被替换或被定位的第一行的缩进，原样复制空格或 Tab；各行之间的相对缩进保留。新内容整体对齐到定位行，所以要选与新内容同一层级的行作定位。
+- **不能有空行。** `lines` 与 `content.lines` 中都不能有空行，也不能有代码块的三个反引号或命名块标记。
+- **超出范围就替换整个语言示例。** 一段代码中有多处不同，或连续超过 5 行，改为替换该语言示例。
 
 ### Cloud 内容文件
 
@@ -164,6 +172,10 @@ Cloud 内容文件与 Milvus 原文使用同一种 Markdown 写法（如提示�
 | 代码组中的一个语言（目标写了 `language`） | 只写一个该语言的代码块，不加 `multipleCode` 外壳，工具把它放进对应的代码组 |
 
 转换为 Cloud 组件的规则（如多语言代码组的语言顺序与必选语言）由工程维护的 Tabs 规则文件 `presentation/cloud-sdk-tabs.yaml` 与工具共同决定，作者写配置和内容文件时不用考虑。
+
+新增和替换的内容与原文一起展开变量与片段，并记入依赖。
+
+**内容文件、`Variables.json` 与页面配置都只有一份，不按 lock 分两个版本。** Prod 与 UAT 由同一个 dev 提交构建，这些文件的修改合并后两边都会变（见 [04](./04-channels-and-lock.md#设计理由)）。还不能在 Prod 显示的内容，在内容文件中用 `<NextChannel>` 包住；Prod 要继续显示 Milvus 原文时，给规则加 `channel: next`（见下文）。
 
 ### 只对一个通道生效的规则
 
@@ -205,14 +217,6 @@ transforms:
 - **提升时由工具清理**：提升 PR 删除 `channel: current` 的规则，去掉 `channel: next` 规则上的标记（见 [04](./04-channels-and-lock.md#写入与提升)）。作者不用回头清理。
 - 上游更新 PR 因上游修改而失败时，报告直接给出按上述写法修改的建议（见 [06](./06-upstream-changes.md#出错时)）。
 
-### 代码行定位（`lines`）
-
-- **定位。** 只在已经定位的代码组和语言示例内查找；`lines` 是一行或连续的几行，每行去掉行首缩进和行尾空格后比较，其余（包括行尾注释前的空格）必须完全一致，并且恰好出现一次。最多 5 行。
-- **三种动作。** `replace` 换掉这几行，`remove` 删掉，`add` 配合 `position: before | after` 在这几行前后插入。
-- **缩进。** 先去掉 `content.lines` 各行共同的行首空白，再在每行前加上原文中被替换或被定位的第一行的缩进，原样复制空格或 Tab；各行之间的相对缩进保留。新内容整体对齐到定位行，所以要选与新内容同一层级的行作定位。
-- **不能有空行。** `lines` 与 `content.lines` 中都不能有空行，也不能有代码块的三个反引号或命名块标记。
-- **超出范围就替换整个语言示例。** 一段代码中有多处不同，或连续超过 5 行，改为替换该语言示例。
-
 ### 首期不支持
 
 - 行号、正则、全文搜索、标题选择器，以及任意语法树路径或下标定位。
@@ -238,7 +242,7 @@ transforms:
 - 内容文件中出现命名块标记或手写的 Tabs；试图对本轮刚插入的内容再做变换。
 - 删除了 Tabs 规则要求必须存在的语言或默认语言。
 
-链接与图片的错误见 [02b](./02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./03-md2md-preprocess.md#出错时)，生成结果被手动修改见 [05](./05-publish-handoff.md#发布保护)。新增和替换的内容同样参与变量绑定和依赖记录；原文中被替换的一节发生变化时，即使 Cloud 输出不变，上游更新 PR 也会提示复核。
+链接与图片的错误见 [02b](./02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./03-md2md-interfaces.md#出错时)，生成结果被手动修改见 [05](./05-publish-handoff.md#发布保护)。
 
 ## 例子
 

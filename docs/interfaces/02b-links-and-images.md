@@ -19,6 +19,7 @@ Milvus 原文中的链接和图片地址是按 milvus.io 写的，原样放进 C
 | milvus.io 的完整地址 | `https://milvus.io/docs/release_notes.md` | 原样保留：作者写完整地址，就是有意指向 Milvus 站点 |
 | Milvus 站内页面 | `boolean.md`、`boolean.md#xxx` | 换成 Cloud 页面地址，见下表 |
 | 以 `/` 开头的站内路径 | `/api-reference/...`、`/bootcamp` | 该页生成失败：在 Cloud 站点上一定指错 |
+| 不属于以上任何一类 | `filtering`（漏写 `.md`） | 该页生成失败 |
 
 Milvus 站内页面按顺序查找，查到即停：
 
@@ -44,6 +45,7 @@ ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，�
 milvus.io 的标题锚点保留大小写（如 `#Delete-Entities-by-Filtering-Conditions`），zdoc 的锚点全部小写（如 `#delete-entities-by-filtering-conditions`），两边对标点的处理也不同。浏览器按大小写匹配锚点，所以原样照搬会失效。
 
 - **目标是本页或另一个共享页**：工具按 Milvus 的规则算出目标页每个标题的锚点，找到链接指向的标题，输出该标题在 Cloud 中的锚点；找不到对应标题时该页生成失败。
+- **两个版本分别计算**：`current` 版本中的链接按目标页 `current` 版本的标题计算，`next` 版本中的链接按目标页 `next` 版本的标题计算。目标页在该版本中不存在（lock 中为 `none`）时，该页生成失败。这条规则同样适用于不带锚点、指向另一个共享页的链接。
 - **目标是 Cloud 自己维护的页面**：按 Cloud 的规则转成小写写法，是否存在由 zdoc 现有的链接检查发现。
 - 多语言代码组中切换语言用的 `#python`、`#java` 等不是链接，由站点适配处理。
 
@@ -70,6 +72,8 @@ milvus.io 的标题锚点保留大小写（如 `#Delete-Entities-by-Filtering-Co
 |---|---|
 | Milvus 站内页面在四步中都没有找到对应地址 | 该页生成失败，提示补映射表 |
 | 出现以 `/` 开头的站内路径 | 该页生成失败，提示在映射表中处理，或回上游改成完整地址 |
+| 链接不属于任何一类 | 该页生成失败，提示回上游修正 |
+| 链接指向的共享页在同一版本中不存在 | 该页生成失败 |
 | 指向共享页标题的锚点找不到对应标题 | 该页生成失败 |
 | 指向 Cloud 自有页面的锚点不存在 | 由 zdoc 现有的链接检查发现 |
 | 外部图片下载失败或不存在 | 该页生成失败 |

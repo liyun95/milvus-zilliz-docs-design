@@ -1,14 +1,37 @@
-# 03 md2md 预处理
+# 03 md2md 提供的接口
 
-zdoc 生成 Cloud 页面时，要用 Cloud 的值展开 Milvus 原文中的变量与片段，规则必须和 Milvus 侧一致。本篇定义 zdoc 怎样调用 md2md 新增的预处理入口，以及它返回什么。
+zdoc 与 Milvus CI 处理命名块、展开变量与片段时，必须用同一套规则。本篇定义 md2md 为此新增的两组接口：命名块的解析与清除（标记规则见 [01](./01-named-blocks.md)），以及用 Cloud 的值展开变量与片段的预处理入口。
 
-**参与方**：zdoc 生成（调用方）、md2md（提供方）。
+**参与方**：md2md（提供方）、zdoc 生成与 Milvus CI（调用方）。
 
 **状态**：已定义，待文档负责人确认。
 
 ## 约定
 
-### 调用
+两组接口随 1a 的 md2md 同一次发版上线。zdoc 与 Milvus CI 都锁定 md2md 的精确版本。
+
+### 命名块的解析与清除
+
+```js
+import { parseBlocks, stripBlockMarkers } from "@zilliz/mdtomd/blocks.js";
+
+const result = parseBlocks(content, { sourceName });
+// { ok, blocks: [{ id, startLine, endLine }], errors: [{ code, message, file, line }] }
+
+const output = stripBlockMarkers(content);   // 只删除标记所在的整行，其余不变
+```
+
+| 能力 | 使用方 | 行为 |
+|---|---|---|
+| `parseBlocks` | zdoc | 返回块的 ID 与起止行；错误一次收集全部，错误码见 [01](./01-named-blocks.md#出错时) |
+| `stripBlockMarkers` | zdoc、`goover` | 只删除代码块之外的标记行；`goover` 在写文件前对每篇文档执行，遇到错误时构建失败 |
+| 命令行检查（如 `md2md-blocks check site/en`） | Milvus PR 检查（`check.yml`） | 检查全部页面与片段文件，有错误时以非零状态退出 |
+
+zdoc 在流水线第 ③ 步完成变换后调用 `stripBlockMarkers`，再调用下文的 `preprocess`。
+
+### 预处理
+
+#### 调用
 
 ```js
 import { preprocess } from "@zilliz/mdtomd/preprocess.js";
@@ -24,7 +47,7 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 | `sourceName` | 否 | 报错时显示的文件名 |
 | `limits` | 否 | 默认：嵌套深度 5、片段数 100、单个片段 256 KiB、输出 2 MiB |
 
-### 处理规则
+#### 处理规则
 
 - 先递归展开片段，再替换变量；片段使用调用页的变量表，代码块中的变量照常替换。这与原有入口一致。
 - 支持 `{{var.a.b}}` 嵌套键，不区分大小写；变量值原样插入，不再展开。
@@ -32,7 +55,7 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 - 片段只能读 `<fragmentRoot>/fragments/` 之内的 `.md` 普通文件，路径中任何一段都不能是符号链接；同一片段多次引用时只读一次。
 - 调用之间互不影响，两个产品可以在同一进程中并行生成。
 
-### 返回
+#### 返回
 
 ```js
 {
@@ -47,9 +70,11 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 }
 ```
 
-zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` 写入记录文件（见 [05](./05-publish-handoff.md#记录文件)），用于缓存判断和恢复。参数类型错误属于调用方的编程错误，直接抛出 `TypeError`。zdoc 与 Milvus CI 都锁定 md2md 的精确版本。
+zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` 写入记录文件（见 [05](./05-publish-handoff.md#记录文件)），用于缓存判断和恢复。参数类型错误属于调用方的编程错误，直接抛出 `TypeError`。
 
 ## 出错时
+
+命名块的错误码见 [01](./01-named-blocks.md#出错时)。预处理的错误码：
 
 | 错误码 | 何时出现 |
 |---|---|
@@ -64,7 +89,7 @@ zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` �
 ## 例子
 
 <details>
-<summary>Delete Entities（1a）</summary>
+<summary>Delete Entities 的预处理（1a）</summary>
 
 内容对齐后，原文第 29 行是 `uri="{{var.example_endpoint}}"`。
 
@@ -90,7 +115,11 @@ const result = preprocess({
 
 ## 设计理由
 
-**为什么另开入口。** md2md 原有入口不满足 Cloud 生成的要求（实测见[复用审计第 3.1 节](../../research/md2md-zdoc-reuse-audit.md#31-实测补充2026-10-14)）：
+**为什么放在 md2md。** md2md 与 zdoc 都是公开仓库，但 zdoc 是大型 monorepo，不适合让 Milvus CI 依赖。规则只实现一次，zdoc 与 Milvus 对“标记是否写对”“变量怎样展开”的判断不会出现分歧。
+
+**为什么命名块的能力在 1a 上线。** 命名块的扫描（T01）属于 1a，解析代码 1a 就要可用；清除能力随同一版本进入 Milvus CI，带命名块的原文就不必等 1b。milvus-docs 目前没有命名块，加入校验不会牵出历史问题。
+
+**为什么另开预处理入口。** md2md 原有入口不满足 Cloud 生成的要求（实测见[复用审计第 3.1 节](../../research/md2md-zdoc-reuse-audit.md#31-实测补充2026-10-14)）：
 
 | 原有行为 | 新入口的处理 |
 |---|---|
@@ -105,10 +134,10 @@ zdoc 现有的 LarkDocWriter 只接收飞书 JSON，不能充当 Markdown 编译
 
 **为什么由 md2md 读片段。** 受控读取的检查（越界、符号链接、循环、上限）由 md2md 负责，Milvus 侧以后也能复用。milvus-docs 中 34 页共引用片段 39 次，没有片段再引用片段，默认上限足够宽松。
 
-**为什么锁定版本。** milvus-docs 的 `ci.yml`、`pre.yml`、`preview.yml` 目前都安装未固定版本的 md2md；新入口发版后，两边要使用同一个确定的版本，结果才可重现。
+**为什么锁定版本。** milvus-docs 的 `ci.yml`、`pre.yml`、`preview.yml` 目前都安装未固定版本的 md2md；新接口发版后，两边要使用同一个确定的版本，结果才可重现。
 
 ## 验收
 
 - **T02**：显式绑定、缺失变量报错、并行不串值、不运行插件。
 - **T03**：嵌套与重复引用记录在依赖中；循环、越界、符号链接、深度或体积超限都失败。
-- **T11**：以 `site/en/Variables.json` 调用新入口，milvus-docs 全部页面的输出与原有入口在插件之前的结果逐字相同。
+- **T11**：以 `site/en/Variables.json` 调用新入口，milvus-docs 全部页面的输出与原有入口在插件之前的结果逐字相同；同一篇原文加命名块前后，Milvus 侧输出逐字相同，没有标记残留。
