@@ -25,7 +25,7 @@
 <g>
 <rect x="244" y="150" width="180" height="120" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
 <circle cx="268" cy="174" r="13" fill="#6d28d9"/><text x="268" y="179" class="num">2</text>
-<text x="342" y="182" class="head">定位</text><text x="334" y="216" class="sub">命名块与代码组</text><text x="334" y="240" class="sub">生成 registry</text>
+<text x="342" y="182" class="head">定位</text><text x="334" y="216" class="sub">命名块与代码组</text><text x="334" y="240" class="sub">生成命名块清单</text>
 </g>
 <g>
 <rect x="448" y="150" width="180" height="120" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>

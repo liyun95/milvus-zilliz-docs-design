@@ -50,6 +50,32 @@ zdoc Guides：Fetch 获取飞书源与媒体 → 分表渲染 → Guides 组装 
 - 源码里的 watcher 对 fragment/variable 文件变化的关联重建留有 TODO；首期使用受控完整构建，不把它当作已有完整反向依赖图。
 - 当前 Milvus CI 未固定安装的 npm 包版本。本次读到的是 Git 源码，不是生产 npm 安装记录；接入时需固定版本并做一致性验证。
 
+### 3.1 实测补充（2026-10-14）
+
+为定义预处理入口（[接口设计 03《md2md 预处理》](../docs/interfaces/03-md2md-preprocess.md)），在 md2md [`635da07`](https://github.com/zilliztech/md2md/tree/635da07276e80fb2a6efdf667686df3913d5de4c) 上用小样例实际运行了 `goover`，并统计了 milvus-docs `v3.0.x`（[`1997ce9`](https://github.com/milvus-io/milvus-docs/tree/1997ce96782b31f8628f22d31fad11007e4b924b)）`site/en` 的实际用法。
+
+| 原有行为 | 实测 | 新入口的处理 |
+|---|---|---|
+| 根目录取自 `PATH_ROOT` 或 cwd，配置和插件在加载时读入，规则存放在模块级状态中 | 读代码确认 | 不依赖这些状态，调用之间互不影响 |
+| 变量从根目录逐级合并各层 `Variables.json`，再合并页面 front matter | front matter 的值遇到冒号被截断：`title: Connect: quick start` 读成 `Connect` | 不查找变量，由调用方传入 |
+| 缺失的变量 | 替换为空串，`token="{{var.example_token}}"` 变成 `token=""`，没有报错 | 报错 |
+| 片段路径带 `..` | `{{fragments/../outside.md}}` 读出了片段目录之外的文件 | 报错 |
+| 片段循环引用 | 运行 10 秒仍未结束，被强制终止 | 报错 |
+| 代码中的 `{{ doc.content }}` | 原样保留 | 保持 |
+
+milvus-docs 的实际用法：
+
+| 项目 | 结果 |
+|---|---|
+| 变量文件 | 只有 `site/en/Variables.json` |
+| `{{var.*}}` | 29 页共 97 处，19 个变量名，全部在 `site/en/Variables.json` 中；仅未被引用的 `fragments/tail.md` 用了不存在的 `auth.*` |
+| front matter 变量 | 0 处 |
+| `{{fragments/*}}` | 34 页共 39 处，9 个片段；片段中不再引用片段，路径不含 `..` |
+| 站点插件标记 | `{{tab}}` 11 页（安装与升级页，不在共享范围内）；术语与图片标记 0 处 |
+| 三个试点页 | 当前没有变量或片段，变量在内容对齐时加入 |
+
+milvus-docs 的 `ci.yml`、`pre.yml`、`preview.yml` 都以 `npm install @zilliz/mdtomd -g` 安装未固定版本的 md2md。
+
 ## 4. zdoc：已有平台能力及其限制
 
 | 能力 | 已核对实现 | 复用与新增边界 |
@@ -107,7 +133,7 @@ zh-CN 是独立产品站点，不等于英文 Guides 的普通翻译 locale；�
 
 ## 7. 共享内容接入边界
 
-共享源从 milvus-docs 的固定修订读取，由 zdoc 扫描、组装和适配，再接入既有发布流程。具体规则以[当前架构](../docs/architecture.md)和[消费规范](../docs/consumption-schema.md)为准；本审计记录现有能力，不另行维护一套配置方案。
+共享源从 milvus-docs 的固定修订读取，由 zdoc 扫描、组装和适配，再接入既有发布流程。具体规则以[接口设计](../docs/interfaces/README.md)和[消费规范](../docs/consumption-schema.md)为准；本审计记录现有能力，不另行维护一套配置方案。
 
 Milvus 的 `sync-shared-scripts` 有同步 Lark 脚本的历史机制，但其路径与当前 zdoc 布局不同，不能据此认定生产仍共享同一版本，也不能把脚本同步当成共享正文消费接口。
 

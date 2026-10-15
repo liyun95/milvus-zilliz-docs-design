@@ -1,0 +1,19 @@
+# 术语
+
+- **overlay**：zdoc 中只记录 Cloud 差异的一层文件，即 `shared-docs/` 中的页面配置、`Variables.json` 和 Cloud 内容文件。是本次新建的，与 zdoc 现有的 `sidebar-overrides` 或部署仓库的 Kubernetes overlays 无关。
+- **共享页**：正文引用 milvus-docs 原文、在 zdoc 中只维护差异的 Cloud 页面。每个共享页对应 `shared-docs/pages/` 下的一个目录。
+- **页面标识**：共享页目录的名字，等于这一页现有的 slug（见 [02](./02-page-config.md#页面标识)）。
+- **页面配置**：每个共享页目录中的 `page.yaml`，说明引用哪篇原文、发布到哪些手册、做哪些变换（见 [02](./02-page-config.md)）。
+- **片段（fragment）**：milvus-docs 中多篇文章共用的一段内容，放在 `site/en/fragments/`，正文用 `{{fragments/xxx.md}}` 引用，由 md2md 展开。本方案只在这个意义上使用“片段”。
+- **Cloud 内容文件**：一个共享页面中 Cloud 用来新增或替换的内容，与页面配置放在同一目录，由页面配置的 `content.file` 指定。
+- **命名块（block ID）**：原文中用 `doc:block` 注释标出的一段 Markdown 或一个完整代码组，是 Cloud 做差异处理的定位点（见 [01](./01-named-blocks.md)）。
+- **命名块清单**：工具扫描各共享页的源文件后得到的命名块列表，包括类型、语言、位置和摘要；每次生成时重新扫描，不提交到仓库。
+- **共享来源配置**：`shared-docs/source.yaml`，记录读哪个仓库、跟踪哪个分支。
+- **链接映射表**：`shared-docs/links.yaml`，登记 Milvus 页面到 Cloud 页面的对应关系（见 [02b](./02b-links-and-images.md)）。
+- **lock**：每个共享页一份，记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`），见 [04](./04-channels-and-lock.md)。上游更新 PR 修改 `next`，提升修改 `current`。
+- **提升（promotion）**：功能上线时按页把 lock 的 `current` 改为 `next` 的值，Prod 采用 UAT 已在显示的版本。沿用 zdoc 对上线的叫法。
+- **记录文件（receipt）**：每个已切换的共享页在 dev 中的一份记录，说明一次构建用到的输入（按仓库分组）与输出摘要，兼作来源记录；用于追溯、重新生成比对和恢复（见 [05](./05-publish-handoff.md#记录文件)）。
+- **manifest**：来源版本、文件及摘要的清单，不能代替实际内容。
+- **artifact**：构建产出的实际文件或包。
+- **stage**：zdoc 现有发布流程中的内容暂存区，生成结果在这里校验后进入发布。
+- **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面，只能由激活写入（见 [05](./05-publish-handoff.md#归属与生效配置)）。
