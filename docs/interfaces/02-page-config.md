@@ -179,7 +179,7 @@ transforms:
 | 第一遍 | lock 中 `current` 的版本 | `page.yaml` | Prod 显示的版本 |
 | 第二遍 | lock 中 `next` 的版本 | 同一份 `page.yaml` | UAT 显示的版本 |
 
-原文有两个版本，原文本身在两版之间的变化由此自动区分，不需要在变换中声明（见 [04](./04-channels-and-lock.md#两个版本怎样合并)）。但加工用的 `page.yaml`、Cloud 内容文件和 `Variables.json` 却只有一份，不受 lock 控制，合并后两遍立刻都用上（见 [04](./04-channels-and-lock.md#设计理由)）。默认每条变换两遍都执行，在两版原文上都必须成立；大多数时候这没有问题。
+原文有两个版本，原文本身在两版之间的变化由此自动区分，不需要在变换中声明（见 [04](./04-channels-and-lock.md#两个版本怎样合并成一页)）。但加工用的 `page.yaml`、Cloud 内容文件和 `Variables.json` 却只有一份，不受 lock 控制，合并后两遍立刻都用上（见 [04](./04-channels-and-lock.md#设计理由)）。默认每条变换两遍都执行，在两版原文上都必须成立；大多数时候这没有问题。
 
 **`channel` 让某一条只在其中一遍执行。**
 
@@ -241,7 +241,7 @@ lock 一直是 `current: A`、`next: A`，两遍读同一版原文，原文写�
 
 </details>
 
-**提升后自动收尾。** 功能上线时提升，lock 的 `current` 改成 `next` 的值，两遍从此用同一版原文。提升 PR 删除标 `channel: current` 的变换（它对准的旧原文已经用不上），去掉 `channel: next` 的标记（之后两遍都执行），见 [04](./04-channels-and-lock.md#写入与提升)。所以 `channel` 只是过渡期的临时标记，作者不用回头清理。上游更新 PR 因上游修改而失败时，报告会直接给出按上面写法修改的建议（见 [06](./06-upstream-changes.md#出错时)）。
+**提升后自动收尾。** 功能上线时提升，lock 的 `current` 改成 `next` 的值，两遍从此用同一版原文。提升 PR 删除标 `channel: current` 的变换（它对准的旧原文已经用不上），去掉 `channel: next` 的标记（之后两遍都执行），见 [04](./04-channels-and-lock.md#提升)。所以 `channel` 只是过渡期的临时标记，作者不用回头清理。上游更新 PR 因上游修改而失败时，报告会直接给出按上面写法修改的建议（见 [06](./06-upstream-changes.md#出错时)）。
 
 **与 `<NextChannel>` 的分工。** `<NextChannel>` 写在 Cloud 内容文件中，只能让 Cloud 新写的一段只在 UAT 显示（见下文“Cloud 内容文件”）；要替换或删除 Milvus 原文、并且只在一边生效，就用 `channel`。第二种场景在飞书中的写法，是用 `<NextChannel action="exclude">` 包住旧说法、`action="include"` 包住新说法；共享页的旧说法在两边共用的 Milvus 原文中，Cloud 不能在原文里加标签，所以改用 `channel: next`。
 

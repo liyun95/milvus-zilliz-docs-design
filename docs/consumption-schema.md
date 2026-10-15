@@ -313,7 +313,7 @@ Cloud 内容文件、`Variables.json` 和页面配置都只有一份，Prod 与 
 - 删除 `channel: current` 的规则，去掉 `channel: next` 的标记；
 - 已下线的页面删除目录（3.11 节）。
 
-PR 说明会列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`。对应的功能也在这次上线时，在这个 PR 中删掉包裹；工具不会自动删，因为它不知道每段包裹属于哪个功能。完整规则见[接口设计 04](./interfaces/04-channels-and-lock.md#下线一页与提升)。
+PR 说明会列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`。对应的功能也在这次上线时，在这个 PR 中删掉包裹；工具不会自动删，因为它不知道每段包裹属于哪个功能。完整规则见[接口设计 04](./interfaces/04-channels-and-lock.md#提升)。
 
 ### 3.11 下线一页
 

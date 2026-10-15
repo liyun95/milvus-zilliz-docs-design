@@ -4,7 +4,7 @@ milvus-docs 合并新提交后，Cloud 要自动得知，并自己决定是否�
 
 **参与方**：milvus-docs（新提交）、zdoc 中的“上游更新”工作流（发现、生成、发起 PR）、文档工程师（审核）。
 
-**状态**：已定义，待文档负责人确认。接入、下线与提升这几种由 Cloud 发起的 PR 见 [04](./04-channels-and-lock.md#写入与提升)。
+**状态**：已定义，待文档负责人确认。接入、下线与提升这几种由 Cloud 发起的 PR 见 [04](./04-channels-and-lock.md#lockyaml-怎样变化)。
 
 ## 约定
 

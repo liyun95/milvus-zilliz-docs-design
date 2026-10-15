@@ -44,9 +44,9 @@
 |---|---|---|---|---|
 | 接入 | 文档工程师开 PR 新增 `page.yaml`，工具补上 lock | `current` 与 `next` 都是最新提交；功能未上线时 `current: none` | 无；首期要激活后才上网站，见下节 | [04](./04-channels-and-lock.md#接入一页) |
 | 上游更新 | 工具每天自动开 PR，文档工程师审核 | `next` 改为新提交 | UAT 显示新版本，Prod 不变 | [06](./06-upstream-changes.md) |
-| 提升 | 功能上线时，文档工程师运行工作流，工具开 PR | `current` 改成 `next` 的值 | Prod 跟上 UAT | [04](./04-channels-and-lock.md#下线一页与提升) |
-| 下线 | 文档工程师运行工作流，工具开 PR | `next` 改为 `none` | UAT 不再显示，Prod 照常 | [04](./04-channels-and-lock.md#下线一页与提升) |
-| 下线后提升 | 同提升 | `current` 也成为 `none`，页面目录连同 lock 一起删除 | 两边都不再显示；首期要等飞书节点删除，见下节 | [04](./04-channels-and-lock.md#下线一页与提升) |
+| 提升 | 功能上线时，文档工程师运行工作流，工具开 PR | `current` 改成 `next` 的值 | Prod 跟上 UAT | [04](./04-channels-and-lock.md#提升) |
+| 下线 | 文档工程师运行工作流，工具开 PR | `next` 改为 `none` | UAT 不再显示，Prod 照常 | [04](./04-channels-and-lock.md#下线一页) |
+| 下线后提升 | 同提升 | `current` 也成为 `none`，页面目录连同 lock 一起删除 | 两边都不再显示；首期要等飞书节点删除，见下节 | [04](./04-channels-and-lock.md#下线一页) |
 
 上游更新与提升随 milvus-docs 的新提交和 Cloud 的每次发版反复进行。
 
