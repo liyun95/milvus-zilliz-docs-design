@@ -95,6 +95,9 @@ milvus.io 的标题锚点保留大小写（如 `#Delete-Entities-by-Filtering-Co
 
 ## 设计理由
 
+<details>
+<summary>展开设计理由</summary>
+
 **为什么需要映射表。** milvus-docs `v3.0.x` 中有 2074 个站内页面链接；User Guide 与 Embeddings 中的 837 个，只有 32% 的目标在 Cloud 有同名页面。两边页面名字不同是历史原因：Cloud 文档在飞书中按自己的结构命名（如 Milvus 的 `boolean.md` 在 Cloud 是 `filtering-overview`）。两边的地址都已公开，被搜索引擎收录、被站外引用，改名要在两站都做跳转，首期不做。
 
 **为什么全站一份。** 同一个目标页会被很多共享页引用，登记一次即可；每页各写一份，成本随页数增长。随着更多页面迁移为共享页，查找的第 1 步覆盖的目标越来越多，映射表随之缩短。
@@ -104,6 +107,8 @@ milvus.io 的标题锚点保留大小写（如 `#Delete-Entities-by-Filtering-Co
 **为什么转存图片。** zdoc 现有的 397 张英文 Guides 图片都存在 zdoc 自己的图片存储中。[恢复能力核验](../../research/recovery-capability-audit.md)发现，现有上传逻辑在内容变化时会上传到同一地址，旧页面不能保证显示旧图片；核验建议为迁移页用到的图片固定内容摘要，存成不会被覆盖的地址。直接引用 Milvus 的地址也有同样的问题，还会让 Milvus 换图绕过上游更新 PR 的审核。
 
 依据的统计见 [zdoc 代码变体与发布通道核验第 2.1 节](../../research/zdoc-variants-and-channels-audit.md#21-补充核验2026-10-14)。
+
+</details>
 
 ## 验收
 

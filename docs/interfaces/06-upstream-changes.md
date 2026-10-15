@@ -104,6 +104,9 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 ## 设计理由
 
+<details>
+<summary>展开设计理由</summary>
+
 **为什么定时检查，而不是事件触发。** milvus-docs 与 zdoc 属于不同的 GitHub 组织。事件触发要在 Milvus 的公开仓库中放一个能操作 zdoc 的跨组织凭据，管理与安全成本都高。milvus-docs 是公开仓库，zdoc 不需要凭据就能读取；上游修改本来就要等 Cloud 审核，晚几个小时发现没有影响。`v3.0.x` 近 30 天有 33 个提交，集中在 11 天内，单日最多 9 个，按天处理比每个提交开一个 PR 合理。
 
 **为什么用 `GITHUB_TOKEN`。** zdoc 现有的 master→dev 同步工作流已用它开 PR 并显式触发校验，有现成的做法可以照搬，不必新增机器人账号或 GitHub App。zdoc 是公开仓库，来自外部 fork 的 PR 拿不到仓库的 secrets；上游更新工作流在 zdoc 内部定时运行，也不需要 Cloud 凭据。PR 中的影响报告是公开的，其内容来自公开的 milvus-docs 与 zdoc master，不会多暴露信息。
@@ -113,6 +116,8 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 **为什么原文改名或删除不提供专门写法。** milvus-docs 调整导航结构改的是目录结构文件，不必移动原文；Cloud 页面在导航中的位置也由 Cloud 自己决定（首期在飞书目录中）。原文本身改名或删除很少：`v3.0.x` 近一年改名 2 次、删除 9 次。改名后新旧文件的相似度只有 51% 和 61%，Git 未必能识别为改名，工具只能报告“找不到原文”。为此新增字段不划算，遇到时人工处理。
 
 **为什么失败也开 PR。** 失败多半意味着 Cloud 的配置需要跟着上游调整，例如为被修改的代码行加一条只对 `next` 生效的新规则。把失败和修改建议放进 PR，文档工程师可以直接在同一个 PR 中修好，再走正常审核。
+
+</details>
 
 ## 验收
 

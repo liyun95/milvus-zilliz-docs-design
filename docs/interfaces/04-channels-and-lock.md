@@ -185,6 +185,9 @@ next:    b2…    # 两边相同，成对的标记消失
 
 ## 设计理由
 
+<details>
+<summary>展开设计理由</summary>
+
 **为什么两个版本必须合并进同一页。** zdoc 的 UAT 与 Prod 由同一个 dev commit 构建同一个镜像，部署时才注入通道（`ZDOC_RELEASE_CHANNEL`）。Prod 与 UAT 不能各读一份文件，只能在同一份页面中放两个版本，由 `<NextChannel>` 切换。只给改动的段落打标记做不到这一点：原文中已经只剩新文，Prod 无法保留旧文。
 
 **为什么接入时自动写 lock。** 作者不需要自己查 commit，也不会抄错 SHA；功能是否已上线用 PR 标签表达，审核人在 PR 中一眼可见。工具用 zdoc 自带的 `GITHUB_TOKEN` 提交，与 06 的上游更新 PR 相同；用它推送的提交不会自动触发其他工作流，所以要显式触发校验。
@@ -202,6 +205,8 @@ next:    b2…    # 两边相同，成对的标记消失
 **为什么锚点跟随标题。** 这与 zdoc 现在修改飞书标题时的行为一致，标题改名本身是正常的修改。milvus-docs 一年内有 17% 的候选页改过或删过标题，所以不能只给提示，要在提升时处理链接。milvus-docs 的链接检查目前不校验锚点；直接加校验要先修历史断链，首期不做，列在[待确认事项](../phase-1.md#61-待确认的接口)中。
 
 依据的核验见 [zdoc 代码变体与发布通道核验第 2.1 节](../../research/zdoc-variants-and-channels-audit.md#21-补充核验2026-10-14)；合并规则与测试见[本地原型](../../examples/filtered-search/two-commit/walkthrough.md)。
+
+</details>
 
 ## 验收
 

@@ -115,6 +115,9 @@ const result = preprocess({
 
 ## 设计理由
 
+<details>
+<summary>展开设计理由</summary>
+
 **为什么放在 md2md。** md2md 与 zdoc 都是公开仓库，但 zdoc 是大型 monorepo，不适合让 Milvus CI 依赖。规则只实现一次，zdoc 与 Milvus 对“标记是否写对”“变量怎样展开”的判断不会出现分歧。
 
 **为什么命名块的能力在 1a 上线。** 命名块的扫描（T01）属于 1a，解析代码 1a 就要可用；清除能力随同一版本进入 Milvus CI，带命名块的原文就不必等 1b。milvus-docs 目前没有命名块，加入校验不会牵出历史问题。
@@ -135,6 +138,8 @@ zdoc 现有的 LarkDocWriter 只接收飞书 JSON，不能充当 Markdown 编译
 **为什么由 md2md 读片段。** 受控读取的检查（越界、符号链接、循环、上限）由 md2md 负责，Milvus 侧以后也能复用。milvus-docs 中 34 页共引用片段 39 次，没有片段再引用片段，默认上限足够宽松。
 
 **为什么锁定版本。** milvus-docs 的 `ci.yml`、`pre.yml`、`preview.yml` 目前都安装未固定版本的 md2md；新接口发版后，两边要使用同一个确定的版本，结果才可重现。
+
+</details>
 
 ## 验收
 
