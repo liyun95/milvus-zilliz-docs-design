@@ -25,8 +25,21 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 读取
 | `next` | UAT 使用的 milvus-docs commit，完整 SHA；写 `none` 表示 UAT 上没有这一页 |
 
 - lock 不记页面标识：所在的页面目录已经说明属于哪一页。
-- 仓库地址与跟踪分支记在共享来源配置中（见 [01](./01-named-blocks.md#共享来源配置)），不在每页重复。
+- 仓库地址与跟踪分支记在共享来源配置中（见下文），不在每页重复。
 - lock 只记“采用哪个版本”，不记文件摘要。一次构建实际用到的输入及其摘要记在记录文件中（见 [05](./05-publish-handoff.md#记录文件)）。
+
+### 共享来源配置与跟踪分支
+
+站点级一份，与页面目录同在 `shared-docs/` 中（见 [02](./02-page-config.md#目录)）：
+
+```yaml
+# shared-docs/source.yaml
+schema_version: 1
+repository: https://github.com/milvus-io/milvus-docs
+track: v3.0.x          # 跟踪分支
+```
+
+**跟踪分支**是 milvus-docs 的默认分支，目前为 `v3.0.x`，记在共享来源配置中，只用于发现新提交；正式生成始终使用 lock 中的 commit。Milvus 发布新的大版本分支时，用一个显式的 PR 切换。只写在 `preview` 分支中的内容，合入 `v3.0.x` 后 Cloud 才能读到；Cloud 先于 Milvus 上线的功能写在 Cloud 内容文件中，用 `<NextChannel>` 包住。
 
 ### 整页上线与下线
 
@@ -50,17 +63,15 @@ lock 只由工具写入，人不手改。改 lock 的 PR 共四种：
 
 **提升**是指：把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。新页面（`current: none`）提升后在 Prod 上线；下线页面的 `next` 是 `none`，提升后 `current` 也变成 `none`，两边都没有这一页。
 
-**跟踪分支**是 milvus-docs 的默认分支，目前为 `v3.0.x`，记在共享来源配置中，只用于发现新提交；正式生成始终使用 lock 中的 commit。Milvus 发布新的大版本分支时，用一个显式的 PR 切换。只写在 `preview` 分支中的内容，合入 `v3.0.x` 后 Cloud 才能读到；Cloud 先于 Milvus 上线的功能写在 Cloud 内容文件中，用 `<NextChannel>` 包住。
-
 #### 接入一页
 
 1. 作者在 zdoc 中开 PR，新增 `shared-docs/pages/<页面标识>/` 下的 `page.yaml` 与 Cloud 内容文件，不写 lock。
-2. 工具在 PR 中自动运行：发现新页面没有 lock，就取跟踪分支的最新提交写入 `lock.yaml`，提交到这个 PR，再触发校验。
+2. 工具在 PR 中自动运行：发现新页面没有 lock，就取跟踪分支的最新提交写入 `lock.yaml`，提交到这个 PR，再触发校验（见 [05](./05-publish-handoff.md#pr-校验)）。
 3. 这一页对应的功能还没上线时，作者给 PR 加标签 `shared-docs: not-launched`，工具把 `current` 重写为 `none`。合并前去掉或加上标签，lock 随之重写。
-4. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05](./05-publish-handoff.md#切换与激活)）。
+4. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05](./05b-cutover-and-ownership.md#切换与激活)）。
 
 - lock 写入后就固定在那个提交上，之后的上游修改由每天的上游更新 PR 处理。要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可。
-- 首期导航由飞书节点决定，只能接入在飞书目录中已有节点的页面（见 [05](./05-publish-handoff.md#导航首期)）。
+- 首期导航由飞书节点决定，只能接入在飞书目录中已有节点的页面（见 [05](./05b-cutover-and-ownership.md#导航首期)）。
 
 #### 下线一页与提升
 
@@ -76,7 +87,7 @@ lock 只由工具写入，人不手改。改 lock 的 PR 共四种：
 - 每页 lock 中的 `current` 改成 `next` 的 commit 值；
 - Git 页面中指向旧锚点的链接改为新锚点（见[标题改名与锚点](#标题改名与锚点)）；
 - 清理页面配置中只对一个通道生效的规则：删除 `channel: current` 的规则，去掉 `channel: next` 的标记（见 [02](./02-page-config.md#只对一个通道生效的规则)）；
-- 下线页面的目录被删除，PR 说明中提醒“合并后请删除这一页的飞书节点”。之后 Fetch 怎样把它从网站上移除见 [05](./05-publish-handoff.md#下线完成)。
+- 下线页面的目录被删除，PR 说明中提醒“合并后请删除这一页的飞书节点”。之后 Fetch 怎样把它从网站上移除见 [05](./05b-cutover-and-ownership.md#下线完成)。
 
 提升在功能上线时进行，也就是现在修改 `Release Channel` 的时机，合并后到达 Prod 的路径与时延见 05。提升合并后，还开着的上游更新 PR 由下一次运行重建：lock 中 `current` 与 `next` 是相邻的两行，两个 PR 同时修改会产生 Git 冲突。
 

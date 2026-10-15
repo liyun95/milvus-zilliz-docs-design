@@ -8,12 +8,14 @@
 - **Cloud 内容文件**：一个共享页面中 Cloud 用来新增或替换的内容，与页面配置放在同一目录，由页面配置的 `content.file` 指定。
 - **命名块（block ID）**：原文中用 `doc:block` 注释标出的一段 Markdown 或一个完整代码组，是 Cloud 做差异处理的定位点（见 [01](./01-named-blocks.md)）。
 - **命名块清单**：工具扫描各共享页的源文件后得到的命名块列表，包括类型、语言、位置和摘要；每次生成时重新扫描，不提交到仓库。
-- **共享来源配置**：`shared-docs/source.yaml`，记录读哪个仓库、跟踪哪个分支。
+- **共享来源配置**：`shared-docs/source.yaml`，记录读哪个仓库、跟踪哪个分支（见 [04](./04-channels-and-lock.md#共享来源配置与跟踪分支)）。
 - **链接映射表**：`shared-docs/links.yaml`，登记 Milvus 页面到 Cloud 页面的对应关系（见 [02b](./02b-links-and-images.md)）。
 - **lock**：每个共享页一份，记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`），见 [04](./04-channels-and-lock.md)。上游更新 PR 修改 `next`，提升修改 `current`。
+- **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，由 lock 决定，作者不写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./02-page-config.md#只对一个通道生效的规则)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
+- **激活**：一页从飞书切换到 Git 生成，由文档负责人触发，一页只做一次（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。与提升无关。
 - **提升（promotion）**：功能上线时，按页把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。沿用 zdoc 对上线的叫法。
 - **记录文件（receipt）**：每个已切换的共享页在 dev 中的一份记录，说明一次构建用到的输入（按仓库分组）与输出摘要，兼作来源记录；用于追溯、重新生成比对和恢复（见 [05](./05-publish-handoff.md#记录文件)）。
 - **manifest**：来源版本、文件及摘要的清单，不能代替实际内容。
 - **artifact**：构建产出的实际文件或包。
 - **stage**：zdoc 现有发布流程中的内容暂存区，生成结果在这里校验后进入发布。
-- **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面；由 Fetch 写入，激活时加入、下线完成时移除，人不手改（见 [05](./05-publish-handoff.md#归属与生效配置)）。
+- **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面；由 Fetch 写入，激活时加入、下线完成时移除，人不手改（见 [05](./05b-cutover-and-ownership.md#归属与生效配置)）。

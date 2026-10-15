@@ -12,7 +12,7 @@
 
 ```
 shared-docs/
-  source.yaml                        # 共享来源配置：仓库与跟踪分支（见 01）
+  source.yaml                        # 共享来源配置：仓库与跟踪分支（见 04）
   Variables.json                     # Cloud 变量（见 03）
   links.yaml                         # 链接映射表（见 02b）
   presentation/cloud-sdk-tabs.yaml   # 代码 Tabs 规则，工程维护
@@ -50,7 +50,7 @@ publish:
 #   title:       不写就用 Milvus 原文的 title
 #   description: 不写就用 Milvus 原文的 summary
 #   beta:        不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE
-# 导航中的位置、顺序和标签首期由飞书目录决定（见 05）
+# 导航中的位置、顺序和标签首期由飞书目录决定（见 05b）
 
 # transforms:                           # Cloud 的差异，见下文“变换”；Delete Entities 没有
 ```
@@ -71,7 +71,7 @@ publish:
 | front matter | 生成方式 |
 |---|---|
 | `slug` | `/` 加页面标识 |
-| `sidebar_label`、`sidebar_position` | 首期按飞书目录中保留的节点填写，与导航一致（见 [05](./05-publish-handoff.md#导航首期)） |
+| `sidebar_label`、`sidebar_position` | 首期按飞书目录中保留的节点填写，与导航一致（见 [05](./05b-cutover-and-ownership.md#导航首期)） |
 | `title`、`description` 的后缀 | 按手册，如 `\| Cloud`、`\| BYOC` |
 | `notebook`、`added_since`、`last_modified`、`deprecate_since` | 固定为 `FALSE` |
 | `type` | `origin` |
@@ -237,9 +237,8 @@ transforms:
 - `lines` 在目标语言示例中找不到、出现多次或超过 5 行；`lines` 用在没有 `language` 的目标上；`lines` 或 `content.lines` 中有空行。
 - 内容文件中出现命名块标记或手写的 Tabs；试图对本轮刚插入的内容再做变换。
 - 删除了 Tabs 规则要求必须存在的语言或默认语言。
-- 生成结果被手动修改过。
 
-链接与图片的错误见 [02b](./02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./03-md2md-preprocess.md#出错时)。新增和替换的内容同样参与变量绑定和依赖记录；原文中被替换的一节发生变化时，即使 Cloud 输出不变，上游更新 PR 也会提示复核。
+链接与图片的错误见 [02b](./02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./03-md2md-preprocess.md#出错时)，生成结果被手动修改见 [05](./05-publish-handoff.md#发布保护)。新增和替换的内容同样参与变量绑定和依赖记录；原文中被替换的一节发生变化时，即使 Cloud 输出不变，上游更新 PR 也会提示复核。
 
 ## 例子
 
@@ -292,7 +291,7 @@ transforms:
 
 **为什么按手册发布。** Delete Entities 和 Filtered Search 在 zdoc 中各发布两份：Guides（SaaS，标题后缀 `| Cloud`）和 BYOC（标题后缀 `| BYOC`），来源是同一条飞书记录，由 `Publish Targets` 控制，两份只差标题和描述的后缀；OpenAI 只发布到 Guides。所以页面配置要列出手册，后缀由工具按手册添加，作者不手写。
 
-**为什么作者只写 3 项元数据。** zdoc 现有 366 个英文 Guides 页面中，`notebook`、`added_since`、`last_modified`、`deprecate_since` 全部是 `FALSE`；`type` 有 365 页是 `origin`；`displayed_sidebar` 只有发布说明使用非默认值；`beta` 有 34 页不是 `FALSE`。所以只开放确实因页而异的项。导航标签与排序首期由飞书目录决定（见 05），不在页面配置中重复。Milvus 原文的 `beta`（如 `Milvus 2.6.x`）是 Milvus 自己的版本说明，不沿用。
+**为什么作者只写 3 项元数据。** zdoc 现有 366 个英文 Guides 页面中，`notebook`、`added_since`、`last_modified`、`deprecate_since` 全部是 `FALSE`；`type` 有 365 页是 `origin`；`displayed_sidebar` 只有发布说明使用非默认值；`beta` 有 34 页不是 `FALSE`。所以只开放确实因页而异的项。导航标签与排序首期由飞书目录决定（见 05b），不在页面配置中重复。Milvus 原文的 `beta`（如 `Milvus 2.6.x`）是 Milvus 自己的版本说明，不沿用。
 
 **为什么代码行差异写在 zdoc。** 同一段代码中只有个别行因产品而不同时，例如 Milvus 的可选 `credential` 注释与 Cloud 必填的 `integration_id`，原文的代码不改，只给代码组加命名块，由 zdoc 按原文中连续的整行定位并修改。不采用以下做法：
 

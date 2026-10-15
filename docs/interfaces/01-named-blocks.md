@@ -42,17 +42,6 @@ const output = stripBlockMarkers(content);   // 只删除标记所在的整行�
 
 这些能力随 1a 的 md2md 发版上线。同一篇原文加命名块前后，Milvus 侧的转换结果必须逐字相同。zdoc 在流水线第 ③ 步完成变换后清除标记，再调用 [03 md2md 预处理](./03-md2md-preprocess.md)。
 
-### 共享来源配置
-
-站点级一份，与页面目录同在 `shared-docs/` 中（见 [02 共享页配置](./02-page-config.md)）：
-
-```yaml
-# shared-docs/source.yaml
-schema_version: 1
-repository: https://github.com/milvus-io/milvus-docs
-track: v3.0.x          # 跟踪分支，见 04
-```
-
 ### 命名块清单与块的类型
 
 zdoc 扫描源文件后，在内部得到每页的命名块清单：块 ID、类型、语言、所在行和内容摘要。它供 [02](./02-page-config.md) 校验变换目标、[05](./05-publish-handoff.md) 写入记录文件、[06](./06-upstream-changes.md) 比较上游变化。清单的具体结构在实现时确定；写入记录文件 与影响报告的部分在 05、06 中定义。
