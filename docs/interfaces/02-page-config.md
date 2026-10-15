@@ -138,11 +138,12 @@ transforms:
 | `position` | 视情况 | 在命名块或代码行旁 `add` 时必填，取 `before` 或 `after`；给代码组增加语言时不写，顺序由 Tabs 规则决定；`replace`、`remove` 不写 |
 | `content.file` | `add` / `replace` 时 | Cloud 内容文件，相对于页面目录，不能指向目录之外 |
 | `content.lines` | 目标有 `lines` 时 | 新的代码行，直接写在配置中，代替 `content.file` |
+| `channel` | 否 | `current` 或 `next`：这条规则只对 Prod 或只对 UAT 的版本生效；不写则两个版本都生效。见下文“只对一个通道生效的规则” |
 
 - 变换对 `publish` 中的所有手册都生效。SaaS 与 BYOC 之间的差异，用 Cloud 内容文件中 zdoc 现有的产品过滤写法表达。
 - 同一位置有多条 `add` 时，按列表顺序输出。
 - 块 ID 在源文件内唯一，语言在代码组内唯一。目标的类型由原文结构决定（见 [01](./01-named-blocks.md#命名块清单与块的类型)）；文件名不决定动作，配置才决定。
-- Current / Next 不在变换中声明，由 lock 的两个版本自动区分（见 04）。
+- 共享原文在 Current / Next 之间的变化不需要在变换中声明，由 lock 的两个版本自动区分（见 04）。
 
 ### Cloud 内容文件
 
@@ -163,6 +164,46 @@ Cloud 内容文件与 Milvus 原文使用同一种 Markdown 写法（如提示�
 | 代码组中的一个语言（目标写了 `language`） | 只写一个该语言的代码块，不加 `multipleCode` 外壳，工具把它放进对应的代码组 |
 
 转换为 Cloud 组件的规则（如多语言代码组的语言顺序与必选语言）由工程维护的 Tabs 规则文件 `presentation/cloud-sdk-tabs.yaml` 与工具共同决定，作者写配置和内容文件时不用考虑。
+
+### 只对一个通道生效的规则
+
+变换默认对 `current`（Prod）与 `next`（UAT）两个版本都生效，在两个版本上都必须成立。有两种情况需要一条规则只对一个通道生效，这时写 `channel`：
+
+| 情况 | 写法 |
+|---|---|
+| 上游修改了 Cloud 定位的内容（如 `lines` 指定的代码行），过渡期内旧写法只在 `current` 中存在，新写法只在 `next` 中存在 | 原规则加 `channel: current`，另加一条按新原文写的规则，标 `channel: next` |
+| Cloud 要在下次发布时才用自己的内容替换 Milvus 的某一节，Prod 继续显示 Milvus 原文 | 这条规则标 `channel: next` |
+
+```yaml
+transforms:
+  # 旧原文的行：只对 Prod 生效
+  - operation: replace
+    channel: current
+    target:
+      block: define-function-code
+      language: python
+      lines: |
+        # "credential": "apikey_dev",               # Optional: Credential label specified in milvus.yaml
+    content:
+      lines: |
+        "integration_id": "YOUR_INTEGRATION_ID",
+
+  # 上游修改后的行：只对 UAT 生效
+  - operation: replace
+    channel: next
+    target:
+      block: define-function-code
+      language: python
+      lines: |
+        <上游修改后的那一行>
+    content:
+      lines: |
+        "integration_id": "YOUR_INTEGRATION_ID",
+```
+
+- 带 `channel` 的规则只在对应版本上校验与生效；不带 `channel` 的规则在两个版本上都必须成立。
+- **提升时由工具清理**：提升 PR 删除 `channel: current` 的规则，去掉 `channel: next` 规则上的标记（见 [04](./04-channels-and-lock.md#写入与提升)）。作者不用回头清理。
+- 上游更新 PR 因上游修改而失败时，报告直接给出按上述写法修改的建议（见 [06](./06-upstream-changes.md#出错时)）。
 
 ### 代码行定位（`lines`）
 
@@ -191,7 +232,8 @@ Cloud 内容文件与 Milvus 原文使用同一种 Markdown 写法（如提示�
 - `source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册。
 - 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外。
 - `position` 缺失或多余：在块旁或代码行旁 `add` 时没写，给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容。
-- 同一个目标被多次变换；整块的 replace 或 remove 与该块的语言项变换、前后增加同时出现；语言项的 replace 或 remove 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。
+- 在同一个通道中：同一个目标被多次变换；整块的 replace 或 remove 与该块的语言项变换、前后增加同时出现；语言项的 replace 或 remove 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。不带 `channel` 的规则同时计入两个通道。
+- `channel` 不是 `current` 或 `next`；页面在该通道中不存在（lock 中为 `none`）。
 - `lines` 在目标语言示例中找不到、出现多次或超过 5 行；`lines` 用在没有 `language` 的目标上；`lines` 或 `content.lines` 中有空行。
 - 内容文件中出现命名块标记或手写的 Tabs；试图对本轮刚插入的内容再做变换。
 - 删除了 Tabs 规则要求必须存在的语言或默认语言。
@@ -258,6 +300,8 @@ transforms:
 - **在代码中加区域标记再替换**：标记要按每种语言写成注释，在代码内部清除，替换时还要按标记位置处理缩进。
 
 **产品过滤沿用现有能力。** zdoc 的产品过滤（zilliz、saas、paas、milvus 等目标）在 Fetch 阶段执行。共享原文不写产品指令；Cloud 内容文件迁入 Git 后仍可使用现有写法，处理对象从飞书输入扩展到 Git 输入。
+
+**为什么允许规则只对一个通道生效。** 规则默认对两个版本都要成立，但上游修改 Cloud 定位的代码行或命名块后，过渡期内旧写法只在 `current` 中存在、新写法只在 `next` 中存在，同一条规则无论怎样写都有一个版本失败，上游更新 PR 就无法合并。允许规则只对一个通道生效，过渡期可以新旧两条并存，提升时由工具合并回一条。同一机制也能表达“只在下次发布时用 Cloud 内容替换某一节”。
 
 **为什么 Cloud 内容文件用 Milvus 的写法。** 这样工具对内容文件和原文做同一套转换，作者不用学第二种写法；本地样例也是这样实现的。
 

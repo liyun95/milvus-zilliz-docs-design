@@ -1,8 +1,8 @@
 # 04 通道与 commit 记录
 
-Cloud 要能在 UAT 提前看到上游的修改，同时让 Prod 保持已上线的版本。本篇定义每个共享页怎样记录 Prod 与 UAT 各用 milvus-docs 的哪个 commit（lock），两个版本怎样合并成一份页面，以及怎样提升。场景说明见[方案总览第 4.3 节](../proposal.md#43-何时上线prod-与-uat-各固定一个-commit)。
+Cloud 要能在 UAT 提前看到上游的修改，同时让 Prod 保持已上线的版本。本篇定义每个共享页怎样记录 Prod 与 UAT 各用 milvus-docs 的哪个 commit（lock），lock 由哪些 PR、怎样写入，以及两个版本怎样合并成一份页面。场景说明见[方案总览第 4.3 节](../proposal.md#43-何时上线prod-与-uat-各固定一个-commit)。
 
-**参与方**：zdoc 生成（读取 lock、按两个版本生成）、上游更新 PR 与提升 PR（写入 lock）、zdoc 发布（按通道显示）。
+**参与方**：zdoc 生成（读取 lock、按两个版本生成）、接入、下线、上游更新与提升 PR（写入 lock）、Cloud 文档工程师（发起下线与提升）、zdoc 发布（按通道显示）。
 
 **状态**：已定义，待文档负责人确认。
 
@@ -39,19 +39,50 @@ Prod 上的隐藏，以及从导航、搜索、`llms.txt` 中去掉，都沿用 
 
 ### 写入与提升
 
-| 写入方 | 改什么 | 何时 |
-|---|---|---|
-| 接入一页 | `current` 与 `next` 都设为内容对齐后的 commit；功能还没上线时 `current` 写 `none` | 1a；两者相同时，生成结果不含 `<NextChannel>` |
-| 下线一页 | 把 `next` 改为 `none` | 按需 |
-| 上游更新 PR | 只改 `next` | 1b，见 [06](./06-upstream-changes.md) |
-| 提升 PR | 把 `current` 改为 `next` 的值。新页面提升后上线；下线页面提升后两边都没有，页面删除 | 1b |
+lock 只由工具写入，人不手改。改 lock 的 PR 共四种：
 
-- **提升由 Cloud 文档工程师在功能上线时发起**，也就是现在修改 `Release Channel` 的时机。工具生成提升 PR，可以指定若干页，也可以选所有 `current` 与 `next` 不同的页。合并后到达 Prod 的路径与时延见 05。
-- **跟踪分支是 milvus-docs 的默认分支**，目前为 `v3.0.x`，记在共享来源配置中，只用于发现新提交；正式生成始终使用 lock 中的 commit。Milvus 发布新的大版本分支时，用一个显式的 PR 切换。只写在 `preview` 分支中的内容，合入 `v3.0.x` 后 Cloud 才能读到；Cloud 先于 Milvus 上线的功能写在 Cloud 内容文件中，用 `<NextChannel>` 包住。
+| PR | 谁发起、怎样发起 | 改 lock 的什么 | 何时 |
+|---|---|---|---|
+| 接入一页 | 作者开 PR 新增页面配置，工具自动写入 lock | `current` 与 `next` 都设为跟踪分支的最新提交；功能还没上线时 `current` 写 `none` | 1a |
+| 下线一页 | Cloud 文档工程师手动运行工作流 | 把 `next` 改为 `none` | 按需 |
+| 上游更新 | 工具每天自动发起 | 只改 `next` | 1b，见 [06](./06-upstream-changes.md) |
+| 提升 | Cloud 文档工程师手动运行工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | 1b |
+
+**提升**是指：把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。新页面（`current: none`）提升后在 Prod 上线；下线页面的 `next` 是 `none`，提升后 `current` 也变成 `none`，两边都没有这一页。
+
+**跟踪分支**是 milvus-docs 的默认分支，目前为 `v3.0.x`，记在共享来源配置中，只用于发现新提交；正式生成始终使用 lock 中的 commit。Milvus 发布新的大版本分支时，用一个显式的 PR 切换。只写在 `preview` 分支中的内容，合入 `v3.0.x` 后 Cloud 才能读到；Cloud 先于 Milvus 上线的功能写在 Cloud 内容文件中，用 `<NextChannel>` 包住。
+
+#### 接入一页
+
+1. 作者在 zdoc 中开 PR，新增 `shared-docs/pages/<页面标识>/` 下的 `page.yaml` 与 Cloud 内容文件，不写 lock。
+2. 工具在 PR 中自动运行：发现新页面没有 lock，就取跟踪分支的最新提交写入 `lock.yaml`，提交到这个 PR，再触发校验。
+3. 这一页对应的功能还没上线时，作者给 PR 加标签 `shared-docs: not-launched`，工具把 `current` 重写为 `none`。合并前去掉或加上标签，lock 随之重写。
+4. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05](./05-publish-handoff.md#切换与激活)）。
+
+- lock 写入后就固定在那个提交上，之后的上游修改由每天的上游更新 PR 处理。要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可。
+- 首期导航由飞书节点决定，只能接入在飞书目录中已有节点的页面（见 [05](./05-publish-handoff.md#导航首期)）。
+
+#### 下线一页与提升
+
+两者用同一个手动工作流，运行时选择操作并填写页面，工具生成 PR：
+
+| 操作 | 输入 | 生成的 PR |
+|---|---|---|
+| 下线 | 一页或几页的页面标识 | 把这些页的 `next` 改为 `none`，UAT 上不再显示，Prod 照常 |
+| 提升 | 若干页的页面标识，或“全部待提升”（`current` 与 `next` 不同的页） | 见下 |
+
+一次提升只开一个 PR，同一次上线的页面一起审核、一起合并。PR 包含：
+
+- 每页 lock 中的 `current` 改成 `next` 的 commit 值；
+- Git 页面中指向旧锚点的链接改为新锚点（见[标题改名与锚点](#标题改名与锚点)）；
+- 清理页面配置中只对一个通道生效的规则：删除 `channel: current` 的规则，去掉 `channel: next` 的标记（见 [02](./02-page-config.md#只对一个通道生效的规则)）；
+- 下线页面的目录被删除，PR 说明中提醒“合并后请删除这一页的飞书节点”。之后 Fetch 怎样把它从网站上移除见 [05](./05-publish-handoff.md#下线完成)。
+
+提升在功能上线时进行，也就是现在修改 `Release Channel` 的时机，合并后到达 Prod 的路径与时延见 05。提升合并后，还开着的上游更新 PR 由下一次运行重建：lock 中 `current` 与 `next` 是相邻的两行，两个 PR 同时修改会产生 Git 冲突。
 
 ### 两个版本怎样合并
 
-每个版本各自经过 [01](./01-named-blocks.md)–[03](./03-md2md-preprocess.md) 的处理，Cloud 规则在两边都必须成立，失败时指出是哪个通道。然后按以下规则合并：
+每个版本各自经过 [01](./01-named-blocks.md)–[03](./03-md2md-preprocess.md) 的处理。不带 `channel` 的 Cloud 规则在两个版本上都必须成立，带 `channel` 的规则只在对应版本上生效（见 [02](./02-page-config.md#只对一个通道生效的规则)）；失败时指出是哪个通道。然后按以下规则合并：
 
 - 结果按顶层块比较：标题、段落、整个列表、表格、提示框各算一块，代码组整体算一块。相同的块只输出一次；连续的不同块输出成 `exclude`（旧）与 `include`（新）一对；只在一侧存在的块只输出那一侧。
 - 两个版本相同时，输出不带通道标记，与单版本生成的结果逐字相同。提升之后即是这种状态。
@@ -84,13 +115,16 @@ Prod 上的隐藏，以及从导航、搜索、`llms.txt` 中去掉，都沿用 
 | 两者都有值时，`current` 不是 `next` 的祖先（Prod 比 UAT 新，或两者不在同一条历史上） | 该页生成失败 |
 | `current` 与 `next` 都是 `none` | 该页生成失败；页面已下线时应删除页面目录 |
 | Cloud 规则只在 `next` 上失效 | 失败并指出是 `next`；`current` 与 Prod 不受影响 |
+| 接入时，原文或页面配置引用的命名块在跟踪分支的最新提交中不存在 | 不写入 lock，PR 校验失败并说明原因 |
+| 接入 PR 来自 fork，工具无权提交到这个 PR | 不写入 lock，PR 中提示改从 zdoc 仓库内的分支提交 |
+| 下线或提升时填写的页面不存在；提升时这一页的 `current` 已与 `next` 相同 | 这一页不进入 PR，运行结果中列出 |
 
 ## 例子
 
 <details>
 <summary>Delete Entities 接入（1a）与 OpenAI 的更新和提升（1b）</summary>
 
-Delete Entities 在 1a 接入时，`current` 与 `next` 都是内容对齐后的 commit，如上面的 lock 示例。生成结果与只读一个版本时逐字相同。
+Delete Entities 在 1a 接入时，作者开 PR 新增 `page.yaml`，工具写入 lock，`current` 与 `next` 都是跟踪分支当时的最新提交，如上面的 lock 示例。生成结果与只读一个版本时逐字相同。
 
 OpenAI 在 1b 中：
 
@@ -108,11 +142,23 @@ current: b2…
 next:    b2…    # 两边相同，成对的标记消失
 ```
 
+假设之后某一页要下线：
+
+| 时间 | 谁触发 | lock | UAT | Prod |
+|---|---|---|---|---|
+| 平时 | — | `current: b2…`，`next: b2…` | 有 | 有 |
+| 决定下线 | 下线 PR | `current: b2…`，`next: none` | 没有 | 有 |
+| 版本发布 | 提升 PR | 页面目录删除（相当于两边都是 `none`） | 没有 | 没有 |
+
 </details>
 
 ## 设计理由
 
 **为什么两个版本必须合并进同一页。** zdoc 的 UAT 与 Prod 由同一个 dev commit 构建同一个镜像，部署时才注入通道（`ZDOC_RELEASE_CHANNEL`）。Prod 与 UAT 不能各读一份文件，只能在同一份页面中放两个版本，由 `<NextChannel>` 切换。只给改动的段落打标记做不到这一点：原文中已经只剩新文，Prod 无法保留旧文。
+
+**为什么接入时自动写 lock。** 作者不需要自己查 commit，也不会抄错 SHA；功能是否已上线用 PR 标签表达，审核人在 PR 中一眼可见。工具用 zdoc 自带的 `GITHUB_TOKEN` 提交，与 06 的上游更新 PR 相同；用它推送的提交不会自动触发其他工作流，所以要显式触发校验。
+
+**为什么下线与提升手动发起。** 下线和上线都是 Cloud 的发布决定，工具无从判断时机。zdoc 现有的“按需抓取 Guides”工作流也是手动运行、填写页面列表，这里照搬；能运行工作流的只有对 zdoc 有写权限的人，审核仍走 PR。
 
 **为什么按页。** zdoc 现在的提升就是按页进行的：整页在多维表格中把 `NEXT` 改为 `CURRENT`，块级去掉标签，没有全站统一发布的动作。全站共用一个 lock 会让不同时间上线的功能被迫一起进入 Prod。每页一份文件，多个上游更新 PR 同时修改不同页面时也不会冲突。
 

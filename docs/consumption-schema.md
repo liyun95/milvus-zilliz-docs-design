@@ -71,7 +71,8 @@ publish:
 - 正文的标题和章节结构随原文引用，不需要在配置中重复。
 - `slug`、标题后缀和其余 front matter 由工具生成，不要写。
 - **导航仍在飞书中调整。** 首期，这一页在飞书知识库目录中的节点保留，导航中的位置、顺序和标签都由它决定；要移动这一页或改导航标签，和其他页面一样在飞书目录中操作（[接口设计 05《生成结果交给发布》](./interfaces/05-publish-handoff.md#导航首期)）。
-- 提交 PR 后，工具在同一目录写入 `lock.yaml`。这一页对应的功能还没上线时，在 PR 中说明，工具会让它先只在 UAT 显示（3.9 节）。
+- 提交 PR 后，工具在同一目录写入 `lock.yaml`，不要自己写。这一页对应的功能还没上线时，给 PR 加标签 `shared-docs: not-launched`，工具会让它先只在 UAT 显示（3.9 节）。
+- PR 合并后，这一页只生成候选结果；由文档负责人激活后才正式发布。
 
 ### 3.2 把产品名或连接值写成变量
 
@@ -252,7 +253,20 @@ transforms:
 **其他规则：**
 
 - `lines` 在这个语言示例中必须恰好出现一次，最多 5 行。`lines` 和 `content.lines` 中都不能有空行，也不能有代码块的三个反引号或命名块标记。
-- 定位行尽量选不常改的行。上游改了这几行时匹配失败，这一页的上游更新 PR 被拦下，从新原文复制后更新 `lines` 即可。
+- 定位行尽量选不常改的行。上游改了这几行时匹配失败，这一页的上游更新 PR 被拦下。这时不要直接改原规则：在 Prod 上线新版本之前，旧原文仍要能匹配。做法是给原规则加 `channel: current`，再按新原文复制一条规则，标 `channel: next`：
+
+  ```yaml
+  - operation: replace
+    channel: current            # 旧原文的行，只对 Prod 生效
+    target: { block: define-function-code, language: python, lines: "<旧的那一行>" }
+    content: { lines: '"integration_id": "YOUR_INTEGRATION_ID",' }
+  - operation: replace
+    channel: next               # 上游修改后的行，只对 UAT 生效
+    target: { block: define-function-code, language: python, lines: "<新的那一行>" }
+    content: { lines: '"integration_id": "YOUR_INTEGRATION_ID",' }
+  ```
+
+  上游更新 PR 的报告会给出这样的修改建议。提升时，工具自动删除 `channel: current` 的规则、去掉 `channel: next` 的标记。
 - 一段代码中有多处不同，或连续超过 5 行，改为用 3.6 节替换整个语言示例。
 - 共享原文中不写产品指令（如 `include-next-line`），Milvus 站点上看到的就是原文的代码。
 
@@ -284,7 +298,8 @@ ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，�
 |---|---|
 | Cloud 内容文件中新增或替换的内容 | 在文件里直接用 `<NextChannel action="include">` 包住 |
 | 共享原文中的变化 | 不需要写。lock 中 `current` 与 `next` 两个版本的差异由工具成对包进 `<NextChannel>` |
-| 整个页面（新页面还没上线，或要下线的页面） | 不在页面配置中写。接入或下线时在 PR 中说明，工具在 lock 中把 `current` 或 `next` 写成 `none` |
+| 用 Cloud 内容替换原文的某一节，但只在下次发布时生效 | 这条变换规则标 `channel: next`，Prod 继续显示原文；提升时工具去掉标记 |
+| 整个页面（新页面还没上线，或要下线的页面） | 不在页面配置中写。新页面：接入 PR 加标签 `shared-docs: not-launched`，工具把 `current` 写成 `none`；下线：Cloud 文档工程师运行下线工作流，工具开 PR 把 `next` 改为 `none`（[接口设计 04](./interfaces/04-channels-and-lock.md#写入与提升)） |
 
 共享原文本身不写通道标记。Cloud 上线时，Cloud 内容文件去掉包裹；共享原文的差异和整页的上线、下线，都通过提升 lock 完成，规则见[接口设计 04《通道与 commit 记录》](./interfaces/04-channels-and-lock.md)。场景说明见[方案总览第 4.3 节](./proposal.md#43-何时上线prod-与-uat-各固定一个-commit)。
 
