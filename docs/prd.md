@@ -16,7 +16,8 @@ Milvus 与 Zilliz Cloud 的功能文档有大量相同的内容，但现在各�
 |---|---|
 | [方案总览](./proposal.md) | 为什么改、大方向（已冻结） |
 | [写法速查](./authoring-spec.md) | 本文的附录：作者要写的文件、字段与出错情形的速查表 |
-| [接口设计](./interfaces/README.md) | 技术设计：工具怎样实现 |
+| [术语表](./glossary.md) | 本方案用到的术语 |
+| [技术设计](./design/README.md) | 技术设计：工具怎样实现 |
 | [Phase 1 实施计划](./phase-1.md) | 排期、任务与各项状态 |
 
 ## 1. 目标与范围
@@ -218,7 +219,7 @@ shared-docs/
 
 </details>
 
-技术设计见[接口设计 03](./interfaces/03-md2md-interfaces.md#预处理)。
+技术设计见[技术设计 03](./design/03-md2md-interfaces.md#预处理)。
 
 ### 场景 2：在 Milvus 原文中标出 Cloud 要改的一段
 
@@ -356,7 +357,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 </details>
 
-技术设计见[接口设计 01](./interfaces/01-named-blocks.md)、[03](./interfaces/03-md2md-interfaces.md#命名块的解析与清除)。
+技术设计见[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md#命名块的解析与清除)。
 
 ### 场景 3：接入一页
 
@@ -465,7 +466,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 </details>
 
-技术设计见[接口设计 02](./interfaces/02-page-config.md)、[04](./interfaces/04-channels-and-lock.md#接入一页)。
+技术设计见[技术设计 02](./design/02-page-config.md)、[04](./design/04-channels-and-lock.md#接入一页)。
 
 ### 场景 4：写 Cloud 的差异
 
@@ -718,7 +719,7 @@ transforms:
 
 </details>
 
-技术设计见[接口设计 02](./interfaces/02-page-config.md#变换)。
+技术设计见[技术设计 02](./design/02-page-config.md#变换的执行)。
 
 ### 场景 5：链接与图片
 
@@ -829,7 +830,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 </details>
 
-技术设计见[接口设计 02b](./interfaces/02b-links-and-images.md)。
+技术设计见[技术设计 02b](./design/02b-links-and-images.md)。
 
 ### 场景 6：让内容先只在 UAT 显示
 
@@ -979,7 +980,7 @@ transforms:
 
 </details>
 
-技术设计见[接口设计 04](./interfaces/04-channels-and-lock.md#两个版本怎样合并成一页)、[02](./interfaces/02-page-config.md#只对一个通道生效的规则)。
+技术设计见[技术设计 04](./design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02](./design/02-page-config.md#两遍生成与-channel)。
 
 ### 场景 7：审核上游更新
 
@@ -1097,7 +1098,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[接口设计 06](./interfaces/06-upstream-changes.md)。
+技术设计见[技术设计 06](./design/06-upstream-changes.md)。
 
 ### 场景 8：功能上线时提升
 
@@ -1178,7 +1179,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[接口设计 04](./interfaces/04-channels-and-lock.md#提升)。
+技术设计见[技术设计 04](./design/04-channels-and-lock.md#提升)。
 
 ### 场景 9：从飞书切换到 Git（激活）
 
@@ -1259,7 +1260,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[接口设计 05b](./interfaces/05b-cutover-and-ownership.md)。
+技术设计见[技术设计 05b](./design/05b-cutover-and-ownership.md)。
 
 ### 场景 10：下线一页
 
@@ -1316,7 +1317,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[接口设计 04](./interfaces/04-channels-and-lock.md#下线一页)、[05b](./interfaces/05b-cutover-and-ownership.md#下线完成)。
+技术设计见[技术设计 04](./design/04-channels-and-lock.md#下线一页)、[05b](./design/05b-cutover-and-ownership.md#下线完成)。
 
 ## 6. 对现有能力的要求
 

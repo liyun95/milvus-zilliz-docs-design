@@ -21,7 +21,7 @@
 
 **对共享方案的结论：** 代码行差异可以沿用这套语法写在共享原文中。Cloud 侧需要在 Git 输入上调用同一过滤器；Milvus 发布链需新增相同语法的过滤，删除 `zilliz` 等非 Milvus 目标的行并移除指令行。段落级差异不采用源内标签，仍由 zdoc 的命名块变换处理。
 
-**后续决定（2026-10-12）：** 为避免 Cloud 的代码进入 Milvus 原文、Milvus 发布链新增过滤，共享原文不写产品指令；代码行差异改由 zdoc 在页面配置中按连续整行定位处理，见[接口设计 02《共享页配置》](../docs/interfaces/02-page-config.md)。上面的结论保留为核验记录。
+**后续决定（2026-10-12）：** 为避免 Cloud 的代码进入 Milvus 原文、Milvus 发布链新增过滤，共享原文不写产品指令；代码行差异改由 zdoc 在页面配置中按连续整行定位处理，见[技术设计 02《共享页配置》](../docs/design/02-page-config.md)。上面的结论保留为核验记录。
 
 ## 2. 发布通道（Current / Next）
 
@@ -39,11 +39,11 @@
 
 **对共享方案的结论：** Cloud 自有片段可以直接使用 `<NextChannel>`；整页通道可放在 Cloud 页面配置中；共享原文中需要只在 Next 显示的内容，由 zdoc 用 `<NextChannel>` 包裹对应命名块，原文不写通道标记。仍需与文档负责人确认此类情况的频率与常见粒度。
 
-**后续建议（2026-10-12）：** 包裹命名块只适合“新增一段”；修改已有内容时 Prod 无法保留旧文，细碎改动也难以逐处加命名块。建议改为 lock 记录 `current` 与 `next` 两个版本，由工具按块比较并成对生成 `<NextChannel>`，见[接口设计 04《通道与 commit 记录》](../docs/interfaces/04-channels-and-lock.md)。上面的结论保留为核验记录。
+**后续建议（2026-10-12）：** 包裹命名块只适合“新增一段”；修改已有内容时 Prod 无法保留旧文，细碎改动也难以逐处加命名块。建议改为 lock 记录 `current` 与 `next` 两个版本，由工具按块比较并成对生成 `<NextChannel>`，见[技术设计 04《通道与 commit 记录》](../docs/design/04-channels-and-lock.md)。上面的结论保留为核验记录。
 
 ### 2.1 补充核验（2026-10-14）
 
-为定义 lock（[接口设计 04《通道与 commit 记录》](../docs/interfaces/04-channels-and-lock.md)），在 zdoc master [`eb9827c`](https://github.com/zilliztech/zdoc/tree/eb9827c054a87e75e84d33817e5b7f52e2761ff9) 与 milvus-docs 上补充核对：
+为定义 lock（[技术设计 04《通道与 commit 记录》](../docs/design/04-channels-and-lock.md)），在 zdoc master [`eb9827c`](https://github.com/zilliztech/zdoc/tree/eb9827c054a87e75e84d33817e5b7f52e2761ff9) 与 milvus-docs 上补充核对：
 
 | 事实 | 来源 |
 |---|---|

@@ -52,7 +52,7 @@ zdoc Guides：Fetch 获取飞书源与媒体 → 分表渲染 → Guides 组装 
 
 ### 3.1 实测补充（2026-10-14）
 
-为定义预处理入口（[接口设计 03《md2md 提供的接口》](../docs/interfaces/03-md2md-interfaces.md)），在 md2md [`635da07`](https://github.com/zilliztech/md2md/tree/635da07276e80fb2a6efdf667686df3913d5de4c) 上用小样例实际运行了 `goover`，并统计了 milvus-docs `v3.0.x`（[`1997ce9`](https://github.com/milvus-io/milvus-docs/tree/1997ce96782b31f8628f22d31fad11007e4b924b)）`site/en` 的实际用法。
+为定义预处理入口（[技术设计 03《md2md 提供的接口》](../docs/design/03-md2md-interfaces.md)），在 md2md [`635da07`](https://github.com/zilliztech/md2md/tree/635da07276e80fb2a6efdf667686df3913d5de4c) 上用小样例实际运行了 `goover`，并统计了 milvus-docs `v3.0.x`（[`1997ce9`](https://github.com/milvus-io/milvus-docs/tree/1997ce96782b31f8628f22d31fad11007e4b924b)）`site/en` 的实际用法。
 
 | 原有行为 | 实测 | 新入口的处理 |
 |---|---|---|
@@ -133,7 +133,7 @@ zh-CN 是独立产品站点，不等于英文 Guides 的普通翻译 locale；�
 
 ## 7. 共享内容接入边界
 
-共享源从 milvus-docs 的固定修订读取，由 zdoc 扫描、组装和适配，再接入既有发布流程。具体规则以[接口设计](../docs/interfaces/README.md)和[产品需求](../docs/prd.md)为准；本审计记录现有能力，不另行维护一套配置方案。
+共享源从 milvus-docs 的固定修订读取，由 zdoc 扫描、组装和适配，再接入既有发布流程。具体规则以[技术设计](../docs/design/README.md)和[产品需求](../docs/prd.md)为准；本审计记录现有能力，不另行维护一套配置方案。
 
 Milvus 的 `sync-shared-scripts` 有同步 Lark 脚本的历史机制，但其路径与当前 zdoc 布局不同，不能据此认定生产仍共享同一版本，也不能把脚本同步当成共享正文消费接口。
 
