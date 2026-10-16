@@ -1,14 +1,14 @@
-# 首期实施计划
+# Phase 1 实施计划
 
-本文面向实施者与评审人，回答首期做什么、按什么顺序做、怎样算完成。为什么改见[方案总览](./proposal.md)，系统怎样搭建见[接口设计](./interfaces/README.md)。
+本文面向实施者与评审人，回答 Phase 1 做什么、按什么顺序做、怎样算完成。为什么改见[方案总览](./proposal.md)，系统怎样搭建见[接口设计](./interfaces/README.md)。
 
 状态：待工程评估与实施。两篇本地样例已可运行；生产的共享内容接入、md2md 新入口和发布保护尚未实现。具体人员、工作量和日期由评审确定。
 
 ## 1. 目标与完成定义
 
-**首期完成，意味着批准的试点页已经从 Git 来源生成并上线，并通过后续更新、翻译和恢复的验证。** 只在本地生成 MDX，或只拿到预览，都只完成了一部分。切换后，共享原文改 milvus-docs，Cloud 的配置、变量和差异改 zdoc，旧的飞书任务不能再覆盖或删除这些页面。
+**Phase 1 完成，意味着批准的试点页已经从 Git 来源生成并上线，并通过后续更新、翻译和恢复的验证。** 只在本地生成 MDX，或只拿到预览，都只完成了一部分。切换后，共享原文改 milvus-docs，Cloud 的配置、变量和差异改 zdoc，旧的飞书任务不能再覆盖或删除这些页面。
 
-首期分两步：
+Phase 1 分两步：
 
 | 阶段 | 试点页 | 完成标志 |
 |---|---|---|
@@ -17,13 +17,13 @@
 
 建议年底前完成 1a 并启动 1b。
 
-**首期不做：** 在共享原文中写产品指令、代码中的区域标记（行级差异按连续整行定位，超过 5 行或多处差异时替换整个语言项）、selector、move/copy、变换链、条件模板语言、按业务定义专门的操作、独立的 registry 服务或内容分发链、完整归档、独立编排多个共享命名块的页面、SDK Reference、全量迁移，以及 Cloud 独有页的迁移。
+**Phase 1 不做：** 在共享原文中写产品指令、代码中的区域标记（行级差异按连续整行定位，超过 5 行或多处差异时替换整个语言项）、selector、move/copy、变换链、条件模板语言、按业务定义专门的操作、独立的 registry 服务或内容分发链、完整归档、独立编排多个共享命名块的页面、SDK Reference、全量迁移，以及 Cloud 独有页的迁移。
 
 ## 2. 任务全景
 
-![首期任务与依赖：五条泳道分别是内容、zdoc 生成、md2md、zdoc 发布和运行条件。1a 中，Delete Entities 内容对齐后，zdoc 实现获取、定位、变量与 MDX 生成并接入 stage 与 UAT 预览；md2md 的预处理入口与命名块的解析、清理一次发版，发版后 zdoc 才能真实集成；发布侧完成 Git 来源接入设计。1b 中，Filtered Search 与 OpenAI 内容对齐后，zdoc 实现差异与通道、上游更新 PR；发布侧完成混源与同批激活、翻译与恢复，在文档负责人审核后切换试点页。运行条件从第一天开始核实，切换前必须解决。](./assets/phase-dependencies.png)
+![Phase 1 任务与依赖：五条泳道分别是内容、zdoc 生成、md2md、zdoc 发布和运行条件。1a 中，Delete Entities 内容对齐后，zdoc 实现获取、定位、变量与 MDX 生成并接入 stage 与 UAT 预览；md2md 的预处理入口与命名块的解析、清理一次发版，发版后 zdoc 才能真实集成；发布侧完成 Git 来源接入设计。1b 中，Filtered Search 与 OpenAI 内容对齐后，zdoc 实现差异与通道、上游更新 PR；发布侧完成混源与同批激活、翻译与恢复，在文档负责人审核后切换试点页。运行条件从第一天开始核实，切换前必须解决。](./assets/phase-dependencies.png)
 
-图 1 · 首期任务与依赖
+图 1 · Phase 1 任务与依赖
 - **关键路径在 md2md 发版。** zdoc 可以先用共同的测试样例开发，但真实集成要等 md2md 新入口发版并固定版本。Milvus CI 目前安装 npm 包时没有固定版本，需要一并处理。
 - **发布接入可以提前开始。** Git 来源接入的设计在 1a 就可以做，与生成能力并行；但联合验证必须使用真实生成结果，替代输入只能帮助开发。
 - **运行条件不能等到最后。** Jenkins、分支权限和资源保留从第一天开始核实，阻碍持续跟踪；本地样例通过不代表这些条件已经具备。
@@ -36,7 +36,7 @@
 | [md2md](https://github.com/zilliztech/md2md) | 只做预处理的入口：受控读取、依赖报告、错误检查；命名块的解析、校验与清理；一次发版；旧入口保持兼容 | 无新增 |
 | [zdoc](https://github.com/zilliztech/zdoc) 生成 | 获取固定源、定位命名块、生成命名块清单、调用 md2md、生成 Tabs 与 MDX；接入 PR 写入 lock 与 PR 校验；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；双版本通道比较；依赖索引、影响报告、上游更新 PR，下线与提升工作流 |
 | [zdoc](https://github.com/zilliztech/zdoc) 发布 | Git 来源接入设计：交接格式、生效配置与来源记录 | 页级混源；激活前比较与同批激活；下线完成；旧飞书任务隔离；生成结果比对；过滤、通道、翻译与恢复接入 |
-| [web-content](https://github.com/milvus-io/web-content)、[milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布回归 | Milvus 发布回归；首期不新增共享消费能力 |
+| [web-content](https://github.com/milvus-io/web-content)、[milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布回归 | Milvus 发布回归；Phase 1 不新增共享消费能力 |
 
 每个仓库的能力属于哪一类：
 
@@ -111,11 +111,11 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 事项 | 现状 | 和谁确认 |
 |---|---|---|
 | 变换规则只对一个通道生效 | 页面配置的变换默认对 Prod 与 UAT 两个版本都生效。上游修改了 Cloud 定位的代码行或命名块时，过渡期内旧写法只在 `current` 中存在、新写法只在 `next` 中存在，上游更新 PR 无法合并；Cloud 想只在下次发布时用自己的内容替换某一节也无法表达。方案：变换加可选字段 `channel`（`current` / `next`），提升时由工具清理（[接口设计 02](./interfaces/02-page-config.md#只对一个通道生效的规则)）。已有方案，待确认 | 文档负责人 |
-| Milvus 侧的锚点校验 | milvus-docs 的链接检查（`check-link.js`）只检查页面、不检查锚点，标题改名留下的断链拦不住。直接加校验要先修历史断链；以后可以只检查 PR 新造成的断链。首期不做 | 文档负责人 |
+| Milvus 侧的锚点校验 | milvus-docs 的链接检查（`check-link.js`）只检查页面、不检查锚点，标题改名留下的断链拦不住。直接加校验要先修历史断链；以后可以只检查 PR 新造成的断链。Phase 1 不做 | 文档负责人 |
 | Cloud 文档能否链接到 Milvus 站点 | Milvus 原文链接的页面在 Cloud 没有对应页时，可以在链接映射表中明确写成 milvus.io 地址，或要求作者删改那句话。暂按允许、只能在映射表中明确写出处理（[接口设计 02b《链接与图片》](./interfaces/02b-links-and-images.md)） | 文档负责人 |
 | 共享配置变化时自动触发 Fetch | master 上 `shared-docs/` 变化时自动触发一次只处理 Guides 的 Fetch，上游更新 PR、提升 PR 合并后不必等到下一次定时运行（最多 8 小时）；代价是 Fetch 运行次数增加（[接口设计 05](./interfaces/05-publish-handoff.md#触发时机)） | 文档负责人 |
 | UAT 部署的触发方式 | 生成结果写入 dev 后，外部 Jenkins 是自动部署 UAT，还是由人工启动；zdoc README 的写法看起来是人工启动，未核实。决定合并后多久能在 UAT 看到 | 文档负责人 |
-| 迁移页的导航由谁管 | A：首期保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。暂按 A 处理（[接口设计 05b](./interfaces/05b-cutover-and-ownership.md#导航首期)） | 文档负责人 |
+| 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。暂按 A 处理（[接口设计 05b](./interfaces/05b-cutover-and-ownership.md#导航phase-1)） | 文档负责人 |
 | Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[接口设计 05](./interfaces/05-publish-handoff.md#交接发生在哪里)） | zdoc 维护者 |
 | 重新生成比对的接法 | Fetch 写 dev 前怎样比对；修改 dev 中共享页生成结果的 PR 由哪个检查拦下（[接口设计 05](./interfaces/05-publish-handoff.md#发布保护)） | zdoc 维护者 |
 

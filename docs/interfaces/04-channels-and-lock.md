@@ -51,7 +51,7 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 读取
 |---|---|---|
 | `lock.yaml` | Git 生成时，Prod 与 UAT 各用 Milvus 原文的哪个版本 | 本篇 |
 | `page.yaml` | 拿到原文后怎样加工 | [02](./02-page-config.md) |
-| 激活（`active.json`） | 网站上这一页用 Git 生成的版本，还是飞书的版本；只在首期过渡时存在 | [05b](./05b-cutover-and-ownership.md#归属与生效配置) |
+| 激活（`active.json`） | 网站上这一页用 Git 生成的版本，还是飞书的版本；只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md#归属与生效配置) |
 
 激活之前，Git 照样按 `lock.yaml` 生成两个版本，只是作为候选结果，网站上仍是飞书版；`lock.yaml` 的变化要等激活之后才体现在网站上。
 
@@ -83,12 +83,12 @@ Prod 上的隐藏，以及从导航、搜索、`llms.txt` 中去掉，都沿用 
 
 `lock.yaml` 只由工具写入，人不手改。改它的 PR 共四种，都是普通的 zdoc PR，审核合并后生效：
 
-| PR | 谁发起、怎样发起 | 改什么 | 首期阶段 |
+| PR | 谁发起、怎样发起 | 改什么 | 所属阶段 |
 |---|---|---|---|
-| 接入一页 | 文档工程师开 PR 新增页面配置，工具自动写入 | `current` 与 `next` 都设为跟踪分支的最新提交；功能还没上线时 `current` 写 `none` | 阶段 1a |
-| 上游更新 | 工具每天自动发起 | 只改 `next` | 阶段 1b |
-| 提升 | 文档工程师手动运行工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | 阶段 1b |
-| 下线一页 | 文档工程师手动运行工作流 | 把 `next` 改为 `none` | 阶段 1b，按需 |
+| 接入一页 | 文档工程师开 PR 新增页面配置，工具自动写入 | `current` 与 `next` 都设为跟踪分支的最新提交；功能还没上线时 `current` 写 `none` | Phase 1a |
+| 上游更新 | 工具每天自动发起 | 只改 `next` | Phase 1b |
+| 提升 | 文档工程师手动运行工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | Phase 1b |
+| 下线一页 | 文档工程师手动运行工作流 | 把 `next` 改为 `none` | Phase 1b，按需 |
 
 提升与下线用 zdoc 中同一个手动工作流：运行时选择操作（“提升”或“下线”）、填写页面，工具生成 PR。
 
@@ -100,7 +100,7 @@ Prod 上的隐藏，以及从导航、搜索、`llms.txt` 中去掉，都沿用 
 4. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
 
 - `lock.yaml` 写入后就固定在那个提交上，之后的上游修改由每天的上游更新 PR 处理。要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可。
-- 首期导航由飞书节点决定，只能接入在飞书目录中已有节点的页面（见 [05b](./05b-cutover-and-ownership.md#导航首期)）。
+- Phase 1 导航由飞书节点决定，只能接入在飞书目录中已有节点的页面（见 [05b](./05b-cutover-and-ownership.md#导航phase-1)）。
 
 #### 上游更新
 
@@ -147,8 +147,8 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 |---|---|
 | milvus-docs 中的其他页 | 报告提示改名与受影响的链接，由文档工程师判断是否回上游修改 |
 | zdoc 中 Git 来源的页面，包括 Cloud 内容文件 | 提升 PR 中由工具自动改为新锚点 |
-| 仍在飞书的页面 | 报告列出，由文档工程师在飞书中修改；首期不拦截提升 |
-| 站外链接 | 首期不处理 |
+| 仍在飞书的页面 | 报告列出，由文档工程师在飞书中修改；Phase 1 不拦截提升 |
+| 站外链接 | Phase 1 不处理 |
 
 过渡期内，指向旧锚点的链接在 UAT 上落到页面顶部，报告中写明。同一 commit 中互相依赖的页面要一起采用，见 06。
 
@@ -175,11 +175,11 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 ## 例子
 
 <details>
-<summary>Delete Entities 接入（阶段 1a）与 OpenAI 的更新和提升（阶段 1b）</summary>
+<summary>Delete Entities 接入（Phase 1a）与 OpenAI 的更新和提升（Phase 1b）</summary>
 
-Delete Entities 在阶段 1a 接入时，文档工程师开 PR 新增 `page.yaml`，工具写入 `lock.yaml`，`current` 与 `next` 都是跟踪分支当时的最新提交，如上面的 `lock.yaml` 示例。生成结果与只读一个版本时逐字相同。
+Delete Entities 在 Phase 1a 接入时，文档工程师开 PR 新增 `page.yaml`，工具写入 `lock.yaml`，`current` 与 `next` 都是跟踪分支当时的最新提交，如上面的 `lock.yaml` 示例。生成结果与只读一个版本时逐字相同。
 
-OpenAI 在阶段 1b 中：
+OpenAI 在 Phase 1b 中：
 
 ```yaml
 # 起始：Prod 与 UAT 读同一个 commit
@@ -224,7 +224,7 @@ next:    b2…    # 两边相同，成对的标记消失
 
 **为什么不跟踪 `preview`。** milvus-docs 的 `preview` 分支放未发布功能，相对 `v3.0.x` 多 265 个、少 1424 个提交，已大幅分叉；两边一比较就会产生大面积差异。
 
-**为什么锚点跟随标题。** 这与 zdoc 现在修改飞书标题时的行为一致，标题改名本身是正常的修改。milvus-docs 一年内有 17% 的候选页改过或删过标题，所以不能只给提示，要在提升时处理链接。milvus-docs 的链接检查目前不校验锚点；直接加校验要先修历史断链，首期不做，列在[待确认事项](../phase-1.md#61-待确认的接口)中。
+**为什么锚点跟随标题。** 这与 zdoc 现在修改飞书标题时的行为一致，标题改名本身是正常的修改。milvus-docs 一年内有 17% 的候选页改过或删过标题，所以不能只给提示，要在提升时处理链接。milvus-docs 的链接检查目前不校验锚点；直接加校验要先修历史断链，Phase 1 不做，列在[待确认事项](../phase-1.md#61-待确认的接口)中。
 
 依据的核验见 [zdoc 代码变体与发布通道核验第 2.1 节](../../research/zdoc-variants-and-channels-audit.md#21-补充核验2026-10-14)；合并规则与测试见[本地原型](../../examples/filtered-search/two-commit/walkthrough.md)。
 

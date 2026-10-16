@@ -50,7 +50,7 @@ publish:
 #   title:       不写就用 Milvus 原文的 title
 #   description: 不写就用 Milvus 原文的 summary
 #   beta:        标题下的标签，不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE
-# 导航中的位置、顺序和标签首期由飞书目录决定（见 05b）
+# 导航中的位置、顺序和标签 Phase 1 由飞书目录决定（见 05b）
 
 # transforms:                           # Cloud 的差异，见下文“变换”；Delete Entities 没有
 ```
@@ -60,7 +60,7 @@ publish:
 | `schema_version` | 是 | 固定为 `1` |
 | `source.file` | 是 | 共享原文路径 |
 | `publish[].manual` | 是 | zdoc 现有的手册 ID，如 `guides`、`guides-byoc`。每个手册各生成一份，产品过滤与标题、描述的后缀按手册处理 |
-| `publish[].path` | 是 | 页面在该手册中的路径，决定输出位置。首期必须与飞书节点生成的路径一致，不一致时生成失败（见 [05b](./05b-cutover-and-ownership.md#导航首期)） |
+| `publish[].path` | 是 | 页面在该手册中的路径，决定输出位置。Phase 1 必须与飞书节点生成的路径一致，不一致时生成失败（见 [05b](./05b-cutover-and-ownership.md#导航phase-1)） |
 | `metadata.title` | 否 | 默认取 Milvus 原文的 `title` |
 | `metadata.description` | 否 | 默认取 Milvus 原文的 `summary`（变量展开后）；两边不同时在这里改写 |
 | `metadata.beta` | 否 | 页面标题下的标签，只影响 Guides；BYOC 的页面一律显示 “Contact Sales”。可选值：`FALSE`（默认，不显示）、`PUBLIC`（Public Beta）、`PRIVATE`（Private Beta）、`NEAR DEPRECATE`（Near Deprecation）。不沿用 Milvus 原文的 `beta` |
@@ -74,7 +74,7 @@ publish:
 | front matter | 生成方式 |
 |---|---|
 | `slug` | `/` 加页面标识 |
-| `sidebar_label`、`sidebar_position` | 首期按飞书节点填写，见 [05b](./05b-cutover-and-ownership.md#导航首期) |
+| `sidebar_label`、`sidebar_position` | Phase 1 按飞书节点填写，见 [05b](./05b-cutover-and-ownership.md#导航phase-1) |
 | `title`、`description` 的后缀 | 按手册，如 `\| Cloud`、`\| BYOC` |
 | `notebook`、`added_since`、`last_modified`、`deprecate_since` | 固定为 `FALSE` |
 | `type` | `origin` |
@@ -268,10 +268,10 @@ Cloud 内容文件是 `add`、`replace` 要放进页面的新内容，放在这�
 
 代码相关的内容文件怎样写（完整的代码组，或单种语言的一个代码块），见上文“目标与操作”。
 
-### 首期不支持
+### Phase 1 不支持
 
 <details>
-<summary>首期不支持的写法</summary>
+<summary>Phase 1 不支持的写法</summary>
 
 - 行号、正则、全文搜索、标题选择器，以及任意语法树路径或下标定位。
 - 代码中的区域标记、超过 5 行或跨多处的行级修改：改为替换整个语言示例。
@@ -355,7 +355,7 @@ transforms:
 
 **为什么按手册发布。** Delete Entities 和 Filtered Search 在 zdoc 中各发布两份：Guides（SaaS，标题后缀 `| Cloud`）和 BYOC（标题后缀 `| BYOC`），来源是同一条飞书记录，由 `Publish Targets` 控制，两份只差标题和描述的后缀；OpenAI 只发布到 Guides。所以页面配置要列出手册，后缀由工具按手册添加，作者不手写。
 
-**为什么作者只写 3 项元数据。** zdoc 现有 366 个英文 Guides 页面中，`notebook`、`added_since`、`last_modified`、`deprecate_since` 全部是 `FALSE`；`type` 有 365 页是 `origin`；`displayed_sidebar` 只有发布说明使用非默认值；`beta` 有 34 页不是 `FALSE`。所以只开放确实因页而异的项。导航标签与排序首期由飞书目录决定（见 05b），不在页面配置中重复。Milvus 原文的 `beta`（如 `Milvus 2.6.x`）是 Milvus 自己的版本说明，不沿用。
+**为什么作者只写 3 项元数据。** zdoc 现有 366 个英文 Guides 页面中，`notebook`、`added_since`、`last_modified`、`deprecate_since` 全部是 `FALSE`；`type` 有 365 页是 `origin`；`displayed_sidebar` 只有发布说明使用非默认值；`beta` 有 34 页不是 `FALSE`。所以只开放确实因页而异的项。导航标签与排序 Phase 1 由飞书目录决定（见 05b），不在页面配置中重复。Milvus 原文的 `beta`（如 `Milvus 2.6.x`）是 Milvus 自己的版本说明，不沿用。
 
 **为什么代码行差异写在 zdoc。** 同一段代码中只有个别行因产品而不同时，例如 Milvus 的可选 `credential` 注释与 Cloud 必填的 `integration_id`，原文的代码不改，只给代码组加命名块，由 zdoc 按原文中连续的整行定位并修改。不采用以下做法：
 

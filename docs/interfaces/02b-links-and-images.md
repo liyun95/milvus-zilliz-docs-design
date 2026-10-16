@@ -108,7 +108,7 @@ milvus.io 的标题锚点保留大小写（如 `#Delete-Entities-by-Filtering-Co
 <details>
 <summary>展开设计理由</summary>
 
-**为什么需要映射表。** milvus-docs `v3.0.x` 中有 2074 个站内页面链接；User Guide 与 Embeddings 中的 837 个，只有 32% 的目标在 Cloud 有同名页面。两边页面名字不同是历史原因：Cloud 文档在飞书中按自己的结构命名（如 Milvus 的 `boolean.md` 在 Cloud 是 `filtering-overview`）。两边的地址都已公开，被搜索引擎收录、被站外引用，改名要在两站都做跳转，首期不做。
+**为什么需要映射表。** milvus-docs `v3.0.x` 中有 2074 个站内页面链接；User Guide 与 Embeddings 中的 837 个，只有 32% 的目标在 Cloud 有同名页面。两边页面名字不同是历史原因：Cloud 文档在飞书中按自己的结构命名（如 Milvus 的 `boolean.md` 在 Cloud 是 `filtering-overview`）。两边的地址都已公开，被搜索引擎收录、被站外引用，改名要在两站都做跳转，Phase 1 不做。
 
 **为什么全站一份。** 同一个目标页会被很多共享页引用，登记一次即可；每页各写一份，成本随页数增长。随着更多页面迁移为共享页，查找的第 1 步覆盖的目标越来越多，映射表随之缩短。
 

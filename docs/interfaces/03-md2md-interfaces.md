@@ -8,7 +8,7 @@ zdoc 与 Milvus CI 处理命名块、展开变量与片段时，必须用同一�
 
 ## 约定
 
-两组接口随阶段 1a 的 md2md 同一次发版上线。zdoc 与 Milvus CI 都锁定 md2md 的精确版本。两组接口都是 md2md 包中的函数：用 `import` 从包中取出，再像下面的代码那样调用。
+两组接口随 Phase 1a 的 md2md 同一次发版上线。zdoc 与 Milvus CI 都锁定 md2md 的精确版本。两组接口都是 md2md 包中的函数：用 `import` 从包中取出，再像下面的代码那样调用。
 
 ### 命名块的解析与清除
 
