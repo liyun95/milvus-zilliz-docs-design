@@ -145,11 +145,13 @@ shared-docs/
 | 验收 | 对应[实施计划](./phase-1.md)中的测试编号 |
 | 取舍 | 为什么这样定，折叠 |
 
-每个场景末尾链接到对应的技术设计。
+每个场景开头的“实现”一项，链接到对应的技术设计；各种错误的错误码见[技术设计 09](./design/09-error-catalog.md)。
 
 ### 场景 1：把产品名和连接值写成变量
 
 **阶段**：Phase 1a　**谁**：文档工程师
+
+**实现**：[03 预处理](./design/03-md2md-interfaces.md#预处理)
 
 **背景**：整篇复用的页面，两边常常只差产品名和示例中的连接地址、令牌。把这些值写成变量，两边各自给值，正文就能共用一份。
 
@@ -219,11 +221,12 @@ shared-docs/
 
 </details>
 
-技术设计见[技术设计 03](./design/03-md2md-interfaces.md#预处理)。
 
 ### 场景 2：在 Milvus 原文中标出 Cloud 要改的一段
 
 **阶段**：Phase 1a 提供能力，Phase 1b 的试点页开始使用　**谁**：文档工程师
+
+**实现**：[01 命名块的解析](./design/01-named-blocks.md)、[03 解析与清除](./design/03-md2md-interfaces.md#命名块的解析与清除)
 
 **背景**：Cloud 要替换、删除或补充原文中的某一段，就要能稳定地指到这一段。按行号、标题或文档结构定位，上游一改就会失效，甚至悄悄指到错误的位置。所以在原文中给这一段起个名字，Cloud 按名字引用。这个有名字的一段叫**命名块**。
 
@@ -357,11 +360,12 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 </details>
 
-技术设计见[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md#命名块的解析与清除)。
 
 ### 场景 3：接入一页
 
 **阶段**：Phase 1a　**谁**：文档工程师
+
+**实现**：[02 页面配置](./design/02-page-config.md)、[04 接入一页](./design/04-channels-and-lock.md#接入一页)、[07 front matter](./design/07-site-adaptation.md#front-matter)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：一页 Cloud 页面要从 Git 生成，先要告诉工具：它引用哪篇 Milvus 原文、发布到哪些手册、标题和描述是否要改写。
 
@@ -466,11 +470,12 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 </details>
 
-技术设计见[技术设计 02](./design/02-page-config.md)、[04](./design/04-channels-and-lock.md#接入一页)。
 
 ### 场景 4：写 Cloud 的差异
 
 **阶段**：Phase 1b　**谁**：文档工程师
+
+**实现**：[02 变换的执行](./design/02-page-config.md#变换的执行)、[07 代码 Tabs](./design/07-site-adaptation.md#代码-tabs)
 
 **背景**：有的页面，Cloud 与 Milvus 不只差几个值。例如 OpenAI 页，Milvus 讲怎样在 `milvus.yaml` 中配置密钥，Cloud 讲在控制台创建集成；代码中 Milvus 用可选的 `credential`，Cloud 必须填 `integration_id`。这些差异写在 zdoc 中，原文不动，Milvus 作者也不需要照顾 Cloud 的写法。
 
@@ -719,11 +724,12 @@ transforms:
 
 </details>
 
-技术设计见[技术设计 02](./design/02-page-config.md#变换的执行)。
 
 ### 场景 5：链接与图片
 
 **阶段**：Phase 1a　**谁**：工具自动处理，文档工程师按提示补充
+
+**实现**：[02b 链接与图片](./design/02b-links-and-images.md)、[05 图片上传](./design/05-publish-handoff.md#图片上传)
 
 **背景**：Milvus 原文中的链接和图片是按 milvus.io 写的。原样放进 Cloud 页面，站内链接会指向 Cloud 不存在的页面，锚点会因为大小写规则不同而失效，图片可能在没人审核的情况下被换掉。
 
@@ -830,11 +836,12 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 </details>
 
-技术设计见[技术设计 02b](./design/02b-links-and-images.md)。
 
 ### 场景 6：让内容先只在 UAT 显示
 
 **阶段**：Phase 1b　**谁**：文档工程师；原文的版本差异由工具处理
+
+**实现**：[04 两版合并](./design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02 两遍生成](./design/02-page-config.md#两遍生成与-channel)
 
 **背景**：Cloud 的功能往往晚于 Milvus 上线。Milvus 文档已经写了新参数，Cloud 下个月才支持；在此之前，Prod 要继续显示旧的内容，UAT 则要能提前审阅新内容。
 
@@ -980,11 +987,12 @@ transforms:
 
 </details>
 
-技术设计见[技术设计 04](./design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02](./design/02-page-config.md#两遍生成与-channel)。
 
 ### 场景 7：审核上游更新
 
 **阶段**：Phase 1b　**谁**：工具发起，文档工程师审核
+
+**实现**：[06 上游更新](./design/06-upstream-changes.md)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：milvus-docs 每天都可能有新的修改。Cloud 要能及时知道，又不能一合并就跟着变：有的修改 Cloud 也适用，有的写法只适合 Milvus，有的涉及 Cloud 还没上线的功能。
 
@@ -1098,11 +1106,12 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[技术设计 06](./design/06-upstream-changes.md)。
 
 ### 场景 8：功能上线时提升
 
 **阶段**：Phase 1b　**谁**：文档工程师发起，工具开 PR
+
+**实现**：[04 提升](./design/04-channels-and-lock.md#提升)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：功能上线时，Prod 要采用 UAT 已在显示的版本。现在这一步是在飞书多维表格中逐页把 `Release Channel` 从 `NEXT` 改为 `CURRENT`。迁移后，改的是每页 `lock.yaml` 中 Prod 用的版本。
 
@@ -1179,11 +1188,12 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[技术设计 04](./design/04-channels-and-lock.md#提升)。
 
 ### 场景 9：从飞书切换到 Git（激活）
 
 **阶段**：Phase 1b，只在 Phase 1 过渡期存在　**谁**：文档负责人
+
+**实现**：[05b 切换与归属](./design/05b-cutover-and-ownership.md)、[05 交给发布](./design/05-publish-handoff.md)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：Phase 1 飞书还不能退出。接入一页之后，网站上仍是飞书生成的版本；飞书上也可能还有人在改它。要有一个明确的时刻，把这一页交给 Git：从此网站上的这一页由 Git 生成，飞书不能再改它。这个时刻叫**激活**。已激活的页面记在一份清单中（`active.json`），由工具维护，人不手改。
 
@@ -1260,11 +1270,12 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[技术设计 05b](./design/05b-cutover-and-ownership.md)。
 
 ### 场景 10：下线一页
 
 **阶段**：Phase 1b，按需　**谁**：文档工程师
+
+**实现**：[04 下线一页](./design/04-channels-and-lock.md#下线一页)、[05b 下线完成](./design/05b-cutover-and-ownership.md#下线完成)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：功能下线或页面合并时，一页要从网站上移除。和上线一样，它要先从 UAT 消失，到发布时再从 Prod 消失；Phase 1 还要处理导航中的飞书节点。
 
@@ -1317,7 +1328,6 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 </details>
 
-技术设计见[技术设计 04](./design/04-channels-and-lock.md#下线一页)、[05b](./design/05b-cutover-and-ownership.md#下线完成)。
 
 ## 6. 对现有能力的要求
 
@@ -1337,7 +1347,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 未迁移的页面 | 飞书页面的行为不变 | T13 |
 | 出错 | 一律在 PR 校验或生成时失败，说明原因与应改的文件；不静默跳过，不静默使用 Milvus 的值 | — |
 
-各项的验收标准见[Phase 1 实施计划第 4、5 节](./phase-1.md#4-1a整篇复用跑通)；T05、T07、T08、T11、T12 是上线阻断项。
+实现见[技术设计 05](./design/05-publish-handoff.md)、[08](./design/08-workflows-and-permissions.md)、[09](./design/09-error-catalog.md)。各项的验收标准见[Phase 1 实施计划第 4、5 节](./phase-1.md#4-1a整篇复用跑通)；T05、T07、T08、T11、T12 是上线阻断项。
 
 ## 7. 待确认的问题
 
@@ -1350,5 +1360,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 接入后、激活前，文档工程师在哪里看到生成的页面 | PR 校验生成完整页面，但没有可以浏览的地方；激活前的比较只给差异 | 3、9 |
 | 共享配置合并后，是否立刻触发一次发布 | 待定；不触发时最多等约 8 小时 | 7、8 |
 | UAT 部署是自动还是人工启动 | 待核实，决定合并后多久能在 UAT 看到 | 全部 |
+| 共享页对各种代码语言的要求 | 原型中 Python、Java、Go、Rust、C++、NodeJS、cURL 都必须有，Zilliz CLI 可选；但 milvus-docs 中没有 Rust 示例 | 3、4 |
+| Milvus 警告框（`alert warning`）在 Cloud 上的样式 | 沿用 zdoc 现有的 danger 样式（🚧） | 3 |
 | 迁移页的导航由谁管 | Phase 1 仍在飞书目录中维护 | 3、9、10 |
 | Milvus 侧是否校验锚点 | Phase 1 不做 | 8 |

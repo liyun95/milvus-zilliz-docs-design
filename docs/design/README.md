@@ -2,7 +2,7 @@
 
 本目录面向 [zdoc](https://github.com/zilliztech/zdoc) 与 [md2md](https://github.com/zilliztech/md2md) 的维护者，定义 Phase 1 的工具怎样实现。要交付什么行为、作者怎么写，以[Phase 1 产品需求](../prd.md)为准；本目录的设计必须满足它，两处不一致时先改本目录。为什么改见[方案总览](../proposal.md)；实施顺序、验收与各项状态见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
 
-**状态**：01–06 由原“接口设计”迁入，待工程维护者完善；07–09 是骨架，待工程维护者补充。生产实现与集成验收尚未完成。术语见[术语表](../glossary.md)。
+**状态**：01–06 由原“接口设计”迁入，待工程维护者完善；07–09 是新写的草稿，依据 zdoc 现有工作流与 milvus-docs 的统计，待工程维护者确认。生产实现与集成验收尚未完成。术语见[术语表](../glossary.md)。
 
 ## 架构总览
 
@@ -51,7 +51,7 @@
 | 共享来源配置 `source.yaml` | zdoc master `shared-docs/` | zdoc 维护者 | [04](./04-channels-and-lock.md#共享来源配置与跟踪分支) |
 | Cloud 变量 `Variables.json` | zdoc master `shared-docs/` | 文档工程师 | [03](./03-md2md-interfaces.md#预处理) |
 | 链接映射表 `links.yaml` | zdoc master `shared-docs/` | 文档工程师 | [02b](./02b-links-and-images.md#链接) |
-| 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md)（待补） |
+| 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
 | 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
 | 版本记录 `lock.yaml` | zdoc master `shared-docs/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
 | 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
@@ -71,9 +71,9 @@
 | 05 | [生成结果交给发布](./05-publish-handoff.md) | 交接物、记录文件、发布保护、翻译与恢复 | 第 6 节 | Phase 1a 设计，Phase 1b 接入 |
 | 05b | [页面切换与归属](./05b-cutover-and-ownership.md) | `active.json`、激活与归属规则 | 场景 9、10 | Phase 1b |
 | 06 | [上游变化的发现与影响报告](./06-upstream-changes.md) | 上游更新工作流、PR 与报告 | 场景 7 | Phase 1b |
-| 07 | [站点适配](./07-site-adaptation.md) | Milvus Markdown 怎样变成 Cloud MDX；Tabs 规则文件的格式 | 场景 3、4 | Phase 1a（骨架） |
-| 08 | [工作流与权限](./08-workflows-and-permissions.md) | 各工作流的触发、身份、权限与失败通知 | 场景 3、7、8、9、10 | Phase 1a 起（骨架） |
-| 09 | [错误目录](./09-error-catalog.md) | 统一的错误码、提示与应改的文件 | 各场景的“出错时” | Phase 1a 起（骨架） |
+| 07 | [站点适配](./07-site-adaptation.md) | Milvus Markdown 怎样变成 Cloud MDX；Tabs 规则文件的格式 | 场景 3、4 | Phase 1a |
+| 08 | [工作流与权限](./08-workflows-and-permissions.md) | 各工作流的触发、身份、权限与失败通知 | 场景 3、7、8、9、10 | Phase 1a 起 |
+| 09 | [错误目录](./09-error-catalog.md) | 统一的错误码、提示与应改的文件 | 各场景的“出错时” | Phase 1a 起 |
 
 ## 每篇的结构
 
