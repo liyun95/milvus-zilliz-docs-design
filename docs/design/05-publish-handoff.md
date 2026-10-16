@@ -2,15 +2,17 @@
 
 共享页在 zdoc 现有的 Fetch 工作流中生成，生成完交给 zdoc 现有的发布流程，与尚未迁移的飞书页面一起写入 dev。本篇定义交接的是哪三样东西、各长什么样，以及发布流程怎样用它们做保护、翻译与恢复。一页什么时候从飞书切换到 Git、导航与归属怎样划分，见 [05b](./05b-cutover-and-ownership.md)。
 
+对应的产品需求见[产品需求第 6 节](../prd.md#6-对现有能力的要求)。
+
 **参与方**：zdoc 生成（产出交接物）、zdoc 发布（Fetch 工作流、stage、校验与串行发布队列）。
 
-**状态**：已定义，待文档负责人确认；UAT 部署的触发方式、Fetch 的具体接入点与重新生成比对的接法待核实，见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
+**状态**：由原接口设计迁入，待工程维护者完善；UAT 部署的触发方式、Fetch 的具体接入点与重新生成比对的接法待核实，见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
 
 ## 约定
 
 ### 交接发生在哪里
 
-几个 zdoc 的现有概念（见[术语表](./glossary.md#发布)）：**Fetch** 是 zdoc 的发布工作流；**dev** 是 zdoc 存放生成结果的分支，网站从它构建，Prod 与 UAT 用同一个 dev 提交；**stage** 是 Fetch 中的内容暂存区，生成结果在这里校验后才进入发布。
+几个 zdoc 的现有概念（见[术语表](../glossary.md#发布)）：**Fetch** 是 zdoc 的发布工作流；**dev** 是 zdoc 存放生成结果的分支，网站从它构建，Prod 与 UAT 用同一个 dev 提交；**stage** 是 Fetch 中的内容暂存区，生成结果在这里校验后才进入发布。
 
 共享页的生成放进 Fetch，不另起发布线：
 
@@ -71,7 +73,7 @@ zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更�
 </NextChannel>
 ```
 
-`current` 与 `next` 相同时，整页没有任何 `<NextChannel>`，与只读一个版本生成的结果逐字相同。front matter 中的字段见 [02](./02-page-config.md#页面配置-pageyaml)，其中两个与交接有关：
+`current` 与 `next` 相同时，整页没有任何 `<NextChannel>`，与只读一个版本生成的结果逐字相同。front matter 中的字段见 [02](./07-site-adaptation.md#front-matter)，其中两个与交接有关：
 
 #### 页面身份（`token`）
 

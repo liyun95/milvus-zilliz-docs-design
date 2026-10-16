@@ -13,7 +13,7 @@ Filtered Search 介绍标准过滤与迭代过滤，并用多种 SDK/API 展示�
 | Cloud 独有的标准过滤、迭代过滤 CLI | 在 zdoc 各写一份 Cloud 内容文件，加入对应代码组 |
 | Cloud 站点标题、导航、链接和图片地址 | 在 Cloud 页面配置中维护 |
 
-下面按首次接入的顺序，以“标准过滤”走通一条完整引用关系，再说明迭代过滤如何复用同样做法。配置采用[消费配置草案](../../docs/consumption-schema.md)的 schema v1 样例格式，生产工具链接入仍待实现。
+下面按首次接入的顺序，以“标准过滤”走通一条完整引用关系，再说明迭代过滤如何复用同样做法。配置采用[消费配置草案](../../docs/authoring-spec.md)的 schema v1 样例格式，生产工具链接入仍待实现。
 
 ## 1. 首次接入：哪些文件需要修改
 
@@ -172,7 +172,7 @@ transforms:
 
 沿配置读下来：先用 `source.module` 找到刚登记的整篇原文，绑定 Cloud 变量，再找到 `standard-filtering-code`，把 CLI 文件作为 `shell` 语言项加入该组。共用展示规则将 `shell` 显示为 `Zilliz CLI`。
 
-`content.file` 相对于页面配置所在目录解析，`variables.file` 和 `presentation.code_groups` 相对于 zdoc 消费配置根目录解析。实际页面 YAML 还维护 `metadata` 中的站点标题、导航和路由，以及 `links`、`assets` 中的链接与图片地址映射；首次接入时需核对这些页面信息。完整字段说明见[消费配置规范](../../docs/consumption-schema.md)。
+`content.file` 相对于页面配置所在目录解析，`variables.file` 和 `presentation.code_groups` 相对于 zdoc 消费配置根目录解析。实际页面 YAML 还维护 `metadata` 中的站点标题、导航和路由，以及 `links`、`assets` 中的链接与图片地址映射；首次接入时需核对这些页面信息。完整字段说明见[消费配置规范](../../docs/authoring-spec.md)。
 
 ### 3.5 为迭代过滤增加第二条关系
 
