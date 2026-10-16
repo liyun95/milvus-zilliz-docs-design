@@ -77,7 +77,7 @@ languages:                  # 顺序即标签页顺序
 | `languages[].aliases` | 否 | Milvus 原文中对应的语言名；变换中的 `language` 写原文的语言名，也可以写 `value` |
 | `languages[].required` | 否 | 默认 `false`；为 `true` 时，每个多语言代码组都必须有这种语言 |
 
-Phase 1 的取值已由文档负责人确定（2026-10-16）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。语言顺序与显示名沿用本地原型，加上 `aliases`。`alert warning` 用哪种样式待确认（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)）。
+Phase 1 的取值是推动者的建议，待文档负责人确认（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。语言顺序与显示名沿用本地原型，加上 `aliases`。
 
 ### 提示框
 
@@ -86,7 +86,7 @@ milvus-docs 中提示框的写法与数量（`1997ce9`）：
 | Milvus 写法 | 次数 | 转换为 |
 |---|---|---|
 | `<div class="alert note">` | 463 | `<Admonition type="info" icon="📘" title="Notes">`，与 zdoc 现有的飞书提示框一致 |
-| `<div class="alert warning">` | 18 | `<Admonition type="danger" icon="🚧" title="Warning">`，沿用 zdoc 现有的警告样式 |
+| `<div class="alert warning">` | 18 | `<Admonition type="warning" icon="🚧" title="Warning">`，与 zdoc 现有页面一致 |
 | `alert notes`、`alert alert-info`、`admonition note` | 各 1 | 不转换，该页生成失败，回上游改成 `alert note` |
 
 - 提示框内的 Markdown 照常转换；结束标记 `</div>` 换成 `</Admonition>`。
@@ -154,7 +154,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 **为什么要 `aliases`。** milvus-docs 中 C++ 的代码块写 `cpp`（68 处），zdoc 页面中写 `c++`；cURL 多数写 `bash`，也有 8 处写 `curl`。作者在变换中按原文写语言名，输出时统一换成 Cloud 的值。
 
-**为什么提示框沿用 zdoc 现有样式。** 现有飞书页面的提示框由 zdoc 按飞书 callout 的图标转换：📘 对应 `info`，🚧 对应 `danger`。共享页沿用同样的输出，两种来源的页面看起来一致。
+**为什么提示框沿用 zdoc 现有样式。** zdoc 现有页面的提示框写作 `<Admonition type="info" icon="📘" title="Notes">` 与 `<Admonition type="warning" icon="🚧" title="Warning">`（zdoc master `b832f16` 的 Guides 中，后者有 15 处）。共享页沿用同样的输出，两种来源的页面看起来一致。
 
 **为什么不认识的写法直接失败。** 原样输出可能编译通过，却在页面上显示成乱码或空白，审核时容易漏掉。
 
