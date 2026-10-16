@@ -1,8 +1,8 @@
 # 共享页面的写法与配置
 
-本文面向 Cloud 文档工程师，按常见任务说明一个共享页面要写哪些文件、怎么写。
+本文面向 文档工程师，按常见任务说明一个共享页面要写哪些文件、怎么写。
 
-**状态：随接口定义更新，待文档负责人确认。** 本文是作者手册，按任务说明写法；字段的正式定义、出错情形和首期不支持的写法见[接口设计 02《共享页配置》](./interfaces/02-page-config.md)。`examples/` 中的两篇样例仍是接口定义之前的草案写法，待接口确认后更新。
+**状态：随接口定义更新，待文档负责人确认。** 本文是作者手册，按任务说明写法；字段的正式定义、出错情形和 Phase 1 不支持的写法见[接口设计 02《共享页配置》](./interfaces/02-page-config.md)。`examples/` 中的两篇样例仍是接口定义之前的草案写法，待接口确认后更新。
 
 ## 1. 写作原则
 
@@ -65,12 +65,12 @@ publish:
 # metadata:                             # 都可以不写
 #   title:       不写就用 Milvus 原文的 title
 #   description: 不写就用 Milvus 原文的 summary
-#   beta:        不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE
+#   beta:        标题下的标签，不写就是 FALSE；可写 PUBLIC / PRIVATE / NEAR DEPRECATE，只影响 Guides
 ```
 
 - 正文的标题和章节结构随原文引用，不需要在配置中重复。
 - `slug`、标题后缀和其余 front matter 由工具生成，不要写。
-- **导航仍在飞书中调整。** 首期，这一页在飞书知识库目录中的节点保留，导航中的位置、顺序和标签都由它决定；`publish` 中的 `path` 要与飞书节点的位置一致，不一致时报错。要移动这一页或改导航标签，在飞书目录中操作，并同步修改 `path`（[接口设计 05b《页面切换与归属》](./interfaces/05b-cutover-and-ownership.md#导航首期)）。
+- **导航仍在飞书中调整。** Phase 1，这一页在飞书知识库目录中的节点保留，导航中的位置、顺序和标签都由它决定；`publish` 中的 `path` 要与飞书节点的位置一致，不一致时报错。要移动这一页或改导航标签，在飞书目录中操作，并同步修改 `path`（[接口设计 05b《页面切换与归属》](./interfaces/05b-cutover-and-ownership.md#导航phase-1)）。
 - 提交 PR 后，工具在同一目录写入 `lock.yaml`，不要自己写。这一页对应的功能还没上线时，给 PR 加标签 `shared-docs: not-launched`，工具会让它先只在 UAT 显示（3.9 节）。
 - PR 合并后，这一页只生成候选结果；由文档负责人激活后才正式发布。只能接入在飞书目录中已有节点的页面。
 
@@ -169,7 +169,7 @@ transforms:
 
 ### 3.6 增加、替换或删除一个语言示例
 
-在目标中加上 `language`。命名块的内容恰好是一个代码组时，才能按语言处理。下面是 Filtered Search 中为一个代码组增加 Cloud CLI 示例：
+在目标中加上 `language`。命名块的内容恰好是一个代码组时，才能按语言处理；多语言代码组要连语言切换栏一起包住（见[接口设计 01](./interfaces/01-named-blocks.md#两种命名块)）。下面是 Filtered Search 中为一个代码组增加 Cloud CLI 示例：
 
 ```yaml
 transforms:
@@ -297,7 +297,7 @@ ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，�
 
 | 内容 | 写法 |
 |---|---|
-| Cloud 内容文件中新增或替换的内容 | 在文件里直接用 `<NextChannel action="include">` 包住；功能上线时由作者去掉包裹（3.10 节） |
+| Cloud 内容文件中新增或替换的内容 | 在文件里直接用 `<NextChannel action="include">` 包住；功能上线时由文档工程师去掉包裹（3.10 节） |
 | 共享原文中的变化 | 不需要写。lock 中 `current` 与 `next` 两个版本的差异由工具成对包进 `<NextChannel>`，提升后自动消失 |
 | 用 Cloud 内容替换原文的某一节，但只在下次发布时生效 | 这条变换规则标 `channel: next`，Prod 继续显示原文；提升时工具去掉标记 |
 | 整个新页面，功能还没上线 | 接入 PR 加标签 `shared-docs: not-launched`，工具把 `current` 写成 `none`（3.1 节） |
@@ -313,7 +313,7 @@ Cloud 内容文件、`Variables.json` 和页面配置都只有一份，Prod 与 
 - 删除 `channel: current` 的规则，去掉 `channel: next` 的标记；
 - 已下线的页面删除目录（3.11 节）。
 
-PR 说明会列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`。对应的功能也在这次上线时，在这个 PR 中删掉包裹；工具不会自动删，因为它不知道每段包裹属于哪个功能。完整规则见[接口设计 04](./interfaces/04-channels-and-lock.md#下线一页与提升)。
+PR 说明会列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`。对应的功能也在这次上线时，在这个 PR 中删掉包裹；工具不会自动删，因为它不知道每段包裹属于哪个功能。完整规则见[接口设计 04](./interfaces/04-channels-and-lock.md#提升)。
 
 ### 3.11 下线一页
 
@@ -338,4 +338,4 @@ milvus-docs 有新提交时，工具每天为受影响的页面开或更新一�
 
 ## 4. 什么情况会报错
 
-工具先校验全部配置，再生成页面；出错时直接失败，不会静默跳过。完整的出错情形、字段定义和首期不支持的写法见[接口设计 02《共享页配置》](./interfaces/02-page-config.md)；命名块标记的错误见 [01](./interfaces/01-named-blocks.md#出错时)，链接与图片的错误见 [02b](./interfaces/02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./interfaces/03-md2md-interfaces.md#出错时)。
+工具先校验全部配置，再生成页面；出错时直接失败，不会静默跳过。完整的出错情形、字段定义和 Phase 1 不支持的写法见[接口设计 02《共享页配置》](./interfaces/02-page-config.md)；命名块标记的错误见 [01](./interfaces/01-named-blocks.md#出错时)，链接与图片的错误见 [02b](./interfaces/02b-links-and-images.md#出错时)，变量与片段的错误见 [03](./interfaces/03-md2md-interfaces.md#出错时)。

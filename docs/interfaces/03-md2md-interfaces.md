@@ -8,51 +8,101 @@ zdoc 与 Milvus CI 处理命名块、展开变量与片段时，必须用同一�
 
 ## 约定
 
-两组接口随 1a 的 md2md 同一次发版上线。zdoc 与 Milvus CI 都锁定 md2md 的精确版本。
+两组接口随 Phase 1a 的 md2md 同一次发版上线。zdoc 与 Milvus CI 都锁定 md2md 的精确版本。两组接口都是 md2md 包中的函数：用 `import` 从包中取出，再像下面的代码那样调用。
 
 ### 命名块的解析与清除
+
+**作用与阶段。** 找出原文中的命名块并检查标记写法，供 zdoc 按页面配置修改时定位；修改完成、发布之前，再把标记删掉，网站上不留痕迹（标记规则见 [01](./01-named-blocks.md)）。Milvus 侧在每个 PR 的检查和发布构建时使用；Cloud 侧每次生成时，读入原文后解析，按页面配置完成变换后清除（生成的各步见[接口地图](./README.md#接口地图)）。
+
+#### 调用
 
 ```js
 import { parseBlocks, stripBlockMarkers } from "@zilliz/mdtomd/blocks.js";
 
+// 解析：找出全部命名块，检查标记写法，返回块的位置与错误
 const result = parseBlocks(content, { sourceName });
-// { ok, blocks: [{ id, startLine, endLine }], errors: [{ code, message, file, line }] }
 
-const output = stripBlockMarkers(content);   // 只删除标记所在的整行，其余不变
+// 清除：删掉标记所在的整行，返回清除后的 Markdown
+const output = stripBlockMarkers(content);
 ```
 
-| 能力 | 使用方 | 行为 |
-|---|---|---|
-| `parseBlocks` | zdoc | 返回块的 ID 与起止行；错误一次收集全部，错误码见 [01](./01-named-blocks.md#出错时) |
-| `stripBlockMarkers` | zdoc、`goover` | 只删除代码块之外的标记行；`goover` 在写文件前对每篇文档执行，遇到错误时构建失败 |
-| 命令行检查（如 `md2md-blocks check site/en`） | Milvus PR 检查（`check.yml`） | 检查全部页面与片段文件，有错误时以非零状态退出 |
+`parseBlocks` 有两个参数：
 
-zdoc 在流水线第 ③ 步完成变换后调用 `stripBlockMarkers`，再调用下文的 `preprocess`。
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `content` | 字符串 | 是 | 一篇页面文件的完整 Markdown |
+| `sourceName` | 字符串 | 否 | 报错时显示的文件名 |
+
+`stripBlockMarkers` 只有一个参数：
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `content` | 字符串 | 是 | 要清除标记的 Markdown |
+
+#### 处理规则
+
+- 标记按 01 的规则识别；代码块（三个反引号围起的部分）中的标记不识别，也不清除。
+- `parseBlocks` 一次收集全部错误，不在第一个错误处停下。
+- `stripBlockMarkers` 只删除标记所在的整行，其余内容逐字不变。调用方先用 `parseBlocks` 检查，没有错误才清除。
+- milvus-docs 的 CI 构建时运行 `goover`（md2md 现有的转换命令）：它在写文件前对每篇文档先检查、再清除，有错误时构建失败。
+
+#### 返回
+
+`parseBlocks` 的返回：
+
+```js
+{
+  ok: true,
+  blocks: [
+    { id: "before-you-start", startLine: 12, endLine: 30 }
+  ],
+  errors: []
+}
+```
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `ok` | 布尔值 | 没有任何错误时为 `true` |
+| `blocks` | 数组 | 每个命名块一项；`ok` 为 `false` 时为空数组，不返回部分结果 |
+| `blocks[].id` | 字符串 | 命名块 ID |
+| `blocks[].startLine`、`blocks[].endLine` | 数字 | 开始标记、结束标记所在的行号，从 1 开始，与编辑器中看到的行号一致 |
+| `errors` | 数组 | 全部错误；每项含 `code`（错误码，见 [01](./01-named-blocks.md#出错时)）、`message`（说明）、`file`（即 `sourceName`）、`line`（行号，从 1 开始） |
+
+`stripBlockMarkers` 返回删除标记后的 Markdown 字符串。
+
+#### 命令行
+
+milvus-docs 的 PR 检查（`check.yml`）运行 md2md 提供的命令，例如 `md2md-blocks check site/en`：检查目录下全部页面与片段文件，有错误时逐条输出并以非零状态退出，PR 检查因此失败。
 
 ### 预处理
+
+**作用与阶段。** 把 `{{var.xxx}}` 换成 Cloud 的变量值，把 `{{fragments/xxx.md}}` 换成片段的内容。只在 Cloud 生成时使用：清除命名块标记之后、产品过滤之前（见[接口地图](./README.md#接口地图)）。Milvus 侧继续用现有的 `goover` 展开，不调用它。
+
+md2md 现有的转换入口（`goover` 所用）已能展开变量与片段，但变量来源、错误处理和读取范围不适合 Cloud（见[设计理由](#设计理由)中的“为什么另开预处理入口”）；`preprocess` 是本期新增的入口，复用同一套展开规则，`goover` 保持不变。
 
 #### 调用
 
 ```js
 import { preprocess } from "@zilliz/mdtomd/preprocess.js";
 
+// 预处理：展开片段、替换变量，返回展开后的 Markdown 与用到的依赖
 const result = preprocess({ content, fragmentRoot, variables, sourceName, limits });
 ```
 
-| 参数 | 必填 | 说明 |
-|---|---|---|
-| `content` | 是 | 待处理的整页 Markdown，即完成流水线第 ③ 步变换、并清除命名块标记后的文本 |
-| `fragmentRoot` | 是 | 同一 commit 的 milvus-docs 检出中 `site/en` 的绝对路径；`{{fragments/x.md}}` 解析为 `<fragmentRoot>/fragments/x.md` |
-| `variables` | 是 | 完整的变量表；md2md 不按目录查找，也不合并其他来源的值。Cloud 的变量表只来自 `shared-docs/Variables.json` |
-| `sourceName` | 否 | 报错时显示的文件名 |
-| `limits` | 否 | 默认：嵌套深度 5、片段数 100、单个片段 256 KiB、输出 2 MiB |
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `content` | 字符串 | 是 | 待处理的整页 Markdown，即按页面配置完成变换、并清除命名块标记后的文本 |
+| `fragmentRoot` | 字符串 | 是 | 同一 commit 的 milvus-docs 检出中 `site/en` 的绝对路径；`{{fragments/x.md}}` 解析为 `<fragmentRoot>/fragments/x.md` |
+| `variables` | 对象 | 是 | 完整的变量表：键是变量名，可以嵌套；值只能是字符串、数字或布尔值。md2md 不按目录查找，也不合并其他来源的值。Cloud 的变量表只来自 `shared-docs/Variables.json` |
+| `sourceName` | 字符串 | 否 | 报错时显示的文件名 |
+| `limits` | 对象 | 否 | 四个数字字段，都可以不写：`maxDepth`（嵌套深度，默认 5）、`maxFragments`（片段数，默认 100）、`maxFragmentBytes`（单个片段大小，默认 256 KiB）、`maxOutputBytes`（输出大小，默认 2 MiB） |
 
 #### 处理规则
 
-- 先递归展开片段，再替换变量；片段使用调用页的变量表，代码块中的变量照常替换。这与原有入口一致。
+- 先递归展开片段，再替换变量；片段使用调用页的变量表，代码块中的变量照常替换。这与 md2md 现有的转换入口（`goover` 所用）一致。
 - 支持 `{{var.a.b}}` 嵌套键，不区分大小写；变量值原样插入，不再展开。
 - `{{var.*}}` 与 `{{fragments/*}}` 之外的 `{{...}}`（如代码中的 `{{ doc.content }}`）原样保留。
-- 片段只能读 `<fragmentRoot>/fragments/` 之内的 `.md` 普通文件，路径中任何一段都不能是符号链接；同一片段多次引用时只读一次。
+- 片段只能读 `<fragmentRoot>/fragments/` 之内的 `.md` 普通文件，路径中任何一段都不能是符号链接（指向别处的快捷方式文件）；同一片段多次引用时只读一次。
 - 调用之间互不影响，两个产品可以在同一进程中并行生成。
 
 #### 返回
@@ -60,17 +110,26 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 ```js
 {
   ok: true,
-  content: "...",                 // ok 为 false 时为 null，不返回部分结果
+  content: "...",
   dependencies: {
     fragments: [{ path, sha256, bytes, includedBy: [...] }],
     variables: [{ key, usedIn: [...] }]
   },
-  errors: [{ code, message, file, line, detail }],   // 一次收集全部错误
+  errors: [],
   engine: { name: "@zilliz/mdtomd", version: "<精确版本>" }
 }
 ```
 
-zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` 写入记录文件（见 [05](./05-publish-handoff.md#记录文件)），用于缓存判断和恢复。参数类型错误属于调用方的编程错误，直接抛出 `TypeError`。
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `ok` | 布尔值 | 没有任何错误时为 `true` |
+| `content` | 字符串或 `null` | 展开后的 Markdown；`ok` 为 `false` 时为 `null`，不返回部分结果 |
+| `dependencies.fragments` | 数组 | 用到的每个片段：路径、内容摘要（`sha256`）、字节数，以及引用它的文件 |
+| `dependencies.variables` | 数组 | 用到的每个变量：变量名，以及在哪些文件中使用 |
+| `errors` | 数组 | 全部错误；每项含 `code`、`message`、`file`、`line`，以及补充信息 `detail`（如循环引用的引用链） |
+| `engine` | 对象 | md2md 的包名与精确版本 |
+
+zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` 写入记录文件（见 [05](./05-publish-handoff.md#记录文件)），用于缓存判断和恢复。参数类型错误属于调用方的编程错误，直接抛出 `TypeError`，不放进 `errors`。
 
 ## 出错时
 
