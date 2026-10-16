@@ -14,7 +14,7 @@ milvus-docs 合并新提交后，Cloud 要自动得知，并自己决定是否�
 
 图 1 · 上游变化怎样成为 Cloud 的上游更新 PR
 
-- **上游更新 PR 就是一个普通的 zdoc PR。** 审核与批准沿用 GitHub PR，不另建审批记录。合并后，master 推送触发 Fetch（见 [05](./05-publish-handoff.md#运行位置与触发)），新版本随后在 UAT 可见。
+- **上游更新 PR 就是一个普通的 zdoc PR。** 审核与批准沿用 GitHub PR，不另建审批记录。合并后，master 推送触发 Fetch（见 [05](./05-publish-handoff.md#触发时机)），新版本随后在 UAT 可见。
 - **跟踪分支只用于发现变化**，正式生成使用 lock 中的 commit，见 [04](./04-channels-and-lock.md#共享来源配置与跟踪分支)。
 
 ### 发现与运行

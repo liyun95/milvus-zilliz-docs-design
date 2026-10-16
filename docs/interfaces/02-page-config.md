@@ -10,7 +10,7 @@
 
 ### 一个共享页由哪些文件组成
 
-`shared-docs/` 位于 zdoc 仓库根目录，在 master 分支上维护：所有修改都向 master 开 PR，合并后发布流程直接从 master 读取（见 [05](./05-publish-handoff.md#运行位置与触发)）。
+`shared-docs/` 位于 zdoc 仓库根目录，在 master 分支上维护：所有修改都向 master 开 PR，合并后发布流程直接从 master 读取（见 [05](./05-publish-handoff.md#交接发生在哪里)）。
 
 ```
 shared-docs/
