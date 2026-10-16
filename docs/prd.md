@@ -70,9 +70,9 @@ Milvus 与 Zilliz Cloud 的功能文档有大量相同的内容，但现在各�
 
 **共享页**是正文引用 milvus-docs 原文、在 zdoc 中只维护差异的 Cloud 页面。
 
-![一个共享页面涉及的文件：milvus-docs 中的共享原文（每页一份）和 Milvus 默认变量（共用）；zdoc 的 shared-docs 目录中的页面配置（每页一份）、Cloud 内容文件（按需，与页面配置放在同一目录）、Cloud 变量（共用）、链接映射表（共用）和 Tabs 规则（工程维护）。生成页面的 front matter 来自页面配置，正文来自共享原文，绑定 Cloud 变量，链接按映射表对应；替换的一节来自 Cloud 内容文件；代码 Tabs 来自共享原文的代码，凭证参数行按页面配置中的规则替换，再按 Tabs 规则生成。](./assets/file-relationships.png)
+![一个共享页的文件，以 OpenAI 页为例。milvus-docs 中有共享原文（每页一份）和 Milvus 默认变量（共用）。zdoc 的 shared-docs 目录中，决定页面内容的有页面配置（每页一份）、Cloud 内容文件（按需）、Cloud 变量（共用）、链接映射表（共用）和代码 Tabs 规则（工程维护）；决定用哪个版本、不提供内容的有 lock.yaml（每页一份，工具写入）和 source.yaml（工程维护）。生成的页面中，标题、描述、标签与路由来自页面配置，导航来自飞书目录；正文来自共享原文，绑定 Cloud 变量，链接按映射表对应；替换的一节来自 Cloud 内容文件；代码 Tabs 来自共享原文的代码，凭证参数行按页面配置中的规则替换，再按 Tabs 规则生成，原文有哪些语言就显示哪些；Prod 与 UAT 各用 lock.yaml 中记录的版本。](./assets/file-relationships.png)
 
-图 1 · 一个共享页面涉及哪些文件（以 OpenAI 页为例）
+图 1 · 一个共享页由哪些文件组成、各影响页面的哪一部分（以 OpenAI 页为例）
 
 | 文件 | 在哪 | 谁写 | 多久改一次 |
 |---|---|---|---|
@@ -81,7 +81,7 @@ Milvus 与 Zilliz Cloud 的功能文档有大量相同的内容，但现在各�
 | Cloud 内容文件 | zdoc，与页面配置同一目录，按需 | 文档工程师 | 有差异时 |
 | Cloud 变量 `Variables.json` | zdoc，全站一份 | 文档工程师 | 新增变量时 |
 | 链接映射表 `links.yaml` | zdoc，全站一份 | 文档工程师 | 工具报错提示时补一行 |
-| 版本记录 `lock.yaml` | zdoc，每页一份 | 只由工具写入 | 每个改变版本的 PR |
+| 版本记录 `lock.yaml` | zdoc，每页一份 | 只由工具写入 | 每个改变版本的 PR；样例见[第 4 节](#4-一页的生命周期) |
 | 代码 Tabs 规则、共享来源配置 | zdoc，全站一份 | zdoc 维护者 | 很少 |
 
 zdoc 中的文件都放在 master 分支根目录的 `shared-docs/` 下，所有修改都向 master 开 PR：
@@ -106,7 +106,19 @@ shared-docs/
 
 ## 4. 一页的生命周期
 
-网站分 **Prod**（正式站点）与 **UAT**（预发布站点）。每个共享页的 **`lock.yaml`** 记录 Prod 与 UAT 各用 milvus-docs 的哪个版本（commit）：`current` 给 Prod，`next` 给 UAT。
+网站分 **Prod**（正式站点）与 **UAT**（预发布站点）。每个共享页的 **`lock.yaml`** 记录 Prod 与 UAT 各用 milvus-docs 的哪个版本（commit）：
+
+```yaml
+# shared-docs/pages/delete-entities/lock.yaml
+# 工具生成，不要手改
+schema_version: 1
+current: 1997ce96782b31f8628f22d31fad11007e4b924b   # Prod 用的 milvus-docs 版本
+next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版本
+```
+
+- 两者相同，Prod 与 UAT 显示同样的内容；不同时，UAT 先显示新版本。
+- 某一边写 `none`，表示这一页在那一边不存在，例如功能还没上线的新页面 `current: none`。
+- 文档工程师不手改它，但上游更新、提升、下线的 PR 都改它，审核时会看到它的变化。
 
 ![一个共享页的生命周期。上半部分是 Git 中的生命周期，由 lock 决定版本：写 page.yaml 接入，工具写入 lock；上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线把 next 改为 none；下线后提升删除页面目录与 lock。下半部分是 Phase 1 过渡，由 active.json 决定来源，飞书退出后不再需要：接入之后由文档负责人激活，网站从飞书版换成 Git 版；下线后提升合并之后，文档工程师删除飞书节点，这一页从网站和导航中移除。](./assets/page-lifecycle.png)
 
@@ -131,27 +143,15 @@ shared-docs/
 
 ## 5. 场景
 
-本节按文档工程师的日常工作组织，从写 Milvus 原文开始，到一页上线、更新和下线为止。每个场景用同一个结构：
+本节按文档工程师的日常工作组织，从写 Milvus 原文开始，到一页上线、更新和下线为止。每个场景开头列出阶段、谁来做和对应的技术设计；“系统行为”带编号，便于评审和验收时引用；错误码见[技术设计 09](./design/09-error-catalog.md)。
 
-| 部分 | 回答什么 |
-|---|---|
-| 背景 | 为什么需要这件事 |
-| 用户故事 | 谁、想做什么、为了什么 |
-| 怎样操作 | 一步步做什么，作者要写的语法 |
-| 规则 | 写法的约束，每条附例子 |
-| 系统行为 | 工具和网站必须怎样响应，带编号，便于评审和验收时引用 |
-| 出错时 | 哪些情况会失败、在哪里发现、怎样改 |
-| 不做与已知局限 | Phase 1 明确不支持的，以及已知的不便 |
-| 验收 | 对应[实施计划](./phase-1.md)中的测试编号 |
-| 取舍 | 为什么这样定，折叠 |
-
-每个场景开头的“实现”一项，链接到对应的技术设计；各种错误的错误码见[技术设计 09](./design/09-error-catalog.md)。
+“技术设计”列出的是对应的篇目，不代表实现方案已经定稿；各篇的完成程度见[技术设计 README](./design/README.md)。
 
 ### 场景 1：把产品名和连接值写成变量
 
 **阶段**：Phase 1a　**谁**：文档工程师
 
-**实现**：[03 预处理](./design/03-md2md-interfaces.md#预处理)
+**技术设计**：[03 预处理](./design/03-md2md-interfaces.md#预处理)
 
 **背景**：整篇复用的页面，两边常常只差产品名和示例中的连接地址、令牌。把这些值写成变量，两边各自给值，正文就能共用一份。
 
@@ -201,14 +201,17 @@ shared-docs/
 | 1-2 | 正文、片段、代码块和 Cloud 内容文件中的变量都按 Cloud 的值替换 |
 | 1-3 | 变量值原样插入，不再当作变量或片段展开 |
 | 1-4 | `{{var.…}}`、`{{fragments/…}}` 之外的 `{{…}}`（如代码中的模板语法 `{{ doc.content }}`）原样保留 |
-| 1-5 | 片段只能引用 `site/en/fragments/` 中的文件；同一片段多次引用时内容一致 |
+| 1-5 | 原文和 Cloud 内容文件中的 `{{fragments/xxx.md}}`，只能引用同一版本 milvus-docs 中 `site/en/fragments/` 里的文件；zdoc 中没有 Cloud 自己的片段目录 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
 | 变量在 Cloud 中没有值 | zdoc 的 PR 校验，或上游更新 PR 的校验 | 在 `shared-docs/Variables.json` 中补上 |
 | 片段不存在、循环引用、嵌套太深或太大 | 同上 | 回 milvus-docs 修正 |
+
+</details>
 
 **验收**：T02、T03。
 
@@ -226,7 +229,7 @@ shared-docs/
 
 **阶段**：Phase 1a 提供能力，Phase 1b 的试点页开始使用　**谁**：文档工程师
 
-**实现**：[01 命名块的解析](./design/01-named-blocks.md)、[03 解析与清除](./design/03-md2md-interfaces.md#命名块的解析与清除)
+**技术设计**：[01 命名块的解析](./design/01-named-blocks.md)、[03 解析与清除](./design/03-md2md-interfaces.md#命名块的解析与清除)
 
 **背景**：Cloud 要替换、删除或补充原文中的某一段，就要能稳定地指到这一段。按行号、标题或文档结构定位，上游一改就会失效，甚至悄悄指到错误的位置。所以在原文中给这一段起个名字，Cloud 按名字引用。这个有名字的一段叫**命名块**。
 
@@ -336,12 +339,15 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 | 2-5 | 工具按原文结构判断命名块的类型和其中的语言，作者不用声明 |
 | 2-6 | Cloud 的标签页由工具按代码块和 Tabs 规则重新生成，不使用切换栏的内容 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
 | 上表任何一条写法错误 | milvus-docs 的 PR 检查；万一漏过，zdoc 中这一页生成失败 | 回 milvus-docs 修正 |
 | 命名块被上游改名或删除，Cloud 还在引用 | 上游更新 PR 的校验（[场景 7](#场景-7审核上游更新)） | 在同一个 PR 中修改 Cloud 的规则 |
+
+</details>
 
 **不做与已知局限**：不能嵌套；不能写在片段中。
 
@@ -365,7 +371,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 **阶段**：Phase 1a　**谁**：文档工程师
 
-**实现**：[02 页面配置](./design/02-page-config.md)、[04 接入一页](./design/04-channels-and-lock.md#接入一页)、[07 front matter](./design/07-site-adaptation.md#front-matter)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[02 页面配置](./design/02-page-config.md)、[04 接入一页](./design/04-channels-and-lock.md#接入一页)、[07 front matter](./design/07-site-adaptation.md#front-matter)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：一页 Cloud 页面要从 Git 生成，先要告诉工具：它引用哪篇 Milvus 原文、发布到哪些手册、标题和描述是否要改写。
 
@@ -410,15 +416,15 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 | `publish[].path` | 是 | 页面在该手册中的路径，决定输出位置。Phase 1 必须与飞书节点生成的路径一致 |
 | `metadata.title` | 否 | 默认取原文的 `title` |
 | `metadata.description` | 否 | 默认取原文的 `summary`；两边不同时在这里改写 |
-| `metadata.beta` | 否 | 页面标题下的标签，见下表；只影响 Guides，BYOC 的页面一律显示 “Contact Sales” |
+| `metadata.beta` | 否 | 页面标题旁的标签，见下表；只影响 Guides。BYOC 的页面不显示这个标签，统一在右侧显示 Contact Sales 按钮 |
 | `transforms` | 否 | Cloud 的差异，见[场景 4](#场景-4写-cloud-的差异) |
 
-| `beta` 的值 | 页面上显示 |
-|---|---|
-| `FALSE`（默认） | 不显示 |
-| `PUBLIC` | Public Beta |
-| `PRIVATE` | Private Beta |
-| `NEAR DEPRECATE` | Near Deprecation |
+| `beta` 的值 | 英文站显示 | 中文站显示 |
+|---|---|---|
+| `FALSE`（默认） | 不显示 | 不显示 |
+| `PUBLIC` | Public Preview | 公测版 |
+| `PRIVATE` | Private Preview | 内测版 |
+| `NEAR DEPRECATE` | Near Deprecation | Near Deprecation |
 
 `slug`、标题后缀、导航标签与排序等其余 front matter 由工具生成，作者不写；完整列表见[写法速查](./authoring-spec.md)。
 
@@ -444,7 +450,8 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 | 3-6 | **接入不等于上线**：合并后网站上仍是飞书版，激活后才换成 Git 版（[场景 9](#场景-9从飞书切换到-git激活)） |
 | 3-7 | 迁移后页面的 URL 不变 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
@@ -452,6 +459,8 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 | `source.file` 在 milvus-docs 中不存在 | PR 校验 | 改路径 |
 | `publish[].manual` 不是已有的手册；`path` 与飞书节点不一致 | PR 校验 | 改 `page.yaml`，或在飞书目录中调整 |
 | PR 来自 fork | PR 中提示 | 改从 zdoc 仓库内的分支提交 |
+
+</details>
 
 **不做与已知局限**：front matter 中的 `keywords`、`hide_title`、`hide_table_of_contents` 不开放；`beta` 的 `DEPRECATED` 暂不开放。接入后、激活前在哪里看到生成的页面，见[第 7 节](#7-待确认的问题)。
 
@@ -475,7 +484,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 **阶段**：Phase 1b　**谁**：文档工程师
 
-**实现**：[02 变换的执行](./design/02-page-config.md#变换的执行)、[07 代码 Tabs](./design/07-site-adaptation.md#代码-tabs)
+**技术设计**：[02 变换的执行](./design/02-page-config.md#变换的执行)、[07 代码 Tabs](./design/07-site-adaptation.md#代码-tabs)
 
 **背景**：有的页面，Cloud 与 Milvus 不只差几个值。例如 OpenAI 页，Milvus 讲怎样在 `milvus.yaml` 中配置密钥，Cloud 讲在控制台创建集成；代码中 Milvus 用可选的 `credential`，Cloud 必须填 `integration_id`。这些差异写在 zdoc 中，原文不动，Milvus 作者也不需要照顾 Cloud 的写法。
 
@@ -485,15 +494,15 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 **按差异的大小选写法**
 
-| 差异 | 写法 |
-|---|---|
-| 只差产品名、连接值 | 变量（[场景 1](#场景-1把产品名和连接值写成变量)） |
-| 整节不同 | 替换整个命名块 |
-| Cloud 要在某一节前后多一段 | 在命名块前或后增加 |
-| 某一节只属于 Milvus | 删除整个命名块 |
-| Cloud 独有一种语言的示例，如 Zilliz CLI | 给代码组增加一种语言 |
-| 某种语言的示例整个不同 | 替换或删除这种语言 |
-| 代码只差一两行 | 替换、增加或删除这几行 |
+| 差异 | 写法 | 例子 |
+|---|---|---|
+| 只差产品名、连接值 | 变量 | [场景 1](#场景-1把产品名和连接值写成变量) |
+| 整节不同 | 替换整个命名块 | 例 1 |
+| Cloud 要在某一节前后多一段 | 在命名块前或后增加 | 例 1 后的说明 |
+| 某一节只属于 Milvus | 删除整个命名块 | 例 1 后的说明 |
+| Cloud 独有一种语言的示例，如 Zilliz CLI | 给代码组增加一种语言 | 例 2 |
+| 某种语言的示例整个不同 | 替换或删除这种语言 | 例 2 后的说明 |
+| 代码只差一两行 | 替换、增加或删除这几行 | 例 3 |
 
 **怎样操作**
 
@@ -502,65 +511,91 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 3. 需要新内容时，在同一目录中写 **Cloud 内容文件**。
 4. 提交 PR，校验通过后合并。
 
-**变换的写法**
+**例 1：替换整个命名块**（OpenAI）
 
-一条变换有以下字段：
-
-| 字段 | 写什么 |
-|---|---|
-| `operation` | 怎么改：`add`（增加）、`replace`（替换）、`remove`（删除） |
-| `target.block` | 改哪个命名块 |
-| `target.language` | 只改代码组中的这种语言；值是代码块开头三个反引号后的语言名 |
-| `target.lines` | 只改这种语言中连续的几行；从原文复制，最多 5 行 |
-| `position` | 加在前面还是后面：`before` 或 `after`，只在下表注明的两种 `add` 中写 |
-| `content.file` | 新内容所在的 Cloud 内容文件 |
-| `content.lines` | 新的几行代码，直接写在配置中 |
-| `channel` | 只对 Prod 或只对 UAT 生效，见[场景 6](#场景-6让内容先只在-uat-显示) |
-
-目标分三级，每级都能做三种操作：
-
-| 目标 | `add` | `replace` | `remove` | 新内容写在哪 |
-|---|---|---|---|---|
-| 整个命名块（`block`） | 在块前或块后插入，必须写 `position` | 换掉整块 | 删掉整块 | `content.file`；替换代码组时写完整的代码组，多语言时含切换栏 |
-| 代码组中的一种语言（`block` + `language`） | 加一种原来没有的语言；不写 `position`，顺序由 Tabs 规则决定 | 换掉这种语言的代码 | 删掉这种语言 | `content.file`；只写一个该语言的代码块，不加切换栏 |
-| 一种语言中连续的几行（`block` + `language` + `lines`） | 在这几行前或后插入，必须写 `position` | 换掉这几行 | 删掉这几行 | `content.lines`，不用写缩进 |
-
-`language` 的值不一定等于标签页上显示的名字：NodeJS 写 `javascript`，cURL 写 `bash`，Zilliz CLI 写 `shell`。可用的值以 Tabs 规则为准。
-
-<details>
-<summary>每一级的写法示例</summary>
+Milvus 原文的 “Configure credentials” 一节已经包成命名块 `before-you-start`。在 `page.yaml` 中写：
 
 ```yaml
-transforms:
-  # 整个命名块：替换（OpenAI）
-  - operation: replace
+transforms:                        # 这一页的全部变换，每一项是一条
+  - operation: replace             # 怎么改：add（增加）、replace（替换）、remove（删除）
     target:
-      block: before-you-start
+      block: before-you-start      # 改哪个命名块
     content:
-      file: before-you-start.md          # 即 shared-docs/pages/openai/before-you-start.md
+      file: before-you-start.md    # 新内容所在的 Cloud 内容文件，与 page.yaml 同一目录
+```
 
-  # 整个命名块：在块后增加
+Cloud 内容文件 `shared-docs/pages/openai/before-you-start.md` 写完整的一节，包括标题，写法与 Milvus 原文相同：
+
+```markdown
+## Before you start
+
+……Cloud 的内容：在控制台创建集成……
+
+<div class="alert note">
+……
+</div>
+```
+
+生成后，Cloud 页面中这一节换成内容文件的内容；Milvus 页面不变。
+
+- 在这一节前后增加一段：`operation` 写 `add`，再加一行 `position: before` 或 `position: after`。
+- 删除这一节：`operation` 写 `remove`，只写 `target`，不写 `content`。
+
+**例 2：给代码组增加一种语言**（Filtered Search）
+
+```yaml
   - operation: add
     target:
-      block: choose-model
-    position: after
+      block: standard-filtering-code   # 一个代码组
+      language: shell                  # 只改这种语言；原来没有这种语言
     content:
-      file: cloud-regions.md
+      file: standard-filtering-cli.md  # 文件中只有一个 shell 代码块
+```
 
-  # 整个命名块：删除，只写目标
-  - operation: remove
-    target:
-      block: product-notes
+`standard-filtering-cli.md` 中只写一个代码块，不加语言切换栏：
 
-  # 一种语言：增加（Filtered Search 加 Zilliz CLI）
+````markdown
+```shell
+zilliz ……
+```
+````
+
+生成后，这个代码组的标签页多出 “Zilliz CLI”，位置由 Tabs 规则决定，所以不写 `position`。
+
+- 替换或删除一种语言：`operation` 换成 `replace` 或 `remove`；删除时不写 `content`。
+- `language` 写代码块开头三个反引号后的语言名，不一定等于标签页上显示的名字：NodeJS 写 `javascript`，cURL 写 `bash`，Zilliz CLI 写 `shell`。
+
+**例 3：改代码中的几行**（OpenAI 的 Java 示例）
+
+```yaml
   - operation: add
     target:
-      block: standard-filtering-code
-      language: shell                    # 原来没有这个语言
+      block: define-function-code
+      language: java
+      lines: |                         # 定位：从原文整行复制的一行或连续几行，最多 5 行
+        .param("model_name", "text-embedding-3-small")
+    position: after                    # 加在定位行之后；before 为之前
     content:
-      file: standard-filtering-cli.md    # 文件中是一个 shell 代码块
+      lines: |                         # 新的代码行，直接写在配置中，不用写缩进
+        .param("integration_id", "YOUR_INTEGRATION_ID")
+```
 
-  # 几行：替换（OpenAI 的 Python 示例）
+生成后，新的一行自动对齐定位行的缩进：
+
+```java
+    .param("provider", "openai")
+    .param("model_name", "text-embedding-3-small")
+    .param("integration_id", "YOUR_INTEGRATION_ID")    // 新增
+    .build();
+```
+
+- 删除几行：`operation` 写 `remove`，只写 `lines`，不写 `content` 与 `position`。
+- 替换几行：`operation` 写 `replace`，不写 `position`，见下面的例子。
+
+<details>
+<summary>替换几行的例子（OpenAI 的 Python 示例）</summary>
+
+```yaml
   - operation: replace
     target:
       block: define-function-code
@@ -569,33 +604,40 @@ transforms:
         # Optional parameters:
         # "credential": "apikey_dev",               # Optional: Credential label specified in milvus.yaml
     content:
-      lines: |                           # 不用写缩进
+      lines: |
         "integration_id": "YOUR_INTEGRATION_ID",
         # Optional parameters:
-
-  # 几行：在后面增加一行（OpenAI 的 Java 示例）
-  - operation: add
-    target:
-      block: define-function-code
-      language: java
-      lines: |
-        .param("model_name", "text-embedding-3-small")
-    position: after
-    content:
-      lines: |
-        .param("integration_id", "YOUR_INTEGRATION_ID")
 ```
 
-Java 示例生成后：
-
-```java
-    .param("provider", "openai")
-    .param("model_name", "text-embedding-3-small")
-    .param("integration_id", "YOUR_INTEGRATION_ID")    // 新增，自动对齐
-    .build();
-```
+两行一起替换，`integration_id` 放在前面，原来的 “Optional parameters” 注释保留在后面，避免必填参数出现在“可选参数”下面。
 
 </details>
+
+**字段与组合**
+
+<details>
+<summary>一条变换的全部字段</summary>
+
+| 字段 | 写什么 |
+|---|---|
+| `operation` | 怎么改：`add`（增加）、`replace`（替换）、`remove`（删除） |
+| `target.block` | 改哪个命名块 |
+| `target.language` | 只改代码组中的这种语言；值是代码块开头三个反引号后的语言名 |
+| `target.lines` | 只改这种语言中连续的几行；从原文复制，最多 5 行 |
+| `position` | 加在前面还是后面：`before` 或 `after`，只在下面的对照表注明的两种 `add` 中写 |
+| `content.file` | 新内容所在的 Cloud 内容文件 |
+| `content.lines` | 新的几行代码，直接写在配置中 |
+| `channel` | 只对 Prod 或只对 UAT 生效，见[场景 6](#场景-6让内容先只在-uat-显示) |
+
+</details>
+
+目标分三级，每级都能做三种操作：
+
+| 目标 | `add` | `replace` | `remove` | 新内容写在哪 |
+|---|---|---|---|---|
+| 整个命名块（`block`） | 在块前或块后插入，必须写 `position` | 换掉整块 | 删掉整块 | `content.file`；替换代码组时写完整的代码组，多语言时含切换栏 |
+| 代码组中的一种语言（`block` + `language`） | 加一种原来没有的语言；不写 `position`，顺序由 Tabs 规则决定 | 换掉这种语言的代码 | 删掉这种语言 | `content.file`；只写一个该语言的代码块，不加切换栏 |
+| 一种语言中连续的几行（`block` + `language` + `lines`） | 在这几行前或后插入，必须写 `position` | 换掉这几行 | 删掉这几行 | `content.lines`，不用写缩进 |
 
 **代码行的规则**
 
@@ -641,11 +683,12 @@ Cloud 内容文件放 `add` 与 `replace` 的新内容，与 `page.yaml` 在同�
 | 4-1 | 先校验全部变换，再生成页面；任何一条不成立，这一页生成失败，不跳过 |
 | 4-2 | 命名块的类型和语言按原文结构判断；Markdown 块上只能做整块操作 |
 | 4-3 | 代码行的缩进按上述规则自动处理，生成结果中不留多余空行 |
-| 4-4 | 代码 Tabs 按 Tabs 规则重新生成：语言顺序、必选语言、默认语言 |
+| 4-4 | 代码 Tabs 按 Tabs 规则重新生成，语言顺序、显示名和默认语言全站统一。多语言代码组必须有 Python；其他语言原文或变换中有就显示，没有就不显示，不加占位 |
 | 4-5 | Cloud 内容文件与原文经过同样的处理：变量、片段、产品过滤、组件转换 |
 | 4-6 | Milvus 站点的输出与原文一致，不受 zdoc 中任何变换影响 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 以下情况，PR 校验失败，这一页不能合并：
 
@@ -658,6 +701,8 @@ Cloud 内容文件放 `add` 与 `replace` 的新内容，与 `page.yaml` 在同�
 | 内容文件中有命名块标记或手写的 Tabs | 去掉 |
 | 删除了 Tabs 规则要求必须有的语言或默认语言 | 改为替换这种语言 |
 
+</details>
+
 **不做与已知局限**
 
 - 行号、正则、全文搜索、标题选择器等定位方式。
@@ -667,6 +712,7 @@ Cloud 内容文件放 `add` 与 `replace` 的新内容，与 `page.yaml` 在同�
 - 变量表达式、循环、条件模板，或把整段代码放进变量。
 - 一页拼接多篇原文的多个命名块。
 - 工具不判断不同语言的示例是否等价。
+- 原文中没有的语言不会出现在 Cloud 页面上。现有 Cloud 页面中的 Rust 示例，在 Phase 1 内容对齐时从飞书同步到 milvus-docs。
 
 **验收**：T04、T13（过滤部分）。
 
@@ -709,8 +755,6 @@ transforms:
         # Optional parameters:
 ```
 
-两行一起替换，`integration_id` 放在前面，原来的 “Optional parameters” 注释保留在后面，避免必填参数出现在“可选参数”下面。
-
 </details>
 
 <details>
@@ -729,7 +773,7 @@ transforms:
 
 **阶段**：Phase 1a　**谁**：工具自动处理，文档工程师按提示补充
 
-**实现**：[02b 链接与图片](./design/02b-links-and-images.md)、[05 图片上传](./design/05-publish-handoff.md#图片上传)
+**技术设计**：[02b 链接与图片](./design/02b-links-and-images.md)、[05 图片上传](./design/05-publish-handoff.md#图片上传)
 
 **背景**：Milvus 原文中的链接和图片是按 milvus.io 写的。原样放进 Cloud 页面，站内链接会指向 Cloud 不存在的页面，锚点会因为大小写规则不同而失效，图片可能在没人审核的情况下被换掉。
 
@@ -761,12 +805,23 @@ transforms:
 
 Milvus 站内页面按顺序查找，查到即停：
 
-| 顺序 | 查什么 | 结果 |
-|---|---|---|
-| 1 | 目标页也是共享页 | 用那一页，如 `./primary-key-search` |
-| 2 | 链接映射表中有这一页 | 用映射表中的地址 |
-| 3 | Cloud 有同名页面 | 用同名页面 |
-| 4 | 都没有 | 这一页生成失败，提示在映射表中补一行 |
+| 顺序 | 查什么 | 怎样判断 | 例子 |
+|---|---|---|---|
+| 1 | 目标页也是共享页 | 某个共享页的 `page.yaml` 中，`source.file` 就是这个 Milvus 页面 | 目标 `delete-entities.md` 已接入，链接换成 Cloud 的 `delete-entities`（示意） |
+| 2 | 链接映射表中有这一页 | `links.yaml` 中登记了这个 Milvus 文件名 | `boolean.md` 换成 `filtering-overview` |
+| 3 | Cloud 有同名页面 | 去掉 `.md` 后，Cloud 上有同样 slug 的页面 | `primary-key-search.md` 换成 Cloud 的 `primary-key-search` |
+| 4 | 都没有 | — | OpenAI 页中的 `embedding-function-overview.md`：这一页生成失败，提示在映射表中补一行 |
+
+- **人工登记排在同名查找之前**：登记的结果比自动猜测可靠；同名页面在 Cloud 上讲的其实是别的内容时，登记一行就能纠正。
+- **链接映射表是一张补丁表**，只补自动查找查不到的部分：
+
+  | 登记的这一行 | 以后 |
+  |---|---|
+  | 目标页以后也迁成共享页 | 第 1 步就能查到，这一行不再起作用，可以删 |
+  | 目标页 Cloud 不迁移，只是两边名字不同 | 一直需要 |
+  | Cloud 上没有对应页，只能指向 milvus.io | 一直需要 |
+
+  迁移的页面越多，这张表越短。
 
 **锚点**：milvus.io 的锚点保留大小写（如 `#Delete-Entities-by-Filtering-Conditions`），Cloud 的锚点全部小写，两边对标点的处理也不同。
 
@@ -795,7 +850,8 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 | 5-4 | Milvus 换图会让图片地址变化，出现在上游更新 PR 中，审核后才进入 Cloud |
 | 5-5 | 校验时只算出地址、不上传；合并后的正式发布才上传还没有的图片 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
@@ -804,6 +860,8 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 | 链接不属于任何一类 | PR 校验 | 回 milvus-docs 修正 |
 | 链接指向的共享页在这个版本中不存在；锚点找不到对应标题 | PR 校验 | 回 milvus-docs 修正，或调整采用的版本 |
 | 图片下载失败或不存在 | PR 校验 | 回源头修正 |
+
+</details>
 
 **不做与已知局限**
 
@@ -841,7 +899,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 **阶段**：Phase 1b　**谁**：文档工程师；原文的版本差异由工具处理
 
-**实现**：[04 两版合并](./design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02 两遍生成](./design/02-page-config.md#两遍生成与-channel)
+**技术设计**：[04 两版合并](./design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02 两遍生成](./design/02-page-config.md#两遍生成与-channel)
 
 **背景**：Cloud 的功能往往晚于 Milvus 上线。Milvus 文档已经写了新参数，Cloud 下个月才支持；在此之前，Prod 要继续显示旧的内容，UAT 则要能提前审阅新内容。
 
@@ -966,13 +1024,16 @@ transforms:
 | 6-6 | front matter 不能按通道区分；两个版本不同时用 Prod 的版本，并在记录中注明 |
 | 6-7 | `<NextChannel>` 包住列表、提示框和代码 Tabs 时都能正确显示；整页通道在各语言译文中同样生效 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
 | Cloud 的规则只在 UAT 的版本上失效 | 上游更新 PR 的校验，指出是 UAT 的版本 | 按上面第一种情况加一对 `channel` 规则；报告会给出建议 |
 | `channel` 不是 `current` 或 `next`；页面在该通道中不存在 | PR 校验 | 改 `page.yaml` |
 | Cloud 内容文件中手写的 `<NextChannel>` 落在工具生成的成对区域内 | PR 校验 | 改用 `channel` |
+
+</details>
 
 **验收**：T13。
 
@@ -992,15 +1053,13 @@ transforms:
 
 **阶段**：Phase 1b　**谁**：工具发起，文档工程师审核
 
-**实现**：[06 上游更新](./design/06-upstream-changes.md)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[06 上游更新](./design/06-upstream-changes.md)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：milvus-docs 每天都可能有新的修改。Cloud 要能及时知道，又不能一合并就跟着变：有的修改 Cloud 也适用，有的写法只适合 Milvus，有的涉及 Cloud 还没上线的功能。
 
+完整的链路是：社区或文档工程师在 milvus-docs 合并修改后，工具每天发现新提交，开出上游更新 PR；文档工程师审核合并后，新内容先在 UAT 显示，功能上线提升后才进入 Prod。
+
 **用户故事**：作为文档工程师，我不用盯着 milvus-docs：上游有修改时，我会收到一个 PR，告诉我哪些页面变了、变了什么、哪些地方需要复核；我决定采用、暂缓还是先修改。
-
-![上游变化成为 Cloud 上游更新 PR 的过程：milvus-docs 的 PR 经 CI 检查后合并，进入跟踪分支；zdoc 的上游更新工作流每天定时运行（也可手动），把新提交作为 next 重新生成并比较变化，在 zdoc 发起上游更新 PR，改 lock.yaml 的 next，附生成结果差异和影响报告；命名块被删除或改名时校验失败，在同一个 PR 中修改，合并前旧版本继续有效。文档工程师审核：修改则回到源文件，暂缓则保持旧版本，合并则新版本先在 UAT 可见；Cloud 发布时提升，把 current 改为 next，Prod 采用新版本。](./assets/upgrade-pr-flow.png)
-
-图 3 · 上游变化怎样成为 Cloud 的上游更新 PR
 
 **怎样操作**
 
@@ -1061,7 +1120,8 @@ transforms:
 | 7-9 | 已下线的页面不再检查 |
 | 7-10 | 社区在 milvus-docs 中的 PR 不运行 zdoc 的任何代码，也拿不到 Cloud 的凭据 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 结果 | 怎样改 |
 |---|---|---|
@@ -1070,6 +1130,8 @@ transforms:
 | 原文被删除 | 同上 | 考虑下线这一页（[场景 10](#场景-10下线一页)） |
 | 检查本身出错，例如网络问题 | 下一次定时运行自动重试；失败沿用 zdoc 现有的飞书通知 | — |
 | milvus-docs 的分支历史被改写，记录的版本不在分支上 | 失败并通知 | 人工处理 |
+
+</details>
 
 **不做与已知局限**
 
@@ -1111,7 +1173,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 **阶段**：Phase 1b　**谁**：文档工程师发起，工具开 PR
 
-**实现**：[04 提升](./design/04-channels-and-lock.md#提升)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[04 提升](./design/04-channels-and-lock.md#提升)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：功能上线时，Prod 要采用 UAT 已在显示的版本。现在这一步是在飞书多维表格中逐页把 `Release Channel` 从 `NEXT` 改为 `CURRENT`。迁移后，改的是每页 `lock.yaml` 中 Prod 用的版本。
 
@@ -1168,12 +1230,15 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 8-3 | 合并后，在下一次发布运行时进入网站（时延见[第 7 节](#7-待确认的问题)） |
 | 8-4 | 这些页面还开着的上游更新 PR，在下一次运行时按新的版本重建 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 结果 |
 |---|---|
 | 填写的页面不存在 | 这一页不进入 PR，运行结果中列出 |
 | 这一页 Prod 与 UAT 已是同一个版本 | 同上 |
+
+</details>
 
 **验收**：T13。
 
@@ -1193,7 +1258,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 **阶段**：Phase 1b，只在 Phase 1 过渡期存在　**谁**：文档负责人
 
-**实现**：[05b 切换与归属](./design/05b-cutover-and-ownership.md)、[05 交给发布](./design/05-publish-handoff.md)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[05b 切换与归属](./design/05b-cutover-and-ownership.md)、[05 交给发布](./design/05-publish-handoff.md)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：Phase 1 飞书还不能退出。接入一页之后，网站上仍是飞书生成的版本；飞书上也可能还有人在改它。要有一个明确的时刻，把这一页交给 Git：从此网站上的这一页由 Git 生成，飞书不能再改它。这个时刻叫**激活**。已激活的页面记在一份清单中（`active.json`），由工具维护，人不手改。
 
@@ -1201,15 +1266,17 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 ![一页从飞书切换到 Git 的三步，都由文档负责人进行。比较：生成 Git 版与网站当前飞书版的差异，不改网站。确认：由人判断飞书最近的修改已在 Git 中，或飞书已暂时冻结。激活：工具先检查能否生成、链接与图片能否解析、飞书节点是否存在且路径一致，通过后正文与导航同时切换。之后网站上是 Git 版，飞书不能再改这一页，导航仍由飞书目录决定；部署失败时重试或回滚，来源仍是 Git。确认不通过或检查不通过时不激活，网站保持飞书版，修正后重新比较。接入之后才能激活，一页只激活一次，不提供切回飞书。](./assets/page-activation.png)
 
-图 4 · 一页从飞书切换到 Git（激活）
+图 3 · 一页从飞书切换到 Git（激活）
 
 **怎样操作**
 
-一页只激活一次，由文档负责人在 zdoc 中手动进行。比较和激活的入口形式由 zdoc 维护者确定。
+一页只激活一次，由文档负责人在 zdoc 的 GitHub Actions 中先后运行两次：先“比较”，再“激活”。两者做成现有 Fetch 工作流的参数，还是单独的工作流，由 zdoc 维护者确定。
 
-1. **比较**：指定这一页，发起一次比较。工具生成两份页面的差异：一份是 Git 版本，一份是网站当前的飞书版本。比较不改网站。
+1. **比较**：运行“比较”，填写页面标识。工具生成两份页面的差异：一份是 Git 版本，一份是网站当前的飞书版本；差异显示在这次运行的结果中。比较不改网站。
 2. **确认**：看过差异，确认飞书最近的修改已反映到 Git 中，或这一页在飞书中已暂时冻结；确认生成结果已审核。这一步由人判断，工具不检查。
-3. **激活**：指定这一页，发起激活。工具先检查，通过后切换。
+3. **激活**：运行“激活”，填写页面标识。运行开始前，需要文档负责人在 GitHub 中批准；批准后工具先检查，通过后切换。
+
+`active.json` 由激活这次运行写入，不能手工编辑：它放在 zdoc 的 dev 分支上，只有工作流能写；而且它要和这一页的正文、导航在同一个提交中一起写入。
 
 **系统行为**
 
@@ -1224,7 +1291,8 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 9-7 | 激活与提升互不依赖：激活决定这一页由飞书还是 Git 生成，一页只做一次；提升决定 Prod 用哪个 Git 版本，每次发版都做。功能未上线的新页面可以先激活、只在 UAT 显示 |
 | 9-8 | 网站部署在激活之后进行；部署失败时重试或回滚，编辑来源仍是 Git，不交回飞书 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 结果 |
 |---|---|
@@ -1232,6 +1300,8 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 同一个地址既有飞书页面又有 Git 页面 | 生成失败 |
 | 飞书记录的发布目标或路径与页面配置不一致 | 这一页生成失败 |
 | 飞书任务试图改写或删除已切换的页面 | 失败，页面保持不变 |
+
+</details>
 
 **不做与已知局限**
 
@@ -1275,7 +1345,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 **阶段**：Phase 1b，按需　**谁**：文档工程师
 
-**实现**：[04 下线一页](./design/04-channels-and-lock.md#下线一页)、[05b 下线完成](./design/05b-cutover-and-ownership.md#下线完成)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[04 下线一页](./design/04-channels-and-lock.md#下线一页)、[05b 下线完成](./design/05b-cutover-and-ownership.md#下线完成)、[08 工作流](./design/08-workflows-and-permissions.md)
 
 **背景**：功能下线或页面合并时，一页要从网站上移除。和上线一样，它要先从 UAT 消失，到发布时再从 Prod 消失；Phase 1 还要处理导航中的飞书节点。
 
@@ -1311,11 +1381,14 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 10-2 | 移除时，这一页的所有内容在同一次发布中一起移除 |
 | 10-3 | 下线后，这一页不再检查上游更新；还开着的上游更新 PR 被关闭并写明原因 |
 
-**出错时**
+<details>
+<summary>出错时</summary>
 
 | 情况 | 结果 |
 |---|---|
 | 填写的页面不存在，或还没激活 | 这一页不进入 PR，运行结果中列出 |
+
+</details>
 
 **验收**：T07。
 
@@ -1360,7 +1433,6 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 | 接入后、激活前，文档工程师在哪里看到生成的页面 | PR 校验生成完整页面，但没有可以浏览的地方；激活前的比较只给差异 | 3、9 |
 | 共享配置合并后，是否立刻触发一次发布 | 待定；不触发时最多等约 8 小时 | 7、8 |
 | UAT 部署是自动还是人工启动 | 待核实，决定合并后多久能在 UAT 看到 | 全部 |
-| 共享页对各种代码语言的要求 | 原型中 Python、Java、Go、Rust、C++、NodeJS、cURL 都必须有，Zilliz CLI 可选；但 milvus-docs 中没有 Rust 示例 | 3、4 |
 | Milvus 警告框（`alert warning`）在 Cloud 上的样式 | 沿用 zdoc 现有的 danger 样式（🚧） | 3 |
 | 迁移页的导航由谁管 | Phase 1 仍在飞书目录中维护 | 3、9、10 |
 | Milvus 侧是否校验锚点 | Phase 1 不做 | 8 |

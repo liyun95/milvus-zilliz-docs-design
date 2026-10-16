@@ -50,7 +50,7 @@ Phase 1 分两步：
 
 **任务**
 
-1. **内容**：Delete Entities 两端正文对齐，确定共同修订与产品差异，产品值改为变量；审核 SDK 适用性。
+1. **内容**：Delete Entities 两端正文对齐，确定共同修订与产品差异，产品值改为变量；飞书上已有的语言示例（如 Rust）同步到 milvus-docs，并确认 milvus.io 能显示这些语言；审核 SDK 适用性。
 2. **md2md**：实现只做预处理的入口，包括受控读取、依赖报告与错误检查；实现命名块的解析、校验与清理（[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md)）；一次发版，并在 Milvus CI 中固定版本，PR 检查中加入命名块校验。
 3. **zdoc 生成**：按固定 commit 获取原文，定位命名块并生成命名块清单，调用 md2md 展开变量，生成 Tabs 与 MDX。
 4. **zdoc 生成**：接入 PR 自动写入 lock，PR 校验覆盖共享页；接入现有 stage 与 UAT 预览；候选任务不具备生产写权限。
@@ -71,7 +71,7 @@ Phase 1 分两步：
 
 **任务**
 
-1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤），加命名块。
+1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤；飞书上已有的 Rust 等语言示例同步到 milvus-docs），加命名块。
 2. **zdoc 生成**：add / replace / remove，目标包括命名块、语言示例和代码中连续的几行；产品过滤器接入 Git 输入（用于 Cloud 内容文件）；lock 记录 current / next 两个 commit，两版各生成一遍，按块比较并成对输出 `<NextChannel>`。
 3. **zdoc 生成**：依赖索引、影响报告、上游更新 PR，下线与提升工作流；按[产品需求场景 7](./prd.md#场景-7审核上游更新)处理各类上游变化，实现见[技术设计 06](./design/06-upstream-changes.md)。
 4. **zdoc 发布**：页级混源；激活前比较与同批激活；下线完成；旧飞书任务隔离；重新生成比对；过滤、通道、翻译与恢复接入。
@@ -116,9 +116,9 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 共享配置变化时自动触发 Fetch | master 上 `shared-docs/` 变化时自动触发一次只处理 Guides 的 Fetch，上游更新 PR、提升 PR 合并后不必等到下一次定时运行（最多 8 小时）；代价是 Fetch 运行次数增加（[技术设计 05](./design/05-publish-handoff.md#触发时机)） | 文档负责人 |
 | UAT 部署的触发方式 | 生成结果写入 dev 后，外部 Jenkins 是自动部署 UAT，还是由人工启动；zdoc README 的写法看起来是人工启动，未核实。决定合并后多久能在 UAT 看到 | 文档负责人 |
 | 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。暂按 A 处理（[技术设计 05b](./design/05b-cutover-and-ownership.md#导航phase-1)） | 文档负责人 |
-| 共享页的代码语言要求 | 现有 Cloud 页面的代码组有 Rust 与 C++；milvus-docs 中没有 Rust 示例，C++ 只有 67 个代码组有，zdoc 现有的飞书转换中 C++ 暂时被过滤。Tabs 规则中哪些语言“必须有”，决定每个共享页是否都要在 zdoc 中补 Rust 或回上游补齐（[技术设计 07](./design/07-site-adaptation.md#代码-tabs)） | 文档负责人 |
+| 共享页的代码语言要求 | 已定（2026-10-16）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。现有 Cloud 页面的 Rust 示例在内容对齐时从飞书同步到 milvus-docs（[技术设计 07](./design/07-site-adaptation.md#代码-tabs)） | 文档负责人 |
 | `alert warning` 的样式 | milvus-docs 中有 18 处 `<div class="alert warning">`：转为 zdoc 现有的 `danger`（🚧），还是 Docusaurus 的 `warning`（[技术设计 07](./design/07-site-adaptation.md#提示框)） | 文档负责人 |
-| Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活所需的“比较”“激活”两种手动运行以什么形式提供（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
+| Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活所需的“比较”“激活”两种手动运行以什么形式提供；链接查找中“同名页面”的名单从哪里读取（[技术设计 02b](./design/02b-links-and-images.md#链接)）（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
 | 重新生成比对的接法 | Fetch 写 dev 前怎样比对；修改 dev 中共享页生成结果的 PR 由哪个检查拦下（[技术设计 05](./design/05-publish-handoff.md#发布保护)） | zdoc 维护者 |
 
 每项确认都要留下接口约定、负责人和对应测试。未确认的接口不能按“直接复用”估为零工作量；若影响 md2md 发版或其他仓库，同步调整排期。
