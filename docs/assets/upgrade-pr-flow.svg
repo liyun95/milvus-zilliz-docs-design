@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="768" height="384" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
 <title id="title">上游变化怎样成为 Cloud 的上游更新 PR</title>
-<desc id="desc">社区或文档工程师向 milvus-docs 提交 PR，CI 检查命名块、变量和 Milvus 构建，合并后进入跟踪分支。zdoc 工具定时或按事件发现新提交，把它作为 next 重新生成受影响的页面，比较整页、命名块和被替换原文的变化，然后在 zdoc 发起上游更新 PR，更新 lock 的 next，附生成结果差异和影响报告。如果命名块被删除或改名，旧版本继续有效，需要显式迁移。Cloud 文档工程师审核上游更新 PR：合并后新版本在 UAT 可见；Cloud 发布时把 current 改为 next（提升），Prod 采用新版本；暂不合并则保持已批准版本；需要修改时回到源文件。</desc>
+<desc id="desc">社区或文档工程师向 milvus-docs 提交 PR，CI 检查命名块、变量和 Milvus 构建，合并后进入跟踪分支。zdoc 的上游更新工作流每天定时运行（也可手动），一天内的提交一并处理：把新提交作为 next 重新生成受影响的页面，比较整页、命名块和被替换原文的变化，然后在 zdoc 发起上游更新 PR，改 lock.yaml 的 next，附生成结果差异和影响报告。如果命名块被删除或改名，校验失败，文档工程师在同一个 PR 中修改，合并前旧版本继续有效。文档工程师审核上游更新 PR：合并后新版本在 UAT 可见；Cloud 发布时把 current 改为 next（提升），Prod 采用新版本；暂不合并则保持已批准版本；需要修改时回到源文件。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:18px;font-weight:600;text-anchor:middle;}.sub{font-size:15px;text-anchor:middle;fill:#64748b;}.lane{font-size:17px;font-weight:600;text-anchor:middle;}.warn{font-size:15px;fill:#b91c1c;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
 <rect width="1280" height="640" fill="#ffffff"/>
@@ -12,7 +12,7 @@
 <path d="M170 20 V140 M170 150 V330 M170 340 V520 M170 530 V620" stroke="#cbd5e1"/>
 <text x="95" y="85" class="lane">milvus-docs</text>
 <text x="95" y="245" class="lane">zdoc 工具</text>
-<text x="95" y="425" class="lane">Cloud 文档</text><text x="95" y="449" class="lane">工程师</text>
+<text x="95" y="425" class="lane">文档</text><text x="95" y="449" class="lane">工程师</text>
 <text x="95" y="581" class="lane">发布</text>
 
 <rect x="190" y="40" width="160" height="80" rx="10" fill="#a7f3d0" stroke="#047857"/>
@@ -25,17 +25,17 @@
 
 <path class="edge" d="M630 120 V163"/>
 <rect x="550" y="170" width="160" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="630" y="198" class="head">发现新提交</text><text x="630" y="222" class="sub">定时或事件触发</text><text x="630" y="242" class="sub">合并重复事件</text>
+<text x="630" y="198" class="head">发现新提交</text><text x="630" y="222" class="sub">每天定时，也可手动</text><text x="630" y="242" class="sub">一天的提交一并处理</text>
 <rect x="730" y="170" width="160" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
 <text x="810" y="198" class="head">重新生成</text><text x="810" y="222" class="sub">新提交作为 next</text><text x="810" y="242" class="sub">比较变化</text>
 <rect x="910" y="170" width="160" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="990" y="198" class="head">发起上游更新 PR</text><text x="990" y="222" class="sub">改 lock 的 next</text><text x="990" y="242" class="sub">差异 · 影响报告</text>
+<text x="990" y="198" class="head">发起上游更新 PR</text><text x="990" y="222" class="sub">改 lock.yaml 的 next</text><text x="990" y="242" class="sub">差异 · 影响报告</text>
 <path class="edge" d="M710 210 H723"/><path class="edge" d="M890 210 H903"/>
 
 <path d="M810 250 V266" stroke="#b91c1c" stroke-width="2" stroke-dasharray="4 4"/>
 <rect x="550" y="266" width="340" height="56" rx="8" fill="#fef2f2" stroke="#b91c1c" stroke-dasharray="6 4"/>
-<text x="566" y="290" class="warn">命名块被删除或改名：阻止更新，</text>
-<text x="566" y="313" class="warn">旧版本继续有效，需要显式迁移</text>
+<text x="566" y="290" class="warn">命名块被删除或改名：校验失败，</text>
+<text x="566" y="313" class="warn">同一个 PR 中修改，合并前旧版本有效</text>
 
 <path class="edge" d="M990 250 V393"/>
 <rect x="910" y="400" width="160" height="80" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
