@@ -49,29 +49,22 @@ languages:                  # 顺序即标签页顺序
   - value: python           # Cloud 的语言值，用于 <TabItem value> 和代码块语言名
     label: Python           # 标签页上显示的名字
     required: true          # 每个多语言代码组都必须有
-  - value: java
+  - value: java             # 不写 required：原文有就显示，没有就不显示
     label: Java
-    required: true
   - value: go
     label: Go
-    required: true
   - value: rust
     label: Rust
-    required: true
   - value: c++
     label: C++
     aliases: [cpp]          # Milvus 原文中的语言名
-    required: true
   - value: javascript
     label: NodeJS
-    required: true
   - value: bash
     label: cURL
     aliases: [curl]
-    required: true
   - value: shell
     label: Zilliz CLI
-    required: false         # 只在明确提供时出现
 ```
 
 | 字段 | 必填 | 说明 |
@@ -84,7 +77,7 @@ languages:                  # 顺序即标签页顺序
 | `languages[].aliases` | 否 | Milvus 原文中对应的语言名；变换中的 `language` 写原文的语言名，也可以写 `value` |
 | `languages[].required` | 否 | 默认 `false`；为 `true` 时，每个多语言代码组都必须有这种语言 |
 
-上面是本地原型使用的取值，加上 `aliases`。哪些语言 `required`、`alert warning` 用哪种样式，待文档负责人确认（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)）。
+Phase 1 的取值已由文档负责人确定（2026-10-16）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。语言顺序与显示名沿用本地原型，加上 `aliases`。`alert warning` 用哪种样式待确认（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)）。
 
 ### 提示框
 
