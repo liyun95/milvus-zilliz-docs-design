@@ -51,7 +51,7 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 读取
 |---|---|---|
 | `lock.yaml` | Git 生成时，Prod 与 UAT 各用 Milvus 原文的哪个版本 | 本篇 |
 | `page.yaml` | 拿到原文后怎样加工 | [02](./02-page-config.md) |
-| 激活（`active.json`） | 网站上这一页用 Git 生成的版本，还是飞书的版本；只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md#归属与生效配置) |
+| 激活（`active.json`） | 网站上这一页用 Git 生成的版本，还是飞书的版本；只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
 
 激活之前，Git 照样按 `lock.yaml` 生成两个版本，只是作为候选结果，网站上仍是飞书版；`lock.yaml` 的变化要等激活之后才体现在网站上。
 

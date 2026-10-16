@@ -116,7 +116,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 共享配置变化时自动触发 Fetch | master 上 `shared-docs/` 变化时自动触发一次只处理 Guides 的 Fetch，上游更新 PR、提升 PR 合并后不必等到下一次定时运行（最多 8 小时）；代价是 Fetch 运行次数增加（[接口设计 05](./interfaces/05-publish-handoff.md#触发时机)） | 文档负责人 |
 | UAT 部署的触发方式 | 生成结果写入 dev 后，外部 Jenkins 是自动部署 UAT，还是由人工启动；zdoc README 的写法看起来是人工启动，未核实。决定合并后多久能在 UAT 看到 | 文档负责人 |
 | 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。暂按 A 处理（[接口设计 05b](./interfaces/05b-cutover-and-ownership.md#导航phase-1)） | 文档负责人 |
-| Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[接口设计 05](./interfaces/05-publish-handoff.md#交接发生在哪里)） | zdoc 维护者 |
+| Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[接口设计 05](./interfaces/05-publish-handoff.md#交接发生在哪里)）；激活所需的“比较”“激活”两种手动运行以什么形式提供（[接口设计 05b](./interfaces/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
 | 重新生成比对的接法 | Fetch 写 dev 前怎样比对；修改 dev 中共享页生成结果的 PR 由哪个检查拦下（[接口设计 05](./interfaces/05-publish-handoff.md#发布保护)） | zdoc 维护者 |
 
 每项确认都要留下接口约定、负责人和对应测试。未确认的接口不能按“直接复用”估为零工作量；若影响 md2md 发版或其他仓库，同步调整排期。
