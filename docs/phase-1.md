@@ -111,13 +111,13 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 事项 | 现状 | 和谁确认 |
 |---|---|---|
 | 变换规则只对一个通道生效 | 页面配置的变换默认对 Prod 与 UAT 两个版本都生效。上游修改了 Cloud 定位的代码行或命名块时，过渡期内旧写法只在 `current` 中存在、新写法只在 `next` 中存在，上游更新 PR 无法合并；Cloud 想只在下次发布时用自己的内容替换某一节也无法表达。方案：变换加可选字段 `channel`（`current` / `next`），提升时由工具清理（[技术设计 02](./prd.md#场景-6让内容先只在-uat-显示)）。已有方案，待确认 | 文档负责人 |
-| Milvus 侧的锚点校验 | milvus-docs 的链接检查（`check-link.js`）只检查页面、不检查锚点，标题改名留下的断链拦不住。直接加校验要先修历史断链；以后可以只检查 PR 新造成的断链。Phase 1 不做 | 文档负责人 |
+| Milvus 侧的锚点校验 | milvus-docs 的链接检查（`check-link.js`）只检查页面、不检查锚点，标题改名留下的断链拦不住。直接加校验要先修历史断链；以后可以只检查 PR 新造成的断链。已定：Phase 1 不做 | 文档负责人 |
 | Cloud 文档能否链接到 Milvus 站点 | Milvus 原文链接的页面在 Cloud 没有对应页时，可以在链接映射表中明确写成 milvus.io 地址，或要求作者删改那句话。暂按允许、只能在映射表中明确写出处理（[技术设计 02b《链接与图片》](./design/02b-links-and-images.md)） | 文档负责人 |
 | 共享配置变化时自动触发 Fetch | master 上 `shared-docs/` 变化时自动触发一次只处理 Guides 的 Fetch，上游更新 PR、提升 PR 合并后不必等到下一次定时运行（最多 8 小时）；代价是 Fetch 运行次数增加（[技术设计 05](./design/05-publish-handoff.md#触发时机)） | 文档负责人 |
 | UAT 部署的触发方式 | 生成结果写入 dev 后，外部 Jenkins 是自动部署 UAT，还是由人工启动；zdoc README 的写法看起来是人工启动，未核实。决定合并后多久能在 UAT 看到 | 文档负责人 |
 | 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。暂按 A 处理（[技术设计 05b](./design/05b-cutover-and-ownership.md#导航phase-1)） | 文档负责人 |
-| 共享页的代码语言要求 | 已定（2026-10-16）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。现有 Cloud 页面的 Rust 示例在内容对齐时从飞书同步到 milvus-docs（[技术设计 07](./design/07-site-adaptation.md#代码-tabs)） | 文档负责人 |
-| `alert warning` 的样式 | milvus-docs 中有 18 处 `<div class="alert warning">`：转为 zdoc 现有的 `danger`（🚧），还是 Docusaurus 的 `warning`（[技术设计 07](./design/07-site-adaptation.md#提示框)） | 文档负责人 |
+| 共享页的代码语言要求 | 推动者建议，待文档负责人确认：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。现有 Cloud 页面的 Rust 示例在内容对齐时从飞书同步到 milvus-docs（[技术设计 07](./design/07-site-adaptation.md#代码-tabs)） | 文档负责人 |
+| `alert warning` 的样式 | 已定：与 zdoc 现有页面一致，转为 `<Admonition type="warning" icon="🚧" title="Warning">`（[技术设计 07](./design/07-site-adaptation.md#提示框)） | — |
 | Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活所需的“比较”“激活”两种手动运行以什么形式提供；链接查找中“同名页面”的名单从哪里读取（[技术设计 02b](./design/02b-links-and-images.md#链接)）（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
 | 重新生成比对的接法 | Fetch 写 dev 前怎样比对；修改 dev 中共享页生成结果的 PR 由哪个检查拦下（[技术设计 05](./design/05-publish-handoff.md#发布保护)） | zdoc 维护者 |
 
