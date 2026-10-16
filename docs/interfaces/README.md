@@ -1,6 +1,6 @@
 # 接口设计
 
-本目录面向 [zdoc](https://github.com/zilliztech/zdoc) 与 [md2md](https://github.com/zilliztech/md2md) 的维护者，是 Phase 1 各接口的唯一定义，也是接口评审的议程。为什么改、整体怎么做见[方案总览](../proposal.md)；文档作者怎么写见[共享页面的写法与配置](../consumption-schema.md)；实施顺序、验收与各接口的状态见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
+本目录面向 [zdoc](https://github.com/zilliztech/zdoc) 与 [md2md](https://github.com/zilliztech/md2md) 的维护者，是 Phase 1 各接口的唯一定义，也是接口评审的议程。为什么改、整体怎么做见[方案总览](../proposal.md)；文档工程师怎样工作、怎么写见[产品需求](../prd.md)；实施顺序、验收与各接口的状态见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
 
 生产实现与集成验收尚未完成。Phase 1 分两个阶段（见[Phase 1 实施计划](../phase-1.md)）：Phase 1a 跑通整篇复用，例子用 Delete Entities；Phase 1b 加入差异、上游更新与切换，例子用 OpenAI。术语见[术语表](./glossary.md)。
 

@@ -133,7 +133,7 @@ zh-CN 是独立产品站点，不等于英文 Guides 的普通翻译 locale；�
 
 ## 7. 共享内容接入边界
 
-共享源从 milvus-docs 的固定修订读取，由 zdoc 扫描、组装和适配，再接入既有发布流程。具体规则以[接口设计](../docs/interfaces/README.md)和[消费规范](../docs/consumption-schema.md)为准；本审计记录现有能力，不另行维护一套配置方案。
+共享源从 milvus-docs 的固定修订读取，由 zdoc 扫描、组装和适配，再接入既有发布流程。具体规则以[接口设计](../docs/interfaces/README.md)和[产品需求](../docs/prd.md)为准；本审计记录现有能力，不另行维护一套配置方案。
 
 Milvus 的 `sync-shared-scripts` 有同步 Lark 脚本的历史机制，但其路径与当前 zdoc 布局不同，不能据此认定生产仍共享同一版本，也不能把脚本同步当成共享正文消费接口。
 
