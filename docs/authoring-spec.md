@@ -20,6 +20,12 @@
 | 代码 Tabs 规则 | zdoc `shared-docs/presentation/cloud-sdk-tabs.yaml` | zdoc 维护者 | — |
 | 共享来源配置 | zdoc `shared-docs/source.yaml` | zdoc 维护者 | — |
 
+每个文件影响生成页面的哪一部分：
+
+![一个共享页的文件，以 OpenAI 页为例。milvus-docs 中有共享原文（每页一份）和 Milvus 默认变量（共用）。zdoc 的 shared-docs 目录中，决定页面内容的有页面配置（每页一份）、Cloud 内容文件（按需）、Cloud 变量（共用）、链接映射表（共用）和代码 Tabs 规则（工程维护）；决定用哪个版本、不提供内容的有 lock.yaml（每页一份，工具写入）和 source.yaml（工程维护）。生成的页面中，标题、描述、标签与路由来自页面配置，导航来自飞书目录；正文来自共享原文，绑定 Cloud 变量，链接按映射表对应；替换的一节来自 Cloud 内容文件；代码 Tabs 来自共享原文的代码，凭证参数行按页面配置中的规则替换，再按 Tabs 规则生成，原文有哪些语言就显示哪些；Prod 与 UAT 各用 lock.yaml 中记录的版本。](./assets/file-relationships.png)
+
+图 1 · 一个共享页由哪些文件组成、各影响页面的哪一部分（以 OpenAI 页为例）
+
 ## 2. 原文中的写法
 
 | 写法 | 例子 | 规则见 |
