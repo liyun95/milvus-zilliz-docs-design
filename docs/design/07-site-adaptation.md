@@ -109,7 +109,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 | front matter | 生成方式 |
 |---|---|
-| `title`、`description` | 默认取原文的 `title`、`summary`，`metadata` 中写了就用它；按手册加后缀，如 `\| Cloud`、`\| BYOC` |
+| `title`、`description` | 默认取原文的 `title`、`summary`，`metadata` 中写了就用它；按手册加后缀：`guides` 加 `\| Cloud`，`guides-byoc` 加 `\| BYOC`。规则与 zdoc 飞书转换器中的 `__title_suffix`（`packages/docs-tooling/src/lark/larkDocWriter.js`）相同，生成结果与现有页面一致 |
 | `beta` | 取 `metadata.beta`，默认 `FALSE` |
 | `slug` | `/` 加页面标识 |
 | `sidebar_label`、`sidebar_position` | Phase 1 按飞书节点填写，见 [05b](./05b-cutover-and-ownership.md#导航phase-1) |
