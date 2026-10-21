@@ -158,7 +158,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 
 | 任务 | 做什么 | 谁 | 排在哪里 |
 |---|---|---|---|
-| R1 md2md 发版准备 | ① 给 milvus-docs 开 PR，把 md2md 固定在现在的版本；② 在 npmjs.com 上为 `@zilliz/mdtomd` 添加可信发布者（Trusted Publishing），代替已失效的 `NPM_TOKEN`：GitHub Actions，`zilliztech` / `md2md`，工作流文件名 `release.yml`，Environment 留空；Allowed actions 中 `npm publish` 与 `npm dist-tag` 都不勾，只允许暂存发布（staged publishing），每个版本由推动者用双因素认证批准后才公开（**已完成**，2026-10-21）；第一次用它发版成功后，再把 Publishing access 改为禁止 bypass 令牌；③ 新建 `.github/workflows/release.yml` 负责发版，不存令牌，用 `npm stage publish`（需要 npm CLI 11.15.0、Node 22.14 及以上；semantic-release 是否支持暂存发布由 WP2 先核实），文件名必须与 ② 中填的一致；`ci.yml` 改为只跑测试；交给 WP2 | ① 可交给 Agent；② 推动者；③ WP2 | ① 必须在 WP1 合并之前：md2md 合并到 master 就会自动发版，而 milvus-docs 现在安装时不固定版本，新代码会直接进入 Milvus 的正式构建 |
+| R1 md2md 发版准备 | ① 给 milvus-docs 开 PR，把 md2md 固定在现在的版本（**已完成**：#3691 `v3.0.x`、#3692 `v2.6.x`、#3693 `v2.5.x`、#3694 `preview`）；② 在 npmjs.com 上为 `@zilliz/mdtomd` 添加可信发布者（Trusted Publishing），代替已失效的 `NPM_TOKEN`：GitHub Actions，`zilliztech` / `md2md`，工作流文件名 `release.yml`，Environment 留空；Allowed actions 中 `npm publish` 与 `npm dist-tag` 都不勾，只允许暂存发布（staged publishing），每个版本由推动者用双因素认证批准后才公开（**已完成**，2026-10-21）；第一次用它发版成功后，再把 Publishing access 改为禁止 bypass 令牌；③ 新建 `.github/workflows/release.yml` 负责发版，不存令牌，用 `npm stage publish`（需要 npm CLI 11.15.0、Node 22.14 及以上；semantic-release 是否支持暂存发布由 WP2 先核实），文件名必须与 ② 中填的一致；`ci.yml` 改为只跑测试；交给 WP2 | ① 可交给 Agent；② 推动者；③ WP2 | ① 必须在 WP1 合并之前：md2md 合并到 master 就会自动发版，而 milvus-docs 现在安装时不固定版本，新代码会直接进入 Milvus 的正式构建 |
 | C1–C3 内容对齐 | Delete Entities（C1，1a）、Filtered Search 与 OpenAI（C2、C3，1b）按 2.4 节的五步对齐 | 文档工程师 | 在批准对应页的基准输出之前；用到 WP4、WP5 生成的临时结果 |
 
 为什么用 Trusted Publishing：md2md 的发版配置最后修改于 2022 年，当时只能用令牌；npm 在 2025 年底作废了旧式令牌，新的写权限令牌最长 90 天就过期。Trusted Publishing 由 GitHub 在发版时现场证明身份，仓库中不存密钥，也不用定期更换。
@@ -169,7 +169,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 |---|---|---|---|---|
 | WP0 | zdoc | 测试与目录骨架：目录、需求清单与覆盖检查、合成仓库的构建器、适配器接口与假实现、基准输出与错误样例的运行器、对照表登记、目录下的 `AGENTS.md`；不含业务逻辑 | — | — |
 | WP1 | md2md | 命名块的解析、校验与清除；`md2md-blocks check` 命令；契约用例 | `2-1`–`2-3`、命名块错误码、T01 | 合并前要完成 R1 ① |
-| WP2 | md2md | 只做预处理的入口：变量、片段、依赖报告、错误；契约用例；回归脚本；提交锁文件，CI 按锁文件安装；发版工作流改用 Trusted Publishing，发一个版本，再给 milvus-docs 开 PR 升级到这个版本 | `1-2`–`1-5`、变量与片段错误码、T02、T03、T11 | WP1；R1 |
+| WP2 | md2md | 只做预处理的入口：变量、片段、依赖报告、错误；契约用例；回归脚本；提交锁文件，CI 按锁文件安装；发版工作流改用 Trusted Publishing，发一个版本，再给 milvus-docs 的 `v3.0.x` 开 PR 升级到这个版本，并在 PR 检查中加入命名块校验 | `1-2`–`1-5`、变量与片段错误码、T02、T03、T11 | WP1；R1 |
 | WP3 | zdoc | 读取：`source.yaml`、`page.yaml`、`lock.yaml` 的 schema；按 commit 读原文；调用 md2md 定位命名块并判断类型与语言（包括列表中的代码块，见技术设计 01 的已知局限）、展开变量；输出变换前的 Markdown | `1-1`、`2-4`、`2-5`、`3-1`、`3-7`，页面配置与 lock 的错误码 | WP0 |
 | WP4 | zdoc | 站点适配：代码 Tabs、提示框、front matter（含 `beta`）、MDX 兼容、标题锚点 | `2-6`、`3-4`、`3-5`，站点适配错误码，T06 的一部分 | WP3 |
 | WP5 | zdoc | 链接与图片：四步查找、锚点换算、图片按内容命名（只算地址） | `5-1`–`5-7`，链接与图片错误码，T06、T10 的一部分 | WP3 |
@@ -202,11 +202,11 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 环节 | 做什么 | 工作包 | 状态 | 走读 |
 |---|---|---|---|---|
 | 测试与目录骨架 | 代码的家、外部系统的替身、需求账本、测试素材 | WP0 | 上游审阅中 | [WP0](./walkthroughs/WP0.md) |
-| 命名块（md2md） | 检查标记写法；Milvus 发布前删掉标记 | WP1 | 上游审阅中 | [WP1](./walkthroughs/WP1.md) |
-| 变量与片段（md2md） | 只做预处理的入口；发版 | WP2 | 未开始 | — |
-| 读取 | 读页面配置与 lock；按 commit 取原文；定位命名块、判断类型 | WP3 | 未开始 | — |
+| 命名块（md2md） | 检查标记写法；Milvus 发布前删掉标记 | WP1 | 已合并到上游（`zilliztech/md2md` `07855e4`），随 1.3.0 发布 | [WP1](./walkthroughs/WP1.md) |
+| 变量与片段（md2md） | 只做预处理的入口；发版 | WP2 | 任务卡已写，可以开工 | — |
+| 读取 | 读页面配置与 lock；按 commit 取原文；定位命名块、判断类型 | WP3 | 任务卡已写，等 WP0 合并 | — |
 | 变换 | 按页面配置做 add / replace / remove | WP10 | 未开始 | — |
-| 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | 未开始 | — |
+| 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | 任务卡已写，等 WP0 合并 | — |
 | 站点适配 | 生成 Tabs、提示框、front matter、标题锚点 | WP4 | 未开始 | — |
 | 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | 未开始 | — |
 | 产品名检查 | 漏换的产品名报错 | WP6 | 未开始 | — |
@@ -224,6 +224,8 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 |---|---|
 | WP0 | [测试与目录骨架](./tasks/WP0-skeleton.md) |
 | WP1 | [命名块的解析、校验与清除](./tasks/WP1-md2md-named-blocks.md) |
+| WP2 | [只做预处理的入口与发版](./tasks/WP2-md2md-preprocess.md) |
+| WP3 | [读取：页面配置、lock、原文与命名块](./tasks/WP3-zdoc-read.md) |
 
 其余的在对应工作包开始前写，写完由推动者确认。
 
