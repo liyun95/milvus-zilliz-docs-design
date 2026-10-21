@@ -81,7 +81,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 
 | 错误码 | 何时出现 | 怎样改 |
 |---|---|---|
-| `LINK_UNRESOLVED` | Milvus 站内页面查不到 Cloud 的对应页 | 在 `links.yaml` 中补一行 |
+| `LINK_UNRESOLVED` | Milvus 站内页面查不到 Cloud 的对应页 | 在 `links.yaml` 中补一行；`detail` 中附有候选 |
 | `LINK_ROOT_PATH` | 出现以 `/` 开头的站内路径 | 在 `links.yaml` 中处理，或回上游改成完整地址 |
 | `LINK_UNKNOWN_FORM` | 链接不属于任何一类，如漏写 `.md` | 回上游修正 |
 | `LINK_TARGET_ABSENT` | 链接指向的共享页在这个版本中不存在 | 回上游修正，或让两页一起采用 |

@@ -100,7 +100,7 @@ boolean.md: filtering-overview                    # Cloud 中对应的页面
 ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，明确指向 Milvus 站点
 ```
 
-只在工具报错“找不到 Cloud 对应页面”时补；每个 Milvus 页面全站登记一次。规则见[场景 5](./prd.md#场景-5链接与图片)。
+初始内容由工具一次生成候选、文档工程师审核后提交；之后只在工具报错“找不到 Cloud 对应页面”时补，报错中附有候选。每个 Milvus 页面全站登记一次。规则见[场景 5](./prd.md#场景-5链接与图片)。
 
 ## 7. 产品名检查规则
 

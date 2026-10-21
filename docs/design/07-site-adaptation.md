@@ -121,6 +121,13 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 原文 front matter 中的其他字段（如 Milvus 的 `beta`、`id`）不输出。
 
+### 标题锚点
+
+每个标题都输出显式的锚点 `{#id}`，`id` 用 zdoc 飞书转换器相同的算法：`slugify(标题文字, { lower: true, strict: true })`（`packages/docs-tooling/src/lark/larkDocWriter.js` 的 `__heading_slug`，复用同一个函数，不另写一份）。这样迁移后与飞书版相同的标题锚点不变，链接换算（[02b](./02b-links-and-images.md#锚点)）也能算出确定的结果。
+
+- 计算前去掉标题中的 Markdown 标记与 HTML，与飞书转换器的 `__clean_headings` 相同。
+- 同一页中有几个标题算出相同的锚点时，第一个不变，之后的依次加 `-1`、`-2`，与 Docusaurus 自动生成锚点的做法相同。User Guide 的 201 篇中有 4 篇有重复的标题，如 `set-collection-ttl.md`。链接换算时，Milvus 的锚点对应到几个标题的，取第一个，与浏览器的行为一致。
+
 ### 其他 Milvus 语法
 
 需要 Milvus 站点插件的标记（如 `{{tab}}`、`::glossary.`）在预处理时就报错（`UNSUPPORTED_MARK`，见 [03](./03-md2md-interfaces.md#出错时)）。Milvus 站点专用的版式 `div`，如 `start_card_container`、`card-wrapper`、`filter`，只出现在首页、安装选择页等非 User Guide 页面，Phase 1 不转换；共享页中出现时，该页生成失败。

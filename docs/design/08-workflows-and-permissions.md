@@ -29,7 +29,7 @@ Fetch 已有的手动参数中，`media_upload_mode`（`write` / `skip`）、`pu
 | `shared-docs-upstream` 上游更新 | `schedule` 每天一次；`workflow_dispatch`，可填页面与目标提交 | `contents: write`、`pull-requests: write`、`actions: write` | `shared-docs-master-pr` | 推送分支，开、更新或关闭上游更新 PR，触发校验 | [06](./06-upstream-changes.md#发现与运行) |
 | `shared-docs-promote` 提升 | `workflow_dispatch`：填页面标识或 `all-pending` | 同上 | `shared-docs-master-pr` | 开一个 PR，触发校验 | [04](./04-channels-and-lock.md#lockyaml-怎样变化) |
 | 比较 | `workflow_dispatch`：填页面标识 | `contents: read`；读飞书需要的凭据与 Fetch 相同 | 无 | 不写 dev；差异与激活前的检查结果写进运行摘要与可下载的产物 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
-| Fetch（改动） | 现有的每天 3 次与手动；`shared-docs/` 合并到 master 后是否新增触发待确认 | 不变 | `docs-production-dev` | 新增“生成共享页”步骤；按飞书表格写 `active.json` | [05](./05-publish-handoff.md#交接发生在哪里)、[05b](./05b-cutover-and-ownership.md) |
+| Fetch（改动） | 现有的每天 3 次与手动；Phase 1 不在 `shared-docs/` 合并后新增触发（见 [05](./05-publish-handoff.md#触发时机)） | 不变 | `docs-production-dev` | 新增“生成共享页”步骤；按飞书表格写 `active.json` | [05](./05-publish-handoff.md#交接发生在哪里)、[05b](./05b-cutover-and-ownership.md) |
 
 激活和下线不是工作流：都在飞书表格中操作，下一次 Fetch 生效（见 [05b](./05b-cutover-and-ownership.md)）。
 
