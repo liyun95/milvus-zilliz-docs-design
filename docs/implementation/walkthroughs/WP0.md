@@ -4,7 +4,7 @@
 
 ## 解决什么问题
 
-WP0 没有任何业务功能，网站上什么都不会变。它是“工作间”而不是“机器”：之后 zdoc 侧的每个工作包都在这里写代码、跑测试。它要保证三件事：
+WP0 没有任何业务功能，网站上什么都不会变。它为之后 zdoc 侧的每个工作包准备好写代码、跑测试的地方，保证三件事：
 
 - 新代码有固定的家，而且核心逻辑碰不到外部系统；
 - 不用连真实的 milvus-docs、GitHub、飞书，也能把功能测完；
@@ -14,20 +14,20 @@ WP0 没有任何业务功能，网站上什么都不会变。它是“工作间�
 
 都在 `packages/docs-tooling/src/shared-docs/` 下：
 
-| 目录或文件 | 做什么 | 类比 |
-|---|---|---|
-| `core/` | 核心逻辑的家；现在只有共用类型，例如错误对象的字段 | 机器的主体，还是空的 |
-| `adapters/types.ts` | 与五个外部系统打交道的接口：milvus-docs、md2md、GitHub、图片存储、飞书表格 | 插座的规格 |
-| `adapters/fake/` | 五个外部系统的替身，测试时用 | 彩排用的道具 |
-| `adapters/contract/` | 每个接口一组“契约测试”：替身必须通过，以后的真实实现也必须通过 | 插头插座的国标检测 |
-| `spec/requirements.json` | 从设计仓库原样复制的需求清单 | 验收清单 |
-| `spec/pending.json` | 还没做的 124 条需求，各归哪个工作包 | 还没开工的项目单 |
-| `spec/coverage.ts` | 覆盖检查：每条需求要么有测试，要么在 `pending.json` 中 | 对账员 |
-| `fixtures/pilots/` | 三篇试点页在 milvus-docs `9acdc99` 上的原文，与草拟的页面配置 | 测试素材 |
-| `fixtures/milvus-docs/` | 合成的 milvus-docs 仓库：测试时现场建一个 Git 仓库，每次的 commit 号都相同 | 模拟考场 |
-| `testing/golden.ts` | 与基准输出（样板间）逐字比较的工具 | 样板间的验收尺 |
-| `testing/errors.ts` | 错误样例表的运行器 | 报错的验收尺 |
-| `testing/core-boundary.test.ts` | 检查 `core/` 中没有读文件、跑命令、联网、引用飞书代码 | 门禁 |
+| 目录或文件 | 做什么 |
+|---|---|
+| `core/` | 核心逻辑的家；现在只有共用类型，例如错误对象的字段 |
+| `adapters/types.ts` | 与五个外部系统打交道的接口：milvus-docs、md2md、GitHub、图片存储、飞书表格 |
+| `adapters/fake/` | 五个外部系统的替身，测试时用 |
+| `adapters/contract/` | 每个接口一组“契约测试”：替身必须通过，以后的真实实现也必须通过 |
+| `spec/requirements.json` | 从设计仓库原样复制的需求清单 |
+| `spec/pending.json` | 还没做的 124 条需求，各归哪个工作包 |
+| `spec/coverage.ts` | 覆盖检查：每条需求要么有测试，要么在 `pending.json` 中 |
+| `fixtures/pilots/` | 三篇试点页在 milvus-docs `9acdc99` 上的原文，与草拟的页面配置 |
+| `fixtures/milvus-docs/` | 合成的 milvus-docs 仓库：测试时现场建一个 Git 仓库，每次的 commit 号都相同 |
+| `testing/golden.ts` | 与基准输出逐字比较的工具 |
+| `testing/errors.ts` | 错误样例表的运行器 |
+| `testing/core-boundary.test.ts` | 检查 `core/` 中没有读文件、跑命令、联网、引用飞书代码 |
 
 仓库根目录还加了两处：`pnpm test:shared-docs` 命令，以及 PR 检查中跑这条命令的一步。
 
@@ -85,7 +85,7 @@ cd ~/zdoc/.claude/worktrees/wp0-skeleton
 | `spec/coverage.test.ts` | 覆盖检查在什么情况下失败 |
 | `fixtures/milvus-docs/build.test.ts` | 两次构建得到相同的 commit 号 |
 | `testing/golden.test.ts` | 不一致时失败、CI 中不改写 |
-| `testing/core-boundary.test.ts` | 哪些写法会被门禁拦下 |
+| `testing/core-boundary.test.ts` | 哪些写法会被拦下 |
 
 ## 刻意没做的
 
