@@ -6,7 +6,7 @@
 
 **参与方**：zdoc 生成（产出交接物）、zdoc 发布（Fetch 工作流、stage、校验与串行发布队列）。
 
-**状态**：由原接口设计迁入，待工程维护者完善；UAT 部署的触发方式、Fetch 的具体接入点与重新生成比对的接法待核实，见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
+**状态**：由原接口设计迁入，待工程维护者完善；Fetch 的具体接入点与重新生成比对的接法待核实，UAT 部署目前不是自动的，见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
 
 ## 约定
 
@@ -29,9 +29,16 @@
 |---|---|
 | 现有的每天 3 次定时运行 | 照常，同时生成共享页 |
 | 任何修改 `shared-docs/` 的 PR 合并到 master 后 | 新增：自动触发一次只处理 Guides 的 Fetch；是否采用待确认（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)） |
-| 手动 | 照常；激活也通过手动触发（见 [05b](./05b-cutover-and-ownership.md#切换与激活)） |
+| 手动 | 照常；激活后想马上生效时，也可以手动触发（见 [05b](./05b-cutover-and-ownership.md#切换与激活)） |
 
 合并后到 UAT 可见的时延 = 一次 Fetch 的耗时 + UAT 部署。不新增触发时，最多等到下一次定时运行（8 小时）。
+
+zdoc 现状（文档负责人 2026-10-20 介绍）：
+
+- 一次 Fetch 约 1 小时。
+- 每个 PR 合并到 master 后，同步工作流先跑一遍文档构建，确认不会把构建打坏，再合到 dev，约十几分钟。
+- 生成结果写入 dev 后，UAT 目前不会自动部署，文档负责人计划改为自动。
+- Jenkins 部署在内网，GitHub Actions 连不到，只能靠探测衔接，待文档负责人另找接法。
 
 #### PR 校验
 
@@ -82,7 +89,7 @@ zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更�
 - 路由插件按 `token` 相等，把整页通道传递给日文译文；译文会原样保留 `token`，这部分代码不用改。
 - 翻译清单按 `token` 查来源记录时，也要能查到下文的记录文件。
 
-整页通道 `channel`（`next` 或 `retire-in-next`）由 `lock.yaml` 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面)。
+整页通道 `channel`（`next` 或 `retire-in-next`）由飞书表格的 `Release Channel` 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面)。
 
 ### 记录文件
 
@@ -140,7 +147,7 @@ generated/en/manifests/shared-pages/
 | `page` | 页面标识 | — |
 | `token` | 页面身份，`shared-<页面标识>` | 翻译清单、路由插件 |
 | `inputs.milvus_docs.repository` | 原文所在的仓库 | 重新生成 |
-| `inputs.milvus_docs.current`、`next` | `lock.yaml` 中的两个 commit；`none` 时为 `null` | 重新生成 |
+| `inputs.milvus_docs.current`、`next` | `lock.yaml` 中的两个 commit | 重新生成 |
 | `inputs.milvus_docs.files[]` | 用到的每个原文与片段：`path` 相对于仓库根目录，`current`、`next` 是它在两个版本中的摘要 | 判断输入是否变化 |
 | `inputs.zdoc.repository`、`commit` | zdoc 仓库，以及 `shared-docs/` 所在的 master commit | 重新生成 |
 | `inputs.zdoc.files[]` | 用到的页面配置、Cloud 内容文件、变量文件、链接映射表，各自的路径与摘要 | 判断输入是否变化 |

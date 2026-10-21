@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="855" height="250" viewBox="0 0 1710 500" role="img" aria-labelledby="title desc">
 <title id="title">一个共享页的生命周期：Git 主线与Phase 1 过渡</title>
-<desc id="desc">上半部分是一页在 Git 中的生命周期，由 lock 决定版本：文档工程师写 page.yaml 接入，工具写入 lock；之后上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线把 next 改为 none；下线后提升删除页面目录与 lock。下半部分是Phase 1 过渡，由 active.json 决定网站上的这一页来自飞书还是 Git，飞书退出后不再需要：接入之后，文档负责人激活，网站从飞书版换成 Git 版；下线后提升合并之后，文档工程师删除飞书节点，这一页从网站和导航中移除。</desc>
+<desc id="desc">上半部分是一页在 Git 中的生命周期，由 lock 决定版本：文档工程师写 page.yaml 接入，工具写入 lock；之后上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线完成后用普通 PR 删除页面目录与 lock。下半部分是 Phase 1 过渡，由飞书表格决定来源与整页通道，飞书退出后不再需要：接入之后文档负责人激活，即把 placement type 改为 Git，网站从飞书版换成 Git 版；下线时文档工程师把 Release Channel 改为 RETIRE-IN-NEXT，UAT 不再显示；发版时删除表格记录与飞书节点，这一页从网站和导航中移除，之后再删页面目录。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.lane{font-size:19px;font-weight:600;}.lanesub{font-size:15px;fill:#64748b;}.head{font-size:20px;font-weight:600;}.t{font-size:16px;fill:#475569;}.note{font-size:15px;fill:#64748b;}.lbl{font-size:15px;fill:#475569;text-anchor:middle;}.act{font-size:16px;font-weight:600;fill:#374151;text-anchor:middle;}.dep{font-size:15px;fill:#b45309;text-anchor:middle;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}.guide{fill:none;stroke:#d97706;stroke-width:1.5;stroke-dasharray:5 5;}</style></defs>
 <rect width="1710" height="500" fill="#ffffff"/>
@@ -9,53 +9,58 @@
 <text x="50" y="118" class="lane">Git 中的生命周期</text>
 <text x="50" y="146" class="lanesub">lock 决定版本</text>
 <rect x="30" y="270" width="1650" height="180" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
-<text x="50" y="338" class="lane">Phase 1 过渡</text>
-<text x="50" y="366" class="lanesub">active.json 决定来源</text>
-<text x="50" y="392" class="lanesub">飞书退出后不再需要</text>
+<text x="50" y="330" class="lane">Phase 1 过渡</text>
+<text x="50" y="358" class="lanesub">飞书表格决定</text>
+<text x="50" y="382" class="lanesub">来源与整页通道</text>
+<text x="50" y="410" class="lanesub">飞书退出后不再需要</text>
 
-<rect x="220" y="70" width="210" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
+<rect x="220" y="70" width="200" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
 <text x="240" y="106" class="head">接入</text>
 <text x="240" y="142" class="t">写 page.yaml</text>
 <text x="240" y="182" class="note">工具写入 lock</text>
-<rect x="530" y="70" width="210" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
-<text x="550" y="106" class="head">上游更新 / 提升</text>
-<text x="550" y="142" class="t">next 前进</text>
-<text x="550" y="170" class="t">current 跟上 next</text>
-<rect x="840" y="70" width="210" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
-<text x="860" y="106" class="head">下线</text>
-<text x="860" y="142" class="t">next 改为 none</text>
-<text x="860" y="182" class="note">UAT 不再显示</text>
-<rect x="1150" y="70" width="210" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
-<text x="1170" y="106" class="head">下线后提升</text>
-<text x="1170" y="142" class="t">删除页面目录</text>
-<text x="1170" y="182" class="note">lock 一起删除</text>
-<path class="edge" d="M430 135 H523"/>
-<path class="edge" d="M740 135 H833"/>
-<path class="edge" d="M1050 135 H1143"/>
-<path d="M700 200 v14 h-130 v-10" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
-<text x="635" y="240" class="lbl" style="fill:#64748b">每次发版重复</text>
+<rect x="550" y="70" width="300" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
+<text x="570" y="106" class="head">上游更新 / 提升</text>
+<text x="570" y="142" class="t">next 前进</text>
+<text x="570" y="170" class="t">current 跟上 next</text>
+<rect x="1360" y="70" width="210" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
+<text x="1380" y="106" class="head">删除页面目录</text>
+<text x="1380" y="142" class="t">lock 一起删除</text>
+<text x="1380" y="182" class="note">普通 PR</text>
+<path class="edge" d="M420 135 H543"/>
+<path class="edge" d="M850 135 H1353"/>
+<path d="M800 200 v14 h-200 v-10" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<text x="700" y="240" class="lbl" style="fill:#64748b">每次发版重复</text>
 
-<rect x="220" y="290" width="210" height="140" rx="12" fill="#ffffff" stroke="#94a3b8"/>
+<rect x="220" y="290" width="200" height="140" rx="12" fill="#ffffff" stroke="#94a3b8"/>
 <text x="240" y="326" class="head">飞书版</text>
 <text x="240" y="362" class="t">网站显示飞书版</text>
 <text x="240" y="412" class="note">Git 版只供核对</text>
-<rect x="530" y="290" width="830" height="140" rx="12" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
-<text x="550" y="326" class="head">Git 版</text>
-<text x="550" y="362" class="t">网站显示 Git 版：Prod 用 current，UAT 用 next</text>
-<text x="550" y="412" class="note">飞书节点保留，只用来决定导航</text>
-<rect x="1460" y="290" width="210" height="140" rx="12" fill="#f8fafc" stroke="#94a3b8"/>
-<text x="1480" y="326" class="head" style="fill:#64748b">已移除</text>
-<text x="1480" y="362" class="t">网站和导航中</text>
-<text x="1480" y="390" class="t">都没有这一页</text>
-<path class="edge" d="M430 360 H523"/>
-<text x="480" y="346" class="act">激活</text>
-<text x="480" y="386" class="lbl">文档负责人</text>
-<path class="edge" d="M1360 360 H1453"/>
-<text x="1410" y="346" class="act">删飞书节点</text>
-<text x="1410" y="386" class="lbl">文档工程师</text>
+<rect x="550" y="290" width="300" height="140" rx="12" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<text x="570" y="326" class="head">Git 版</text>
+<text x="570" y="360" class="t">Prod 用 current，UAT 用 next</text>
+<text x="570" y="388" class="note">placement type 为 Git</text>
+<text x="570" y="414" class="note">导航仍由飞书表格决定</text>
+<rect x="980" y="290" width="250" height="140" rx="12" fill="#ffffff" stroke="#94a3b8"/>
+<text x="1000" y="326" class="head">待下线</text>
+<text x="1000" y="360" class="t">RETIRE-IN-NEXT</text>
+<text x="1000" y="388" class="t">UAT 不再显示</text>
+<text x="1000" y="414" class="note">Prod 照常</text>
+<rect x="1360" y="290" width="210" height="140" rx="12" fill="#f8fafc" stroke="#94a3b8"/>
+<text x="1380" y="326" class="head" style="fill:#64748b">已移除</text>
+<text x="1380" y="362" class="t">网站和导航中</text>
+<text x="1380" y="390" class="t">都没有这一页</text>
+<path class="edge" d="M420 360 H543"/>
+<text x="485" y="346" class="act">激活</text>
+<text x="485" y="386" class="lbl">文档负责人</text>
+<path class="edge" d="M850 360 H973"/>
+<text x="915" y="346" class="act">下线</text>
+<text x="915" y="386" class="lbl">文档工程师</text>
+<path class="edge" d="M1230 360 H1353"/>
+<text x="1295" y="346" class="act">删除记录</text>
+<text x="1295" y="386" class="lbl">发版时</text>
 
-<path class="guide" d="M480 145 V232 M480 264 V322"/>
-<text x="480" y="252" class="dep">接入之后</text>
-<path class="guide" d="M1360 135 H1410 V232 M1410 264 V322"/>
-<text x="1410" y="252" class="dep">合并之后</text>
+<path class="guide" d="M485 135 V232 M485 264 V322"/>
+<text x="485" y="252" class="dep">接入之后</text>
+<path class="guide" d="M1295 145 V232 M1295 264 V322"/>
+<text x="1295" y="252" class="dep">记录删除之后</text>
 </svg>

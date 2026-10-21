@@ -16,6 +16,7 @@
 | Cloud 内容文件 | zdoc `shared-docs/pages/<页面标识>/` 下，按需 | 文档工程师 | [场景 4](./prd.md#场景-4写-cloud-的差异) |
 | Cloud 变量 | zdoc `shared-docs/Variables.json` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
 | 链接映射表 | zdoc `shared-docs/links.yaml` | 文档工程师 | [场景 5](./prd.md#场景-5链接与图片) |
+| 产品名检查规则 | zdoc `shared-docs/product-names.yaml` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
 | 版本记录 | zdoc `shared-docs/pages/<页面标识>/lock.yaml` | 只由工具写入 | [第 4 节](./prd.md#4-一页的生命周期) |
 | 代码 Tabs 规则 | zdoc `shared-docs/presentation/cloud-sdk-tabs.yaml` | zdoc 维护者 | — |
 | 共享来源配置 | zdoc `shared-docs/source.yaml` | zdoc 维护者 | — |
@@ -44,7 +45,7 @@
 | `publish[].path` | 是 | 页面在手册中的路径；Phase 1 与飞书节点一致 | 同上 |
 | `metadata.title` | 否 | 默认取原文的 `title` | 同上 |
 | `metadata.description` | 否 | 默认取原文的 `summary` | 同上 |
-| `metadata.beta` | 否 | `FALSE`（默认）、`PUBLIC`、`PRIVATE`、`NEAR DEPRECATE` | 同上 |
+| `metadata.beta` | 否 | `FALSE`（默认）、`PUBLIC`、`PRIVATE`、`ON REQUEST`、`NEAR DEPRECATE`、`DEPRECATED`、`CONTACT SALES`；以 zdoc 的标签定义为准 | 同上 |
 | `transforms[].operation` | 是 | `add`、`replace`、`remove` | [场景 4](./prd.md#场景-4写-cloud-的差异) |
 | `transforms[].target.block` | 是 | 命名块 ID | 同上 |
 | `transforms[].target.language` | 否 | 代码块的语言名，如 `python`、`javascript`、`bash`、`shell`；只用于代码组 | 同上 |
@@ -75,9 +76,9 @@
 | `type` | `origin` |
 | `displayed_sidebar` | `default` |
 | `token` | `shared-<页面标识>` |
-| `channel` | 整页只在一边存在时，由 `lock.yaml` 决定 |
+| `channel` | 整页只在一边存在时，由飞书表格的 `Release Channel` 决定 |
 
-Phase 1 不开放：`keywords`、`hide_title`、`hide_table_of_contents`，以及 `beta` 的 `DEPRECATED`。
+Phase 1 不开放：`keywords`、`hide_title`、`hide_table_of_contents`。
 
 ## 5. Cloud 内容文件
 
@@ -101,39 +102,55 @@ ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，�
 
 只在工具报错“找不到 Cloud 对应页面”时补；每个 Milvus 页面全站登记一次。规则见[场景 5](./prd.md#场景-5链接与图片)。
 
-## 7. 让内容只在 UAT 显示
+## 7. 产品名检查规则
+
+```yaml
+# shared-docs/product-names.yaml
+check:                                  # 出现就报错的写法
+  - Milvus
+  - localhost:19530
+  - root:Milvus
+allow:                                  # 确实要保留的写法
+  - Zilliz Cloud is built on Milvus
+```
+
+检查生成后的 Cloud 页面，按整词匹配，链接地址不检查；`allow` 写完整的短语。只在检查误报时补 `allow`。规则见[场景 1](./prd.md#场景-1把产品名和连接值写成变量)。
+
+## 8. 让内容只在 UAT 显示
 
 | 内容 | 写法 |
 |---|---|
 | Milvus 原文在两个版本之间的变化 | 不用写 |
 | Cloud 新写的一段 | Cloud 内容文件中用 `<NextChannel action="include">` 包住 |
 | 替换或删除原文的一段，下次发布时才生效 | 变换加 `channel: next` |
-| 整个新页面 | 接入 PR 加标签 `shared-docs: not-launched` |
+| 整个新页面 | 飞书表格中 `Release Channel` 设为 `NEXT`（新记录的默认值） |
 
 规则见[场景 6](./prd.md#场景-6让内容先只在-uat-显示)。
 
-## 8. PR 标签与手动操作
+## 9. 手动操作
 
 | 操作 | 在哪里 | 谁 | 规则见 |
 |---|---|---|---|
-| 标签 `shared-docs: not-launched` | 接入 PR | 文档工程师 | [场景 3](./prd.md#场景-3接入一页) |
 | 手动触发上游更新，可指定页面与提交 | zdoc GitHub Actions | 文档工程师 | [场景 7](./prd.md#场景-7审核上游更新) |
-| 提升 | zdoc GitHub Actions，“提升与下线”工作流 | 文档工程师 | [场景 8](./prd.md#场景-8功能上线时提升) |
-| 下线 | 同上 | 文档工程师 | [场景 10](./prd.md#场景-10下线一页) |
-| 比较、激活 | zdoc，入口形式待定 | 文档负责人 | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |
-| 删除飞书节点 | 飞书知识库目录 | 发起提升的文档工程师 | [场景 10](./prd.md#场景-10下线一页) |
+| 提升 | zdoc GitHub Actions，“提升”工作流 | 文档工程师 | [场景 8](./prd.md#场景-8功能上线时提升) |
+| 新页面上线：`Release Channel` 从 `NEXT` 改为 `CURRENT` | 飞书表格 | 文档工程师 | [场景 6](./prd.md#场景-6让内容先只在-uat-显示) |
+| 比较 | zdoc GitHub Actions | 文档负责人 | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |
+| 激活：placement type 改为 `git` | 飞书表格 | 文档负责人 | 同上 |
+| 下线：`Release Channel` 改为 `RETIRE-IN-NEXT` | 飞书表格 | 文档工程师 | [场景 10](./prd.md#场景-10下线一页) |
+| 下线完成：删除表格记录与飞书节点 | 飞书表格与目录 | 文档工程师 | 同上 |
+| 删除页面目录 | zdoc 普通 PR | 文档工程师 | 同上 |
 
-## 9. 出错时查哪里
+## 10. 出错时查哪里
 
 工具先校验全部配置，再生成页面；出错时直接失败，不会静默跳过。
 
 | 错误与什么有关 | 在哪里发现 | 见 |
 |---|---|---|
-| 变量缺少 Cloud 的值；片段 | zdoc 的 PR 校验 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
+| 变量缺少 Cloud 的值；片段；没换成变量的产品名 | zdoc 的 PR 校验 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
 | 命名块标记的写法 | milvus-docs 的 PR 检查 | [场景 2](./prd.md#场景-2在-milvus-原文中标出-cloud-要改的一段) |
 | 页面目录、`page.yaml` 的字段 | zdoc 的 PR 校验 | [场景 3](./prd.md#场景-3接入一页) |
 | 变换的目标、冲突、代码行、内容文件 | zdoc 的 PR 校验 | [场景 4](./prd.md#场景-4写-cloud-的差异) |
 | 链接、锚点、图片 | zdoc 的 PR 校验 | [场景 5](./prd.md#场景-5链接与图片) |
 | `channel`，规则只在一个版本上失效 | zdoc 的 PR 校验 | [场景 6](./prd.md#场景-6让内容先只在-uat-显示) |
 | 上游改名、删除了 Cloud 引用的内容 | 上游更新 PR 的校验 | [场景 7](./prd.md#场景-7审核上游更新) |
-| 激活前的检查 | 激活运行 | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |
+| 激活前的检查 | 比较运行；激活后的每次 Fetch | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |

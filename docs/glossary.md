@@ -9,6 +9,7 @@
 - **overlay**：zdoc 中只记录 Cloud 差异的一层文件，即 `shared-docs/` 中的页面配置、`Variables.json` 和 Cloud 内容文件。用于[生成流水线](./design/README.md#生成流水线)的图 1。是本次新建的，与 zdoc 现有的 `sidebar-overrides` 或部署仓库的 Kubernetes overlays 无关。
 - **共享来源配置**：`shared-docs/source.yaml`，记录读哪个仓库、跟踪哪个分支。**跟踪分支**目前是 milvus-docs 的 `v3.0.x`，只用于发现新提交（见 [04](./design/04-channels-and-lock.md#共享来源配置与跟踪分支)）。
 - **链接映射表**：`shared-docs/links.yaml`，登记 Milvus 页面到 Cloud 页面的对应关系（见 [02b](./design/02b-links-and-images.md)）。
+- **产品名检查规则**：`shared-docs/product-names.yaml`，列出生成后的 Cloud 页面中不能出现的 Milvus 产品名与连接值，以及放行的短语（见 [07](./design/07-site-adaptation.md#产品名检查)）。
 
 ## 原文
 
@@ -20,17 +21,21 @@
 ## 版本与生命周期
 
 - **Prod / UAT**：zdoc 的正式站点与预发布站点。两者由同一个 dev 提交构建，部署时才区分。
-- **lock（`lock.yaml`）**：每个共享页一份，放在页面目录中（`shared-docs/pages/<页面标识>/lock.yaml`），记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升、下线四类 PR 写入，人不手改（见 [04](./design/04-channels-and-lock.md#lockyaml-怎样变化)）。
-- **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，由 lock 决定，作者不写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
+- **lock（`lock.yaml`）**：每个共享页一份，放在页面目录中（`shared-docs/pages/<页面标识>/lock.yaml`），记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升三类 PR 写入，人不手改（见 [04](./design/04-channels-and-lock.md#lockyaml-怎样变化)）。
+- **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，Phase 1 由飞书表格的 `Release Channel` 决定，作者不在 zdoc 中写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
 - **接入**：文档工程师开 PR 新增页面目录（`page.yaml`，需要时加 Cloud 内容文件），工具在同一个 PR 中写入 `lock.yaml`。接入后只生成候选结果，不改变网站（见 [04](./design/04-channels-and-lock.md#接入一页)）。
-- **激活**：一页从飞书切换到 Git 生成，由文档负责人先比较、再触发，一页只做一次（见 [05b](./design/05b-cutover-and-ownership.md#切换与激活)）。与提升无关。
-- **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面；由 Fetch 写入，激活时加入、下线完成时移除，人不手改（见 [05b](./design/05b-cutover-and-ownership.md#生效配置activejson)）。
+- **飞书表格（DocsList）**：zdoc 现有的飞书多维表格，Guides 的每一页一条记录，决定导航、发布目标与整页通道。Phase 1 共享页仍在其中保留记录。
+- **placement type**：飞书表格中每条记录的字段，说明这一行在导航中是什么，现有 `canonical`、`section`、`link`、`ref`。Phase 1 新增 `git`，表示这一页由 Git 生成（见 [05b](./design/05b-cutover-and-ownership.md#切换与激活)）。
+- **Release Channel**：飞书表格中每条记录的字段，`CURRENT`、`NEXT` 或 `RETIRE-IN-NEXT`，决定整页只在 Prod、只在 UAT 还是两边都显示。Phase 1 共享页的整页通道沿用它。
+- **激活**：一页从飞书切换到 Git 生成。文档负责人先运行比较，再在飞书表格中把 placement type 改为 `git`，一页只做一次（见 [05b](./design/05b-cutover-and-ownership.md#切换与激活)）。与提升无关。
+- **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面；由 Fetch 按飞书表格生成，激活后的第一次 Fetch 加入、下线完成时移除，人不手改（见 [05b](./design/05b-cutover-and-ownership.md#生效配置activejson)）。
 - **提升（promotion）**：功能上线时，按页把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。沿用 zdoc 对上线的叫法。
-- **下线**：把已激活页面 lock 中的 `next` 改为 `none`，UAT 先不再显示；之后的提升删除页面目录，飞书节点删除后由 Fetch 把它从网站移除（见 [04](./design/04-channels-and-lock.md#下线一页)、[05b](./design/05b-cutover-and-ownership.md#下线完成)）。
+- **下线**：Phase 1 沿用飞书表格：把这一页的 `Release Channel` 改为 `RETIRE-IN-NEXT`，UAT 先不再显示；发版时删除表格记录与飞书节点，由 Fetch 把它从网站移除；之后用普通 PR 删除页面目录（见 [05b](./design/05b-cutover-and-ownership.md#下线完成)）。
 
 ## 发布
 
-- **Fetch**：zdoc 现有的发布工作流，每天定时运行 3 次，也可以手动触发；抓取飞书内容、生成共享页，校验后写入 dev（见 [05](./design/05-publish-handoff.md#交接发生在哪里)）。
+- **Fetch**：zdoc 现有的发布工作流，每天定时运行 3 次，也可以手动触发，一次约 1 小时；抓取飞书内容、生成共享页，校验后写入 dev（见 [05](./design/05-publish-handoff.md#交接发生在哪里)）。
+- **docs-tooling**：zdoc 中的 `packages/docs-tooling`，是 Fetch 等工作流调用的工具包，入口是 `pnpm docs-tooling`。共享页的生成代码放在其中的 `src/shared-docs/`（见[技术设计 README](./design/README.md#代码位置)）。
 - **候选结果（候选运行）**：不写 dev、不上传图片、不需要 Cloud 凭据的生成，用于 PR 校验，以及激活之前的共享页（见 [05](./design/05-publish-handoff.md#pr-校验)）。
 - **dev**：zdoc 存放生成结果的分支，由 Fetch 写入；网站从它构建，Prod 与 UAT 用同一个 dev 提交，部署时才区分。人编写的文件在 master，不在 dev。
 - **stage**：zdoc 现有发布流程中的内容暂存区，生成结果在这里校验后进入发布。

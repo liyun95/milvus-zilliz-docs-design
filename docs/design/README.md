@@ -12,11 +12,29 @@
 |---|---|---|---|
 | 共享原文与 Milvus CI | [milvus-docs](https://github.com/milvus-io/milvus-docs) | PR 检查中加入命名块校验；固定 md2md 版本 | [01](./01-named-blocks.md)、[03](./03-md2md-interfaces.md) |
 | md2md | [md2md](https://github.com/zilliztech/md2md) | 新增命名块的解析与清除、只做预处理的入口；一次发版 | [03](./03-md2md-interfaces.md) |
-| zdoc 生成 | [zdoc](https://github.com/zilliztech/zdoc) | 按 lock 获取原文、定位命名块、执行变换、调用预处理、站点适配、两版合并 | [01](./01-named-blocks.md)–[04](./04-channels-and-lock.md)、[07](./07-site-adaptation.md) |
+| zdoc 生成 | [zdoc](https://github.com/zilliztech/zdoc) | 按 lock 获取原文、定位命名块、执行变换、调用预处理、站点适配、两版合并、产品名检查；代码在 `packages/docs-tooling`（见下文“代码位置”） | [01](./01-named-blocks.md)–[04](./04-channels-and-lock.md)、[07](./07-site-adaptation.md) |
 | zdoc 发布（Fetch） | zdoc | 接入生成结果；混源与激活；归属检查；翻译与恢复接入 | [05](./05-publish-handoff.md)、[05b](./05b-cutover-and-ownership.md) |
-| zdoc 新增工作流 | zdoc | 接入时写 lock、PR 校验、上游更新、提升与下线、比较与激活 | [04](./04-channels-and-lock.md)、[06](./06-upstream-changes.md)、[08](./08-workflows-and-permissions.md) |
+| zdoc 新增工作流 | zdoc | 接入时写 lock、PR 校验、上游更新、提升、激活前的比较 | [04](./04-channels-and-lock.md)、[06](./06-upstream-changes.md)、[08](./08-workflows-and-permissions.md) |
 
 各仓库的分阶段改动见[Phase 1 实施计划第 3 节](../phase-1.md#3-各仓库改动)。
+
+### 代码位置
+
+zdoc 侧的代码放在 `packages/docs-tooling` 中。zdoc 的约定是发布与工作流工具都放在这里（`AGENTS.md`），它按来源组织：`lark/` 是飞书来源，`reference/` 是 SDK 与 REST 参考来源；共享页是第三种来源，与 `lark/` 并列。发布、校验、通知、图片上传、飞书表格的读取都在同一个包中，可以直接复用。
+
+```
+shared-docs/                              # 数据，master（见下文“数据文件”）
+packages/docs-tooling/src/shared-docs/
+  core/        页面配置 schema、命名块、变换、两版合并、链接换算、产品名检查；纯计算，不读写外部
+  adapters/    按 commit 读 milvus-docs、调 md2md、图片、GitHub；飞书表格复用 lark/ 的读取
+  commands/    build、check、lock、compare、upstream-plan、promote-plan，注册到 cli-main.ts
+  fixtures/    测试用的合成 milvus-docs 仓库、试点页输入与基准输出
+packages/docs-tooling/src/lark/guidesBaseRecordSemantics.js   # placement type 加一个值
+.github/workflows/shared-docs-*.yml       # 只负责触发与权限，调用 pnpm docs-tooling shared-docs …
+```
+
+- `core/` 不依赖 `lark/`，与飞书有关的只经过适配器。飞书退出、删掉 `lark/` 时，共享页不受影响。
+- 新路径登记到 zdoc 的代码与测试对照表（`scripts/docs-workflow/test-matrix.json`，`pnpm test:for-change`）；`shared-docs/` 不在 `deploy/contracts/master-tooling-sync.json` 的 `devOwnedPaths` 中，默认归 master，不用改这个文件。
 
 ### 生成流水线
 
@@ -51,10 +69,12 @@
 | 共享来源配置 `source.yaml` | zdoc master `shared-docs/` | zdoc 维护者 | [04](./04-channels-and-lock.md#共享来源配置与跟踪分支) |
 | Cloud 变量 `Variables.json` | zdoc master `shared-docs/` | 文档工程师 | [03](./03-md2md-interfaces.md#预处理) |
 | 链接映射表 `links.yaml` | zdoc master `shared-docs/` | 文档工程师 | [02b](./02b-links-and-images.md#链接) |
+| 产品名检查规则 `product-names.yaml` | zdoc master `shared-docs/` | 文档工程师 | [07](./07-site-adaptation.md#产品名检查) |
 | 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
 | 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
 | 版本记录 `lock.yaml` | zdoc master `shared-docs/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
-| 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
+| 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch，按飞书表格生成 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
+| placement type、`Release Channel` | 飞书表格（DocsList）中每页的记录 | 文档负责人、文档工程师 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
 | 记录文件 `<页面标识>.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch | [05](./05-publish-handoff.md#记录文件) |
 | 页面 MDX | zdoc dev 各手册的内容目录 | Fetch | [05](./05-publish-handoff.md#页面-mdx) |
 | 图片 | zdoc 现有的图片存储，按内容摘要命名 | Fetch | [02b](./02b-links-and-images.md#图片)、[05](./05-publish-handoff.md#图片上传) |

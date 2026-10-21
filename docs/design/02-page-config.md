@@ -17,6 +17,7 @@ shared-docs/
   source.yaml                        # 共享来源配置：仓库与跟踪分支（见 04）
   Variables.json                     # Cloud 变量（见 03）
   links.yaml                         # 链接映射表（见 02b）
+  product-names.yaml                 # 产品名检查规则（见 07）
   presentation/cloud-sdk-tabs.yaml   # 代码 Tabs 规则，工程维护
   pages/
     delete-entities/                 # 目录名即页面标识
@@ -60,7 +61,7 @@ shared-docs/
 | 目标 | 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外 |
 | `position` 与内容 | 在块旁或代码行旁 `add` 时没写 `position`；给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容 |
 | 冲突（同一个通道中） | 同一个目标被多次变换；整块的 `replace` 或 `remove` 与该块的语言项变换、前后增加同时出现；语言项的 `replace` 或 `remove` 与该语言内的行级变换同时出现；同一语言内两条行级规则定位的行有重叠。不带 `channel` 的规则同时计入两个通道 |
-| `channel` | 不是 `current` 或 `next`；页面在该通道中不存在（lock 中为 `none`） |
+| `channel` | 不是 `current` 或 `next`；页面在该通道中不存在（飞书表格中为 `NEXT` 的页面写了 `channel: current`） |
 | 代码行 | `lines` 在目标语言中找不到、出现多次或超过 5 行；`lines` 用在没有 `language` 的目标上；`lines` 或 `content.lines` 中有空行 |
 | 内容文件与 Tabs | 内容文件中出现命名块标记或手写的 Tabs；试图对本轮刚插入的内容再做变换；删除了 Tabs 规则要求必须存在的语言或默认语言 |
 
