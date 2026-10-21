@@ -54,7 +54,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `CONFIG_FIELD_UNKNOWN` | 未知的字段、动作或 `schema_version` | 删去或改正 |
 | `CONFIG_SOURCE_NOT_FOUND` | `source.file` 在该版本中不存在，包括上游改名或删除了原文 | 改 `source.file`；原文被删除时考虑下线 |
 | `CONFIG_MANUAL_UNKNOWN` | `publish[].manual` 不是 zdoc 已有的手册 | 改手册 ID |
-| `CONFIG_BETA_INVALID` | `metadata.beta` 不是可选值 | 改为 `FALSE`、`PUBLIC`、`PRIVATE` 或 `NEAR DEPRECATE` |
+| `CONFIG_BETA_INVALID` | `metadata.beta` 不是 zdoc 标签定义中的值，或写了 `BYOC` | 改为 zdoc 现有的值，见[产品需求场景 3](../prd.md#场景-3接入一页) |
 
 **变换**（见 [02](./02-page-config.md#出错时)）
 
@@ -97,11 +97,18 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `LOCK_INVALID` | 没有 `lock.yaml`，或字段缺失、格式不对 | 删掉 `lock.yaml` 让工具重写；不要手改 |
 | `LOCK_COMMIT_NOT_FOUND` | commit 不存在，或不在跟踪分支的历史上（如分支历史被改写） | 人工处理 |
 | `LOCK_ORDER` | `current` 不是 `next` 的祖先 | 人工处理 |
-| `LOCK_BOTH_NONE` | `current` 与 `next` 都是 `none` | 删除页面目录 |
+| `LOCK_NONE_UNSUPPORTED` | `current` 或 `next` 写了 `none`（Phase 1 不启用） | 删掉 `lock.yaml` 让工具重写；整页通道在飞书表格中设置 |
 | `LOCK_FORK_PR` | 接入 PR 来自 fork，工具无法写入 | 改从 zdoc 仓库内的分支提交 |
 | `MERGE_NESTED_CHANNEL` | Cloud 内容文件中手写的 `<NextChannel>` 落在工具生成的成对区域内 | 改用变换的 `channel` |
 
-提升与下线时不符合条件的页面（页面不存在、下线时还没激活、提升时两个版本已相同）不算错误，在运行摘要中列出：`PROMOTE_PAGE_NOT_FOUND`、`RETIRE_NOT_ACTIVE`、`PROMOTE_NOTHING_TO_DO`。
+**产品名**（见 [07](./07-site-adaptation.md#产品名检查)）
+
+| 错误码 | 何时出现 | 怎样改 |
+|---|---|---|
+| `PRODUCT_NAME_FOUND` | 生成的页面中出现 `check` 中的写法，且不在 `allow` 中 | 回 milvus-docs 改成变量；确实要保留时，在 `allow` 中补一行 |
+| `PRODUCT_NAMES_INVALID` | `product-names.yaml` 格式不对，或 `allow` 中有单个词 | 改正规则文件 |
+
+提升时不符合条件的页面（页面不存在、两个版本已相同）不算错误，在运行摘要中列出：`PROMOTE_PAGE_NOT_FOUND`、`PROMOTE_NOTHING_TO_DO`。
 
 **站点适配**（见 [07](./07-site-adaptation.md#出错时)）
 
@@ -123,7 +130,11 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `OWNERSHIP_DUPLICATE_PATH` | 同一个输出路径既有飞书页面又有 Git 页面 | 生成失败 |
 | `OWNERSHIP_PATH_MISMATCH` | 飞书记录的发布目标或路径与 `publish` 不一致 | 该页生成失败 |
 | `OWNERSHIP_WRITE_DENIED` | 飞书任务试图改写或删除已切换的页面 | 失败，页面保持不变 |
-| `ACTIVATE_CHECK_FAILED` | 激活前的检查不通过，`detail` 中列出是哪一项 | 不激活 |
+| `ACTIVATE_CHECK_FAILED` | 比较时，或标为 `git` 后的 Fetch 中，激活前的检查不通过；`detail` 中列出是哪一项 | 比较时：不应激活；Fetch 中：这一页保留现有版本 |
+| `OWNERSHIP_CONFIG_MISSING` | 飞书表格标为 `git`，但没有对应的页面目录 | 这一页生成失败，保留现有版本；补回目录，或先删表格记录 |
+| `OWNERSHIP_REVERTED` | `active.json` 中的页面，placement type 被改回其他值 | Fetch 失败，页面保持 Git 版；把表格改回 `git` |
+| `RETIRE_DIR_LEFTOVER` | 表格记录已删除，页面目录还在 | 不算错误，不生成这一页，运行摘要中提示删除目录 |
+| `IMAGE_SOURCE_CHANGED` | 已记录的图片在原地址的内容变了（同名覆盖） | 不算错误，沿用记录中的图片，通知文档工程师 |
 
 ## 设计理由
 
@@ -134,7 +145,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 
 **为什么一次报出全部错误。** 作者一次就能改完，不必反复提交、每次只看到下一个错误。
 
-**为什么提升与下线的不符合条件不算错误。** 选“全部待提升”时，有的页本来就无需提升；整次运行失败会拖住其他页面。
+**为什么提升时的不符合条件不算错误。** 选“全部待提升”时，有的页本来就无需提升；整次运行失败会拖住其他页面。
 
 </details>
 

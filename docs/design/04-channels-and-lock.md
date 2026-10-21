@@ -1,8 +1,8 @@
 # 04 通道与 commit 记录
 
-Cloud 要能在 UAT 提前看到上游的修改，同时让 Prod 保持已上线的版本。本篇定义每个共享页怎样用 `lock.yaml` 记录 Prod 与 UAT 各用 milvus-docs 的哪个 commit，两个版本怎样合并成一份页面，以及 `lock.yaml` 由哪些 PR、怎样改变。对应的产品需求见[产品需求场景 3、6、8、10](../prd.md#场景-6让内容先只在-uat-显示)。
+Cloud 要能在 UAT 提前看到上游的修改，同时让 Prod 保持已上线的版本。本篇定义每个共享页怎样用 `lock.yaml` 记录 Prod 与 UAT 各用 milvus-docs 的哪个 commit，两个版本怎样合并成一份页面，以及 `lock.yaml` 由哪些 PR、怎样改变。对应的产品需求见[产品需求场景 3、6、8](../prd.md#场景-6让内容先只在-uat-显示)。
 
-**参与方**：zdoc 生成（读取 `lock.yaml`、按两个版本生成）、接入、下线、上游更新与提升 PR（写入 `lock.yaml`）、文档工程师（发起下线与提升）、zdoc 发布（按通道显示）。
+**参与方**：zdoc 生成（读取 `lock.yaml`、按两个版本生成）、接入、上游更新与提升 PR（写入 `lock.yaml`）、文档工程师（发起提升）、zdoc 发布（按通道显示）。
 
 **状态**：由原接口设计迁入，待工程维护者完善。
 
@@ -38,8 +38,10 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 读取
 | 字段 | 说明 |
 |---|---|
 | `schema_version` | 格式版本 |
-| `current` | Prod 使用的 milvus-docs commit，完整 SHA；写 `none` 表示 Prod 上没有这一页 |
-| `next` | UAT 使用的 milvus-docs commit，完整 SHA；写 `none` 表示 UAT 上没有这一页 |
+| `current` | Prod 使用的 milvus-docs commit，完整 SHA |
+| `next` | UAT 使用的 milvus-docs commit，完整 SHA |
+
+格式中保留 `none` 这个值，表示这一页在那一边不存在，留给导航迁到 Git 之后使用；Phase 1 不启用，出现时按格式错误处理（见下文“只在一个通道存在的页面”）。
 
 - 不记页面标识：所在的页面目录已经说明属于哪一页。
 - 不记仓库地址与跟踪分支：它们记在共享来源配置中（见上文），不在每页重复；记录的 commit 必须在跟踪分支的历史上。
@@ -51,7 +53,7 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 读取
 |---|---|---|
 | `lock.yaml` | Git 生成时，Prod 与 UAT 各用 Milvus 原文的哪个版本 | 本篇 |
 | `page.yaml` | 拿到原文后怎样加工 | [02](./02-page-config.md) |
-| 激活（`active.json`） | 网站上这一页用 Git 生成的版本，还是飞书的版本；只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
+| 飞书表格（placement type、`Release Channel`） | 网站上这一页用 Git 生成的版本还是飞书的版本；整页在哪一边显示。只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md) |
 
 激活之前，Git 照样按 `lock.yaml` 生成两个版本，只是作为候选结果，网站上仍是飞书版；`lock.yaml` 的变化要等激活之后才体现在网站上。
 
@@ -70,34 +72,35 @@ Prod 与 UAT 由同一个 dev 提交构建，不能各读一份文件，只能�
 
 ### 只在一个通道存在的页面
 
-`lock.yaml` 中一边写 `none`，表示这一页只在另一边存在：
+Phase 1 沿用飞书表格的 `Release Channel`，与其他页面相同，`lock.yaml` 不表达：
 
-| `lock.yaml` | 含义 | 生成结果 |
+| 表格中的 `Release Channel` | 含义 | 生成结果 |
 |---|---|---|
-| `current: none`，`next` 有值 | 新页面，功能还没上线：UAT 显示，Prod 没有这一页 | 带 zdoc 现有的整页标记 `channel: next` |
-| `current` 有值，`next: none` | 要下线的页面：Prod 照常显示，UAT 上已没有 | 带 `channel: retire-in-next` |
+| `NEXT` | 新页面，功能还没上线：UAT 显示，Prod 没有这一页 | 带 zdoc 现有的整页标记 `channel: next` |
+| `RETIRE-IN-NEXT` | 要下线的页面：Prod 照常显示，UAT 上已没有 | 带 `channel: retire-in-next` |
+| `CURRENT` 或不填 | 两边都显示 | 不带整页标记 |
 
-Prod 上的隐藏，以及从导航、搜索、`llms.txt` 中去掉，都沿用 zdoc 现有的整页通道实现。这两种情况替代飞书多维表格中的 `Release Channel`。
+- 生成时从 Fetch 读到的表格记录中取值；PR 校验没有飞书凭据，读 Fetch 保存在 dev 中的 `packages/docs-tooling/src/lark/meta/snapshots/guides-uat-last-success.json` 中的表格快照：其中 `records[]` 的每一项有 `record_id`、`slug`、`placement_type`、`release_channel`、`publish_targets` 与 `output_paths`。
+- Prod 上的隐藏，以及从导航、搜索、`llms.txt` 中去掉，都沿用 zdoc 现有的整页通道实现。
+- `lock.yaml` 照常记录两个 commit。表格为 `NEXT` 的页面，`current` 不会显示出来；上线时要在同一次发布中提升，否则 Prod 显示的是接入时的版本（见下文“提升”）。
+- 导航迁到 Git 后，再由 `lock.yaml` 的 `none` 承担这两种情况。
 
 ### `lock.yaml` 怎样变化
 
-`lock.yaml` 只由工具写入，人不手改。改它的 PR 共四种，都是普通的 zdoc PR，审核合并后生效：
+`lock.yaml` 只由工具写入，人不手改。改它的 PR 共三种，都是普通的 zdoc PR，审核合并后生效；另有一种普通 PR 在下线完成后删除它：
 
 | PR | 谁发起、怎样发起 | 改什么 | 所属阶段 |
 |---|---|---|---|
-| 接入一页 | 文档工程师开 PR 新增页面配置，工具自动写入 | `current` 与 `next` 都设为跟踪分支的最新提交；功能还没上线时 `current` 写 `none` | Phase 1a |
+| 接入一页 | 文档工程师开 PR 新增页面配置，工具自动写入 | `current` 与 `next` 都设为跟踪分支的最新提交 | Phase 1a |
 | 上游更新 | 工具每天自动发起 | 只改 `next` | Phase 1b |
-| 提升 | 文档工程师手动运行工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | Phase 1b |
-| 下线一页 | 文档工程师手动运行工作流 | 把 `next` 改为 `none` | Phase 1b，按需 |
-
-提升与下线用 zdoc 中同一个手动工作流：运行时选择操作（“提升”或“下线”）、填写页面，工具生成 PR。
+| 提升 | 文档工程师手动运行“提升”工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | Phase 1b |
+| 删除页面目录 | 下线完成后，文档工程师开普通 PR | 删除整个页面目录，`lock.yaml` 随之删除 | Phase 1b，按需 |
 
 #### 接入一页
 
 1. 文档工程师在 zdoc 中开 PR，新增 `shared-docs/pages/<页面标识>/` 下的 `page.yaml`，需要时加 Cloud 内容文件，不写 `lock.yaml`。
 2. 工具在 PR 中自动运行：发现新页面没有 `lock.yaml`，就取跟踪分支的最新提交写入 `lock.yaml`，提交到这个 PR，再触发校验（见 [05](./05-publish-handoff.md#pr-校验)）。
-3. 这一页对应的功能还没上线时，文档工程师给 PR 加标签 `shared-docs: not-launched`，工具把 `current` 重写为 `none`。合并前去掉或加上标签，`lock.yaml` 随之重写。这个标签由 zdoc 维护者在仓库中预先创建。
-4. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
+3. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
 
 - `lock.yaml` 写入后就固定在那个提交上，之后的上游修改由每天的上游更新 PR 处理。要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可。
 - Phase 1 导航由飞书节点决定，只能接入在飞书目录中已有节点的页面（见 [05b](./05b-cutover-and-ownership.md#导航phase-1)）。
@@ -108,25 +111,25 @@ milvus-docs 有新提交时，工具每天自动开 PR，把受影响页面的 `
 
 #### 提升
 
-**提升**是指：把 `lock.yaml` 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。新页面（`current: none`）提升后在 Prod 上线。
+**提升**是指：把 `lock.yaml` 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。新页面在 Prod 上线，还要在飞书表格中把 `Release Channel` 改为 `CURRENT`（见上文“只在一个通道存在的页面”）。
 
-运行工作流时选择“提升”，填写若干页的页面标识，或选“全部待提升”（`current` 与 `next` 不同的页）。一次提升只开一个 PR，同一次上线的页面一起审核、一起合并。PR 包含：
+运行“提升”工作流，填写若干页的页面标识，或选“全部待提升”（`current` 与 `next` 不同的页）。一次提升只开一个 PR，同一次上线的页面一起审核、一起合并。PR 包含：
 
 - 每页 `lock.yaml` 中的 `current` 改成 `next` 的 commit 值；
 - Git 页面中指向旧锚点的链接改为新锚点（见[标题改名与锚点](#标题改名与锚点)）；
 - 清理页面配置中只对一个通道生效的规则：删除 `channel: current` 的规则，去掉 `channel: next` 的标记（见 [02](../prd.md#场景-6让内容先只在-uat-显示)）；
-- 已下线页面的目录被删除，见下文“下线一页”；
+- PR 说明中列出飞书表格中 `Release Channel` 仍为 `NEXT` 的页面，提示“这些页面如果也在这次上线，请在同一次发布中把表格改为 `CURRENT`”；
 - PR 说明中列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`，提示“对应的功能也在这次上线时，请在本 PR 中一并去掉”。工具不自动去掉：这些包裹对应的是某个 Cloud 功能的上线时间，与这一页的提升不一定同时发生。
 
-提升在功能上线时进行，也就是现在修改 `Release Channel` 的时机；合并后到达 Prod 的路径与时延见 [05](./05-publish-handoff.md#触发时机)。提升或下线合并后，这一页还开着的上游更新 PR 由下一次运行重建或关闭（见 [06](./06-upstream-changes.md#每页一个滚动更新的-pr)）。
+提升在功能上线时进行，也就是现在修改 `Release Channel` 的时机；合并后到达 Prod 的路径与时延见 [05](./05-publish-handoff.md#触发时机)。提升合并后，这一页还开着的上游更新 PR 由下一次运行重建（见 [06](./06-upstream-changes.md#每页一个滚动更新的-pr)）。
 
-#### 下线一页
+#### 删除页面目录
 
-运行工作流时选择“下线”，填写一页或几页已激活页面的页面标识；工具生成 PR，把这些页的 `next` 改为 `none`：UAT 上不再显示，Prod 照常。
+Phase 1 下线沿用飞书表格（见 [05b](./05b-cutover-and-ownership.md#下线完成)）：`Release Channel` 改为 `RETIRE-IN-NEXT`，发版时删除表格记录与飞书节点，Fetch 把这一页从网站移除。之后文档工程师开一个普通 PR，删除 `shared-docs/pages/<页面标识>/`。
 
-之后的提升中，按提升的规则 `current` 也会变成 `none`，两边都没有这一页了，所以提升 PR 直接删除这一页的目录，`lock.yaml` 随之删除；PR 说明中提醒“合并后请删除这一页的飞书节点”。之后 Fetch 怎样把它从网站上移除，见 [05b](./05b-cutover-and-ownership.md#下线完成)。
-
-只下线已激活的页面。还没激活的页面，网站上显示的是飞书生成的版本，下线工作流改不到它：不再需要时，用普通 PR 删除页面目录，网站上的版本照现有做法在飞书中处理。
+- 要先删表格记录、再删目录。目录先删时，表格中仍标为 `git`，这一页生成失败，网站保留现有的版本。
+- 表格记录已删除、目录还在时，PR 校验与 Fetch 提示删除目录，不生成这一页。
+- 还没激活的页面不再需要时，同样用普通 PR 删除目录，网站上的版本照现有做法在飞书中处理。
 
 #### 急需上线的修正
 
@@ -161,7 +164,7 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 | 共享页没有 `lock.yaml`，或字段缺失、格式不对 | 该页生成失败 |
 | commit 在 milvus-docs 中不存在，或不在跟踪分支的历史上 | 该页生成失败 |
 | 两者都有值时，`current` 不是 `next` 的祖先（Prod 比 UAT 新，或两者不在同一条历史上） | 该页生成失败 |
-| `current` 与 `next` 都是 `none` | 该页生成失败；页面已下线时应删除页面目录 |
+| `current` 或 `next` 写了 `none`（Phase 1 不启用） | 该页生成失败，按格式错误处理 |
 | Cloud 规则只在 `next` 上失效 | 失败并指出是 `next`；`current` 与 Prod 不受影响 |
 
 发起改 `lock.yaml` 的 PR 时：
@@ -170,7 +173,7 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 |---|---|
 | 接入时，原文或页面配置引用的命名块在跟踪分支的最新提交中不存在 | 不写入 `lock.yaml`，PR 校验失败并说明原因 |
 | 接入 PR 来自 fork，工具无权提交到这个 PR | 不写入 `lock.yaml`，PR 中提示改从 zdoc 仓库内的分支提交 |
-| 下线或提升时填写的页面不存在；下线时这一页还没激活；提升时这一页的 `current` 已与 `next` 相同 | 这一页不进入 PR，运行结果中列出 |
+| 提升时填写的页面不存在，或这一页的 `current` 已与 `next` 相同 | 这一页不进入 PR，运行结果中列出 |
 
 ## 例子
 
@@ -197,11 +200,12 @@ next:    b2…    # 两边相同，成对的标记消失
 
 假设之后某一页要下线：
 
-| 时间 | 谁触发 | `lock.yaml` | UAT | Prod |
+| 时间 | 做什么 | `lock.yaml` | UAT | Prod |
 |---|---|---|---|---|
 | 平时 | — | `current: b2…`，`next: b2…` | 有 | 有 |
-| 决定下线 | 下线 PR | `current: b2…`，`next: none` | 没有 | 有 |
-| 版本发布 | 提升 PR | 页面目录删除（相当于两边都是 `none`） | 没有 | 没有 |
+| 决定下线 | 表格改为 `RETIRE-IN-NEXT` | 不变 | 没有 | 有 |
+| 版本发布 | 删除表格记录与飞书节点 | 不变 | 没有 | 没有 |
+| 之后 | 普通 PR 删除页面目录 | 随目录删除 | 没有 | 没有 |
 
 </details>
 
@@ -210,13 +214,15 @@ next:    b2…    # 两边相同，成对的标记消失
 <details>
 <summary>展开设计理由</summary>
 
-下线与提升手动发起、整页上线与下线不另设字段的理由见[产品需求](../prd.md#场景-8功能上线时提升)。
+提升手动发起、整页上线与下线沿用飞书表格的理由见[产品需求场景 3](../prd.md#场景-3接入一页)、[8](../prd.md#场景-8功能上线时提升)。
 
 **为什么两个版本必须合并进同一页。** zdoc 的 UAT 与 Prod 由同一个 dev commit 构建同一个镜像，部署时才注入通道（`ZDOC_RELEASE_CHANNEL`）。Prod 与 UAT 不能各读一份文件，只能在同一份页面中放两个版本，由 `<NextChannel>` 切换。只给改动的段落打标记做不到这一点：原文中已经只剩新文，Prod 无法保留旧文。
 
-**为什么接入时自动写 `lock.yaml`。** 作者不需要自己查 commit，也不会抄错 SHA；功能是否已上线用 PR 标签表达，审核人在 PR 中一眼可见。工具用 zdoc 自带的 `GITHUB_TOKEN` 提交，与 06 的上游更新 PR 相同；用它推送的提交不会自动触发其他工作流，所以要显式触发校验。
+**为什么接入时自动写 `lock.yaml`。** 作者不需要自己查 commit，也不会抄错 SHA。工具用 zdoc 自带的 `GITHUB_TOKEN` 提交，与 06 的上游更新 PR 相同；用它推送的提交不会自动触发其他工作流，所以要显式触发校验。
 
 **为什么按页。** zdoc 现在的提升就是按页进行的：整页在多维表格中把 `NEXT` 改为 `CURRENT`，块级去掉标签，没有全站统一发布的动作。全站共用一个 lock 会让不同时间上线的功能被迫一起进入 Prod。每页一份文件，多个上游更新 PR 同时修改不同页面时也不会冲突。
+
+**为什么格式中保留 `none`、Phase 1 不启用。** Phase 1 整页通道由飞书表格决定，`lock.yaml` 再表达一次就有两处来源。导航迁到 Git 后，表格不再存在，那时每页的 `Release Channel` 用一次性脚本写成 `none` 即可；格式中先留好这个值，到时不用改格式版本。
 
 **为什么 `lock.yaml` 不记摘要。** 它只表达决定；实际用到的输入与摘要属于构建结果，记在记录文件中。旧版本内容可以随时按 commit 从 Git 重新读取，比较变化不需要事先存摘要。
 

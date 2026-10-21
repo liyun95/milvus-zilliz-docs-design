@@ -1,6 +1,6 @@
 # 07 站点适配
 
-对应的产品需求见[产品需求场景 3](../prd.md#场景-3接入一页)（系统行为 3-4、3-5）与[场景 4](../prd.md#场景-4写-cloud-的差异)（系统行为 4-4、4-5）。本篇定义生成的最后一步：把完成变换、变量展开和产品过滤之后的 Milvus Markdown，转换成 Cloud 站点使用的 MDX（见[生成流水线](./README.md#生成流水线)）。
+对应的产品需求见[产品需求场景 1](../prd.md#场景-1把产品名和连接值写成变量)（系统行为 1-6）、[场景 3](../prd.md#场景-3接入一页)（系统行为 3-4、3-5）与[场景 4](../prd.md#场景-4写-cloud-的差异)（系统行为 4-4、4-5）。本篇定义生成的最后一步：把完成变换、变量展开和产品过滤之后的 Milvus Markdown，转换成 Cloud 站点使用的 MDX（见[生成流水线](./README.md#生成流水线)），再检查其中有没有漏换的产品名。
 
 **参与方**：zdoc 生成（转换）、zdoc 维护者（维护 Tabs 规则）。
 
@@ -110,20 +110,29 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 | front matter | 生成方式 |
 |---|---|
 | `title`、`description` | 默认取原文的 `title`、`summary`，`metadata` 中写了就用它；按手册加后缀：`guides` 加 `\| Cloud`，`guides-byoc` 加 `\| BYOC`。规则与 zdoc 飞书转换器中的 `__title_suffix`（`packages/docs-tooling/src/lark/larkDocWriter.js`）相同，生成结果与现有页面一致 |
-| `beta` | 取 `metadata.beta`，默认 `FALSE` |
+| `beta` | 取 `metadata.beta`，默认 `FALSE`。可选的值读 zdoc 的标签定义（`packages/docs-ui/src/shared/utils/docHeadingTags.ts` 中的 `DOC_HEADING_TAGS`），去掉标手册的 `BYOC`，不在工具中另写一份 |
 | `slug` | `/` 加页面标识 |
 | `sidebar_label`、`sidebar_position` | Phase 1 按飞书节点填写，见 [05b](./05b-cutover-and-ownership.md#导航phase-1) |
 | `notebook`、`added_since`、`last_modified`、`deprecate_since` | 固定为 `FALSE` |
 | `type` | `origin` |
 | `displayed_sidebar` | `default` |
 | `token` | `shared-<页面标识>`，见 [05](./05-publish-handoff.md#页面身份token) |
-| `channel` | 整页只在一边存在时，由 `lock.yaml` 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面) |
+| `channel` | 整页只在一边存在时，由飞书表格的 `Release Channel` 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面) |
 
 原文 front matter 中的其他字段（如 Milvus 的 `beta`、`id`）不输出。
 
 ### 其他 Milvus 语法
 
 需要 Milvus 站点插件的标记（如 `{{tab}}`、`::glossary.`）在预处理时就报错（`UNSUPPORTED_MARK`，见 [03](./03-md2md-interfaces.md#出错时)）。Milvus 站点专用的版式 `div`，如 `start_card_container`、`card-wrapper`、`filter`，只出现在首页、安装选择页等非 User Guide 页面，Phase 1 不转换；共享页中出现时，该页生成失败。
+
+### 产品名检查
+
+每个版本、每个手册的 MDX 生成后、两版合并前，按 `shared-docs/product-names.yaml` 检查一遍：
+
+- **检查什么**：`check` 中的每一项，在正文与代码块中按整词匹配，区分大小写。`MilvusClient`、`pymilvus`、`milvus.yaml` 这类更长的词中出现的 Milvus 不算命中；链接与图片地址、front matter 不检查。
+- **放过什么**：命中的位置落在 `allow` 中某个短语之内时放过。`allow` 只接受包含空格的短语，不接受单个词。
+- **报在哪里**：报错指出页面、版本和手册，并按变换前的位置映射回原文的文件与行号；命中在 Cloud 内容文件中时，指向内容文件。
+- **milvus-docs 侧**：milvus-docs 的 PR 检查用同一套规则只给提示、不拦截，因为它不知道哪些页面是共享页。规则文件从 zdoc 读取还是在 milvus-docs 中另放一份，由实现决定。
 
 ## 出错时
 
@@ -135,6 +144,8 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 | 提示框写法不在上表中；出现 Milvus 站点专用的版式 `div` | 该页生成失败 |
 | MDX 修补后仍不能编译 | 该页生成失败 |
 | Cloud 内容文件中手写了 `<Tabs>`、`<Admonition>` 等 Cloud 组件 | 该页生成失败，见 [02](./02-page-config.md#出错时) |
+| 生成的页面中出现 `check` 中的写法，且不在 `allow` 中 | 该页生成失败，提示回 milvus-docs 改成变量，或在 `allow` 中补一行 |
+| `product-names.yaml` 格式不对，或 `allow` 中有单个词 | 所有共享页生成失败 |
 
 ## 例子
 
@@ -163,3 +174,4 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 ## 验收
 
 - **T06**：Tabs 可切换、语言完整；锚点、导航、链接、图片和编辑入口正确；未知语法失败。
+- **T14**：漏换的产品名与连接值在两个版本中都能查出；`allow` 中的短语与更长的词不误报；报错位置指回原文或内容文件。

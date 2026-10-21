@@ -34,8 +34,8 @@ Phase 1 分两步：
 |---|---|---|
 | [milvus-docs](https://github.com/milvus-io/milvus-docs) | Delete Entities 内容对齐，加变量；固定 CI 中的工具版本；PR 检查中加入命名块校验 | Filtered Search、OpenAI 内容对齐（OpenAI 先对齐历史漂移）；加命名块；更新贡献说明；撤销旧飞书导入任务对已迁移页的覆盖能力 |
 | [md2md](https://github.com/zilliztech/md2md) | 只做预处理的入口：受控读取、依赖报告、错误检查；命名块的解析、校验与清理；一次发版；旧入口保持兼容 | 无新增 |
-| [zdoc](https://github.com/zilliztech/zdoc) 生成 | 获取固定源、定位命名块、生成命名块清单、调用 md2md、生成 Tabs 与 MDX；接入 PR 写入 lock 与 PR 校验；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；双版本通道比较；依赖索引、影响报告、上游更新 PR，下线与提升工作流 |
-| [zdoc](https://github.com/zilliztech/zdoc) 发布 | Git 来源接入设计：交接格式、生效配置与来源记录 | 页级混源；激活前比较与同批激活；下线完成；旧飞书任务隔离；生成结果比对；过滤、通道、翻译与恢复接入 |
+| [zdoc](https://github.com/zilliztech/zdoc) 生成（`packages/docs-tooling`） | 获取固定源、定位命名块、生成命名块清单、调用 md2md、生成 Tabs 与 MDX、产品名检查；接入 PR 写入 lock 与 PR 校验；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；双版本通道比较；依赖索引、影响报告、上游更新 PR，提升工作流 |
+| [zdoc](https://github.com/zilliztech/zdoc) 发布 | Git 来源接入设计：交接格式、生效配置与来源记录 | 页级混源；placement type 新值与比较；按表格生成 `active.json` 并与内容同批写入；下线完成；旧飞书任务隔离；生成结果比对；过滤、通道、翻译与恢复接入 |
 | [web-content](https://github.com/milvus-io/web-content)、[milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布回归 | Milvus 发布回归；Phase 1 不新增共享消费能力 |
 
 每个仓库的能力属于哪一类：
@@ -52,7 +52,7 @@ Phase 1 分两步：
 
 1. **内容**：Delete Entities 两端正文对齐，确定共同修订与产品差异，产品值改为变量；飞书上已有的语言示例（如 Rust）同步到 milvus-docs，并确认 milvus.io 能显示这些语言；审核 SDK 适用性。
 2. **md2md**：实现只做预处理的入口，包括受控读取、依赖报告与错误检查；实现命名块的解析、校验与清理（[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md)）；一次发版，并在 Milvus CI 中固定版本，PR 检查中加入命名块校验。
-3. **zdoc 生成**：按固定 commit 获取原文，定位命名块并生成命名块清单，调用 md2md 展开变量，生成 Tabs 与 MDX。
+3. **zdoc 生成**：按固定 commit 获取原文，定位命名块并生成命名块清单，调用 md2md 展开变量，生成 Tabs 与 MDX，检查漏换的产品名。代码放在 `packages/docs-tooling/src/shared-docs/`（[技术设计 README](./design/README.md#代码位置)）。
 4. **zdoc 生成**：接入 PR 自动写入 lock，PR 校验覆盖共享页；接入现有 stage 与 UAT 预览；候选任务不具备生产写权限。
 5. **zdoc 发布**：确定 Git 来源接入方式：生成结果、资源、来源与依赖记录的交接格式，以及生效配置的存储位置。
 6. **运行条件**：开始核实 Jenkins 接线、分支权限、图片与镜像保留、整页通道在译文中的传递，记录责任人。
@@ -63,6 +63,7 @@ Phase 1 分两步：
 - 【T02】md2md 变量入口：显式产品绑定；与原有作用域兼容；缺失变量报错；两个产品并行生成时不串值；不运行 Milvus 站点插件。
 - 【T03】include 与依赖：嵌套与重复引用可以追踪；循环、越界、符号链接、深度或体积超限都失败。
 - 【T06】MDX、路由与资源：Tabs 可切换、语言完整；锚点、导航、链接、图片和编辑入口正确；缺图、图片字节变化或未知语法都失败。
+- 【T14】产品名检查：漏换的产品名与连接值在两个版本中都能查出；放行的短语与 `MilvusClient` 这类更长的词不误报；报错位置指回原文或内容文件。
 - 【T11】Milvus 回归：新旧 md2md 默认行为兼容；真实 goover 构建通过，没有标记泄漏或内容丢失；同一篇原文加命名块前后，Milvus 侧输出逐字相同。
 - 【T12，候选部分】没有权限的候选任务不能写生产。
 - 对照批准的完整基线核验正文、章节、语言、代码、图片和导航；不能只统计 Tab 数。
@@ -73,15 +74,15 @@ Phase 1 分两步：
 
 1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤；飞书上已有的 Rust 等语言示例同步到 milvus-docs），加命名块。
 2. **zdoc 生成**：add / replace / remove，目标包括命名块、语言示例和代码中连续的几行；产品过滤器接入 Git 输入（用于 Cloud 内容文件）；lock 记录 current / next 两个 commit，两版各生成一遍，按块比较并成对输出 `<NextChannel>`。
-3. **zdoc 生成**：依赖索引、影响报告、上游更新 PR，下线与提升工作流；按[产品需求场景 7](./prd.md#场景-7审核上游更新)处理各类上游变化，实现见[技术设计 06](./design/06-upstream-changes.md)。
-4. **zdoc 发布**：页级混源；激活前比较与同批激活；下线完成；旧飞书任务隔离；重新生成比对；过滤、通道、翻译与恢复接入。
+3. **zdoc 生成**：依赖索引、影响报告、上游更新 PR，提升工作流；按[产品需求场景 7](./prd.md#场景-7审核上游更新)处理各类上游变化，实现见[技术设计 06](./design/06-upstream-changes.md)。
+4. **zdoc 发布**：页级混源；placement type 新值、比较运行，按表格生成 `active.json` 并与内容同批写入；下线完成；旧飞书任务隔离；重新生成比对；过滤、通道、翻译与恢复接入。
 5. **切换**：核对最新飞书修订，文档负责人审核后切换试点页，更新编辑入口；记录验证结果与后续迁移条件。
 
 **完成标准**
 
 - 【T04】内容变换：目标存在性、类型、语言和冲突检查；多语言内容完整。以 OpenAI 的凭证参数为真实用例，在每种语言中验证代码行的 replace 与 add：缩进正确，不留多余空行，Milvus 输出与原文一致；`lines` 找不到、出现多次、超过上限或与语言项变换冲突时都失败；上游改了被定位的行时不能更新。
 - 【T05】上游更新 PR：被替换的原文变化仍然提示；上游变化只生成 PR，不自动采用；PR 合并前的生成结果不进入正式发布；命名块改名或删除时校验失败，旧版本继续有效；已下线的页面不再更新。
-- 【T07】混源与切换：覆盖[技术设计 05b 图 1](./design/05b-cutover-and-ownership.md#切换与激活) 中的每一种情况——同步配置不激活；失败或取消保持原状；激活时配置、正文、导航、来源记录同批提交；等待期间基线变化不会覆盖新状态；部署失败不恢复飞书写权；飞书全量抓取、旧缓存、删除清单与恢复任务都不能改变已迁移页，未迁移页照常更新；激活前的比较不写 dev；下线完成时飞书节点已删与未删两种情况。
+- 【T07】混源与切换：覆盖[技术设计 05b 图 1](./design/05b-cutover-and-ownership.md#切换与激活) 中的每一种情况——接入后未激活时不写 dev；标为 `git` 后检查不通过时保留现有版本；激活时 `active.json`、正文、导航、来源记录同批提交；placement type 被改回时失败；部署失败不恢复飞书写权；飞书全量抓取、旧缓存、删除清单与恢复任务都不能改变已迁移页，未迁移页照常更新；比较不写 dev；下线时 `RETIRE-IN-NEXT`、删除记录、目录残留与目录先删四种情况。
 - 【T08】缓存：只有变量、Cloud 内容文件、工具、资源或归属变化时也会重新检查，不会被飞书侧的“未变化”跳过；冷热构建结果一致，损坏的缓存不会发布旧结果。
 - 【T09】翻译：以最终 Cloud 正文为输入，技术内容受保护；输出不变且已有有效译文时不重译；缺译文仍按原规则处理；英文、日文和中文的边界正确。
 - 【T10】恢复：临时 artifact 不可用时，能从 Git 恢复或从固定输入重建；来源记录一致；缺源或缺资源时停止；镜像回滚不恢复飞书写权。
@@ -102,7 +103,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | [01](./design/01-named-blocks.md) | 命名块的定义与解析 | 两种命名块与标记写法；出错规则；写错时在哪里发现、标记怎样清除 | 1a；带标记的原文合并前 | 已定义，待确认 |
 | [02](./design/02-page-config.md)、[02b](./design/02b-links-and-images.md) | 共享页配置（含链接与图片） | 目录与全部字段：整篇复用、发布手册、页面元数据、add / replace / remove（命名块、语言示例、`lines`）；链接与图片的处理 | 目录在 1a；差异字段在 1b 开发前 | 已定义，待确认 |
 | [03](./design/03-md2md-interfaces.md) | md2md 提供的接口 | 命名块解析与清除的接口，Milvus CI 怎样复用；预处理入口的调用参数、变量根目录与作用域、读取接口、依赖与错误的返回格式 | 1a 并行开发前；集成前完成发版 | 已定义，待确认 |
-| [04](./design/04-channels-and-lock.md) | 通道与 commit 记录 | `current` / `next` 的字段；接入、下线与提升怎样发起；记录粒度、跟踪的 Milvus 分支，以及怎样进入既有的发布和恢复数据 | 记录格式在 1a 获取原文前确定；提升方式与跟踪分支在 1b 开发前；恢复接线在切换前 | 已定义，待确认 |
+| [04](./design/04-channels-and-lock.md) | 通道与 commit 记录 | `current` / `next` 的字段；接入与提升怎样发起；整页通道沿用飞书表格；记录粒度、跟踪的 Milvus 分支，以及怎样进入既有的发布和恢复数据 | 记录格式在 1a 获取原文前确定；提升方式与跟踪分支在 1b 开发前；恢复接线在切换前 | 已定义，待确认 |
 | [05](./design/05-publish-handoff.md)、[05b](./design/05b-cutover-and-ownership.md) | 生成结果交给发布（含页面切换与归属） | 生成结果、资源、来源与依赖记录的格式；Git 来源怎样进入现有来源模型；生效配置的存储与同批提交；下线页面怎样从网站移除 | 1a 发布接入设计时 | 已定义，待确认；有待核实事项，见下表 |
 | [06](./design/06-upstream-changes.md) | 上游变化的发现与影响报告 | 触发方式、执行身份（社区 PR 不提供 Cloud 凭据）、重复事件合并、失败重试与手动重跑、上游更新 PR 与影响报告的内容 | 1b 上游更新 PR 开发前 | 已定义，待确认 |
 
@@ -114,11 +115,18 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | Milvus 侧的锚点校验 | milvus-docs 的链接检查（`check-link.js`）只检查页面、不检查锚点，标题改名留下的断链拦不住。直接加校验要先修历史断链；以后可以只检查 PR 新造成的断链。已定：Phase 1 不做 | 文档负责人 |
 | Cloud 文档能否链接到 Milvus 站点 | Milvus 原文链接的页面在 Cloud 没有对应页时，可以在链接映射表中明确写成 milvus.io 地址，或要求作者删改那句话。暂按允许、只能在映射表中明确写出处理（[技术设计 02b《链接与图片》](./design/02b-links-and-images.md)） | 文档负责人 |
 | 共享配置变化时自动触发 Fetch | master 上 `shared-docs/` 变化时自动触发一次只处理 Guides 的 Fetch，上游更新 PR、提升 PR 合并后不必等到下一次定时运行（最多 8 小时）；代价是 Fetch 运行次数增加（[技术设计 05](./design/05-publish-handoff.md#触发时机)） | 文档负责人 |
-| UAT 部署的触发方式 | 生成结果写入 dev 后，外部 Jenkins 是自动部署 UAT，还是由人工启动；zdoc README 的写法看起来是人工启动，未核实。决定合并后多久能在 UAT 看到 | 文档负责人 |
-| 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。暂按 A 处理（[技术设计 05b](./design/05b-cutover-and-ownership.md#导航phase-1)） | 文档负责人 |
+| UAT 部署的触发方式 | 2026-10-20 确认：目前不是自动部署，文档负责人计划改为自动；Jenkins 在内网，GitHub Actions 连不到，要另找接法。决定合并后多久能在 UAT 看到 | 文档负责人 |
+| 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。已定：A（[技术设计 05b](./design/05b-cutover-and-ownership.md#导航phase-1)） | — |
 | 共享页的代码语言要求 | 推动者建议，待文档负责人确认：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。现有 Cloud 页面的 Rust 示例在内容对齐时从飞书同步到 milvus-docs（[技术设计 07](./design/07-site-adaptation.md#代码-tabs)） | 文档负责人 |
+| 激活、新页面与下线的开关 | 2026-10-20 按文档负责人的意见改为：激活在飞书表格中改 placement type；整页通道（新页面、下线）沿用表格的 `Release Channel`；不用 PR 标签 `shared-docs: not-launched`；`lock.yaml` 的 `none` 保留在格式中、Phase 1 不启用；`active.json` 改为 Fetch 按表格生成的派生记录；placement type 新增 `git`，标为 `git` 的记录不填 `Docs`（[产品需求场景 9](./prd.md#场景-9从飞书切换到-git激活)、[10](./prd.md#场景-10下线一页)）。已定 | — |
+| 产品名检查 | 已定：zdoc 检查生成后的页面并拦截，milvus-docs 只给提示（[产品需求场景 1](./prd.md#场景-1把产品名和连接值写成变量)） | — |
+| `beta` 的取值 | 已定：读 zdoc 的标签定义，现有 `PUBLIC`、`PRIVATE`、`ON REQUEST`、`NEAR DEPRECATE`、`DEPRECATED`、`CONTACT SALES`（[产品需求场景 3](./prd.md#场景-3接入一页)） | — |
+| 链接映射表的维护方式 | 文档负责人认为人工维护难、出错代价高。待重新调研：从飞书现有页面反推映射候选；找不到时降级为指向 milvus.io 并在报告中列出；校验提前到 PR 中。Delete Entities 只有一个站内链接，不阻塞 1a | 推动者、文档负责人 |
+| 锚点转为小写能否正常定位 | 待文档负责人在 zdoc 中测试 | 文档负责人 |
+| 换图规则 | milvus-docs 中换图用新文件名、不覆盖已上传的图片（[产品需求场景 5](./prd.md#场景-5链接与图片)）。仓库调研见[技术设计 02b](./design/02b-links-and-images.md#图片)。已定：由推动者写进 milvus-docs 的贡献说明 | — |
+| 代码位置 | 已定：zdoc 的 `packages/docs-tooling/src/shared-docs/`，见[技术设计 README](./design/README.md#代码位置) | — |
 | `alert warning` 的样式 | 已定：与 zdoc 现有页面一致，转为 `<Admonition type="warning" icon="🚧" title="Warning">`（[技术设计 07](./design/07-site-adaptation.md#提示框)） | — |
-| Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活所需的“比较”“激活”两种手动运行以什么形式提供；链接查找中“同名页面”的名单从哪里读取（[技术设计 02b](./design/02b-links-and-images.md#链接)）（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
+| Fetch 的接入点 | 共享页的生成具体接在 Fetch 的哪一步；覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活前的“比较”以什么形式提供；PR 校验读 dev 中的表格快照 `guides-uat-last-success.json`（已定，见[技术设计 04](./design/04-channels-and-lock.md#只在一个通道存在的页面)）；链接查找中“同名页面”的名单从哪里读取（[技术设计 02b](./design/02b-links-and-images.md#链接)）（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
 | 重新生成比对的接法 | Fetch 写 dev 前怎样比对；修改 dev 中共享页生成结果的 PR 由哪个检查拦下（[技术设计 05](./design/05-publish-handoff.md#发布保护)） | zdoc 维护者 |
 
 每项确认都要留下接口约定、负责人和对应测试。未确认的接口不能按“直接复用”估为零工作量；若影响 md2md 发版或其他仓库，同步调整排期。
@@ -129,7 +137,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 - 外部 Jenkins 的实际触发、审批、UAT / Prod 接线和运行版本。
 - Git 分支保护、工作流身份和部署权限能否落实发布保护。
 - 图片对象版本、保留策略和镜像回滚窗口，只为确认的缺口补能力。
-- 整页通道（lock 中的 `none`，见[技术设计 04](./design/04-channels-and-lock.md#只在一个通道存在的页面)）在各语言译文中的传递方式。
+- 整页通道（飞书表格的 `Release Channel`，见[技术设计 04](./design/04-channels-and-lock.md#只在一个通道存在的页面)）在共享页各语言译文中的传递方式。
 - 产品过滤的实际规则、翻译开关、语言发布契约、导航与其他飞书依赖的运行配置。
 
 ### 6.3 测试方式
