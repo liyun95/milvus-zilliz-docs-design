@@ -32,6 +32,21 @@ ERROR_SECTION = re.compile(r"^\*\*(.+?)\*\*（")
 ERROR_ROW = re.compile(r"^\| `([A-Z][A-Z0-9_]+)` \| (.+?) \|")
 ERROR_INLINE = re.compile(r"`([A-Z][A-Z0-9_]{3,})`")
 
+# Stable ASCII identifiers for the error areas, so code in the English-language
+# implementation repositories never matches on the Chinese headings.
+AREA_IDS = {
+    "命名块": "named-blocks",
+    "变量与片段": "variables-and-fragments",
+    "页面配置": "page-config",
+    "变换": "transforms",
+    "链接与图片": "links-and-images",
+    "版本记录与两版合并": "lock-and-merge",
+    "产品名": "product-names",
+    "站点适配": "site-adaptation",
+    "发布与切换": "publish-and-cutover",
+    "提升": "promotion",
+}
+
 
 def read(path: Path) -> list[str]:
     try:
@@ -83,6 +98,10 @@ def errors() -> list[dict]:
         elif line.startswith("提升时不符合条件"):
             for code in ERROR_INLINE.findall(line):
                 items.setdefault(code, {"code": code, "area": "提升", "when": "运行摘要中列出，不算错误"})
+    for item in items.values():
+        if item["area"] not in AREA_IDS:
+            raise SystemExit(f"error area {item['area']!r} has no ID in AREA_IDS")
+        item["area_id"] = AREA_IDS[item["area"]]
     return list(items.values())
 
 
