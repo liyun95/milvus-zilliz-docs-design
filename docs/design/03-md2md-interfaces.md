@@ -22,18 +22,19 @@ zdoc 与 Milvus CI 处理命名块、展开变量与片段时，必须用同一�
 import { parseBlocks, stripBlockMarkers } from "@zilliz/mdtomd/blocks.js";
 
 // 解析：找出全部命名块，检查标记写法，返回块的位置与错误
-const result = parseBlocks(content, { sourceName });
+const result = parseBlocks(content, { sourceName, isFragment });
 
 // 清除：删掉标记所在的整行，返回清除后的 Markdown
 const output = stripBlockMarkers(content);
 ```
 
-`parseBlocks` 有两个参数：
+`parseBlocks` 的参数：
 
 | 参数 | 类型 | 必填 | 说明 |
 |---|---|---|---|
 | `content` | 字符串 | 是 | 一篇页面文件的完整 Markdown |
 | `sourceName` | 字符串 | 否 | 报错时显示的文件名 |
+| `isFragment` | 布尔值 | 否，默认 `false` | 为 `true` 时，任何标记都报 `BLOCK_IN_FRAGMENT`。命令行与 `goover` 按文件是否在 `fragments/` 下传入 |
 
 `stripBlockMarkers` 只有一个参数：
 

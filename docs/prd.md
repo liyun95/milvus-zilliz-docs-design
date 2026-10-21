@@ -314,7 +314,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 | 规则 | 例子 |
 |---|---|
-| 标记必须独占一行 | ❌ `## Configure credentials <!-- doc:block:start id="x" -->` |
+| 标记必须独占一行；行首、行尾可以有空格或 Tab | ❌ `## Configure credentials <!-- doc:block:start id="x" -->` |
 | ID 由小写字母、数字和连字符组成，以字母或数字开头，ID 加双引号 | ✅ `id="before-you-start"`；❌ `id="BeforeYouStart"`、`id=before-you-start` |
 | ID 在同一个文件内唯一；开始与结束标记的 ID 一致 | 两个 `id="code"` 报错 |
 | 代码组只包代码，不包说明文字 | 把代码前的一句说明也包进去，这一块就成了 Markdown 块，只能整块处理 |
