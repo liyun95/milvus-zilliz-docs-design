@@ -15,15 +15,54 @@
 - 查找的第 3 步“Cloud 有同名页面”：把 Milvus 文件名去掉 `.md`，在该手册现有页面的 slug 名单中查找。名单包括飞书生成的页面与已激活的共享页；从哪里读取（dev 中的内容目录，或导航生成的中间结果）由 zdoc 维护者确定。
 - 链接映射表 `shared-docs/links.yaml` 全站一份：键是 Milvus 页面文件名，值是 Cloud 页面标识或完整的 milvus.io 地址。
 - 链接在 PR 校验中解析：校验只生成共享页，不跑整站构建，错误在合并前报出，不会等到一两个小时的 Fetch 才失败。
-- 映射表的维护方式待重新调研（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)），调研结论可能改变第 2、4 步。
+- 生成时只按上面四步查找，不按标题或相似度自动匹配；它们只用于下面的初始映射表与报错中的候选。
+
+### 初始映射表的生成
+
+一个一次性的命令（建议 `pnpm docs-tooling shared-docs links-seed`），在 Phase 1 开始、飞书版页面还在时运行一次，输出 `links.yaml` 的候选，由文档工程师审核后用 PR 提交。依据与数据见[链接映射表的维护方式调研](../../research/link-mapping-maintenance.md)。
+
+| 输入 | 来源 |
+|---|---|
+| 被链接的 Milvus 页面 | 跟踪分支最新提交中 `site/en/userGuide/` 的全部站内链接（2026-10-20 共 181 个目标） |
+| Cloud 页面的 slug 与标题 | dev 中英文 Guides 的内容目录 |
+| Cloud 现有页面中的链接 | 同上，只取 `./` 开头的站内链接 |
+
+对每个目标依次取候选，取到即停，并在行尾注释中写明来源：
+
+1. **同名页面**：已在构建时的第 3 步中，不写进表。
+2. **标题相同**：Milvus 页面的 `title` 与 Cloud 页面的标题（去掉 `| Cloud`，转小写，非字母数字换成空格）相同，且 Cloud 只有一页是这个标题。
+3. **从 Cloud 现有页面反推**：Milvus 源页面对应的 Cloud 页面（同名或同标题）中，与 Milvus 链接文字相同的链接所指的页面；多个时取出现次数最多的，并在注释中列出其余的。
+4. **按类别指向 milvus.io**：目标在 Milvus 的 `adminGuide/`、`getstarted/`、`reference/` 下，或是索引类型页（如 `ivf-flat.md`、`hnsw.md`），写成 `https://milvus.io/docs/<文件名>`。
+5. **其余**：写成注释掉的一行，附上按标题相似度排出的前三个 Cloud 页面，由人判断。
+
+```yaml
+# shared-docs/links.yaml（候选示意）
+boolean.md: filtering-overview                     # 标题相同；反推
+ivf-flat.md: https://milvus.io/docs/ivf-flat.md    # 索引类型
+# limitations.md: ?                                # 待判断；相近：limits（Zilliz Cloud Limits）……
+```
+
+- 2、3 两步都给出结果时必须相同，不同时写成待判断。
+- 审核时注释保留在表中，便于以后追溯；工具读表时忽略注释。
+
+**查不到时的报错**：`LINK_UNRESOLVED` 的 `detail` 中附上按第 2 步与相似度给出的前三个候选，不自动采用。
 
 ### 锚点
 
-milvus.io 的标题锚点保留大小写（如 `#Delete-Entities-by-Filtering-Conditions`），zdoc 的锚点全部小写（如 `#delete-entities-by-filtering-conditions`），两边对标点的处理也不同。浏览器按大小写匹配锚点，所以原样照搬会失效。
+两边的锚点都由标题文字生成（2026-10-21 核验 milvus.io 与 docs.zilliz.com 的线上页面和 zdoc 代码）：
 
-- **目标是本页或另一个共享页**：工具按 Milvus 的规则算出目标页每个标题的锚点，找到链接指向的标题，输出该标题在 Cloud 中的锚点；找不到对应标题时该页生成失败。
+| 站点 | 算法 | 依据 |
+|---|---|---|
+| milvus.io | 去掉标题中的 Markdown 标记后，`replace(/\s+/g, '-')`，再 `replace(/[^A-Za-z0-9-]/g, '')`，保留大小写 | 线上页面：`What’s next` → `Whats-next`，`Phase 1: Ingestion & key classification` → `Phase-1-Ingestion--key-classification` |
+| zdoc | `slugify(标题, { lower: true, strict: true })`（slugify 1.6.x），写成显式的 `{#id}`；飞书中手写了 `{#…}` 时用手写的 | `packages/docs-tooling/src/lark/larkDocWriter.js` 的 `__heading_slug`；`&` → `and`、`\|` → `or`、`<` → `less`、`$` → `dollar`、`%` → `percent` |
+
+浏览器按大小写匹配锚点：docs.zilliz.com 上 `#Iterative-filtering` 不跳转，`#iterative-filtering` 跳转。
+
+- **换算方法**：在链接指向的 Milvus 原文（同一版本）中，按 milvus.io 的算法算出每个标题的锚点，找到与链接完全相同的那个标题，再按 zdoc 的算法从标题文字算出 Cloud 的锚点。找不到时该页生成失败；只差大小写的也算找不到，因为它在 milvus.io 上同样失效。
+- **目标是本页或另一个共享页**：算出的锚点一定存在，因为共享页的标题也按 zdoc 的算法输出（见 [07](./07-site-adaptation.md#标题锚点)）。
 - **两个版本分别计算**：`current` 版本中的链接按目标页 `current` 版本的标题计算，`next` 版本中的链接按目标页 `next` 版本的标题计算。目标页在该版本的原文中不存在时，该页生成失败。这条规则同样适用于不带锚点、指向另一个共享页的链接。
-- **目标是 Cloud 自己维护的页面**：按 Cloud 的规则转成小写写法，是否存在由 zdoc 现有的链接检查发现。
+- **目标是 Cloud 自己维护的页面**：同样从 Milvus 原文的标题文字算出锚点；飞书版的标题可能不同，是否存在由 zdoc 现有的链接检查发现。
+- **统计**（milvus-docs `v3.0.x` `9acdc99`，User Guide 与 Embeddings，不含完整的 milvus.io 地址）：带锚点的站内链接 233 个；能找到标题的 184 个，直接转小写能对上 183 个；找不到标题的 49 个，其中 11 个是飞书导入时留下的块 ID，8 个只差大小写。全站 4457 个标题中，直接转小写与 zdoc 算法结果不同的有 136 个，原因是 `&`、`<`、`|`、`$`、`%`、表情符号与其他非 ASCII 字符。
 - 多语言代码组中切换语言用的 `#python`、`#java` 等不是链接，由站点适配处理。
 
 标题改名后锚点变化的处理见 [04](./04-channels-and-lock.md#标题改名与锚点)。

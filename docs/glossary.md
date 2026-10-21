@@ -34,7 +34,7 @@
 
 ## 发布
 
-- **Fetch**：zdoc 现有的发布工作流，每天定时运行 3 次，也可以手动触发，一次约 1 小时；抓取飞书内容、生成共享页，校验后写入 dev（见 [05](./design/05-publish-handoff.md#交接发生在哪里)）。
+- **Fetch**：zdoc 现有的发布工作流，每天定时运行 3 次，也可以手动触发，一次约 70 分钟；抓取飞书内容、生成共享页，校验后写入 dev（见 [05](./design/05-publish-handoff.md#交接发生在哪里)）。
 - **docs-tooling**：zdoc 中的 `packages/docs-tooling`，是 Fetch 等工作流调用的工具包，入口是 `pnpm docs-tooling`。共享页的生成代码放在其中的 `src/shared-docs/`（见[技术设计 README](./design/README.md#代码位置)）。
 - **候选结果（候选运行）**：不写 dev、不上传图片、不需要 Cloud 凭据的生成，用于 PR 校验，以及激活之前的共享页（见 [05](./design/05-publish-handoff.md#pr-校验)）。
 - **dev**：zdoc 存放生成结果的分支，由 Fetch 写入；网站从它构建，Prod 与 UAT 用同一个 dev 提交，部署时才区分。人编写的文件在 master，不在 dev。

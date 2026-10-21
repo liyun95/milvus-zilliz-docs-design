@@ -52,10 +52,11 @@ Phase 1 分两步：
 
 1. **内容**：Delete Entities 两端正文对齐，确定共同修订与产品差异，产品值改为变量；飞书上已有的语言示例（如 Rust）同步到 milvus-docs，并确认 milvus.io 能显示这些语言；审核 SDK 适用性。
 2. **md2md**：实现只做预处理的入口，包括受控读取、依赖报告与错误检查；实现命名块的解析、校验与清理（[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md)）；一次发版，并在 Milvus CI 中固定版本，PR 检查中加入命名块校验。
-3. **zdoc 生成**：按固定 commit 获取原文，定位命名块并生成命名块清单，调用 md2md 展开变量，生成 Tabs 与 MDX，检查漏换的产品名。代码放在 `packages/docs-tooling/src/shared-docs/`（[技术设计 README](./design/README.md#代码位置)）。
-4. **zdoc 生成**：接入 PR 自动写入 lock，PR 校验覆盖共享页；接入现有 stage 与 UAT 预览；候选任务不具备生产写权限。
-5. **zdoc 发布**：确定 Git 来源接入方式：生成结果、资源、来源与依赖记录的交接格式，以及生效配置的存储位置。
-6. **运行条件**：开始核实 Jenkins 接线、分支权限、图片与镜像保留、整页通道在译文中的传递，记录责任人。
+3. **初始链接映射表**：工具按[技术设计 02b](./design/02b-links-and-images.md#初始映射表的生成)为 User Guide 中所有被链接的页面生成候选，文档工程师审核后提交；要在飞书版页面还在时做。
+4. **zdoc 生成**：按固定 commit 获取原文，定位命名块并生成命名块清单，调用 md2md 展开变量，生成 Tabs 与 MDX，检查漏换的产品名。代码放在 `packages/docs-tooling/src/shared-docs/`（[技术设计 README](./design/README.md#代码位置)）。
+5. **zdoc 生成**：接入 PR 自动写入 lock，PR 校验覆盖共享页；接入现有 stage 与 UAT 预览；候选任务不具备生产写权限。
+6. **zdoc 发布**：确定 Git 来源接入方式：生成结果、资源、来源与依赖记录的交接格式，以及生效配置的存储位置。
+7. **运行条件**：开始核实 Jenkins 接线、分支权限、图片与镜像保留、整页通道在译文中的传递，记录责任人。
 
 **完成标准**
 
@@ -113,16 +114,16 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 |---|---|---|
 | 变换规则只对一个通道生效 | 页面配置的变换默认对 Prod 与 UAT 两个版本都生效。上游修改了 Cloud 定位的代码行或命名块时，过渡期内旧写法只在 `current` 中存在、新写法只在 `next` 中存在，上游更新 PR 无法合并；Cloud 想只在下次发布时用自己的内容替换某一节也无法表达。方案：变换加可选字段 `channel`（`current` / `next`），提升时由工具清理（[技术设计 02](./prd.md#场景-6让内容先只在-uat-显示)）。已有方案，待确认 | 文档负责人 |
 | Milvus 侧的锚点校验 | milvus-docs 的链接检查（`check-link.js`）只检查页面、不检查锚点，标题改名留下的断链拦不住。直接加校验要先修历史断链；以后可以只检查 PR 新造成的断链。已定：Phase 1 不做 | 文档负责人 |
-| Cloud 文档能否链接到 Milvus 站点 | Milvus 原文链接的页面在 Cloud 没有对应页时，可以在链接映射表中明确写成 milvus.io 地址，或要求作者删改那句话。暂按允许、只能在映射表中明确写出处理（[技术设计 02b《链接与图片》](./design/02b-links-and-images.md)） | 文档负责人 |
-| 共享配置变化时自动触发 Fetch | master 上 `shared-docs/` 变化时自动触发一次只处理 Guides 的 Fetch，上游更新 PR、提升 PR 合并后不必等到下一次定时运行（最多 8 小时）；代价是 Fetch 运行次数增加（[技术设计 05](./design/05-publish-handoff.md#触发时机)） | 文档负责人 |
+| Cloud 文档能否链接到 Milvus 站点 | 已定：可以，但只能在链接映射表中明确写出，工具不自动指向 milvus.io（[技术设计 02b《链接与图片》](./design/02b-links-and-images.md)） | — |
+| 共享配置变化时自动触发 Fetch | 已定：Phase 1 不新增，等下一次定时运行，急用时手动运行。UAT 要人工部署，提前跑完也看不到；一次 Fetch 中位 69 分钟，只跑 Guides 也要抓中文 Guides，还与 Translation 共用串行队列。UAT 改为自动部署、迁移页变多后，考虑扩展按页抓取（[技术设计 05](./design/05-publish-handoff.md#触发时机)） | — |
 | UAT 部署的触发方式 | 2026-10-20 确认：目前不是自动部署，文档负责人计划改为自动；Jenkins 在内网，GitHub Actions 连不到，要另找接法。决定合并后多久能在 UAT 看到 | 文档负责人 |
 | 迁移页的导航由谁管 | A：Phase 1 保留飞书目录中的节点，导航位置、顺序和标签仍在飞书中维护，Git 只接管正文与其余元数据；B：删除飞书节点，Git 页面按页面配置插入导航，完全迁出但改动与风险更大。已定：A（[技术设计 05b](./design/05b-cutover-and-ownership.md#导航phase-1)） | — |
 | 共享页的代码语言要求 | 推动者建议，待文档负责人确认：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。现有 Cloud 页面的 Rust 示例在内容对齐时从飞书同步到 milvus-docs（[技术设计 07](./design/07-site-adaptation.md#代码-tabs)） | 文档负责人 |
 | 激活、新页面与下线的开关 | 2026-10-20 按文档负责人的意见改为：激活在飞书表格中改 placement type；整页通道（新页面、下线）沿用表格的 `Release Channel`；不用 PR 标签 `shared-docs: not-launched`；`lock.yaml` 的 `none` 保留在格式中、Phase 1 不启用；`active.json` 改为 Fetch 按表格生成的派生记录；placement type 新增 `git`，标为 `git` 的记录不填 `Docs`（[产品需求场景 9](./prd.md#场景-9从飞书切换到-git激活)、[10](./prd.md#场景-10下线一页)）。已定 | — |
 | 产品名检查 | 已定：zdoc 检查生成后的页面并拦截，milvus-docs 只给提示（[产品需求场景 1](./prd.md#场景-1把产品名和连接值写成变量)） | — |
 | `beta` 的取值 | 已定：读 zdoc 的标签定义，现有 `PUBLIC`、`PRIVATE`、`ON REQUEST`、`NEAR DEPRECATE`、`DEPRECATED`、`CONTACT SALES`（[产品需求场景 3](./prd.md#场景-3接入一页)） | — |
-| 链接映射表的维护方式 | 文档负责人认为人工维护难、出错代价高。待重新调研：从飞书现有页面反推映射候选；找不到时降级为指向 milvus.io 并在报告中列出；校验提前到 PR 中。Delete Entities 只有一个站内链接，不阻塞 1a | 推动者、文档负责人 |
-| 锚点转为小写能否正常定位 | 待文档负责人在 zdoc 中测试 | 文档负责人 |
+| 链接映射表的维护方式 | 已定：初始内容由工具从同名页面、标题相同、Cloud 现有页面中的链接一次生成候选，人审后提交；查不到仍然失败，报错附候选（[产品需求场景 5](./prd.md#场景-5链接与图片)、[调研](../research/link-mapping-maintenance.md)） | — |
+| 锚点的换算 | 已定：docs.zilliz.com 实测锚点区分大小写；从 Milvus 原文的标题文字按 zdoc 的算法计算，不直接转小写（[产品需求场景 5](./prd.md#场景-5链接与图片)、[技术设计 02b](./design/02b-links-and-images.md#锚点)） | — |
 | 换图规则 | milvus-docs 中换图用新文件名、不覆盖已上传的图片（[产品需求场景 5](./prd.md#场景-5链接与图片)）。仓库调研见[技术设计 02b](./design/02b-links-and-images.md#图片)。已定：由推动者写进 milvus-docs 的贡献说明 | — |
 | 代码位置 | 已定：zdoc 的 `packages/docs-tooling/src/shared-docs/`，见[技术设计 README](./design/README.md#代码位置) | — |
 | `alert warning` 的样式 | 已定：与 zdoc 现有页面一致，转为 `<Admonition type="warning" icon="🚧" title="Warning">`（[技术设计 07](./design/07-site-adaptation.md#提示框)） | — |
