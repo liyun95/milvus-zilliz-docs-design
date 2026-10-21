@@ -756,7 +756,7 @@ source:
 
 publish:
   - manual: guides                       # OpenAI 只发布到 Guides
-    path: tutorials/development/function/text-embedding-functions/openai
+    path: tutorials/development/function/text-embedding-funcs/openai
 
 metadata:
   # 两边描述不同，在这里改写
