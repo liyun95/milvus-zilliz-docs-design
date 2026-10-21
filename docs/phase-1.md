@@ -50,8 +50,8 @@ Phase 1 分两步：
 
 **任务**
 
-1. **内容**：Delete Entities 两端正文对齐，确定共同修订与产品差异，产品值改为变量；飞书上已有的语言示例（如 Rust）同步到 milvus-docs，并确认 milvus.io 能显示这些语言；审核 SDK 适用性。
-2. **md2md**：实现只做预处理的入口，包括受控读取、依赖报告与错误检查；实现命名块的解析、校验与清理（[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md)）；一次发版，并在 Milvus CI 中固定版本，PR 检查中加入命名块校验。
+1. **内容**：Delete Entities 两端正文对齐，确定共同修订与产品差异，产品值改为变量；飞书上已有的语言示例（如 Rust）同步到 milvus-docs，并确认 milvus.io 能显示这些语言；审核 SDK 适用性。对齐的步骤见[实现指南 2.4 节](./implementation/README.md#24-试点页输入与基准输出)，对齐完成后才批准这一页的基准输出。
+2. **md2md**：实现只做预处理的入口，包括受控读取、依赖报告与错误检查；实现命名块的解析、校验与清理（[技术设计 01](./design/01-named-blocks.md)、[03](./design/03-md2md-interfaces.md)）；先在 Milvus CI 中固定现有版本，再改用 Trusted Publishing 发一个版本，由 milvus-docs 的 PR 升级到这个版本，PR 检查中加入命名块校验（顺序见[实现指南第 4 节](./implementation/README.md#4-工作包)）。
 3. **初始链接映射表**：工具按[技术设计 02b](./design/02b-links-and-images.md#初始映射表的生成)为 User Guide 中所有被链接的页面生成候选，文档工程师审核后提交；要在飞书版页面还在时做。
 4. **zdoc 生成**：按固定 commit 获取原文，定位命名块并生成命名块清单，调用 md2md 展开变量，生成 Tabs 与 MDX，检查漏换的产品名。代码放在 `packages/docs-tooling/src/shared-docs/`（[技术设计 README](./design/README.md#代码位置)）。
 5. **zdoc 生成**：接入 PR 自动写入 lock，PR 校验覆盖共享页；接入现有 stage 与 UAT 预览；候选任务不具备生产写权限。
@@ -142,6 +142,8 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 - 产品过滤的实际规则、翻译开关、语言发布契约、导航与其他飞书依赖的运行配置。
 
 ### 6.3 测试方式
+
+实现怎样切分成工作包、每一步怎样验证与审阅，见 [Phase 1 实现指南](./implementation/README.md)。
 
 - **沿用现有测试体系**：md2md 用 Jest，zdoc 用 Node、Vitest 与 Playwright，不另建测试平台。新增路径登记到既有的 code-to-test matrix。
 - **执行顺序**：安装固定依赖 → 单元、兼容与契约测试 → 按变更矩阵检查 → 共享链路的完整回放 → 真实 artifact 隔离回放 → 必要的站点构建与浏览器检查 → 实际权限与恢复验证。
