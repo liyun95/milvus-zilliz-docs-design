@@ -1,6 +1,6 @@
 # WP2 只做预处理的入口与发版
 
-**仓库**：[md2md](https://github.com/zilliztech/md2md)（随后一个 [milvus-docs](https://github.com/milvus-io/milvus-docs) 的 PR）　**阶段**：Phase 1a　**依赖**：WP1 已合并（[zilliztech/md2md#3](https://github.com/zilliztech/md2md/pull/3)，commit [`07855e4`](https://github.com/zilliztech/md2md/commit/07855e4b4fc29ddb1907af111f7630d25b20621b)）；[R1](../README.md#4-工作包) ① ② 已完成（milvus-docs [#3691](https://github.com/milvus-io/milvus-docs/pull/3691)–[#3694](https://github.com/milvus-io/milvus-docs/pull/3694)；npm 可信发布者）　**状态**：已合并（[zilliztech/md2md#4](https://github.com/zilliztech/md2md/pull/4)，commit [`a143b27`](https://github.com/zilliztech/md2md/commit/a143b27c475059f1fe22e84e074953b05bd9cd37)），1.3.0 已发布；合并之后的第 3、4 步待做
+**仓库**：[md2md](https://github.com/zilliztech/md2md)（随后一个 [milvus-docs](https://github.com/milvus-io/milvus-docs) 的 PR）　**阶段**：Phase 1a　**依赖**：WP1 已合并（[zilliztech/md2md#3](https://github.com/zilliztech/md2md/pull/3)，commit [`07855e4`](https://github.com/zilliztech/md2md/commit/07855e4b4fc29ddb1907af111f7630d25b20621b)）；[R1](../README.md#4-工作包) ① ② 已完成（milvus-docs [#3691](https://github.com/milvus-io/milvus-docs/pull/3691)–[#3694](https://github.com/milvus-io/milvus-docs/pull/3694)；npm 可信发布者）　**状态**：已合并（[zilliztech/md2md#4](https://github.com/zilliztech/md2md/pull/4)，commit [`a143b27`](https://github.com/zilliztech/md2md/commit/a143b27c475059f1fe22e84e074953b05bd9cd37)），1.3.0 已发布；milvus-docs `v3.0.x` 已升级（[milvus-io/milvus-docs#3697](https://github.com/milvus-io/milvus-docs/pull/3697)）；合并之后的第 4 步待做
 
 ## 目标
 

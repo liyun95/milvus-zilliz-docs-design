@@ -158,7 +158,8 @@ bad.md:5              UNSUPPORTED_MARK {{tab}}
 1. 推动者运行 `release.yml`（[运行记录](https://github.com/zilliztech/md2md/actions/runs/39718860046)），全部步骤成功。
 2. 日志中 npm 提示三个命令行“was invalid and removed”。查了 npm 的源码，它只是把 `./bin/goover.js` 改写成 `bin/goover.js`，三个命令都还在；从 npm 安装 1.3.0 后 `goover`、`md2md`、`md2md-blocks` 都能用。以后可以用 `npm pkg fix` 消掉这条提示。
 3. 推动者在 npmjs.com 上批准，1.3.0 公开。
-4. 锁文件提交后，GitHub 的 Dependabot 能看到全部依赖，对 `axios` 报了 23 条安全提醒。md2md 从 2021 年起列着 `axios`，却没有任何代码用它，于是另开 [zilliztech/md2md#6](https://github.com/zilliztech/md2md/pull/6) 删掉（commit `eb91900`）。这不影响已发布的 1.3.0，随下一个版本生效。
+4. milvus-docs 的 `v3.0.x` 升级到 1.3.0，PR 检查中加入 `md2md-blocks check site/en`（[milvus-io/milvus-docs#3697](https://github.com/milvus-io/milvus-docs/pull/3697)）。合并后的发布构建（[运行记录](https://github.com/milvus-io/milvus-docs/actions/runs/39736951233)）用 1.3.0 成功运行，没有给 `milvus-io/web-content` 产生新的提交：与上一次用 1.2.3 的构建输出相同。
+5. 锁文件提交后，GitHub 的 Dependabot 能看到全部依赖，对 `axios` 报了 23 条安全提醒。md2md 从 2021 年起列着 `axios`，却没有任何代码用它，于是另开 [zilliztech/md2md#6](https://github.com/zilliztech/md2md/pull/6) 删掉（commit `eb91900`）。这不影响已发布的 1.3.0，随下一个版本生效。
 
 ## 自己试一试
 
