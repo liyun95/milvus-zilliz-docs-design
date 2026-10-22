@@ -120,13 +120,17 @@ Shared text.
 
 ## 自己试一试
 
-需要 Node 22 以上。WP1 合并到上游之前，在 Agent 的工作树中运行；合并之后，在 `~/md2md` 中 `git pull` 后运行。
+需要 Node 22 以上。WP1 已合并到 md2md 的 master。在你的 md2md 检出中更新到最新、安装依赖，然后在仓库根目录运行下面的命令：
 
 ```bash
-cd ~/worktrees/md2md/wp1-named-blocks
+git checkout master && git pull
 ```
 
-1. 跑全部测试，应看到 83 个通过：
+```bash
+yarn install
+```
+
+1. 跑全部测试，应全部通过（WP1 合并时是 83 个，之后的工作包会增加）：
 
    ```bash
    yarn test
