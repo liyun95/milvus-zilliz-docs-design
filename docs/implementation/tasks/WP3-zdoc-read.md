@@ -1,6 +1,6 @@
 # WP3 读取：页面配置、lock、原文与命名块
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 已合并（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)，commit [`5dd0e56`](https://github.com/zilliztech/zdoc/commit/5dd0e56a58054864eda231deeb76f1945be80fb0)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 已合并（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)，commit [`5dd0e56`](https://github.com/zilliztech/zdoc/commit/5dd0e56a58054864eda231deeb76f1945be80fb0)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：WP3a 已合并（[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)）；WP3b 未开始
 
 ## 目标
 
@@ -59,7 +59,7 @@ pnpm docs-tooling shared-docs inspect --pages <目录> --page <页面标识> --r
 
 - 已有手册的列表取自 [`manuals/registry.ts`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-tooling/src/manuals/registry.ts)；`beta` 的可选值取自 [`packages/docs-ui/src/shared/utils/docHeadingTags.ts`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-ui/src/shared/utils/docHeadingTags.ts) 的 `DOC_HEADING_TAGS`，去掉 `BYOC`。两者都在 `commands/` 中读出后传给 `core/`，`core/` 不直接引用。
 - 变量表只来自 `shared-docs/Variables.json`，原样传给 `preprocess`（产品需求 1-1）。
-- md2md 1.3.0 发布之前，`Md2md` 用替身。替身要通过从 md2md 复制来的契约用例：[`zilliztech/md2md` `07855e4` 的 `test/contract/cases/blocks/`](https://github.com/zilliztech/md2md/tree/07855e4b4fc29ddb1907af111f7630d25b20621b/test/contract/cases/blocks)；WP2 合并后再复制 `preprocess/` 的用例。发布后再换成真实的包，可以是本工作包的最后一个 PR，也可以留给 WP4。
+- md2md 1.3.0 已于 2026-10-22 发布。WP3a 合并时 `Md2md` 用的是替身；WP3b 接入真实的包 `@zilliz/mdtomd@1.3.0`（`@zilliz/mdtomd/blocks.js`、`@zilliz/mdtomd/preprocess.js`），替身保留给不需要真实包的测试。真实的包与替身跑同一组契约用例，从 md2md 复制：[`a143b27` 的 `test/contract/cases/blocks/`](https://github.com/zilliztech/md2md/tree/a143b27c475059f1fe22e84e074953b05bd9cd37/test/contract/cases/blocks) 与 [`preprocess/`](https://github.com/zilliztech/md2md/tree/a143b27c475059f1fe22e84e074953b05bd9cd37/test/contract/cases/preprocess)；`preprocess/README.md` 说明了怎样运行这些用例。
 
 ## 要覆盖的编号
 
