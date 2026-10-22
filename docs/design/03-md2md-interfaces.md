@@ -145,7 +145,7 @@ zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` �
 | `maxDepth` | 页面直接引用的片段为第 1 层 |
 | `maxOutputBytes` | 同一片段被引用多次时，每次展开都计入 |
 | 报错的行号 | 指向写着这个变量或片段引用的那个文件中的行，不是展开后的行 |
-| 键名只差大小写 | 同一层中有只差大小写的两个键，如 `Product` 与 `product`，整份变量表不合法，抛出 `TypeError`。zdoc 在调用前先检查 `Variables.json`，把这种情况报成页面错误 |
+| 键名只差大小写 | 同一层中有只差大小写的两个键，如 `Product` 与 `product`，整份变量表不合法，抛出 `TypeError`。zdoc 在调用前先检查 `Variables.json`，报 `CONFIG_VARIABLES_INVALID`（见 [09](./09-error-catalog.md)），所有共享页都生成失败 |
 
 ## 出错时
 
