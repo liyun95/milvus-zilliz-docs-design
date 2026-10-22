@@ -1,6 +1,6 @@
 # WP1 命名块的解析、校验与清除
 
-**仓库**：md2md　**阶段**：Phase 1a　**依赖**：开工不依赖；合并前要完成 R1 ①（milvus-docs 固定 md2md 的版本，见[实现指南第 4 节](../README.md#4-工作包)）　**状态**：未开始
+**仓库**：[md2md](https://github.com/zilliztech/md2md)　**阶段**：Phase 1a　**依赖**：开工不依赖；合并前要完成 R1 ①（[milvus-docs](https://github.com/milvus-io/milvus-docs) 固定 md2md 的版本，见[实现指南第 4 节](../README.md#4-工作包)）　**状态**：已合并（[zilliztech/md2md#3](https://github.com/zilliztech/md2md/pull/3)，commit [`07855e4`](https://github.com/zilliztech/md2md/commit/07855e4b4fc29ddb1907af111f7630d25b20621b)）
 
 ## 目标
 

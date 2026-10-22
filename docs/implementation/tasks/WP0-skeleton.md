@@ -1,6 +1,6 @@
 # WP0 测试与目录骨架
 
-**仓库**：zdoc　**阶段**：Phase 1a　**依赖**：无　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：无　**状态**：已合并（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)，commit [`5dd0e56`](https://github.com/zilliztech/zdoc/commit/5dd0e56a58054864eda231deeb76f1945be80fb0)）
 
 ## 目标
 
