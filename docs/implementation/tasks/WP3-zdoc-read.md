@@ -1,6 +1,6 @@
 # WP3 读取：页面配置、lock、原文与命名块
 
-**仓库**：zdoc　**阶段**：Phase 1a　**依赖**：WP0 合并到上游（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)）；WP2 不阻塞，发版前用替身　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 合并到上游（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：未开始
 
 ## 目标
 
@@ -56,9 +56,9 @@ pnpm docs-tooling shared-docs inspect --pages <目录> --page <页面标识> --r
 // 打印：配置与 lock 的校验结果、命名块清单、展开后的 Markdown（每个版本一份）
 ```
 
-- 已有手册的列表取自 `manuals/registry.ts`；`beta` 的可选值取自 `packages/docs-ui/src/shared/utils/docHeadingTags.ts` 的 `DOC_HEADING_TAGS`，去掉 `BYOC`。两者都在 `commands/` 中读出后传给 `core/`，`core/` 不直接引用。
+- 已有手册的列表取自 [`manuals/registry.ts`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-tooling/src/manuals/registry.ts)；`beta` 的可选值取自 [`packages/docs-ui/src/shared/utils/docHeadingTags.ts`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-ui/src/shared/utils/docHeadingTags.ts) 的 `DOC_HEADING_TAGS`，去掉 `BYOC`。两者都在 `commands/` 中读出后传给 `core/`，`core/` 不直接引用。
 - 变量表只来自 `shared-docs/Variables.json`，原样传给 `preprocess`（产品需求 1-1）。
-- md2md 1.3.0 发布之前，`Md2md` 用替身。替身要通过从 md2md 复制来的契约用例：`zilliztech/md2md` `07855e4` 的 `test/contract/cases/blocks/`；WP2 合并后再复制 `preprocess/` 的用例。发布后再换成真实的包，可以是本工作包的最后一个 PR，也可以留给 WP4。
+- md2md 1.3.0 发布之前，`Md2md` 用替身。替身要通过从 md2md 复制来的契约用例：[`zilliztech/md2md` `07855e4` 的 `test/contract/cases/blocks/`](https://github.com/zilliztech/md2md/tree/07855e4b4fc29ddb1907af111f7630d25b20621b/test/contract/cases/blocks)；WP2 合并后再复制 `preprocess/` 的用例。发布后再换成真实的包，可以是本工作包的最后一个 PR，也可以留给 WP4。
 
 ## 要覆盖的编号
 
@@ -68,7 +68,7 @@ pnpm docs-tooling shared-docs inspect --pages <目录> --page <页面标识> --r
 | `2-4` | 原文中写错的标记让这一页失败，错误带文件与行号 |
 | `2-5` | Markdown 块、单语言代码组、多语言代码组各一个；语言取自代码块；列表中缩进的代码块也能识别为代码组 |
 | `3-1` | 没有 lock 时，`current` 与 `next` 都取跟踪分支的最新提交 |
-| `3-7` | 输出位置由页面标识与 `publish[].path` 决定，三篇试点页与 zdoc dev 上的现有路径一致 |
+| `3-7` | 输出位置由页面标识与 `publish[].path` 决定，三篇试点页与 zdoc [dev 上的现有路径](https://github.com/zilliztech/zdoc/tree/dev/content/en/guides/tutorials/development)一致 |
 | 页面配置的 6 个错误码 | 每个一个错误样例（实现指南 2.5），断言 `code`、`file`、`line`、`page` |
 | lock 的 5 个错误码 | 同上；`LOCK_COMMIT_NOT_FOUND`、`LOCK_ORDER` 用合成仓库构造 |
 

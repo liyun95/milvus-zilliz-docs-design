@@ -1,6 +1,6 @@
 # WP2 只做预处理的入口与发版
 
-**仓库**：md2md（随后一个 milvus-docs 的 PR）　**阶段**：Phase 1a　**依赖**：WP1 已合并（`zilliztech/md2md` `07855e4`）；R1 ① ② 已完成　**状态**：未开始
+**仓库**：[md2md](https://github.com/zilliztech/md2md)（随后一个 [milvus-docs](https://github.com/milvus-io/milvus-docs) 的 PR）　**阶段**：Phase 1a　**依赖**：WP1 已合并（[zilliztech/md2md#3](https://github.com/zilliztech/md2md/pull/3)，commit [`07855e4`](https://github.com/zilliztech/md2md/commit/07855e4b4fc29ddb1907af111f7630d25b20621b)）；[R1](../README.md#4-工作包) ① ② 已完成（milvus-docs [#3691](https://github.com/milvus-io/milvus-docs/pull/3691)–[#3694](https://github.com/milvus-io/milvus-docs/pull/3694)；npm 可信发布者）　**状态**：未开始
 
 ## 目标
 
@@ -39,7 +39,7 @@ preprocess({ content, fragmentRoot, variables, sourceName, limits })
 // → { ok, content | null, dependencies: { fragments, variables }, errors, engine: { name, version } }
 ```
 
-- 规则可以参考 `src/helpers/File.js` 中现有的 `_replaceFragment`、`_replaceVariable`，但不要改动它们；`goover` 继续走原来的路径。
+- 规则可以参考 [`src/helpers/File.js`](https://github.com/zilliztech/md2md/blob/07855e4b4fc29ddb1907af111f7630d25b20621b/src/helpers/File.js) 中现有的 `_replaceFragment`、`_replaceVariable`，但不要改动它们；`goover` 继续走原来的路径。
 - `variables` 只用调用方传入的这一份，不按目录查找、不合并其他来源（产品需求 1-1）。
 - 参数类型错误直接抛 `TypeError`，不放进 `errors`。
 - `engine.version` 读自 `package.json`，不写死。
@@ -55,7 +55,7 @@ preprocess({ content, fragmentRoot, variables, sourceName, limits })
 | 版本 | 取 `package.json` 中的 `version`，不在工作流中计算 |
 | 不需要 | `NPM_TOKEN`、semantic-release |
 
-npm 上的可信发布者已配置为 `zilliztech` / `md2md` / `release.yml`、只允许暂存发布（实现指南第 4 节 R1 ②）。`npm stage publish` 之后，由推动者在 npmjs.com 上用双因素认证批准，版本才公开。
+npm 上的可信发布者已配置为 `zilliztech` / `md2md` / `release.yml`、只允许暂存发布（[实现指南第 4 节 R1 ②](../README.md#4-工作包)）。`npm stage publish` 之后，由推动者在 npmjs.com 上用双因素认证批准，版本才公开。
 
 ## 要覆盖的编号
 
@@ -67,7 +67,7 @@ npm 上的可信发布者已配置为 `zilliztech` / `md2md` / `release.yml`、�
 | `1-5` | 片段只能在 `<fragmentRoot>/fragments/` 之内；同一片段多次引用只读一次 |
 | `T02` | 显式传入变量表；与 `goover` 现有的展开结果一致；缺少变量报错；两份不同的变量表并行调用互不串值；不运行 Milvus 站点插件（`{{tab}}` 等报 `UNSUPPORTED_MARK`） |
 | `T03` | 嵌套与重复引用都记录在依赖中；循环、越界、符号链接、深度或体积超限都失败 |
-| `T11` | 用 npm 上的 1.2.3 与本分支处理 milvus-docs `v3.0.x` 最新提交的全部文档，输出逐字节相同；沿用 WP1 的 `test/blocks/regression.js` |
+| `T11` | 用 npm 上的 1.2.3 与本分支处理 milvus-docs [`v3.0.x`](https://github.com/milvus-io/milvus-docs/tree/v3.0.x) 最新提交的全部文档，输出逐字节相同；沿用 WP1 的 [`test/blocks/regression.js`](https://github.com/zilliztech/md2md/blob/07855e4b4fc29ddb1907af111f7630d25b20621b/test/blocks/regression.js) |
 | 变量与片段的 8 个错误码 | 每个错误码一个契约用例，断言 `code`、`line`，循环引用断言 `detail` 中的引用链 |
 
 做完后 `test/spec/pending.json` 应为空。
@@ -84,7 +84,7 @@ npm 上的可信发布者已配置为 `zilliztech` / `md2md` / `release.yml`、�
 
 1. 推动者在 GitHub Actions 中手动运行 `release.yml`，再在 npmjs.com 上批准暂存的 1.3.0。
 2. 发布后，用 npm 上的 1.3.0 再跑一次 T11 回归。
-3. 给 milvus-docs 的 `v3.0.x` 开 PR：三个工作流中的 `@zilliz/mdtomd@1.2.3` 升级为 `@1.3.0`；`check.yml` 中加一步 `md2md-blocks check site/en`（产品需求 2-3）。其他分支保持 1.2.3。
+3. 给 milvus-docs 的 [`v3.0.x`](https://github.com/milvus-io/milvus-docs/tree/v3.0.x) 开 PR：三个工作流中的 `@zilliz/mdtomd@1.2.3` 升级为 `@1.3.0`；[`check.yml`](https://github.com/milvus-io/milvus-docs/blob/v3.0.x/.github/workflows/check.yml) 中加一步 `md2md-blocks check site/en`（产品需求 2-3）。其他分支保持 1.2.3。
 4. 第一次发版成功后，推动者把 npm 上的 Publishing access 改为禁止 bypass 令牌。
 
 ## 不做

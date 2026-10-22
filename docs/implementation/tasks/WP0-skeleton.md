@@ -1,6 +1,6 @@
 # WP0 测试与目录骨架
 
-**仓库**：zdoc　**阶段**：Phase 1a　**依赖**：无　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：无　**状态**：上游审阅中（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)）
 
 ## 目标
 

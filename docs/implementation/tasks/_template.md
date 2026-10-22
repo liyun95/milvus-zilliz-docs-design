@@ -1,6 +1,8 @@
 # WPn 标题
 
-**仓库**：zdoc / md2md　**阶段**：Phase 1a / 1b　**依赖**：WPx　**状态**：未开始 / 进行中 / 已合并（PR 链接）
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc) / [md2md](https://github.com/zilliztech/md2md)　**阶段**：Phase 1a / 1b　**依赖**：WPx（链接到它的 PR 或 commit）　**状态**：未开始 / 进行中 / 已合并（PR 链接）
+
+<!-- 写卡时：提到仓库、PR、commit、分支或其他仓库中的文件，都写成链接；commit 链接用完整的 SHA，文件链接固定到 commit 或分支。 -->
 
 ## 目标
 
