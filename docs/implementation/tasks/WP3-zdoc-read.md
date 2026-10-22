@@ -27,7 +27,8 @@
 |---|---|
 | `packages/docs-tooling/src/shared-docs/` 下：`core/` 新增读取逻辑；`adapters/` 新增真实的 milvus-docs 读取，扩展接口；`commands/` 新增 `inspect` 命令；测试与测试素材 | 仓库根目录的 `shared-docs/`：不建，试点页只在测试素材中 |
 | `packages/docs-tooling/src/cli-main.ts`：注册 `shared-docs inspect` 子命令 | `lark/`、`manuals/` 等现有模块 |
-| `spec/pending.json`：删掉本工作包的编号 | `spec/requirements.json`、基准输出 |
+| `spec/pending.json`：删掉本工作包的编号；`requirements.json` 更新后重新复制 | 自行修改 `spec/requirements.json`、基准输出 |
+| WP3b：`packages/docs-ui/src/shared/utils/docHeadingTags.ts` 只加一个 `export`，供 `commands/` 引用（计划审阅时批准） | 读取 dev 上的飞书表格快照：归 WP8 |
 
 本工作包是共用类型的主人（实现指南第 5 节“协作规则”）：`core/types.ts` 与 `adapters/types.ts` 中的类型由本工作包扩展。
 
@@ -69,7 +70,7 @@ pnpm docs-tooling shared-docs inspect --pages <目录> --page <页面标识> --r
 | `2-5` | Markdown 块、单语言代码组、多语言代码组各一个；语言取自代码块；列表中缩进的代码块也能识别为代码组 |
 | `3-1` | 没有 lock 时，`current` 与 `next` 都取跟踪分支的最新提交 |
 | `3-7` | 输出位置由页面标识与 `publish[].path` 决定，三篇试点页与 zdoc [dev 上的现有路径](https://github.com/zilliztech/zdoc/tree/dev/content/en/guides/tutorials/development)一致 |
-| 页面配置的 6 个错误码 | 每个一个错误样例（实现指南 2.5），断言 `code`、`file`、`line`、`page` |
+| 页面配置的 7 个错误码（含 `CONFIG_SYNTAX_INVALID`） | 每个一个错误样例（实现指南 2.5），断言 `code`、`file`、`line`、`page` |
 | lock 的 5 个错误码 | 同上；`LOCK_COMMIT_NOT_FOUND`、`LOCK_ORDER` 用合成仓库构造 |
 
 做完后把这些编号从 `spec/pending.json` 中删掉。

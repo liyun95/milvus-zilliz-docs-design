@@ -28,6 +28,8 @@
 | `yarn.lock`：提交锁文件，`.gitignore` 中去掉它 | |
 | `.github/workflows/`：删除 `ci.yml`（旧的 semantic-release 发版）；新建 `release.yml`；`test.yml` 改为按锁文件安装 | |
 | `test/spec/pending.json`：删掉本工作包的编号 | `test/spec/requirements.json` |
+| `test/blocks/regression.js`：只加一个参数，可以指定期望的 milvus-docs 提交，默认值不变（计划审阅时批准） | |
+| `AGENTS.md`：PR 说明改为六个部分（计划审阅时批准） | |
 
 ## 接口
 

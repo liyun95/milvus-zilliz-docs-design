@@ -158,7 +158,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 
 | 任务 | 做什么 | 谁 | 排在哪里 |
 |---|---|---|---|
-| R1 md2md 发版准备 | ① 给 milvus-docs 开 PR，把 md2md 固定在现在的版本（**已完成**：#3691 `v3.0.x`、#3692 `v2.6.x`、#3693 `v2.5.x`、#3694 `preview`）；② 在 npmjs.com 上为 `@zilliz/mdtomd` 添加可信发布者（Trusted Publishing），代替已失效的 `NPM_TOKEN`：GitHub Actions，`zilliztech` / `md2md`，工作流文件名 `release.yml`，Environment 留空；Allowed actions 中 `npm publish` 与 `npm dist-tag` 都不勾，只允许暂存发布（staged publishing），每个版本由推动者用双因素认证批准后才公开（**已完成**，2026-10-21）；第一次用它发版成功后，再把 Publishing access 改为禁止 bypass 令牌；③ 新建 `.github/workflows/release.yml` 负责发版，不存令牌，用 `npm stage publish`（需要 npm CLI 11.15.0、Node 22.14 及以上；semantic-release 是否支持暂存发布由 WP2 先核实），文件名必须与 ② 中填的一致；`ci.yml` 改为只跑测试；交给 WP2 | ① 可交给 Agent；② 推动者；③ WP2 | ① 必须在 WP1 合并之前：md2md 合并到 master 就会自动发版，而 milvus-docs 现在安装时不固定版本，新代码会直接进入 Milvus 的正式构建 |
+| R1 md2md 发版准备 | ① 给 milvus-docs 开 PR，把 md2md 固定在现在的版本（**已完成**：#3691 `v3.0.x`、#3692 `v2.6.x`、#3693 `v2.5.x`、#3694 `preview`）；② 在 npmjs.com 上为 `@zilliz/mdtomd` 添加可信发布者（Trusted Publishing），代替已失效的 `NPM_TOKEN`：GitHub Actions，`zilliztech` / `md2md`，工作流文件名 `release.yml`，Environment 留空；Allowed actions 中 `npm publish` 与 `npm dist-tag` 都不勾，只允许暂存发布（staged publishing），每个版本由推动者用双因素认证批准后才公开（**已完成**，2026-10-21）；第一次用它发版成功后，再把 Publishing access 改为禁止 bypass 令牌；③ 新建 `.github/workflows/release.yml` 负责发版，不存令牌，用 `npm stage publish`（需要 npm CLI 11.15.0、Node 22.14 及以上；semantic-release 是否支持暂存发布由 WP2 先核实），文件名必须与 ② 中填的一致；删除旧的 `ci.yml`（测试由 `test.yml` 负责）；交给 WP2 | ① 可交给 Agent；② 推动者；③ WP2 | ① 必须在 WP1 合并之前：md2md 合并到 master 就会自动发版，而 milvus-docs 现在安装时不固定版本，新代码会直接进入 Milvus 的正式构建 |
 | C1–C3 内容对齐 | Delete Entities（C1，1a）、Filtered Search 与 OpenAI（C2、C3，1b）按 2.4 节的五步对齐 | 文档工程师 | 在批准对应页的基准输出之前；用到 WP4、WP5 生成的临时结果 |
 
 为什么用 Trusted Publishing：md2md 的发版配置最后修改于 2022 年，当时只能用令牌；npm 在 2025 年底作废了旧式令牌，新的写权限令牌最长 90 天就过期。Trusted Publishing 由 GitHub 在发版时现场证明身份，仓库中不存密钥，也不用定期更换。
@@ -175,7 +175,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP5 | zdoc | 链接与图片：四步查找、锚点换算、图片按内容命名（只算地址） | `5-1`–`5-7`，链接与图片错误码，T06、T10 的一部分 | WP3 |
 | WP6 | zdoc | 产品名检查 | `1-6`，产品名错误码，T14 | WP3 |
 | WP7 | zdoc | 初始链接映射表的生成命令 | 技术设计 02b | WP5 |
-| WP8 | zdoc | 工作流：接入时写 lock、PR 校验 | `3-2`、`3-3`、`3-6`，T12 的候选部分 | WP4、WP5、WP6 |
+| WP8 | zdoc | 工作流：接入时写 lock、PR 校验；读取 dev 上的飞书表格快照（`GuidesBase` 的真实实现） | `3-2`、`3-3`、`3-6`，T12 的候选部分 | WP4、WP5、WP6 |
 | WP9 | zdoc | Fetch 接入：候选生成、交接物、记录文件；回放测试 | 第 6 节“及时生效”“发布保护”，T08 的一部分 | WP8；需要 zdoc 维护者参与 |
 
 ### 4.2 Phase 1b
