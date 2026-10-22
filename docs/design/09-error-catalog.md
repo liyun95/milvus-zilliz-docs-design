@@ -86,6 +86,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `LINK_UNRESOLVED` | Milvus 站内页面查不到 Cloud 的对应页 | 在 `links.yaml` 中补一行；`detail` 中附有候选 |
 | `LINK_ROOT_PATH` | 出现以 `/` 开头的站内路径 | 在 `links.yaml` 中处理，或回上游改成完整地址 |
 | `LINK_UNKNOWN_FORM` | 链接不属于任何一类，如漏写 `.md` | 回上游修正 |
+| `LINK_MAP_INVALID` | `links.yaml` 格式不对：不是合法的 YAML，同一个 Milvus 页面登记了两次，键不是 `.md` 文件名，或值既不是页面标识也不是 `https://milvus.io/` 开头的地址 | 改正 `links.yaml`；改好之前所有共享页都生成失败 |
 | `LINK_TARGET_ABSENT` | 链接指向的共享页在这个版本中不存在 | 回上游修正，或让两页一起采用 |
 | `ANCHOR_NOT_FOUND` | 指向共享页标题的锚点找不到对应标题 | 回上游修正；标题改名见 [04](./04-channels-and-lock.md#标题改名与锚点) |
 | `IMAGE_FETCH_FAILED` | 外部图片下载失败或不存在 | 回源头修正 |
@@ -116,10 +117,10 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 
 | 错误码 | 何时出现 | 怎样改 |
 |---|---|---|
-| `TABS_UNKNOWN_LANGUAGE` | 代码组中有 Tabs 规则中没有的语言 | 在规则中补充，或用变换删除这种语言 |
+| `TABS_UNKNOWN_LANGUAGE` | 代码组中有 Tabs 规则中没有的语言，包括多语言代码组中没写语言名的代码块 | 在规则中补充，或用变换删除这种语言 |
 | `TABS_REQUIRED_MISSING` | 多语言代码组缺少必须有的语言，或变换删除了它 | 用变换补上，或回上游补齐 |
 | `TABS_RULES_INVALID` | Tabs 规则文件格式不对 | zdoc 维护者修正 |
-| `ADAPT_UNSUPPORTED_MARKUP` | 提示框写法不在支持范围内，或出现 Milvus 站点专用的版式 `div` | 回上游改为支持的写法 |
+| `ADAPT_UNSUPPORTED_MARKUP` | 提示框写法不在支持范围内，出现 Milvus 站点专用的版式 `div`，或同一个多语言代码组中一种语言出现两次 | 回上游改为支持的写法 |
 | `ADAPT_MDX_INVALID` | 修补后仍不能编译为 MDX | 回上游修正写法 |
 
 **发布与切换**（见 [05](./05-publish-handoff.md#出错时)、[05b](./05b-cutover-and-ownership.md#出错时)）
