@@ -56,11 +56,12 @@ MilvusDocsReader: readFile(commit, path)；isOnBranch(commit, branch)；isAncest
 // commands
 pnpm docs-tooling shared-docs inspect --pages <目录> --page <页面标识> --repo <milvus-docs 检出>
 // 打印：配置与 lock 的校验结果、命名块清单、展开后的 Markdown（每个版本一份）
+// 页面还没有 lock.yaml 时，按产品需求 3-1 用 planLock 的结果（两个版本都取跟踪分支的最新提交），并标明这是计划值；不写文件
 ```
 
 - 已有手册的列表取自 [`manuals/registry.ts`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-tooling/src/manuals/registry.ts)；`beta` 的可选值取自 [`packages/docs-ui/src/shared/utils/docHeadingTags.ts`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-ui/src/shared/utils/docHeadingTags.ts) 的 `DOC_HEADING_TAGS`，去掉 `BYOC`。两者都在 `commands/` 中读出后传给 `core/`，`core/` 不直接引用。
 - 变量表只来自 `shared-docs/Variables.json`，原样传给 `preprocess`（产品需求 1-1）。
-- md2md 1.3.0 已于 2026-10-22 发布。WP3a 合并时 `Md2md` 用的是替身；WP3b 接入真实的包 `@zilliz/mdtomd@1.3.0`（`@zilliz/mdtomd/blocks.js`、`@zilliz/mdtomd/preprocess.js`），替身保留给不需要真实包的测试。真实的包与替身跑同一组契约用例，从 md2md 复制：[`a143b27` 的 `test/contract/cases/blocks/`](https://github.com/zilliztech/md2md/tree/a143b27c475059f1fe22e84e074953b05bd9cd37/test/contract/cases/blocks) 与 [`preprocess/`](https://github.com/zilliztech/md2md/tree/a143b27c475059f1fe22e84e074953b05bd9cd37/test/contract/cases/preprocess)；`preprocess/README.md` 说明了怎样运行这些用例。
+- md2md 1.3.0 已于 2026-10-22 发布。WP3a 合并时 `Md2md` 用的是替身；WP3b 接入真实的包 `@zilliz/mdtomd@1.3.0`（`@zilliz/mdtomd/blocks.js`、`@zilliz/mdtomd/preprocess.js`），替身保留给不需要真实包的测试。从 md2md 复制的契约用例只用来测真实的包；替身仍按预设返回结果，与真实的包一起跑 WP0 的形状契约（`adapters/contract/`），不重新实现 md2md 的规则。用例从 md2md 复制：[`a143b27` 的 `test/contract/cases/blocks/`](https://github.com/zilliztech/md2md/tree/a143b27c475059f1fe22e84e074953b05bd9cd37/test/contract/cases/blocks) 与 [`preprocess/`](https://github.com/zilliztech/md2md/tree/a143b27c475059f1fe22e84e074953b05bd9cd37/test/contract/cases/preprocess)；`preprocess/README.md` 说明了怎样运行这些用例。
 
 ## 要覆盖的编号
 
@@ -72,6 +73,7 @@ pnpm docs-tooling shared-docs inspect --pages <目录> --page <页面标识> --r
 | `3-1` | 没有 lock 时，`current` 与 `next` 都取跟踪分支的最新提交 |
 | `3-7` | 输出位置由页面标识与 `publish[].path` 决定，三篇试点页与 zdoc [dev 上的现有路径](https://github.com/zilliztech/zdoc/tree/dev/content/en/guides/tutorials/development)一致 |
 | 页面配置的 7 个错误码（含 `CONFIG_SYNTAX_INVALID`） | 每个一个错误样例（实现指南 2.5），断言 `code`、`file`、`line`、`page` |
+| `CONFIG_VARIABLES_INVALID`；`Variables.json` 的 `CONFIG_SYNTAX_INVALID`（WP3b） | `Variables.json` 不是 JSON、顶层不是对象、同一层有只差大小写的键各一个样例；在调用 md2md 之前报出 |
 | lock 的 5 个错误码 | 同上；`LOCK_COMMIT_NOT_FOUND`、`LOCK_ORDER` 用合成仓库构造 |
 
 做完后把这些编号从 `spec/pending.json` 中删掉。

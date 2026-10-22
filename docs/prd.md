@@ -227,6 +227,7 @@ allow:                                  # 确实要保留的写法，报错时�
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
 | 变量在 Cloud 中没有值 | zdoc 的 PR 校验，或上游更新 PR 的校验 | 在 `shared-docs/Variables.json` 中补上 |
+| `Variables.json` 写错：不是合法的 JSON，或同一层中有只差大小写的两个键 | zdoc 的 PR 校验 | 按报错改正 `shared-docs/Variables.json`；改好之前所有共享页都生成失败 |
 | 片段不存在、循环引用、嵌套太深或太大 | 同上 | 回 milvus-docs 修正 |
 | Cloud 页面中出现没换成变量的产品名或连接值 | 同上 | 回 milvus-docs 改成变量；确实要保留的写法，在 `product-names.yaml` 的 `allow` 中补一行 |
 
