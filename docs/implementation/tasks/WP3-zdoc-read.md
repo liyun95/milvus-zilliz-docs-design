@@ -29,6 +29,7 @@
 | `packages/docs-tooling/src/cli-main.ts`：注册 `shared-docs inspect` 子命令 | `lark/`、`manuals/` 等现有模块 |
 | `spec/pending.json`：删掉本工作包的编号；`requirements.json` 更新后重新复制 | 自行修改 `spec/requirements.json`、基准输出 |
 | WP3b：`packages/docs-ui/src/shared/utils/docHeadingTags.ts` 只加一个 `export`，供 `commands/` 引用（计划审阅时批准） | 读取 dev 上的飞书表格快照：归 WP8 |
+| WP3b：`packages/docs-tooling/package.json` 加依赖 `@zilliz/mdtomd`，版本写死为 `1.3.0`（不用 `^`）；`pnpm-lock.yaml` 随之更新；`adapters/` 新增真实的 `Md2md` 实现 | 其他依赖的版本 |
 
 本工作包是共用类型的主人（实现指南第 5 节“协作规则”）：`core/types.ts` 与 `adapters/types.ts` 中的类型由本工作包扩展。
 
