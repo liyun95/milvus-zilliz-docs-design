@@ -21,7 +21,7 @@ WP0 没有任何业务功能，网站上什么都不会变。它为之后 zdoc �
 | `adapters/fake/` | 五个外部系统的替身，测试时用 |
 | `adapters/contract/` | 每个接口一组“契约测试”：替身必须通过，以后的真实实现也必须通过 |
 | `spec/requirements.json` | 从设计仓库原样复制的需求清单 |
-| `spec/pending.json` | 还没做的 124 条需求，各归哪个工作包 |
+| `spec/pending.json` | 还没做的需求，各归哪个工作包（WP0 合并时是 124 条） |
 | `spec/coverage.ts` | 覆盖检查：每条需求要么有测试，要么在 `pending.json` 中 |
 | `fixtures/pilots/` | 三篇试点页在 milvus-docs `9acdc99` 上的原文，与草拟的页面配置 |
 | `fixtures/milvus-docs/` | 合成的 milvus-docs 仓库：测试时现场建一个 Git 仓库，每次的 commit 号都相同 |
@@ -42,7 +42,7 @@ WP0 没有任何业务功能，网站上什么都不会变。它为之后 zdoc �
 | 测试引用了清单中不存在的编号 | 失败：写错了或需求已删 |
 | 被跳过的测试（`skip`、`todo`） | 不算覆盖 |
 
-现在 124 条都在 `pending.json` 中，每做完一个工作包就删掉一批。剩下的数量就是进度。
+WP0 合并时 124 条都在 `pending.json` 中，每做完一个工作包就删掉一批。剩下的数量就是进度。
 
 **替身和契约测试**。核心逻辑以后要读 milvus-docs、调 md2md、开 PR、上传图片、读飞书表格。WP0 先把这些动作定义成接口，再各做一个只在内存中运转的替身。契约测试规定“任何实现都必须这样表现”，替身现在就要通过；以后接入真实系统时，同一组测试再跑一遍，两边的行为就不会不一致。
 
@@ -52,13 +52,17 @@ WP0 没有任何业务功能，网站上什么都不会变。它为之后 zdoc �
 
 ## 自己试一试
 
-WP0 合并到上游之前，在 Agent 的工作树中运行；合并之后，在 `~/zdoc` 中 `git pull`、安装依赖后运行。
+WP0 已合并到 zdoc 的 master。在你的 zdoc 检出中更新到最新、安装依赖，然后在仓库根目录运行下面的命令：
 
 ```bash
-cd ~/zdoc/.claude/worktrees/wp0-skeleton
+git checkout master && git pull
 ```
 
-1. 跑全部测试，应看到 11 个测试文件、19 个测试通过：
+```bash
+pnpm install --frozen-lockfile
+```
+
+1. 跑全部测试，应全部通过（WP0 合并时是 11 个测试文件、19 个测试，之后的工作包会增加）：
 
    ```bash
    pnpm test:shared-docs
@@ -70,7 +74,7 @@ cd ~/zdoc/.claude/worktrees/wp0-skeleton
    python3 -c "import json,collections; p=json.load(open('packages/docs-tooling/src/shared-docs/spec/pending.json')); print(len(p), sorted(collections.Counter(p.values()).items(), key=lambda x:int(x[0][2:])))"
    ```
 
-   现在是 124 条：WP3 16、WP4 8、WP5 16、WP6 4、WP8 4、WP10 23、WP11 9、WP12 11、WP13 6、WP14 23、WP15 4。
+   WP0 合并时是 124 条：WP3 16、WP4 8、WP5 16、WP6 4、WP8 4、WP10 23、WP11 9、WP12 11、WP13 6、WP14 23、WP15 4。
 
 3. 看三篇试点页的配置，与[产品需求场景 3](../../prd.md#场景-3接入一页)的例子对照：
 
