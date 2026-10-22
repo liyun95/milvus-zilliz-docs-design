@@ -51,6 +51,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 |---|---|---|
 | `CONFIG_PAGE_ID_INVALID` | 页面目录名不符合 slug 规则 | 改目录名 |
 | `CONFIG_FIELD_MISSING` | 缺少必填字段 | 补字段 |
+| `CONFIG_SYNTAX_INVALID` | `page.yaml` 或 `source.yaml` 不是合法的 YAML | 按报错的行号改正语法 |
 | `CONFIG_FIELD_UNKNOWN` | 未知的字段、动作或 `schema_version` | 删去或改正 |
 | `CONFIG_SOURCE_NOT_FOUND` | `source.file` 在该版本中不存在，包括上游改名或删除了原文 | 改 `source.file`；原文被删除时考虑下线 |
 | `CONFIG_MANUAL_UNKNOWN` | `publish[].manual` 不是 zdoc 已有的手册 | 改手册 ID |

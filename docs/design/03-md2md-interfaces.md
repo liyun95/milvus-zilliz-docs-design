@@ -134,6 +134,19 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 
 zdoc 收到 `ok: false` 时让该页生成失败；`dependencies` 与 `engine` 写入记录文件（见 [05](./05-publish-handoff.md#记录文件)），用于缓存判断和恢复。参数类型错误属于调用方的编程错误，直接抛出 `TypeError`，不放进 `errors`。
 
+依赖与限额的约定（2026-10-22 在 WP2 的计划审阅中确定，由契约用例固定）：
+
+| 项 | 约定 |
+|---|---|
+| `fragments[].path` | 相对于 `fragmentRoot`、用 `/` 分隔，如 `fragments/a.md` |
+| `includedBy`、`usedIn` | 直接引用它的文件，去重；数组按第一次用到的顺序排列 |
+| `variables[].key` | 小写、用 `.` 连接的完整键名，如 `cloud.region` |
+| `maxFragments` | 按读到的不同片段文件计数 |
+| `maxDepth` | 页面直接引用的片段为第 1 层 |
+| `maxOutputBytes` | 同一片段被引用多次时，每次展开都计入 |
+| 报错的行号 | 指向写着这个变量或片段引用的那个文件中的行，不是展开后的行 |
+| 键名只差大小写 | 同一层中有只差大小写的两个键，如 `Product` 与 `product`，整份变量表不合法，抛出 `TypeError`。zdoc 在调用前先检查 `Variables.json`，把这种情况报成页面错误 |
+
 ## 出错时
 
 命名块的错误码见 [01](./01-named-blocks.md#出错时)。预处理的错误码：
