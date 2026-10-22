@@ -1,6 +1,6 @@
 # WP3 读取：页面配置、lock、原文与命名块
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 合并到上游（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 已合并（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)，commit [`5dd0e56`](https://github.com/zilliztech/zdoc/commit/5dd0e56a58054864eda231deeb76f1945be80fb0)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：未开始
 
 ## 目标
 
