@@ -194,19 +194,23 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版
 
 **产品名检查**
 
-漏写变量时，Milvus 的产品名或连接值会直接出现在 Cloud 页面上。所以工具在合并前检查**生成后的 Cloud 页面**：出现检查规则中的写法，又不在放行清单中，这一页生成失败。规则写在 zdoc 的 `shared-docs/product-names.yaml`：
+漏写变量或漏做变换时，只属于 Milvus 的写法会直接出现在 Cloud 页面上：产品名、本机的连接地址、默认的用户名与密码、只有自部署才有的配置文件。所以工具在合并前检查**生成后的 Cloud 页面**：出现检查规则中的写法，又不在放行清单中，这一页生成失败。规则写在 zdoc 的 `shared-docs/product-names.yaml`，Phase 1 的初始内容如下：
 
 ```yaml
 # shared-docs/product-names.yaml
 check:                                  # 出现就报错的写法
-  - Milvus
-  - localhost:19530
-  - root:Milvus
+  - Milvus                              # 产品名
+  - localhost                           # 本机地址，任何端口，如 localhost:19530、localhost:8080
+  - 127.0.0.1                           # 同上
+  - root:Milvus                         # 默认的用户名与密码；Cloud 上是 API key 或集群凭据
+  - milvus.yaml                         # 自部署的配置文件；Cloud 用户不配置它
 allow:                                  # 确实要保留的写法，报错时由文档工程师补
   - Zilliz Cloud is built on Milvus
 ```
 
-- 按整词匹配：`MilvusClient`、`pymilvus`、`milvus.yaml` 中的 Milvus 不算；链接地址不检查。
+- 按整词匹配、区分大小写：`MilvusClient`、`pymilvus`、`milvus.yaml` 中的 Milvus 不算命中 `Milvus` 这一项；`milvus.yaml` 由清单中单独的一项查出。链接地址不检查。
+- 两类写法改法不同：产品名、连接地址、用户名与密码，在 milvus-docs 中改成变量；`milvus.yaml` 这类写法说明这一段讲的是 Cloud 没有的功能，变量解决不了，要在页面配置中用变换删掉或替换这一段。
+- milvus-docs `v3.0.x` `6fb1bf9` 的 User Guide 中：`localhost` 507 处（其中 `localhost:19530` 481 处），`root:Milvus` 247 处，`milvus.yaml` 134 处（35 篇），`127.0.0.1` 13 处。接入一页时，这些在内容对齐中逐处处理。
 - 放行清单写完整的短语，不写单个词，避免把 `Milvus` 整个放过。
 - milvus-docs 的 PR 检查只给提示，不拦截：它不知道哪些页面是共享页，Milvus 页面中也大量合法地写着 Milvus。
 
@@ -229,7 +233,8 @@ allow:                                  # 确实要保留的写法，报错时�
 | 变量在 Cloud 中没有值 | zdoc 的 PR 校验，或上游更新 PR 的校验 | 在 `shared-docs/Variables.json` 中补上 |
 | `Variables.json` 写错：不是合法的 JSON，或同一层中有只差大小写的两个键 | zdoc 的 PR 校验 | 按报错改正 `shared-docs/Variables.json`；改好之前所有共享页都生成失败 |
 | 片段不存在、循环引用、嵌套太深或太大 | 同上 | 回 milvus-docs 修正 |
-| Cloud 页面中出现没换成变量的产品名或连接值 | 同上 | 回 milvus-docs 改成变量；确实要保留的写法，在 `product-names.yaml` 的 `allow` 中补一行 |
+| Cloud 页面中出现没换成变量的产品名、连接地址、用户名与密码 | 同上 | 回 milvus-docs 改成变量；确实要保留的写法，在 `product-names.yaml` 的 `allow` 中补一行 |
+| Cloud 页面中出现 `milvus.yaml` 这类只有自部署才有的写法 | 同上 | 在页面配置中用变换删掉或替换这一段 |
 
 </details>
 

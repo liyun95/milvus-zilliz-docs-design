@@ -140,7 +140,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 每个版本、每个手册的 MDX 生成后、两版合并前，按 `shared-docs/product-names.yaml` 检查一遍：
 
-- **检查什么**：`check` 中的每一项，在正文与代码块中按整词匹配，区分大小写。`MilvusClient`、`pymilvus`、`milvus.yaml` 这类更长的词中出现的 Milvus 不算命中；链接与图片地址、front matter 不检查。
+- **检查什么**：`check` 中的每一项，在正文与代码块中按整词匹配，区分大小写。`MilvusClient`、`pymilvus`、`milvus.yaml` 这类更长的词中出现的 Milvus 不算命中 `Milvus` 这一项；要查 `milvus.yaml` 本身，在 `check` 中单独列出。不写端口的 `localhost` 能查出任何端口。一处同时命中几项时（如 `root:Milvus` 中的 `Milvus`），只报最长的一项。链接与图片地址、front matter 不检查。Phase 1 的初始清单见[产品需求场景 1](../prd.md#场景-1把产品名和连接值写成变量)。
 - **放过什么**：命中的位置落在 `allow` 中某个短语之内时放过。`allow` 只接受包含空格的短语，不接受单个词。
 - **报在哪里**：报错指出页面、版本和手册，并按变换前的位置映射回原文的文件与行号；命中在 Cloud 内容文件中时，指向内容文件。
 - **怎样找回位置**：是否失败只看生成的 MDX。对 MDX 中命中的每种写法，再到这一版本用到的输入中按同样的规则查找：Cloud 内容文件、原文、用到的片段、用到的变量的值；每处没被放过的位置报一条错，MDX 中的行号放在 `detail` 中。输入中都找不到时（写法来自站点适配），报在页面原文上，不给行号。变换接入后，原文中被替换或删除的范围不再查找。
@@ -157,7 +157,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 | 提示框写法不在上表中；出现 Milvus 站点专用的版式 `div` | 该页生成失败 |
 | MDX 修补后仍不能编译 | 该页生成失败 |
 | Cloud 内容文件中手写了 `<Tabs>`、`<Admonition>` 等 Cloud 组件 | 该页生成失败，见 [02](./02-page-config.md#出错时) |
-| 生成的页面中出现 `check` 中的写法，且不在 `allow` 中 | 该页生成失败，提示回 milvus-docs 改成变量，或在 `allow` 中补一行 |
+| 生成的页面中出现 `check` 中的写法，且不在 `allow` 中 | 该页生成失败。产品名、连接地址、用户名与密码：提示回 milvus-docs 改成变量，或在 `allow` 中补一行；`milvus.yaml` 这类只有自部署才有的写法：提示用变换删掉或替换这一段 |
 | `product-names.yaml` 格式不对，或 `allow` 中有单个词 | 所有共享页生成失败 |
 
 ## 例子
