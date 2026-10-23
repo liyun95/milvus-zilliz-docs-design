@@ -20,15 +20,15 @@
 每个多语言代码组（[01](./01-named-blocks.md#识别规则)）按 Tabs 规则重新生成一组 `<Tabs>`，不使用语言切换栏 `<div class="multipleCode">` 的内容；不在代码组中的代码块照原样输出。
 
 ````mdx
-<Tabs groupId="code" defaultValue="python" values={[{"label":"Python","value":"python"},{"label":"Java","value":"java"}]}>
-<TabItem value="python">
+<Tabs groupId="code" defaultValue='python' values={[{"label":"Python","value":"python"},{"label":"Java","value":"java"}]}>
+<TabItem value='python'>
 
 ```python
 client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 ```
 
 </TabItem>
-<TabItem value="java">
+<TabItem value='java'>
 ……
 </TabItem>
 </Tabs>
@@ -123,10 +123,12 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 ### 标题锚点
 
-每个标题都输出显式的锚点 `{#id}`，`id` 用 zdoc 飞书转换器相同的算法：`slugify(标题文字, { lower: true, strict: true })`（`packages/docs-tooling/src/lark/larkDocWriter.js` 的 `__heading_slug`，复用同一个函数，不另写一份）。这样迁移后与飞书版相同的标题锚点不变，链接换算（[02b](./02b-links-and-images.md#锚点)）也能算出确定的结果。
+除页面标题（一级标题）外，每个标题都输出显式的锚点，`id` 用 zdoc 飞书转换器相同的算法：`slugify(标题文字, { lower: true, strict: true })`（`packages/docs-tooling/src/lark/larkDocWriter.js` 的 `__heading_slug`，复用同一个函数，不另写一份）。这样迁移后与飞书版相同的标题锚点不变，链接换算（[02b](./02b-links-and-images.md#锚点)）也能算出确定的结果。
 
 - 计算前去掉标题中的 Markdown 标记与 HTML，与飞书转换器的 `__clean_headings` 相同。
-- 同一页中有几个标题算出相同的锚点时，第一个不变，之后的依次加 `-1`、`-2`，与 Docusaurus 自动生成锚点的做法相同。User Guide 的 201 篇中有 4 篇有重复的标题，如 `set-collection-ttl.md`。链接换算时，Milvus 的锚点对应到几个标题的，取第一个，与浏览器的行为一致。
+- 写法与 zdoc dev 上飞书生成的页面相同：锚点紧跟标题文字、中间不留空格，转义写作 `## Delete Entities by Filtering Conditions\{#delete-entities-by-filtering-conditions}`；一级标题不加。2026-10-23 核验 dev 的英文 Guides 390 篇：一级标题 391 个中只有 5 个带锚点；二到六级标题 2847 个中 2819 个是这种写法，没有一个在 `\{#` 前留空格。
+- `<Tabs>` 与 `<TabItem>` 的写法同样以 dev 上现有页面为准，如 `defaultValue='python'`、`<TabItem value='python'>`（5090 个 `<TabItem>` 中 5068 个用单引号）。
+- 同一页中有几个标题算出相同的锚点时，第一个不变，之后的依次加 `-1`、`-2`，与 Docusaurus 自动生成锚点的做法相同；只计带锚点的标题。User Guide 的 201 篇中有 4 篇有重复的标题，如 `set-collection-ttl.md`。链接换算时，Milvus 的锚点对应到几个标题的，取第一个，与浏览器的行为一致。
 
 ### 其他 Milvus 语法
 
