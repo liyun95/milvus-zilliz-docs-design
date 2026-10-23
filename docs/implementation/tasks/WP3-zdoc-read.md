@@ -1,6 +1,6 @@
 # WP3 读取：页面配置、lock、原文与命名块
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 已合并（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)，commit [`5dd0e56`](https://github.com/zilliztech/zdoc/commit/5dd0e56a58054864eda231deeb76f1945be80fb0)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：WP3a 已合并（[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)）；WP3b 未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP0 已合并（[zilliztech/zdoc#792](https://github.com/zilliztech/zdoc/pull/792)，commit [`5dd0e56`](https://github.com/zilliztech/zdoc/commit/5dd0e56a58054864eda231deeb76f1945be80fb0)）；[WP2](./WP2-md2md-preprocess.md) 不阻塞，发版前用替身　**状态**：已合并。WP3a：[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)；WP3b：[zilliztech/zdoc#800](https://github.com/zilliztech/zdoc/pull/800)，commit [`31a9b54`](https://github.com/zilliztech/zdoc/commit/31a9b54176c9adc50515f84a559b4082700b6620)
 
 ## 目标
 
