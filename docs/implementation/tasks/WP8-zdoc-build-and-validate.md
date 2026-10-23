@@ -1,6 +1,6 @@
 # WP8 生成命令与 PR 校验
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP4、WP5、WP6 已合并（[zilliztech/zdoc#804](https://github.com/zilliztech/zdoc/pull/804)、[#815](https://github.com/zilliztech/zdoc/pull/815)、[#812](https://github.com/zilliztech/zdoc/pull/812)）；WP8a 在 [WP7](./WP7-zdoc-links-seed.md) 合并后开工；WP8b 要等 zdoc 维护者回答下文“待确认”的问题　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP4、WP5、WP6 已合并（[zilliztech/zdoc#804](https://github.com/zilliztech/zdoc/pull/804)、[#815](https://github.com/zilliztech/zdoc/pull/815)、[#812](https://github.com/zilliztech/zdoc/pull/812)）；WP8a 在 [WP7](./WP7-zdoc-links-seed.md) 合并后开工；WP8b 在 WP8a 合并后开工　**状态**：未开始
 
 ## 目标
 
@@ -64,11 +64,11 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
 
 1. **读取**（WP3 的 `inspectPage`）：配置、lock、原文、命名块、删标记、展开变量与片段。没有 `lock.yaml` 时按计划值生成（产品需求 3-1）。
 2. **链接与图片**（WP5 的 `prepareLinkInputs` 与 `rewriteLinksAndImages`）：
-   - Cloud 页面清单取 dev 中这个手册的页面（待确认 1）；
+   - Cloud 页面清单取 dev 中这个手册的页面（见“已定的事”1）；
    - 共享页清单取全部 `page.yaml` 的 `source.file`。
 3. **站点适配**（WP4 的 `adaptPage` 与 `toMdx`）：
    - 标题锚点传入 `text => cloudAnchor(headingText(text))`，即 WP5 的算法；
-   - `sidebar_label`、`sidebar_position` 取 dev 上这一页现有 MDX 的 front matter（待确认 2）。
+   - `sidebar_label`、`sidebar_position` 取 dev 上这一页现有 MDX 的 front matter（见“已定的事”2）。
 4. **产品名检查**（WP6 的 `checkProductNames`）：`sources` 依次放这一版本的原文、用到的片段、用到的变量的值。
 
 - **两个版本**：`current` 与 `next` 各走一遍。两版生成的 MDX 相同时输出一份；不同时，命令以明确的消息拒绝这一页，说明两版合并要等 WP11。Phase 1a 中，接入时两个版本是同一个提交，不会出现不同。
@@ -80,7 +80,7 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
   - 整页通道（`release_channel`）归 WP13，这里不输出。
 - **输出路径**：用 `page.yaml` 的 `publish[].path`，不读快照中的 `output_paths`（2026-10-23 dev 上的快照中，402 条记录的这个字段都是空的）。
 
-## WP8b：两个工作流（待 zdoc 维护者确认后开工）
+## WP8b：两个工作流
 
 按技术设计 08 的“工作流一览”实现 `shared-docs-lock` 与 `shared-docs-validate`：
 
@@ -105,17 +105,15 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
 - 三篇试点页也各跑一次 `shared-docs build`，把结果写进 PR 说明，测试不断言。内容对齐之前，预期会有产品名与链接的错误，例如 OpenAI 的 `LINK_UNRESOLVED`。
 - `3-6`（接入不等于上线）改归 WP14：要等激活实现后才能验收。
 
-## 待确认（问 zdoc 维护者）
+## 已定的事
 
-1–3 也影响 WP8a：WP8a 可以先按下面的提议实现，由维护者在上游 PR 中确认；4 是 WP8b 开工的前提。
+推动者有 zdoc 的维护权限，下面几条由推动者在写卡时定下（2026-10-23）：
 
-1. **Cloud 页面清单**：链接查找第 3 步与 WP7 的候选，从 dev 的 `content/en/<手册>/` 读 front matter 中的 slug 与标题，是否合适（技术设计 02b 留给维护者确定）？
-2. **导航**：飞书表格快照中没有 `sidebar_label`、`sidebar_position`。Phase 1 共享页的这两项，从 dev 上这一页现有的 MDX 中取，是否合适？
-3. **站点校验**：技术设计 05 要求生成的 MDX “通过 zdoc 现有的站点校验”。PR 校验中该跑哪一条命令？
-4. **工作流与仓库配置**：
-   - 两个新工作流（`shared-docs-lock` 会向 PR 分支推送 `lock.yaml`）是否可以按上表实现？
-   - `shared-docs-validate` 设为 master 的必需检查项：不能按路径区分，所以所有 PR 都要跑它，没改 `shared-docs/` 的立即通过。
-   - `CODEOWNERS` 与分支保护由维护者配置。
+1. **Cloud 页面清单**：链接查找第 3 步与 WP7 的候选，从 dev 的 `content/en/<手册>/` 读每页 front matter 中的 slug 与标题。
+2. **导航**：飞书表格快照中没有 `sidebar_label`、`sidebar_position`，Phase 1 从 dev 上这一页现有的 MDX 中取。
+3. **输出路径**：dev 上的快照中，402 条记录的 `output_paths` 都是空的（2026-10-23），不用它；输出路径取 `page.yaml` 的 `publish[].path`。
+4. **PR 校验跑什么**：只跑 `shared-docs build`，其中已经包含逐页用 zdoc 现有的 MDX 修补模块处理并编译（WP4）。不跑整站构建：`site-validation.yml` 的整站构建要 dev 上的全部内容、耗时十几分钟，正式发布前 Fetch 本来就会试构建（技术设计 05“交接发生在哪里”的第 4 步，WP9）。
+5. **工作流**：WP8b 按技术设计 08 实现，不事先征询。上游 PR 改了 `.github/workflows/`，按 #796 中提出的规则请 zdoc 文档负责人 review，并在 PR 说明中写明：`shared-docs-validate` 设为 master 的必需检查后，所有 PR 都会多一个检查项，没改 `shared-docs/` 的立即通过。合并后由推动者配置分支保护与 `CODEOWNERS`。
 
 ## 完成的定义
 
