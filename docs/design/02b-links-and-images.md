@@ -33,7 +33,7 @@
 1. **同名页面**：已在构建时的第 3 步中，不写进表。
 2. **标题相同**：Milvus 页面的 `title` 与 Cloud 页面的标题（去掉 `| Cloud`，转小写，非字母数字换成空格）相同，且 Cloud 只有一页是这个标题。
 3. **从 Cloud 现有页面反推**：Milvus 源页面对应的 Cloud 页面（同名或同标题）中，与 Milvus 链接文字相同的链接所指的页面；多个时取出现次数最多的，并在注释中列出其余的。
-4. **按类别指向 milvus.io**：目标在 Milvus 的 `adminGuide/`、`getstarted/`、`reference/` 下，或是索引类型页（如 `ivf-flat.md`、`hnsw.md`），写成 `https://milvus.io/docs/<文件名>`。
+4. **按类别指向 milvus.io**：目标在 Milvus 的 `adminGuide/`、`getstarted/`、`reference/` 下，或是索引类型页（`userGuide/indexes/` 下的页面，如 `ivf-flat.md`、`hnsw.md`、`gpu-cagra.md`），写成 `https://milvus.io/docs/<文件名>`。
 5. **其余**：写成注释掉的一行，附上按标题相似度排出的前三个 Cloud 页面，由人判断。
 
 ```yaml
