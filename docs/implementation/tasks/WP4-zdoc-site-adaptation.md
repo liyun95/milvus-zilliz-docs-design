@@ -67,7 +67,7 @@ toMdx(adapted, context): Promise<{ mdx: string } | { errors }>          // ADAPT
   - 原文的 front matter 用 `core/yaml.ts` 读。
   - 后缀规则与 zdoc 飞书转换器中的 [`__title_suffix`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-tooling/src/lark/larkDocWriter.js) 相同。在测试中直接调用它比对，只比 `guides` 与 `guides-byoc` 两种路径。
   - `channel` 暂不输出，整页通道归 WP13。
-- **标题锚点**：每个标题输出 `{#id}`，`id` 由 `headingAnchor` 算出。
+- **标题锚点**：除一级标题外，每个标题输出锚点，`id` 由 `headingAnchor` 算出；写法以 dev 上现有页面为准，见技术设计 07 的“标题锚点”。
   - 同一页中重复的锚点，第一个不变，之后依次加 `-1`、`-2`。
   - 代码块中的 `#` 行不是标题。
   - 测试中传入一个简单的替身函数。
