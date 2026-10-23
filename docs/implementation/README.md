@@ -174,8 +174,8 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP4 | zdoc | 站点适配：代码 Tabs、提示框、front matter（含 `beta`）、MDX 兼容、标题锚点 | `2-6`、`3-5`，站点适配错误码 | WP3 |
 | WP5 | zdoc | 链接与图片：四步查找、锚点换算（两个站点的锚点算法）、图片按内容命名（只算地址） | `5-1`、`5-2`、`5-4`–`5-7`，链接与图片错误码 | WP3 |
 | WP6 | zdoc | 产品名检查 | `1-6`，产品名错误码，T14 | WP3 |
-| WP7 | zdoc | 初始链接映射表的生成命令 | 技术设计 02b | WP5 |
-| WP8 | zdoc | 把读取、链接与图片、站点适配、产品名检查接成一条生成命令；工作流：接入时写 lock、PR 校验；读取 dev 上的飞书表格快照（`GuidesBase` 的真实实现） | `3-2`、`3-3`、`3-4`、`3-6`，T12 的候选部分 | WP4、WP5、WP6 |
+| WP7 | zdoc | 初始链接映射表的生成命令 | 技术设计 02b；不覆盖编号 | WP5 |
+| WP8 | zdoc | WP8a：把读取、链接与图片、站点适配、产品名检查接成一条生成命令，读取 dev 上的飞书表格快照（`GuidesBase` 的真实实现）；WP8b：工作流，接入时写 lock、PR 校验 | `3-2`、`3-3`、`3-4`，T12 的候选部分 | WP4、WP5、WP6；WP8a 在 WP7 之后；WP8b 需要 zdoc 维护者确认 |
 | WP9 | zdoc | Fetch 接入：候选生成、交接物、记录文件、图片上传；回放测试 | 第 6 节“及时生效”“发布保护”，`5-3`，T06，T08 的一部分 | WP8；需要 zdoc 维护者参与 |
 
 ### 4.2 Phase 1b
@@ -186,12 +186,12 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP11 | zdoc | 两版合并与 `channel` 变换 | `6-1`–`6-7`，T13 | WP10 |
 | WP12 | zdoc | 上游更新：发现、每页一个 PR、影响报告 | `7-1`–`7-10`，T05 | WP11 |
 | WP13 | zdoc | 提升工作流 | `8-1`–`8-4` | WP11 |
-| WP14 | zdoc | 激活与下线：placement type `git`、比较运行、`active.json`、归属检查 | `9-1`–`9-8`、`10-1`–`10-4`，发布与切换错误码，T07 | WP9 |
+| WP14 | zdoc | 激活与下线：placement type `git`、比较运行、`active.json`、归属检查 | `3-6`、`9-1`–`9-8`、`10-1`–`10-4`，发布与切换错误码，T07 | WP9 |
 | WP15 | zdoc | 翻译、恢复与缓存的接入 | 第 6 节“翻译”“恢复”，T08、T09、T10 | WP14 |
 
 ### 4.3 并行与关键路径
 
-- **关键路径**：WP0 → WP3 → WP4 / WP5 / WP6 → WP8 → WP9 → WP14。md2md 的 WP1、WP2 与 zdoc 并行，zdoc 在 WP2 发版前用替身。
+- **关键路径**：WP0 → WP3 → WP4 / WP5 / WP6 → WP7 → WP8 → WP9 → WP14。WP7 与 WP8a 都在 `cli-main.ts` 中注册子命令、都读 zdoc dev 的内容（WP7 新建读取的适配器，WP8a 复用），所以先后进行。md2md 的 WP1、WP2 与 zdoc 并行，zdoc 在 WP2 发版前用替身。
 - **可以同时交给几个 Agent 的**：WP1 与 WP3；WP4、WP5、WP6（各在自己的目录中，只共用 WP3 的类型；都只提供纯计算的函数，不接入命令，由 WP8 接成一条生成命令；WP4 输出标题锚点时用的算法由 WP5 提供，经参数传入）；WP12 与 WP13。
 - **不交给 Agent 的**：R1 中的 npm 设置、C1–C3 内容对齐、基准输出的审核，见本节开头。
 
@@ -208,10 +208,11 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 变换 | 按页面配置做 add / replace / remove | WP10 | 未开始 | — |
 | 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | 已合并到上游（WP3b `31a9b54`） | [WP3](./walkthroughs/WP3.md) |
 | 站点适配 | 生成 Tabs、提示框、front matter、标题锚点 | WP4 | 已合并到上游（`zilliztech/zdoc` `09859d7`） | [WP4](./walkthroughs/WP4.md) |
-| 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 已合并到上游（`zilliztech/zdoc` `ca1cbd5`）；WP7 未开始 | [WP5](./walkthroughs/WP5.md) |
+| 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 已合并到上游（`zilliztech/zdoc` `ca1cbd5`）；WP7 任务卡已写，可以开工 | [WP5](./walkthroughs/WP5.md) |
 | 产品名检查 | 漏换的产品名报错 | WP6 | 已合并到上游（`zilliztech/zdoc` `ca64aa6`） | [WP6](./walkthroughs/WP6.md) |
 | 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | 未开始 | — |
-| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8、WP12、WP13 | 未开始 | — |
+| 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 任务卡已写，WP7 合并后开工 | — |
+| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 任务卡已写，等 zdoc 维护者确认 | — |
 | 发布与切换 | 接入 Fetch；激活与下线；翻译与恢复 | WP9、WP14、WP15 | 未开始 | — |
 
 ## 5. 任务卡
@@ -229,6 +230,8 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP4 | [站点适配](./tasks/WP4-zdoc-site-adaptation.md) |
 | WP5 | [链接与图片](./tasks/WP5-zdoc-links-images.md) |
 | WP6 | [产品名检查](./tasks/WP6-zdoc-product-names.md) |
+| WP7 | [生成初始链接映射表](./tasks/WP7-zdoc-links-seed.md) |
+| WP8 | [生成命令与 PR 校验](./tasks/WP8-zdoc-build-and-validate.md) |
 
 其余的在对应工作包开始前写，写完由推动者确认。
 
