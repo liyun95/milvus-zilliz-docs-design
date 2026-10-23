@@ -57,7 +57,7 @@ shared-docs/
 
 | 类别 | 生成失败的情况 |
 |---|---|
-| 页面与字段 | `page.yaml` 不是合法的 YAML；页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册；`metadata.beta` 不是[产品需求](../prd.md#场景-3接入一页)列出的可选值（zdoc 遇到不认识的值会不显示标签、也不报错，所以在生成前拦下） |
+| 页面与字段 | `page.yaml` 不是合法的 YAML；页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册；Phase 1 中 `publish[].path` 在该手册中没有飞书节点生成的页面；`metadata.beta` 不是[产品需求](../prd.md#场景-3接入一页)列出的可选值（zdoc 遇到不认识的值会不显示标签、也不报错，所以在生成前拦下） |
 | 变量表 | `Variables.json` 不是合法的 JSON、顶层不是对象，或同一层中有只差大小写的两个键；这时所有共享页都生成失败 |
 | 目标 | 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外 |
 | `position` 与内容 | 在块旁或代码行旁 `add` 时没写 `position`；给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容 |

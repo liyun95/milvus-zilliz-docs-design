@@ -56,6 +56,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `CONFIG_FIELD_UNKNOWN` | 未知的字段、动作或 `schema_version` | 删去或改正 |
 | `CONFIG_SOURCE_NOT_FOUND` | `source.file` 在该版本中不存在，包括上游改名或删除了原文 | 改 `source.file`；原文被删除时考虑下线 |
 | `CONFIG_MANUAL_UNKNOWN` | `publish[].manual` 不是 zdoc 已有的手册 | 改手册 ID |
+| `CONFIG_PATH_UNKNOWN` | Phase 1 中，`publish[].path` 在该手册中没有飞书节点生成的页面，或飞书表格快照中没有这一页的记录 | 改 `publish[].path`；全新的页面先在飞书表格与目录中建好记录与节点 |
 | `CONFIG_BETA_INVALID` | `metadata.beta` 不是 zdoc 标签定义中的值，或写了 `BYOC` | 改为 zdoc 现有的值，见[产品需求场景 3](../prd.md#场景-3接入一页) |
 
 **变换**（见 [02](./02-page-config.md#出错时)）
