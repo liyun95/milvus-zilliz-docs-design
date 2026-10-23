@@ -120,7 +120,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `TABS_UNKNOWN_LANGUAGE` | 代码组中有 Tabs 规则中没有的语言，包括多语言代码组中没写语言名的代码块 | 在规则中补充，或用变换删除这种语言 |
 | `TABS_REQUIRED_MISSING` | 多语言代码组缺少必须有的语言，或变换删除了它 | 用变换补上，或回上游补齐 |
 | `TABS_RULES_INVALID` | Tabs 规则文件格式不对 | zdoc 维护者修正 |
-| `ADAPT_UNSUPPORTED_MARKUP` | 提示框写法不在支持范围内，出现 Milvus 站点专用的版式 `div`，或同一个多语言代码组中一种语言出现两次 | 回上游改为支持的写法 |
+| `ADAPT_UNSUPPORTED_MARKUP` | 提示框写法不在支持范围内；出现代码组切换栏与提示框之外的 `<div>`，如 Milvus 站点专用的版式、按 SDK 语言显示的说明；同一个多语言代码组中一种语言出现两次 | 回上游改为支持的写法 |
 | `ADAPT_MDX_INVALID` | 修补后仍不能编译为 MDX | 回上游修正写法 |
 
 **发布与切换**（见 [05](./05-publish-handoff.md#出错时)、[05b](./05b-cutover-and-ownership.md#出错时)）
