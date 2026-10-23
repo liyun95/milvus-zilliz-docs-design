@@ -1,6 +1,6 @@
 # WP8 生成命令与 PR 校验
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP4、WP5、WP6 已合并（[zilliztech/zdoc#804](https://github.com/zilliztech/zdoc/pull/804)、[#815](https://github.com/zilliztech/zdoc/pull/815)、[#812](https://github.com/zilliztech/zdoc/pull/812)）；WP8a 在 [WP7](./WP7-zdoc-links-seed.md) 合并后开工；WP8b 在 WP8a 合并后开工　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP4、WP5、WP6 已合并（[zilliztech/zdoc#804](https://github.com/zilliztech/zdoc/pull/804)、[#815](https://github.com/zilliztech/zdoc/pull/815)、[#812](https://github.com/zilliztech/zdoc/pull/812)）；WP7 已合并（[#818](https://github.com/zilliztech/zdoc/pull/818)）；WP8a 已合并（[#822](https://github.com/zilliztech/zdoc/pull/822)，commit [`d3d1cbe`](https://github.com/zilliztech/zdoc/commit/d3d1cbe58af0324039a9086366c0e3d823c7f902)）；WP8b 可以开工　**状态**：WP8a 已合并；WP8b 未开始
 
 ## 目标
 
@@ -38,7 +38,7 @@ WP8 不写 dev、不上传图片：合并后进入 Fetch、真正发布是 WP9 �
 | WP8a：新建 `adapters/build-page.ts`（一页的整条流水线）、`adapters/guides-snapshot.ts`（`GuidesBase` 的真实实现，读 dev 检出中的飞书表格快照）、`commands/build.ts`；在 `cli-main.ts` 中注册 `shared-docs build` | 各步已有函数的行为：WP3–WP7 的代码只调用；要改先在 PR 中提出 |
 | WP8a：复用 WP7 的 `adapters/zdoc-content.ts`，可以给它加读 front matter 的方法 | `lark/`、`mdx/` 与 dev 上的任何文件：只读 |
 | WP8a：新建 `fixtures/build/`、`testing/build/` | 仓库根目录的 `shared-docs/`：第一篇页面正式接入时再建 |
-| WP8b：新建 `.github/workflows/shared-docs-lock.yml`、`shared-docs-validate.yml`；在 `scripts/docs-workflow/test-matrix.json` 中登记；按 zdoc 现有的工作流测试补用例 | 现有工作流，包括 `fetch-docs.yml` 与 `sync-master-tooling-to-dev.yml` |
+| WP8b：新建 `.github/workflows/shared-docs-lock.yml`、`shared-docs-validate.yml`；在 `scripts/docs-workflow/test-matrix.json` 中登记；按 zdoc 现有的工作流测试补用例。新建 `commands/lock.ts` 并在 `cli-main.ts` 中注册 `shared-docs lock`：为没有 `lock.yaml` 的页面调用 WP3 的 `planLock` 写入，已有的不改，来自 fork 时报 `LOCK_FORK_PR` | 现有工作流，包括 `fetch-docs.yml` 与 `sync-master-tooling-to-dev.yml` |
 | `spec/pending.json`：删掉本工作包的编号；`3-6` 改为 `"WP14"`。`spec/requirements.json`：WP8a 从设计仓库原样重新复制一次（新增 `CONFIG_PATH_UNKNOWN`，共 77 个错误码），并把它记入 `pending.json` 后由本工作包覆盖 | 分支保护、`CODEOWNERS`、仓库设置：由 zdoc 维护者在 GitHub 上配置，不在 PR 中改 |
 
 ## WP8a：生成命令

@@ -208,11 +208,11 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 变换 | 按页面配置做 add / replace / remove | WP10 | 未开始 | — |
 | 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | 已合并到上游（WP3b `31a9b54`） | [WP3](./walkthroughs/WP3.md) |
 | 站点适配 | 生成 Tabs、提示框、front matter、标题锚点 | WP4 | 已合并到上游（`zilliztech/zdoc` `09859d7`） | [WP4](./walkthroughs/WP4.md) |
-| 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 已合并到上游（`zilliztech/zdoc` `ca1cbd5`）；WP7 任务卡已写，可以开工 | [WP5](./walkthroughs/WP5.md) |
+| 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 已合并到上游（`zilliztech/zdoc` `ca1cbd5`）；WP7 已合并（`f19966c`） | [WP5](./walkthroughs/WP5.md) |
 | 产品名检查 | 漏换的产品名报错 | WP6 | 已合并到上游（`zilliztech/zdoc` `ca64aa6`） | [WP6](./walkthroughs/WP6.md) |
 | 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | 未开始 | — |
-| 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 任务卡已写，WP7 合并后开工 | — |
-| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 任务卡已写，WP8a 合并后开工 | — |
+| 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | — |
+| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 任务卡已写，可以开工 | — |
 | 发布与切换 | 接入 Fetch；激活与下线；翻译与恢复 | WP9、WP14、WP15 | 未开始 | — |
 
 ## 5. 任务卡
