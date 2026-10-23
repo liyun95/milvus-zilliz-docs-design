@@ -108,7 +108,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 
 | 错误码 | 何时出现 | 怎样改 |
 |---|---|---|
-| `PRODUCT_NAME_FOUND` | 生成的页面中出现 `check` 中的写法，且不在 `allow` 中 | 回 milvus-docs 改成变量；确实要保留时，在 `allow` 中补一行 |
+| `PRODUCT_NAME_FOUND` | 生成的页面中出现 `check` 中的写法，且不在 `allow` 中 | 产品名、连接地址、用户名与密码：回 milvus-docs 改成变量，确实要保留时在 `allow` 中补一行；`milvus.yaml` 这类只有自部署才有的写法：用变换删掉或替换这一段 |
 | `PRODUCT_NAMES_INVALID` | `product-names.yaml` 格式不对，或 `allow` 中有单个词 | 改正规则文件 |
 
 提升时不符合条件的页面（页面不存在、两个版本已相同）不算错误，在运行摘要中列出：`PROMOTE_PAGE_NOT_FOUND`、`PROMOTE_NOTHING_TO_DO`。
