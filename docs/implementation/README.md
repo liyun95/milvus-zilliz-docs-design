@@ -204,12 +204,12 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 测试与目录骨架 | 代码的家、外部系统的替身、需求账本、测试素材 | WP0 | 已合并到上游（`zilliztech/zdoc` `5dd0e56`） | [WP0](./walkthroughs/WP0.md) |
 | 命名块（md2md） | 检查标记写法；Milvus 发布前删掉标记 | WP1 | 已合并到上游（`zilliztech/md2md` `07855e4`），已随 1.3.0 发布 | [WP1](./walkthroughs/WP1.md) |
 | 变量与片段（md2md） | 只做预处理的入口；发版 | WP2 | 已合并到上游（`zilliztech/md2md` `a143b27`），1.3.0 已发布；milvus-docs `v3.0.x` 已升级（#3697） | [WP2](./walkthroughs/WP2.md) |
-| 读取 | 读页面配置与 lock；按 commit 取原文；定位命名块、判断类型 | WP3 | WP3a 已合并到上游（`zilliztech/zdoc` `5844587`）；WP3b 可以开工 | WP3b 合并后写 |
+| 读取 | 读页面配置与 lock；按 commit 取原文；定位命名块、判断类型 | WP3 | 已合并到上游（`zilliztech/zdoc` WP3a `5844587`、WP3b `31a9b54`） | [WP3](./walkthroughs/WP3.md) |
 | 变换 | 按页面配置做 add / replace / remove | WP10 | 未开始 | — |
-| 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | WP3b 可以开工 | — |
-| 站点适配 | 生成 Tabs、提示框、front matter、标题锚点 | WP4 | 任务卡已写，WP3b 合并后开工 | — |
-| 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 任务卡已写，WP3b 合并后开工 | — |
-| 产品名检查 | 漏换的产品名报错 | WP6 | 任务卡已写，WP3b 合并后开工 | — |
+| 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | 已合并到上游（WP3b `31a9b54`） | [WP3](./walkthroughs/WP3.md) |
+| 站点适配 | 生成 Tabs、提示框、front matter、标题锚点 | WP4 | 任务卡已写，可以开工 | — |
+| 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 任务卡已写，可以开工 | — |
+| 产品名检查 | 漏换的产品名报错 | WP6 | 任务卡已写，可以开工 | — |
 | 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | 未开始 | — |
 | 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8、WP12、WP13 | 未开始 | — |
 | 发布与切换 | 接入 Fetch；激活与下线；翻译与恢复 | WP9、WP14、WP15 | 未开始 | — |

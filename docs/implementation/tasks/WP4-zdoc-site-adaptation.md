@@ -1,6 +1,6 @@
 # WP4 站点适配
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP3](./WP3-zdoc-read.md)：WP3a 已合并（[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)）；WP3b（[zilliztech/zdoc#800](https://github.com/zilliztech/zdoc/pull/800)）合并后开工。可与 [WP5](./WP5-zdoc-links-images.md)、[WP6](./WP6-zdoc-product-names.md) 同时进行　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP3](./WP3-zdoc-read.md)：WP3a 已合并（[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)）；WP3b 已合并（[zilliztech/zdoc#800](https://github.com/zilliztech/zdoc/pull/800)，commit [`31a9b54`](https://github.com/zilliztech/zdoc/commit/31a9b54176c9adc50515f84a559b4082700b6620)），可以开工。可与 [WP5](./WP5-zdoc-links-images.md)、[WP6](./WP6-zdoc-product-names.md) 同时进行　**状态**：未开始
 
 ## 目标
 
@@ -36,7 +36,7 @@
 | 新建 `adapters/mdx.ts`：调用 zdoc 现有的 [`packages/docs-tooling/src/mdx`](https://github.com/zilliztech/zdoc/blob/master/packages/docs-tooling/src/mdx/index.ts)（`applyMdxPatches`、`validateMdxStructure`）与 `@mdx-js/mdx` 编译 | `commands/`、`cli-main.ts`：接入命令归 WP8 |
 | 新建 `fixtures/site/`：Tabs 规则文件 `cloud-sdk-tabs.yaml`（按技术设计 07 的 Phase 1 建议值）、合成的小样例 | 链接、锚点换算与图片（WP5）；产品名检查（WP6） |
 | 新建 `fixtures/site-errors/<样例>/`、`testing/site/` | `fixtures/golden/`：内容对齐前不产生基准输出 |
-| `spec/pending.json`：删掉本工作包的编号；`3-4` 改为 `"WP8"` | `spec/requirements.json` |
+| `spec/pending.json`：删掉本工作包的编号；`3-4` 改为 `"WP8"` | `spec/requirements.json`：WP5 会复制带新错误码的版本，本工作包不复制 |
 
 ## 接口
 

@@ -1,6 +1,6 @@
 # WP6 产品名检查
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP3](./WP3-zdoc-read.md)：WP3a 已合并（[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)）；WP3b（[zilliztech/zdoc#800](https://github.com/zilliztech/zdoc/pull/800)）合并后开工。可与 [WP4](./WP4-zdoc-site-adaptation.md)、[WP5](./WP5-zdoc-links-images.md) 同时进行　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP3](./WP3-zdoc-read.md)：WP3a 已合并（[zilliztech/zdoc#796](https://github.com/zilliztech/zdoc/pull/796)，commit [`5844587`](https://github.com/zilliztech/zdoc/commit/5844587037d5397e8ebd1510235db5d8592584d7)）；WP3b 已合并（[zilliztech/zdoc#800](https://github.com/zilliztech/zdoc/pull/800)，commit [`31a9b54`](https://github.com/zilliztech/zdoc/commit/31a9b54176c9adc50515f84a559b4082700b6620)），可以开工。可与 [WP4](./WP4-zdoc-site-adaptation.md)、[WP5](./WP5-zdoc-links-images.md) 同时进行　**状态**：未开始
 
 ## 目标
 
@@ -29,7 +29,7 @@
 | 新建 `core/product-names/`：规则文件的读取、匹配、位置查找，都是纯计算 | `core/types.ts`、`adapters/types.ts`：WP3 是主人，要加共用类型先在 PR 中提出；本工作包的类型放在 `core/product-names/` 中 |
 | 新建 `fixtures/product-names/`：规则文件样例（产品需求场景 1 中的三项检查与一项放行）、合成的小样例 | `commands/`、`cli-main.ts`：接入命令归 WP8 |
 | 新建 `fixtures/product-names-errors/<样例>/`、`testing/product-names/` | 站点适配（WP4）；链接与图片（WP5） |
-| `spec/pending.json`：删掉本工作包的编号 | `spec/requirements.json`、`fixtures/golden/` |
+| `spec/pending.json`：删掉本工作包的编号 | `spec/requirements.json`：WP5 会复制带新错误码的版本，本工作包不复制；`fixtures/golden/` |
 
 ## 接口
 
