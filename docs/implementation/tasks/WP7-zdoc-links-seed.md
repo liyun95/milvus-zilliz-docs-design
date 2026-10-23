@@ -1,6 +1,6 @@
 # WP7 生成初始链接映射表
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP5](./WP5-zdoc-links-images.md) 已合并（[zilliztech/zdoc#815](https://github.com/zilliztech/zdoc/pull/815)，commit [`ca1cbd5`](https://github.com/zilliztech/zdoc/commit/ca1cbd57c3179a202f625391fa4d7b4b84054296)），可以开工。与 [WP8](./WP8-zdoc-build-and-validate.md) 都要在 `cli-main.ts` 中注册子命令、都要读 zdoc dev 的内容，所以先做 WP7，WP8 在它合并后开工　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP5](./WP5-zdoc-links-images.md) 已合并（[zilliztech/zdoc#815](https://github.com/zilliztech/zdoc/pull/815)，commit [`ca1cbd5`](https://github.com/zilliztech/zdoc/commit/ca1cbd57c3179a202f625391fa4d7b4b84054296)），可以开工。与 [WP8](./WP8-zdoc-build-and-validate.md) 都要在 `cli-main.ts` 中注册子命令、都要读 zdoc dev 的内容，所以先做 WP7，WP8 在它合并后开工　**状态**：已合并（[zilliztech/zdoc#818](https://github.com/zilliztech/zdoc/pull/818)，commit [`f19966c`](https://github.com/zilliztech/zdoc/commit/f19966c2aaf1b179180dc747215169ceca7b3b49)）
 
 ## 目标
 
