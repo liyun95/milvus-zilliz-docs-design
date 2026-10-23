@@ -39,7 +39,7 @@ WP8 不写 dev、不上传图片：合并后进入 Fetch、真正发布是 WP9 �
 | WP8a：复用 WP7 的 `adapters/zdoc-content.ts`，可以给它加读 front matter 的方法 | `lark/`、`mdx/` 与 dev 上的任何文件：只读 |
 | WP8a：新建 `fixtures/build/`、`testing/build/` | 仓库根目录的 `shared-docs/`：第一篇页面正式接入时再建 |
 | WP8b：新建 `.github/workflows/shared-docs-lock.yml`、`shared-docs-validate.yml`；在 `scripts/docs-workflow/test-matrix.json` 中登记；按 zdoc 现有的工作流测试补用例 | 现有工作流，包括 `fetch-docs.yml` 与 `sync-master-tooling-to-dev.yml` |
-| `spec/pending.json`：删掉本工作包的编号；`3-6` 改为 `"WP14"` | 分支保护、`CODEOWNERS`、仓库设置：由 zdoc 维护者在 GitHub 上配置，不在 PR 中改 |
+| `spec/pending.json`：删掉本工作包的编号；`3-6` 改为 `"WP14"`。`spec/requirements.json`：WP8a 从设计仓库原样重新复制一次（新增 `CONFIG_PATH_UNKNOWN`，共 77 个错误码），并把它记入 `pending.json` 后由本工作包覆盖 | 分支保护、`CODEOWNERS`、仓库设置：由 zdoc 维护者在 GitHub 上配置，不在 PR 中改 |
 
 ## WP8a：生成命令
 
@@ -76,7 +76,7 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
 - **飞书表格快照**：
   - 从 dev 检出中读 `packages/docs-tooling/src/lark/meta/snapshots/guides-uat-last-success.json`；
   - 每条记录有 `slug`、`title`、`placement_type`、`release_channel`；
-  - WP8a 只用它确认 `publish[].path` 对应的页面在飞书目录中存在（技术设计 04：“只能接入在飞书目录中已有节点的页面”），不存在时报错。
+  - WP8a 只用它确认 `publish[].path` 对应的页面在飞书目录中存在（技术设计 04：“只能接入在飞书目录中已有节点的页面”），不存在时报 `CONFIG_PATH_UNKNOWN`（位置是那一条 `path`）。
   - 整页通道（`release_channel`）归 WP13，这里不输出。
 - **输出路径**：用 `page.yaml` 的 `publish[].path`，不读快照中的 `output_paths`（2026-10-23 dev 上的快照中，402 条记录的这个字段都是空的）。
 
@@ -97,6 +97,7 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
 
 | 编号 | 工作包 | 怎样测 |
 |---|---|---|
+| `CONFIG_PATH_UNKNOWN` | WP8a | 错误样例：`publish[].path` 在 dev 的这个手册中没有页面；页面在飞书表格快照中没有记录 |
 | `3-4` | WP8a | 一篇合成的页面走完整条流水线：多语言代码组变成完整的 `<Tabs>`、变量换成 Cloud 的值、链接换成 `./<页面标识>`、锚点换算、图片换成 `shared/<摘要>` 地址，产品名检查通过，MDX 能编译 |
 | `3-2` | WP8b | `Release Channel` 为 `NEXT` 的页面，接入时 `lock.yaml` 照常写入 |
 | `3-3` | WP8b | 改 `shared-docs/` 的 PR 运行完整生成；生成失败时检查项失败 |
