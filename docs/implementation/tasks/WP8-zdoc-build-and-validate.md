@@ -78,6 +78,7 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
   - 每条记录有 `slug`、`title`、`placement_type`、`release_channel`；
   - WP8a 只用它确认 `publish[].path` 对应的页面在飞书目录中存在（技术设计 04：“只能接入在飞书目录中已有节点的页面”），不存在时报错。
   - 整页通道（`release_channel`）归 WP13，这里不输出。
+- **输出路径**：用 `page.yaml` 的 `publish[].path`，不读快照中的 `output_paths`（2026-10-23 dev 上的快照中，402 条记录的这个字段都是空的）。
 
 ## WP8b：两个工作流（待 zdoc 维护者确认后开工）
 
@@ -106,13 +107,12 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
 
 ## 待确认（问 zdoc 维护者）
 
-1–4 也影响 WP8a：WP8a 可以先按下面的提议实现，由维护者在上游 PR 中确认；5 是 WP8b 开工的前提。
+1–3 也影响 WP8a：WP8a 可以先按下面的提议实现，由维护者在上游 PR 中确认；4 是 WP8b 开工的前提。
 
 1. **Cloud 页面清单**：链接查找第 3 步与 WP7 的候选，从 dev 的 `content/en/<手册>/` 读 front matter 中的 slug 与标题，是否合适（技术设计 02b 留给维护者确定）？
 2. **导航**：飞书表格快照中没有 `sidebar_label`、`sidebar_position`。Phase 1 共享页的这两项，从 dev 上这一页现有的 MDX 中取，是否合适？
-3. **`output_paths`**：2026-10-23 dev 上的快照中，402 条记录的 `output_paths` 都是空的，而技术设计 04 写着 PR 校验会读它。这是预期的吗？WP8 现在改用 `page.yaml` 的 `publish[].path`。
-4. **站点校验**：技术设计 05 要求生成的 MDX “通过 zdoc 现有的站点校验”。PR 校验中该跑哪一条命令？
-5. **工作流与仓库配置**：
+3. **站点校验**：技术设计 05 要求生成的 MDX “通过 zdoc 现有的站点校验”。PR 校验中该跑哪一条命令？
+4. **工作流与仓库配置**：
    - 两个新工作流（`shared-docs-lock` 会向 PR 分支推送 `lock.yaml`）是否可以按上表实现？
    - `shared-docs-validate` 设为 master 的必需检查项：不能按路径区分，所以所有 PR 都要跑它，没改 `shared-docs/` 的立即通过。
    - `CODEOWNERS` 与分支保护由维护者配置。
