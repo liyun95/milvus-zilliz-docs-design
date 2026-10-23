@@ -48,7 +48,7 @@ Fetch 已有的手动参数中，`media_upload_mode`（`write` / `skip`）、`pu
 | 工作流和校验器的改动需工程审核 | `CODEOWNERS` 中 `.github/workflows/` 与生成工具的代码归 zdoc 维护者，master 分支保护要求代码所有者审核 |
 | 普通作者不能直接写 dev | 沿用现有 dev 分支保护，只允许工作流写入 |
 | 候选运行没有生产写权限 | `shared-docs-validate` 与比较只有 `contents: read`，不读取图片存储、飞书等任何 secret |
-| 社区 PR 不需要 Cloud 凭据 | 只用 `pull_request` 触发，不用 `pull_request_target`；来自 fork 的 PR 拿不到写权限与 secret，`shared-docs-lock` 不写入，在 PR 中提示改从仓库内的分支提交 |
+| 社区 PR 不需要 Cloud 凭据 | 只用 `pull_request` 触发，不用 `pull_request_target`；来自 fork 的 PR 拿不到写权限与 secret，`shared-docs-lock` 不写入，在 PR 的检查结果中（检查项的注释与运行摘要）提示改从仓库内的分支提交：fork 的 PR 拿到的令牌只读，不能发 PR 评论 |
 | 只有文档负责人能激活 | 飞书表格的权限设置：只有文档负责人能修改 placement type；修改记录留在表格历史与 `active.json` 的提交历史中 |
 | 只有对 zdoc 有写权限的人能运行提升与比较 | GitHub 对 `workflow_dispatch` 的默认限制，无需额外配置 |
 
