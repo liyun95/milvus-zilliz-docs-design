@@ -12,6 +12,7 @@
 
 - 只处理 Cloud 最终页面中留下的链接，被替换或删除的部分不处理。
 - 查找的第 1 步“目标页也是共享页”，指某个页面配置的 `source.file` 就是这个 Milvus 页面；结果用那一页的页面标识，如 `./primary-key-search`。
+- 结果是 Cloud 页面时，一律写成 `./<页面标识>`，包括映射表中的值是页面标识的情况；与 dev 上现有页面的写法相同，如 `[Filtering Explained](./filtering-overview)`。映射表中的值是 milvus.io 地址时原样使用。
 - 查找的第 3 步“Cloud 有同名页面”：把 Milvus 文件名去掉 `.md`，在该手册现有页面的 slug 名单中查找。名单包括飞书生成的页面与已激活的共享页；从哪里读取（dev 中的内容目录，或导航生成的中间结果）由 zdoc 维护者确定。
 - 链接映射表 `shared-docs/links.yaml` 全站一份：键是 Milvus 页面文件名，值是 Cloud 页面标识或完整的 milvus.io 地址。
 - 链接在 PR 校验中解析：校验只生成共享页，不跑整站构建，错误在合并前报出，不会等到一两个小时的 Fetch 才失败。

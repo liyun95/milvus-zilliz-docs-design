@@ -134,6 +134,8 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 需要 Milvus 站点插件的标记（如 `{{tab}}`、`::glossary.`）在预处理时就报错（`UNSUPPORTED_MARK`，见 [03](./03-md2md-interfaces.md#出错时)）。Milvus 站点专用的版式 `div`，如 `start_card_container`、`card-wrapper`、`filter`，只出现在首页、安装选择页等非 User Guide 页面，Phase 1 不转换；共享页中出现时，该页生成失败。
 
+除多语言代码组的切换栏与上表的提示框外，任何 `<div>` 都不转换，该页生成失败，不原样输出。其中按 SDK 语言显示的说明 `<div class="language-python">` 等，在 milvus.io 上只在读者选中这种语言时显示；原样输出会让所有语言的说明同时出现。milvus-docs `v3.0.x` `6fb1bf9` 的 User Guide 中有 36 处，在 5 篇页面中（如 `index-vector-fields.md`、`import-data.md`）；接入这些页面之前，在内容对齐时改写。这种写法的页面以后多起来（如超过 10 篇）时，再考虑由 zdoc 把相邻的几段转成一组与代码 Tabs 同步切换的 `<Tabs groupId="code">`，不必改 Milvus 原文。
+
 ### 产品名检查
 
 每个版本、每个手册的 MDX 生成后、两版合并前，按 `shared-docs/product-names.yaml` 检查一遍：

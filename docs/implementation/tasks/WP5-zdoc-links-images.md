@@ -68,7 +68,7 @@ prepareLinkInputs(markdown, sourceFile, commit, reader, fetcher): Promise<{ targ
   - `mailto:` 按外部网站处理。
   - 只处理正文中的 Markdown 链接与 HTML 的 `href`。代码块中的不处理，多语言代码组切换栏中的 `#python` 等也不处理。
 - **四步查找**查到即停：
-  - 第 1、3 步得到 `./<页面标识>`，第 2 步得到映射表中的值；
+  - 得到 Cloud 页面时一律写成 `./<页面标识>`：第 1、3 步，以及第 2 步中映射表的值是页面标识时；与 dev 上现有页面的写法相同，如 `(./filtering-overview)`；
   - 映射表的值是 milvus.io 地址时，原链接的锚点原样接在后面，因为它指向的是 milvus.io 的页面；
   - 查不到时报 `LINK_UNRESOLVED`，`detail.candidates` 中附上最多三个候选：标题相同的页面，以及标题相近的页面。候选的计算写成独立的函数，WP7 生成初始映射表时复用。
 - **锚点换算**：
