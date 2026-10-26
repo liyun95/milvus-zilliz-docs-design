@@ -12,14 +12,14 @@
 |---|---|---|---|
 | 共享原文 | milvus-docs | 文档工程师、社区贡献者 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量)、[2](./prd.md#场景-2在-milvus-原文中标出-cloud-要改的一段) |
 | Milvus 变量 | milvus-docs `site/en/Variables.json` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
-| 页面配置 | zdoc `shared-docs/pages/<页面标识>/page.yaml` | 文档工程师 | [场景 3](./prd.md#场景-3接入一页)、[4](./prd.md#场景-4写-cloud-的差异) |
-| Cloud 内容文件 | zdoc `shared-docs/pages/<页面标识>/` 下，按需 | 文档工程师 | [场景 4](./prd.md#场景-4写-cloud-的差异) |
-| Cloud 变量 | zdoc `shared-docs/Variables.json` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
-| 链接映射表 | zdoc `shared-docs/links.yaml` | 文档工程师 | [场景 5](./prd.md#场景-5链接与图片) |
-| 产品名检查规则 | zdoc `shared-docs/product-names.yaml` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
-| 版本记录 | zdoc `shared-docs/pages/<页面标识>/lock.yaml` | 只由工具写入 | [第 4 节](./prd.md#4-一页的生命周期) |
-| 代码 Tabs 规则 | zdoc `shared-docs/presentation/cloud-sdk-tabs.yaml` | zdoc 维护者 | — |
-| 共享来源配置 | zdoc `shared-docs/source.yaml` | zdoc 维护者 | — |
+| 页面配置 | zdoc `shared-docs/guides/pages/<页面标识>/page.yaml` | 文档工程师 | [场景 3](./prd.md#场景-3接入一页)、[4](./prd.md#场景-4写-cloud-的差异) |
+| Cloud 内容文件 | zdoc `shared-docs/guides/pages/<页面标识>/` 下，按需 | 文档工程师 | [场景 4](./prd.md#场景-4写-cloud-的差异) |
+| Cloud 变量 | zdoc `shared-docs/guides/Variables.json` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
+| 链接映射表 | zdoc `shared-docs/guides/links.yaml` | 文档工程师 | [场景 5](./prd.md#场景-5链接与图片) |
+| 产品名检查规则 | zdoc `shared-docs/guides/product-names.yaml` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
+| 版本记录 | zdoc `shared-docs/guides/pages/<页面标识>/lock.yaml` | 只由工具写入 | [第 4 节](./prd.md#4-一页的生命周期) |
+| 代码 Tabs 规则 | zdoc `shared-docs/guides/presentation/cloud-sdk-tabs.yaml` | zdoc 维护者 | — |
+| 共享来源配置 | zdoc `shared-docs/guides/source.yaml` | zdoc 维护者 | — |
 
 每个文件影响生成页面的哪一部分：
 
@@ -95,17 +95,17 @@ Phase 1 不开放：`keywords`、`hide_title`、`hide_table_of_contents`。
 ## 6. 链接映射表
 
 ```yaml
-# shared-docs/links.yaml
+# shared-docs/guides/links.yaml
 boolean.md: filtering-overview                    # Cloud 中对应的页面
 ivf-flat.md: https://milvus.io/docs/ivf-flat.md   # Cloud 没有对应页时，明确指向 Milvus 站点
 ```
 
-初始内容由工具一次生成候选、文档工程师审核后提交；之后只在工具报错“找不到 Cloud 对应页面”时补，报错中附有候选。每个 Milvus 页面全站登记一次。规则见[场景 5](./prd.md#场景-5链接与图片)。
+初始内容由工具一次生成候选、文档工程师审核后提交；之后只在工具报错“找不到 Cloud 对应页面”时补，报错中附有候选。每个 Milvus 页面在 Guides 组中登记一次。规则见[场景 5](./prd.md#场景-5链接与图片)。
 
 ## 7. 产品名检查规则
 
 ```yaml
-# shared-docs/product-names.yaml
+# shared-docs/guides/product-names.yaml
 check:                                  # 出现就报错的写法
   - Milvus
   - localhost:19530

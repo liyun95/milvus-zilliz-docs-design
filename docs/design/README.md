@@ -66,13 +66,13 @@ packages/docs-tooling/src/lark/guidesBaseRecordSemantics.js   # placement type �
 
 | 文件 | 位置 | 谁写 | 格式见 |
 |---|---|---|---|
-| 共享来源配置 `source.yaml` | zdoc master `shared-docs/` | zdoc 维护者 | [04](./04-channels-and-lock.md#共享来源配置与跟踪分支) |
-| Cloud 变量 `Variables.json` | zdoc master `shared-docs/` | 文档工程师 | [03](./03-md2md-interfaces.md#预处理) |
-| 链接映射表 `links.yaml` | zdoc master `shared-docs/` | 文档工程师 | [02b](./02b-links-and-images.md#链接) |
-| 产品名检查规则 `product-names.yaml` | zdoc master `shared-docs/` | 文档工程师 | [07](./07-site-adaptation.md#产品名检查) |
-| 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
-| 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
-| 版本记录 `lock.yaml` | zdoc master `shared-docs/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
+| 共享来源配置 `source.yaml` | zdoc master `shared-docs/guides/` | zdoc 维护者 | [04](./04-channels-and-lock.md#共享来源配置与跟踪分支) |
+| Cloud 变量 `Variables.json` | zdoc master `shared-docs/guides/` | 文档工程师 | [03](./03-md2md-interfaces.md#预处理) |
+| 链接映射表 `links.yaml` | zdoc master `shared-docs/guides/` | 文档工程师 | [02b](./02b-links-and-images.md#链接) |
+| 产品名检查规则 `product-names.yaml` | zdoc master `shared-docs/guides/` | 文档工程师 | [07](./07-site-adaptation.md#产品名检查) |
+| 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/guides/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
+| 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/guides/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
+| 版本记录 `lock.yaml` | zdoc master `shared-docs/guides/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
 | 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch，按飞书表格生成 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
 | placement type、`Release Channel` | 飞书表格（DocsList）中每页的记录 | 文档负责人、文档工程师 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
 | 记录文件 `<页面标识>.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch | [05](./05-publish-handoff.md#记录文件) |

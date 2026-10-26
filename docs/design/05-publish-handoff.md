@@ -124,9 +124,9 @@ generated/en/manifests/shared-pages/
       "repository": "zilliztech/zdoc",
       "commit": "<shared-docs 所在的 master commit>",
       "files": [
-        { "path": "shared-docs/pages/filtered-search/page.yaml", "sha256": "…" },
-        { "path": "shared-docs/pages/filtered-search/standard-filtering-cli.md", "sha256": "…" },
-        { "path": "shared-docs/Variables.json", "sha256": "…" }
+        { "path": "shared-docs/guides/pages/filtered-search/page.yaml", "sha256": "…" },
+        { "path": "shared-docs/guides/pages/filtered-search/standard-filtering-cli.md", "sha256": "…" },
+        { "path": "shared-docs/guides/Variables.json", "sha256": "…" }
       ]
     },
     "tools": { "zdoc": "<tooling commit>", "md2md": "1.3.0" },

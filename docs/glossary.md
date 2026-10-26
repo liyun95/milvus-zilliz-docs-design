@@ -2,14 +2,15 @@
 
 ## 页面与配置
 
-- **共享页**：正文引用 milvus-docs 原文、在 zdoc 中只维护差异的 Cloud 页面。每个共享页对应 `shared-docs/pages/` 下的一个目录。
-- **页面标识**：共享页目录的名字，等于这一页现有的 slug（见 [02](./design/02-page-config.md#shared-docs-的位置)）。
+- **共享页**：正文引用 milvus-docs 原文、在 zdoc 中只维护差异的 Cloud 页面。每个共享页对应 `shared-docs/guides/pages/` 下的一个目录。
+- **组**：`shared-docs/` 下的一个子目录，对应 zdoc Fetch 的一个发布组：`guides` 对应 Guides 与 BYOC 两个手册，以后每本 Reference 手册各一组。每组有自己的上游仓库与配置（见 [02](./design/02-page-config.md#shared-docs-的位置)）。
+- **页面标识**：共享页目录的名字，在组内唯一，等于这一页现有的 slug（见 [02](./design/02-page-config.md#shared-docs-的位置)）。
 - **页面配置**：每个共享页目录中的 `page.yaml`，说明引用哪篇原文、发布到哪些手册、做哪些变换（见 [02](./design/02-page-config.md)）。
 - **Cloud 内容文件**：一个共享页面中 Cloud 用来新增或替换的内容，与页面配置放在同一目录，由页面配置的 `content.file` 指定。
-- **overlay**：zdoc 中只记录 Cloud 差异的一层文件，即 `shared-docs/` 中的页面配置、`Variables.json` 和 Cloud 内容文件。用于[生成流水线](./design/README.md#生成流水线)的图 1。是本次新建的，与 zdoc 现有的 `sidebar-overrides` 或部署仓库的 Kubernetes overlays 无关。
-- **共享来源配置**：`shared-docs/source.yaml`，记录读哪个仓库、跟踪哪个分支。**跟踪分支**目前是 milvus-docs 的 `v3.0.x`，只用于发现新提交（见 [04](./design/04-channels-and-lock.md#共享来源配置与跟踪分支)）。
-- **链接映射表**：`shared-docs/links.yaml`，登记 Milvus 页面到 Cloud 页面的对应关系（见 [02b](./design/02b-links-and-images.md)）。
-- **产品名检查规则**：`shared-docs/product-names.yaml`，列出生成后的 Cloud 页面中不能出现的 Milvus 产品名与连接值，以及放行的短语（见 [07](./design/07-site-adaptation.md#产品名检查)）。
+- **overlay**：zdoc 中只记录 Cloud 差异的一层文件，即 `shared-docs/<组>/` 中的页面配置、`Variables.json` 和 Cloud 内容文件。用于[生成流水线](./design/README.md#生成流水线)的图 1。是本次新建的，与 zdoc 现有的 `sidebar-overrides` 或部署仓库的 Kubernetes overlays 无关。
+- **共享来源配置**：每组一份，Guides 组为 `shared-docs/guides/source.yaml`，记录这一组读哪个仓库、跟踪哪个分支。**跟踪分支**目前是 milvus-docs 的 `v3.0.x`，只用于发现新提交（见 [04](./design/04-channels-and-lock.md#共享来源配置与跟踪分支)）。
+- **链接映射表**：`shared-docs/guides/links.yaml`，登记 Milvus 页面到 Cloud 页面的对应关系（见 [02b](./design/02b-links-and-images.md)）。
+- **产品名检查规则**：`shared-docs/guides/product-names.yaml`，列出生成后的 Cloud 页面中不能出现的 Milvus 产品名与连接值，以及放行的短语（见 [07](./design/07-site-adaptation.md#产品名检查)）。
 
 ## 原文
 
@@ -21,7 +22,7 @@
 ## 版本与生命周期
 
 - **Prod / UAT**：zdoc 的正式站点与预发布站点。两者由同一个 dev 提交构建，部署时才区分。
-- **lock（`lock.yaml`）**：每个共享页一份，放在页面目录中（`shared-docs/pages/<页面标识>/lock.yaml`），记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升三类 PR 写入，人不手改（见 [04](./design/04-channels-and-lock.md#lockyaml-怎样变化)）。
+- **lock（`lock.yaml`）**：每个共享页一份，放在页面目录中（`shared-docs/guides/pages/<页面标识>/lock.yaml`），记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升三类 PR 写入，人不手改（见 [04](./design/04-channels-and-lock.md#lockyaml-怎样变化)）。
 - **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，Phase 1 由飞书表格的 `Release Channel` 决定，作者不在 zdoc 中写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
 - **接入**：文档工程师开 PR 新增页面目录（`page.yaml`，需要时加 Cloud 内容文件），工具在同一个 PR 中写入 `lock.yaml`。接入后只生成候选结果，不改变网站（见 [04](./design/04-channels-and-lock.md#接入一页)）。
 - **飞书表格（DocsList）**：zdoc 现有的飞书多维表格，Guides 的每一页一条记录，决定导航、发布目标与整页通道。Phase 1 共享页仍在其中保留记录。

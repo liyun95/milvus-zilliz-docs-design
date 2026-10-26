@@ -15,7 +15,7 @@
 一页由飞书还是 Git 生成，由飞书表格中这一页记录的 placement type 决定。zdoc 现有 `canonical`、`section`、`link`、`ref` 四个值（`packages/docs-tooling/src/lark/guidesBaseRecordSemantics.js`），其中 `canonical` 表示由飞书文档生成的页面。Phase 1 新增 `git`，表示由 Git 生成：
 
 - 标为 `git` 的记录不填 `Docs`（飞书文档链接）。发布目标（`Targets`）、路径、`Progress`、`Release Channel` 与导航用的标签和排序照常填写，发布目标与路径必须与页面配置的 `publish` 一致。
-- Fetch 读到 `git` 记录时，不抓飞书正文，改用 `shared-docs/pages/<页面标识>/` 的生成结果；导航仍按这条记录生成。
+- Fetch 读到 `git` 记录时，不抓飞书正文，改用 `shared-docs/guides/pages/<页面标识>/` 的生成结果；导航仍按这条记录生成。
 
 ### 生效配置（`active.json`）
 
@@ -92,7 +92,7 @@ Phase 1 下线沿用飞书表格现有的做法，与其他页面相同（zdoc `
 |---|---|---|---|
 | 决定下线 | 文档工程师 | 表格中把 `Release Channel` 改为 `RETIRE-IN-NEXT` | UAT 不再显示，Prod 照常；Fetch 照常生成，整页带 `channel: retire-in-next` |
 | 发版 | 文档工程师 | 删除表格记录与飞书节点 | 下一次 Fetch 在同一个 dev 提交中删除这一页两个手册的 MDX、译文与记录文件，并把它从 `active.json` 移除 |
-| 之后 | 文档工程师 | 普通 PR 删除 `shared-docs/pages/<页面标识>/`（见 [04](./04-channels-and-lock.md#删除页面目录)） | 无 |
+| 之后 | 文档工程师 | 普通 PR 删除 `shared-docs/guides/pages/<页面标识>/`（见 [04](./04-channels-and-lock.md#删除页面目录)） | 无 |
 
 - 表格中为 `RETIRE-IN-NEXT` 或已没有记录的页面，上游更新不再检查（见 [06](./06-upstream-changes.md#发现与运行)）。
 - 记录已删除、目录还在：Fetch 不生成这一页，在运行摘要中提示删除目录。

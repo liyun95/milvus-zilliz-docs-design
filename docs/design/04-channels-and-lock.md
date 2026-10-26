@@ -10,10 +10,10 @@ Cloud 要能在 UAT 提前看到上游的修改，同时让 Prod 保持已上线
 
 ### 共享来源配置与跟踪分支
 
-所有共享页都从同一个仓库读 Milvus 原文。读哪个仓库、跟踪哪个分支，记在共享来源配置中：站点级一份，与页面目录同在 `shared-docs/` 中（见 [02](./02-page-config.md#shared-docs-的位置)）：
+同一组的共享页都从同一个仓库读原文。读哪个仓库、跟踪哪个分支，记在共享来源配置中：每组一份，放在这一组的目录中（见 [02](./02-page-config.md#shared-docs-的位置)）。Guides 组读 milvus-docs：
 
 ```yaml
-# shared-docs/source.yaml
+# shared-docs/guides/source.yaml
 schema_version: 1
 repository: https://github.com/milvus-io/milvus-docs
 track: v3.0.x          # 跟踪分支
@@ -25,10 +25,10 @@ track: v3.0.x          # 跟踪分支
 
 ### 每页一份 `lock.yaml`
 
-每个共享页都有一份 `lock.yaml`，放在页面目录中，与 `page.yaml` 并列：`shared-docs/pages/<页面标识>/lock.yaml`（见 [02](./02-page-config.md#shared-docs-的位置)）。它记录这一页在 Prod 与 UAT 上各用 milvus-docs 的哪个 commit，只由工具写入，人不手改（见下文“`lock.yaml` 怎样变化”）。
+每个共享页都有一份 `lock.yaml`，放在页面目录中，与 `page.yaml` 并列：`shared-docs/guides/pages/<页面标识>/lock.yaml`（见 [02](./02-page-config.md#shared-docs-的位置)）。它记录这一页在 Prod 与 UAT 上各用 milvus-docs 的哪个 commit，只由工具写入，人不手改（见下文“`lock.yaml` 怎样变化”）。
 
 ```yaml
-# shared-docs/pages/delete-entities/lock.yaml
+# shared-docs/guides/pages/delete-entities/lock.yaml
 # 工具生成，不要手改
 schema_version: 1
 current: 1997ce96782b31f8628f22d31fad11007e4b924b   # Prod 读取
@@ -98,7 +98,7 @@ Phase 1 沿用飞书表格的 `Release Channel`，与其他页面相同，`lock.
 
 #### 接入一页
 
-1. 文档工程师在 zdoc 中开 PR，新增 `shared-docs/pages/<页面标识>/` 下的 `page.yaml`，需要时加 Cloud 内容文件，不写 `lock.yaml`。
+1. 文档工程师在 zdoc 中开 PR，新增 `shared-docs/guides/pages/<页面标识>/` 下的 `page.yaml`，需要时加 Cloud 内容文件，不写 `lock.yaml`。
 2. 工具在 PR 中自动运行：发现新页面没有 `lock.yaml`，就取跟踪分支的最新提交写入 `lock.yaml`，提交到这个 PR，再触发校验（见 [05](./05-publish-handoff.md#pr-校验)）。
 3. 校验通过后合并。合并后只生成候选结果，正式发布要由文档负责人激活（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
 
@@ -125,7 +125,7 @@ milvus-docs 有新提交时，工具每天自动开 PR，把受影响页面的 `
 
 #### 删除页面目录
 
-Phase 1 下线沿用飞书表格（见 [05b](./05b-cutover-and-ownership.md#下线完成)）：`Release Channel` 改为 `RETIRE-IN-NEXT`，发版时删除表格记录与飞书节点，Fetch 把这一页从网站移除。之后文档工程师开一个普通 PR，删除 `shared-docs/pages/<页面标识>/`。
+Phase 1 下线沿用飞书表格（见 [05b](./05b-cutover-and-ownership.md#下线完成)）：`Release Channel` 改为 `RETIRE-IN-NEXT`，发版时删除表格记录与飞书节点，Fetch 把这一页从网站移除。之后文档工程师开一个普通 PR，删除 `shared-docs/guides/pages/<页面标识>/`。
 
 - 要先删表格记录、再删目录。目录先删时，表格中仍标为 `git`，这一页生成失败，网站保留现有的版本。
 - 表格记录已删除、目录还在时，PR 校验与 Fetch 提示删除目录，不生成这一页。

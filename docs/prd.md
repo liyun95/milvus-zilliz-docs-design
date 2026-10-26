@@ -75,11 +75,11 @@ Milvus 与 Zilliz Cloud 的功能文档有大量相同的内容，但现在各�
 | 共享原文 | milvus-docs | 文档工程师、社区贡献者 | 日常 |
 | 页面配置 `page.yaml` | zdoc，每页一份 | 文档工程师 | 接入时写，有差异时改 |
 | Cloud 内容文件 | zdoc，与页面配置同一目录，按需 | 文档工程师 | 有差异时 |
-| Cloud 变量 `Variables.json` | zdoc，全站一份 | 文档工程师 | 新增变量时 |
-| 链接映射表 `links.yaml` | zdoc，全站一份 | 工具生成初始内容，文档工程师审核；之后由文档工程师补 | 工具报错提示时补一行 |
-| 产品名检查规则 `product-names.yaml` | zdoc，全站一份 | 文档工程师 | 检查误报、需要放行时补一行 |
+| Cloud 变量 `Variables.json` | zdoc，Guides 组一份 | 文档工程师 | 新增变量时 |
+| 链接映射表 `links.yaml` | zdoc，Guides 组一份 | 工具生成初始内容，文档工程师审核；之后由文档工程师补 | 工具报错提示时补一行 |
+| 产品名检查规则 `product-names.yaml` | zdoc，Guides 组一份 | 文档工程师 | 检查误报、需要放行时补一行 |
 | 版本记录 `lock.yaml` | zdoc，每页一份 | 只由工具写入 | 每个改变版本的 PR；样例见[第 4 节](#4-一页的生命周期) |
-| 代码 Tabs 规则、共享来源配置 | zdoc，全站一份 | zdoc 维护者 | 很少 |
+| 代码 Tabs 规则、共享来源配置 | zdoc，Guides 组一份 | zdoc 维护者 | 很少 |
 
 zdoc 中的文件都放在 master 分支根目录的 `shared-docs/` 下，所有修改都向 master 开 PR：
 
@@ -107,7 +107,7 @@ shared-docs/
 网站分 **Prod**（正式站点）与 **UAT**（预发布站点）。每个共享页的 **`lock.yaml`** 记录 Prod 与 UAT 各用 milvus-docs 的哪个版本（commit）：
 
 ```yaml
-# shared-docs/pages/delete-entities/lock.yaml
+# shared-docs/guides/pages/delete-entities/lock.yaml
 # 工具生成，不要手改
 schema_version: 1
 current: 1997ce96782b31f8628f22d31fad11007e4b924b   # Prod 用的 milvus-docs 版本
@@ -171,7 +171,7 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版
    )
    ```
 
-2. 新增的变量，两边都要给值：milvus-docs 的 `site/en/Variables.json` 给 Milvus 的值，zdoc 的 `shared-docs/Variables.json` 给 Cloud 的值。
+2. 新增的变量，两边都要给值：milvus-docs 的 `site/en/Variables.json` 给 Milvus 的值，zdoc 的 `shared-docs/guides/Variables.json` 给 Cloud 的值。
 
    | 变量 | Milvus 的值 | Cloud 的值 |
    |---|---|---|
@@ -194,10 +194,10 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版
 
 **产品名检查**
 
-漏写变量或漏做变换时，只属于 Milvus 的写法会直接出现在 Cloud 页面上：产品名、本机的连接地址、默认的用户名与密码、只有自部署才有的配置文件。所以工具在合并前检查**生成后的 Cloud 页面**：出现检查规则中的写法，又不在放行清单中，这一页生成失败。规则写在 zdoc 的 `shared-docs/product-names.yaml`，Phase 1 的初始内容如下：
+漏写变量或漏做变换时，只属于 Milvus 的写法会直接出现在 Cloud 页面上：产品名、本机的连接地址、默认的用户名与密码、只有自部署才有的配置文件。所以工具在合并前检查**生成后的 Cloud 页面**：出现检查规则中的写法，又不在放行清单中，这一页生成失败。规则写在 zdoc 的 `shared-docs/guides/product-names.yaml`，Phase 1 的初始内容如下：
 
 ```yaml
-# shared-docs/product-names.yaml
+# shared-docs/guides/product-names.yaml
 check:                                  # 出现就报错的写法
   - Milvus                              # 产品名
   - localhost                           # 本机地址，任何端口，如 localhost:19530、localhost:8080
@@ -230,8 +230,8 @@ allow:                                  # 确实要保留的写法，报错时�
 
 | 情况 | 在哪里发现 | 怎样改 |
 |---|---|---|
-| 变量在 Cloud 中没有值 | zdoc 的 PR 校验，或上游更新 PR 的校验 | 在 `shared-docs/Variables.json` 中补上 |
-| `Variables.json` 写错：不是合法的 JSON，或同一层中有只差大小写的两个键 | zdoc 的 PR 校验 | 按报错改正 `shared-docs/Variables.json`；改好之前所有共享页都生成失败 |
+| 变量在 Cloud 中没有值 | zdoc 的 PR 校验，或上游更新 PR 的校验 | 在 `shared-docs/guides/Variables.json` 中补上 |
+| `Variables.json` 写错：不是合法的 JSON，或同一层中有只差大小写的两个键 | zdoc 的 PR 校验 | 按报错改正 `shared-docs/guides/Variables.json`；改好之前所有共享页都生成失败 |
 | 片段不存在、循环引用、嵌套太深或太大 | 同上 | 回 milvus-docs 修正 |
 | Cloud 页面中出现没换成变量的产品名、连接地址、用户名与密码 | 同上 | 回 milvus-docs 改成变量；确实要保留的写法，在 `product-names.yaml` 的 `allow` 中补一行 |
 | Cloud 页面中出现 `milvus.yaml` 这类只有自部署才有的写法 | 同上 | 在页面配置中用变换删掉或替换这一段 |
@@ -406,7 +406,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 **怎样操作**
 
-1. 在 zdoc 中从仓库内的分支向 master 开 PR，在 `shared-docs/pages/` 下新建一个目录，目录名用这一页现有的 slug，如 `delete-entities`。
+1. 在 zdoc 中从仓库内的分支向 master 开 PR，在 `shared-docs/guides/pages/` 下新建一个目录，目录名用这一页现有的 slug，如 `delete-entities`。
 2. 在目录中写 `page.yaml`。整篇复用的 Delete Entities：
 
    ```yaml
@@ -559,7 +559,7 @@ transforms:                        # 这一页的全部变换，每一项是一�
       file: before-you-start.md    # 新内容所在的 Cloud 内容文件，与 page.yaml 同一目录
 ```
 
-Cloud 内容文件 `shared-docs/pages/openai/before-you-start.md` 写完整的一节，包括标题，写法与 Milvus 原文相同：
+Cloud 内容文件 `shared-docs/guides/pages/openai/before-you-start.md` 写完整的一节，包括标题，写法与 Milvus 原文相同：
 
 ```markdown
 ## Before you start
@@ -816,7 +816,7 @@ transforms:
 
 **怎样操作**
 
-- **链接**：多数不用管。全站共用的链接映射表 `shared-docs/links.yaml` 登记 Milvus 页面在 Cloud 中对应哪一页：
+- **链接**：多数不用管。Guides 组共用的链接映射表 `shared-docs/guides/links.yaml` 登记 Milvus 页面在 Cloud 中对应哪一页：
 
   ```yaml
   boolean.md: filtering-overview                    # Cloud 中对应的页面
@@ -904,7 +904,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 | 编号 | 要求 |
 |---|---|
 | 5-1 | 链接按上述规则处理，处理不了的一律报错，不原样放过 |
-| 5-2 | 映射表全站一份，每个 Milvus 页面只登记一次，所有共享页共用 |
+| 5-2 | 映射表每组一份，Guides 组中每个 Milvus 页面只登记一次，组内所有共享页共用 |
 | 5-7 | 生成时不按标题或相似度自动猜测对应页；它们只用来生成初始映射表的候选，以及查不到时报错中附带的候选，采用前都经人确认 |
 | 5-3 | 已存的图片不会被覆盖或自动清理，只要还有已发布或可以恢复的页面引用它 |
 | 5-4 | Milvus 换图会让图片地址变化，出现在上游更新 PR 中，审核后才进入 Cloud |
@@ -949,7 +949,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 **为什么需要映射表。** milvus-docs 中 User Guide 与 Embeddings 的 837 个站内链接，只有 32% 的目标在 Cloud 有同名页面。两边的页面名字因历史原因不同，而且都已公开，改名要两站都做跳转，Phase 1 不做。
 
-**为什么全站一份。** 同一个目标页会被很多共享页引用，登记一次即可。随着更多页面成为共享页，查找第 1 步覆盖得越来越多，映射表会越来越短。
+**为什么一组一份。** 同一个目标页会被很多共享页引用，登记一次即可。随着更多页面成为共享页，查找第 1 步覆盖得越来越多，映射表会越来越短。
 
 **为什么初始映射表由工具生成。** 只靠同名页面，User Guide 中 181 个被链接的页面要人登记 121 个。加上标题相同与 Cloud 现有页面中的链接，工具能给出 116 个的候选，三种来源两两比较没有一个不一致；剩下 65 个中，43 个是 Cloud 没有对应页的索引类型、自部署与配置页，可以按类别批量写成指向 milvus.io。人要做的变成审一遍候选、判断二十多个。从 Cloud 现有页面反推只能在飞书退出之前做，所以放在 Phase 1 开始时一次做完。数据见[链接映射表的维护方式调研](../research/link-mapping-maintenance.md)。
 
@@ -1228,7 +1228,7 @@ transforms:
 milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一节的模型表加了一行，并在被 Cloud 整节替换的 “Configure credentials” 中补充了一条要求。
 
 - **标题**：`shared-docs: update openai to milvus-docs b2c3d4e`
-- **改动**：`shared-docs/pages/openai/lock.yaml` 中 `next` 改为 `b2c3d4e…`
+- **改动**：`shared-docs/guides/pages/openai/lock.yaml` 中 `next` 改为 `b2c3d4e…`
 - **影响报告**：
   - UAT 将看到的变化：模型表新增一行。
   - 需要复核：`before-you-start` 替换的原文有变化，Cloud 页面没有变化；请确认 `before-you-start.md` 是否也要补充这条要求。
@@ -1366,7 +1366,7 @@ Phase 1 导航仍由飞书表格（DocsList）决定，表格中每条记录都�
 | 规则 | 说明 |
 |---|---|
 | 只由文档负责人修改 placement type | 修改记录留在飞书表格的历史和 `active.json` 的提交历史中 |
-| 接入之后才能激活 | `shared-docs/pages/` 中没有这一页的目录时，表格标为 `git` 会让这一页生成失败 |
+| 接入之后才能激活 | `shared-docs/guides/pages/` 中没有这一页的目录时，表格标为 `git` 会让这一页生成失败 |
 | 一页只激活一次 | 激活后不能改回其他值（9-3） |
 
 **系统行为**
@@ -1452,7 +1452,7 @@ Phase 1 导航仍由飞书表格（DocsList）决定，表格中每条记录都�
 
 1. 在飞书表格中把这一页的 `Release Channel` 改为 `RETIRE-IN-NEXT`：UAT 不再显示，Prod 照常。
 2. 发版时，在飞书表格中删除这一页的记录，并删除飞书节点，沿用现有做法。之后的 Fetch 把这一页从网站上移除。
-3. 之后开一个普通 PR，删除 `shared-docs/pages/<页面标识>/`。
+3. 之后开一个普通 PR，删除 `shared-docs/guides/pages/<页面标识>/`。
 
 | 时间 | 做什么 | UAT | Prod |
 |---|---|---|---|
