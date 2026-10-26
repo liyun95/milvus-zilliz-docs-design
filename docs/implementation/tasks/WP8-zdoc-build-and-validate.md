@@ -1,6 +1,6 @@
 # WP8 生成命令与 PR 校验
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP4、WP5、WP6 已合并（[zilliztech/zdoc#804](https://github.com/zilliztech/zdoc/pull/804)、[#815](https://github.com/zilliztech/zdoc/pull/815)、[#812](https://github.com/zilliztech/zdoc/pull/812)）；WP7 已合并（[#818](https://github.com/zilliztech/zdoc/pull/818)）；WP8a 已合并（[#822](https://github.com/zilliztech/zdoc/pull/822)，commit [`d3d1cbe`](https://github.com/zilliztech/zdoc/commit/d3d1cbe58af0324039a9086366c0e3d823c7f902)）；WP8b 可以开工　**状态**：WP8a 已合并；WP8b 未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：WP4、WP5、WP6 已合并（[zilliztech/zdoc#804](https://github.com/zilliztech/zdoc/pull/804)、[#815](https://github.com/zilliztech/zdoc/pull/815)、[#812](https://github.com/zilliztech/zdoc/pull/812)）；WP7 已合并（[#818](https://github.com/zilliztech/zdoc/pull/818)）；WP8a 已合并（[#822](https://github.com/zilliztech/zdoc/pull/822)，commit [`d3d1cbe`](https://github.com/zilliztech/zdoc/commit/d3d1cbe58af0324039a9086366c0e3d823c7f902)）；WP8b 可以开工　**状态**：已合并。WP8a：[#822](https://github.com/zilliztech/zdoc/pull/822)，commit [`d3d1cbe`](https://github.com/zilliztech/zdoc/commit/d3d1cbe58af0324039a9086366c0e3d823c7f902)；WP8b：[#832](https://github.com/zilliztech/zdoc/pull/832)，commit [`8680736`](https://github.com/zilliztech/zdoc/commit/86807361cdca0f2b768f51d7ff47c5b78461bee8)
 
 ## 目标
 
