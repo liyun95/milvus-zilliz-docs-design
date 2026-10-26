@@ -212,7 +212,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 产品名检查 | 漏换的产品名报错 | WP6 | 已合并到上游（`zilliztech/zdoc` `ca64aa6`） | [WP6](./walkthroughs/WP6.md) |
 | 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | 未开始 | — |
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
-| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 上游 PR（`zilliztech/zdoc#832`）待合并，等 zdoc 文档负责人 review | [WP8](./walkthroughs/WP8.md) |
+| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 已合并到上游（`zilliztech/zdoc` `8680736`）；WP12、WP13 未开始 | [WP8](./walkthroughs/WP8.md) |
 | 发布与切换 | 接入 Fetch；激活与下线；翻译与恢复 | WP9、WP14、WP15 | 未开始 | — |
 
 ## 5. 任务卡

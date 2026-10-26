@@ -1,6 +1,6 @@
 # WP8 走读：生成命令与 PR 校验
 
-**仓库**：zdoc　**上游 PR**：WP8a [zilliztech/zdoc#822](https://github.com/zilliztech/zdoc/pull/822)（commit [`d3d1cbe`](https://github.com/zilliztech/zdoc/commit/d3d1cbe58af0324039a9086366c0e3d823c7f902)）；WP8b [zilliztech/zdoc#832](https://github.com/zilliztech/zdoc/pull/832)（待合并，等 zdoc 文档负责人 review）　**任务卡**：[WP8](../tasks/WP8-zdoc-build-and-validate.md)
+**仓库**：zdoc　**上游 PR**：WP8a [zilliztech/zdoc#822](https://github.com/zilliztech/zdoc/pull/822)（commit [`d3d1cbe`](https://github.com/zilliztech/zdoc/commit/d3d1cbe58af0324039a9086366c0e3d823c7f902)）；WP8b [zilliztech/zdoc#832](https://github.com/zilliztech/zdoc/pull/832)（commit [`8680736`](https://github.com/zilliztech/zdoc/commit/86807361cdca0f2b768f51d7ff47c5b78461bee8)，经 zdoc 文档负责人 review）　**任务卡**：[WP8](../tasks/WP8-zdoc-build-and-validate.md)
 
 ## 解决什么问题
 
@@ -146,7 +146,7 @@ wp8_demo="$(mktemp -d)"
 node -e 'const { loadTypeScript } = require("./scripts/lib/load-typescript"); const path = require("node:path"), fs = require("node:fs"); loadTypeScript(path.resolve("packages/docs-tooling/src/shared-docs/testing/build/demo.ts")).runBuildDemo(process.argv[1]).then(result => { console.log(JSON.stringify(result.summary, null, 2)); console.log(fs.readFileSync(path.join(result.out, "guides/tutorials/build-pipeline.mdx"), "utf8")); console.log(result.failure.stdout) })' "$wp8_demo"
 ```
 
-WP8b 合并后，这里会补上：怎样在 GitHub 上看到这两个工作流，以及把 `shared-docs-validate` 设为 master 的必需检查之后 PR 页面上的样子。
+WP8b 已合并。在 zdoc 任何一个发往 master 的 PR 的检查列表中，都能看到 `shared-docs-validate`：没改 `shared-docs/` 的 PR，它约 10 秒通过，运行摘要写着 “No shared-docs inputs changed”。`shared-docs-lock` 要等第一篇页面接入时才会出现。
 
 ## 值得读的测试
 
@@ -163,7 +163,7 @@ WP8b 合并后，这里会补上：怎样在 GitHub 上看到这两个工作流�
 - **写 dev、上传图片、记录文件、接入 Fetch**：WP9。
 - **两版合并**：WP11；**变换**：WP10；**整页通道 `channel`**：WP13。
 - **上游更新、提升、比较三个工作流**：WP12、WP13、WP14。
-- **分支保护与 `CODEOWNERS`**：不在 PR 中改。WP8b 合并后，由推动者在 GitHub 上把 `shared-docs-validate` 设为 master 的必需检查。
+- **分支保护与 `CODEOWNERS`**：不在 PR 中改，由推动者在 GitHub 上设置：把 `shared-docs-validate` 设为 master 的必需检查。
 - **整站构建**：PR 校验只做逐页编译；整站的试构建在 Fetch 中做（WP9）。
 
 ## 已知的问题
@@ -173,5 +173,5 @@ WP8b 合并后，这里会补上：怎样在 GitHub 上看到这两个工作流�
 ## 证据
 
 - WP8a 合并时 `pnpm test:shared-docs` 为 37 个测试文件、397 个测试通过，另有 4 个需要联网的测试默认跳过；`spec/requirements.json` 与设计仓库逐字节相同（77 个错误码）。
-- WP8b 审阅时为 39 个测试文件、468 个测试通过；zdoc 的工作流规则测试 118 个通过；[#832](https://github.com/zilliztech/zdoc/pull/832) 本身已跑出第一次 `shared-docs-validate`，因为没改 `shared-docs/`，约 10 秒通过。
+- WP8b 合并时为 39 个测试文件、474 个测试通过；zdoc 的工作流规则测试 118 个通过。zdoc 文档负责人独立复现了测试数字，并找出 1 个 P1（作者推送可能取消正在等待的校验，造成误报失败）与 4 个 P2，都在合并前修复。[#832](https://github.com/zilliztech/zdoc/pull/832) 本身跑出了第一次 `shared-docs-validate`，因为没改 `shared-docs/`，约 10 秒通过；合并后的站点校验与同步到 dev 都成功。
 - Filtered Search 的图片超时由审阅人在国内网络上复现，放宽超时后两张图片都下载成功（2026-10-23）。
