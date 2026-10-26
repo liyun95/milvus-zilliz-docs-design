@@ -96,7 +96,7 @@ const result = preprocess({ content, fragmentRoot, variables, sourceName, limits
 |---|---|---|---|
 | `content` | 字符串 | 是 | 待处理的整页 Markdown，即按页面配置完成变换、并清除命名块标记后的文本 |
 | `fragmentRoot` | 字符串 | 是 | 同一 commit 的 milvus-docs 检出中 `site/en` 的绝对路径；`{{fragments/x.md}}` 解析为 `<fragmentRoot>/fragments/x.md` |
-| `variables` | 对象 | 是 | 完整的变量表：键是变量名，可以嵌套；值只能是字符串、数字或布尔值。md2md 不按目录查找，也不合并其他来源的值。Cloud 的变量表只来自 `shared-docs/Variables.json` |
+| `variables` | 对象 | 是 | 完整的变量表：键是变量名，可以嵌套；值只能是字符串、数字或布尔值。md2md 不按目录查找，也不合并其他来源的值。Cloud 的变量表只来自 `shared-docs/guides/Variables.json` |
 | `sourceName` | 字符串 | 否 | 报错时显示的文件名 |
 | `limits` | 对象 | 否 | 四个数字字段，都可以不写：`maxDepth`（嵌套深度，默认 5）、`maxFragments`（片段数，默认 100）、`maxFragmentBytes`（单个片段大小，默认 256 KiB）、`maxOutputBytes`（输出大小，默认 2 MiB） |
 

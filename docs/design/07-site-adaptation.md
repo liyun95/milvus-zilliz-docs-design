@@ -39,7 +39,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 - 代码块的语言名先按规则中的 `aliases` 换成 Cloud 的值，再输出到 `<TabItem value>` 与代码块的语言名。
 - 只有一种语言的代码组输出普通代码块，不加 `<Tabs>`，与 zdoc 现有页面一致；Cloud 给它增加语言后，按多种语言输出。
 
-**Tabs 规则文件** `shared-docs/presentation/cloud-sdk-tabs.yaml`，全站一份，由 zdoc 维护者修改：
+**Tabs 规则文件** `shared-docs/guides/presentation/cloud-sdk-tabs.yaml`，Guides 组一份，由 zdoc 维护者修改：
 
 ```yaml
 schema_version: 1
@@ -139,7 +139,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 ### 产品名检查
 
-每个版本、每个手册的 MDX 生成后、两版合并前，按 `shared-docs/product-names.yaml` 检查一遍：
+每个版本、每个手册的 MDX 生成后、两版合并前，按 `shared-docs/guides/product-names.yaml` 检查一遍：
 
 - **检查什么**：`check` 中的每一项，在正文与代码块中按整词匹配，区分大小写。`MilvusClient`、`pymilvus`、`milvus.yaml` 这类更长的词中出现的 Milvus 不算命中 `Milvus` 这一项；要查 `milvus.yaml` 本身，在 `check` 中单独列出。不写端口的 `localhost` 能查出任何端口。一处同时命中几项时（如 `root:Milvus` 中的 `Milvus`），只报最长的一项。链接与图片地址、front matter 不检查。Phase 1 的初始清单见[产品需求场景 1](../prd.md#场景-1把产品名和连接值写成变量)。
 - **放过什么**：命中的位置落在 `allow` 中某个短语之内时放过。`allow` 只接受包含空格的短语，不接受单个词。

@@ -24,7 +24,7 @@ Fetch 已有的手动参数中，`media_upload_mode`（`write` / `skip`）、`pu
 
 | 工作流（建议名称） | 触发 | 权限 | 并发组 | 写什么 | 见 |
 |---|---|---|---|---|---|
-| `shared-docs-lock` 接入时写 lock | `pull_request`：`shared-docs/pages/**` 变化 | `contents: write`、`actions: write` | 每个 PR 一组 | 向 PR 分支提交 `lock.yaml`，再触发 `shared-docs-validate` | [04](./04-channels-and-lock.md#接入一页) |
+| `shared-docs-lock` 接入时写 lock | `pull_request`：`shared-docs/*/pages/**` 变化 | `contents: write`、`actions: write` | 每个 PR 一组 | 向 PR 分支提交 `lock.yaml`，再触发 `shared-docs-validate` | [04](./04-channels-and-lock.md#接入一页) |
 | `shared-docs-validate` PR 校验 | `pull_request`：`shared-docs/**` 变化；`workflow_dispatch`：工具推送后显式触发 | `contents: read`；不读任何 secret | 每个 PR 一组，新运行取消旧运行 | 不写；结果作为 PR 的检查项 | [05](./05-publish-handoff.md#pr-校验) |
 | `shared-docs-upstream` 上游更新 | `schedule` 每天一次；`workflow_dispatch`，可填页面与目标提交 | `contents: write`、`pull-requests: write`、`actions: write` | `shared-docs-master-pr` | 推送分支，开、更新或关闭上游更新 PR，触发校验 | [06](./06-upstream-changes.md#发现与运行) |
 | `shared-docs-promote` 提升 | `workflow_dispatch`：填页面标识或 `all-pending` | 同上 | `shared-docs-master-pr` | 开一个 PR，触发校验 | [04](./04-channels-and-lock.md#lockyaml-怎样变化) |

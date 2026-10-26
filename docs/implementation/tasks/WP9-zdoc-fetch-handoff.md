@@ -76,7 +76,7 @@
 
 ### dev 上的保护
 
-有 PR 修改 dev 中已激活页面的生成结果（MDX 或记录文件）时，检查失败，报 `PUBLISH_REGEN_MISMATCH`，指出应改的源文件：`shared-docs/pages/<页面标识>/` 或 milvus-docs 的原文。判断依据是 `active.json` 与记录文件中的 `outputs` 摘要。由哪个现有检查承担，在计划中提出，例如站点校验中的 “Gate dev-owned paths”。Fetch 自己写 dev 的提交要能通过。
+有 PR 修改 dev 中已激活页面的生成结果（MDX 或记录文件）时，检查失败，报 `PUBLISH_REGEN_MISMATCH`，指出应改的源文件：`shared-docs/guides/pages/<页面标识>/` 或 milvus-docs 的原文。判断依据是 `active.json` 与记录文件中的 `outputs` 摘要。由哪个现有检查承担，在计划中提出，例如站点校验中的 “Gate dev-owned paths”。Fetch 自己写 dev 的提交要能通过。
 
 ## 要覆盖的编号
 

@@ -30,7 +30,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 
 ```
 ✗ LINE_NOT_FOUND  openai · next 版本
-  位置：shared-docs/pages/openai/page.yaml 第 18 行
+  位置：shared-docs/guides/pages/openai/page.yaml 第 18 行
         → 原文 define-function-code（python）
   原因：lines 在 python 代码中找不到
   怎样改：上游可能改了这一行。原规则加 channel: current，

@@ -12,24 +12,27 @@
 
 `shared-docs/` 位于 zdoc 仓库根目录，在 master 分支上维护：所有修改都向 master 开 PR，合并后发布流程直接从 master 读取（见 [05](./05-publish-handoff.md#交接发生在哪里)）。
 
+`shared-docs/` 下按**组**分子目录。一组对应 zdoc Fetch 的一个发布组（`packages/docs-tooling/src/workflows/groups.ts`）：Guides 与 BYOC 两个手册同属 `guides` 组，每本 Reference 手册各成一组。每组的目录自成一体：上游仓库、Cloud 变量、链接映射表、检查规则都在自己的目录中，工具一次只处理一组，不跨组读文件。Phase 1 只有 `guides` 一组；以后新增的组，结构按那一组的需要定，不必与 `guides` 相同。
+
 ```
 shared-docs/
-  source.yaml                        # 共享来源配置：仓库与跟踪分支（见 04）
-  Variables.json                     # Cloud 变量（见 03）
-  links.yaml                         # 链接映射表（见 02b）
-  product-names.yaml                 # 产品名检查规则（见 07）
-  presentation/cloud-sdk-tabs.yaml   # 代码 Tabs 规则，工程维护
-  pages/
-    delete-entities/                 # 目录名即页面标识
-      page.yaml                      # 页面配置，作者编写
-      lock.yaml                      # 版本记录，工具写入（见 04）
-    openai/
-      page.yaml
-      lock.yaml
-      before-you-start.md            # Cloud 内容文件，按需提供
+  guides/                            # 组名，等于 Fetch 的发布组
+    source.yaml                      # 共享来源配置：仓库与跟踪分支（见 04）
+    Variables.json                   # Cloud 变量（见 03）
+    links.yaml                       # 链接映射表（见 02b）
+    product-names.yaml               # 产品名检查规则（见 07）
+    presentation/cloud-sdk-tabs.yaml # 代码 Tabs 规则，工程维护
+    pages/
+      delete-entities/               # 目录名即页面标识
+        page.yaml                    # 页面配置，作者编写
+        lock.yaml                    # 版本记录，工具写入（见 04）
+      openai/
+        page.yaml
+        lock.yaml
+        before-you-start.md          # Cloud 内容文件，按需提供
 ```
 
-**页面标识**就是 `pages/` 下的目录名，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`、供翻译清单与路由插件使用，见 [05](./05-publish-handoff.md#页面身份token)。
+**页面标识**就是 `pages/` 下的目录名，在组内唯一，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`、供翻译清单与路由插件使用，见 [05](./05-publish-handoff.md#页面身份token)。
 
 ### 变换的执行
 
@@ -74,6 +77,8 @@ shared-docs/
 <summary>展开设计理由</summary>
 
 **为什么放在 `shared-docs/`。** zdoc 规定 `content/`、`generated/` 等目录归 dev 分支，只由发布工作流写入；人编写的文件走 master，经同步 PR 进入 dev。共享页的配置由人编写，所以放在 `content/` 之外、归 master 管理的新目录中。
+
+**为什么按组分目录。** zdoc 的 Fetch 按发布组运行，每组单独提交到 dev、单独失败。共享页的输入按同样的组划分：Fetch 只看这一组的目录有没有变化，就知道要不要重新生成这一组；不同的组可以读不同的上游仓库（Guides 读 milvus-docs，SDK Reference 读 web-content）；不同组的页面标识也不会冲突。`product-names.yaml` 等文件放在组内而不是根目录，是为了让工具一次只读一个目录；各组的放行短语本来也可能不同。
 
 **产品过滤沿用现有能力。** zdoc 的产品过滤（zilliz、saas、paas、milvus 等目标）在 Fetch 阶段执行。共享原文不写产品指令；Cloud 内容文件迁入 Git 后仍可使用现有写法，处理对象从飞书输入扩展到 Git 输入。
 

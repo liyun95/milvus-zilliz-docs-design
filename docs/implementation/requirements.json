@@ -195,7 +195,7 @@
       "scenario": 5,
       "scenario_title": "链接与图片",
       "phase": "Phase 1a",
-      "text": "映射表全站一份，每个 Milvus 页面只登记一次，所有共享页共用"
+      "text": "映射表每组一份，Guides 组中每个 Milvus 页面只登记一次，组内所有共享页共用"
     },
     {
       "id": "5-7",

@@ -81,7 +81,7 @@ zdoc 新增“上游更新”工作流：
 milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一节的模型表加了一行，并在被 Cloud 整节替换的 “Configure credentials” 中补充了一条要求。
 
 - **标题**：`shared-docs: update openai to milvus-docs b2c3d4e`
-- **改动**：`shared-docs/pages/openai/lock.yaml` 中 `next: a1…` 改为 `next: b2c3d4e…`
+- **改动**：`shared-docs/guides/pages/openai/lock.yaml` 中 `next: a1…` 改为 `next: b2c3d4e…`
 - **影响报告**：
   - UAT 将看到的变化：模型表新增一行。
   - 需要复核：`before-you-start` 替换的原文有变化，Cloud 页面没有变化；请确认 `before-you-start.md` 是否也要补充这条要求。

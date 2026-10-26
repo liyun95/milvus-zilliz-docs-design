@@ -14,7 +14,7 @@
 - 查找的第 1 步“目标页也是共享页”，指某个页面配置的 `source.file` 就是这个 Milvus 页面；结果用那一页的页面标识，如 `./primary-key-search`。
 - 结果是 Cloud 页面时，一律写成 `./<页面标识>`，包括映射表中的值是页面标识的情况；与 dev 上现有页面的写法相同，如 `[Filtering Explained](./filtering-overview)`。映射表中的值是 milvus.io 地址时原样使用。
 - 查找的第 3 步“Cloud 有同名页面”：把 Milvus 文件名去掉 `.md`，在该手册现有页面的 slug 名单中查找。名单包括飞书生成的页面与已激活的共享页；从哪里读取（dev 中的内容目录，或导航生成的中间结果）由 zdoc 维护者确定。
-- 链接映射表 `shared-docs/links.yaml` 全站一份：键是 Milvus 页面文件名，值是 Cloud 页面标识或完整的 milvus.io 地址。
+- 链接映射表 `shared-docs/guides/links.yaml` 每组一份（Guides 组一份）：键是 Milvus 页面文件名，值是 Cloud 页面标识或完整的 milvus.io 地址。
 - 链接在 PR 校验中解析：校验只生成共享页，不跑整站构建，错误在合并前报出，不会等到一两个小时的 Fetch 才失败。
 - 生成时只按上面四步查找，不按标题或相似度自动匹配；它们只用于下面的初始映射表与报错中的候选。
 
@@ -37,7 +37,7 @@
 5. **其余**：写成注释掉的一行，附上按标题相似度排出的前三个 Cloud 页面，由人判断。
 
 ```yaml
-# shared-docs/links.yaml（候选示意）
+# shared-docs/guides/links.yaml（候选示意）
 boolean.md: filtering-overview                     # 标题相同；反推
 ivf-flat.md: https://milvus.io/docs/ivf-flat.md    # 索引类型
 # limitations.md: ?                                # 待判断；相近：limits（Zilliz Cloud Limits）……
@@ -106,7 +106,7 @@ milvus-docs 现状（2026-10-20 核验）：仓库中没有上传图片的代码
 <details>
 <summary>展开设计理由</summary>
 
-需要映射表、全站一份、换算锚点、转存图片的理由见[产品需求场景 5](../prd.md#场景-5链接与图片)。依据的统计见 [zdoc 代码变体与发布通道核验第 2.1 节](../../research/zdoc-variants-and-channels-audit.md#21-补充核验2026-10-14)；转存图片的依据见[恢复能力核验](../../research/recovery-capability-audit.md)。
+需要映射表、一组一份、换算锚点、转存图片的理由见[产品需求场景 5](../prd.md#场景-5链接与图片)。依据的统计见 [zdoc 代码变体与发布通道核验第 2.1 节](../../research/zdoc-variants-and-channels-audit.md#21-补充核验2026-10-14)；转存图片的依据见[恢复能力核验](../../research/recovery-capability-audit.md)。
 
 </details>
 
