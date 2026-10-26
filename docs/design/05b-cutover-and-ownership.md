@@ -89,7 +89,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
 其他飞书页面链接到这一页时，链接中写的是这一页的飞书文档 ID；链接到某一节时，锚点是飞书的块 ID。zdoc 转换这种链接，要读目标页这次抓下来的飞书原文，从中取 slug，再按标题文字算出锚点（`lark/larkDocWriter.js` 的 `__convert_link`）。找不到原文时，链接变成普通文字，只在日志中打一行，运行不会失败。激活之后这一页不再抓飞书原文，所以要另外保住这些链接：
 
 - **转换时先查 `active.json`**：飞书页面中的链接，文档 ID 等于某一项的 `feishu_token`，就换成 `./<页面标识>`；带块 ID 时，按 `anchors` 换成锚点。zdoc 现有的 `--linkShim`（按文档 ID 替换链接）可以复用。
-- **`anchors` 在激活时算出**：激活后的第一次 Fetch，从上一次抓取的飞书原文中取出被其他页面链接到的标题块，按飞书版的标题算出锚点，再在 Git 版中找同一个锚点。都找得到，就记入 `anchors`；有找不到的，激活检查不通过（`ACTIVATE_CHECK_FAILED`），`detail` 中列出这些链接所在的页面，由文档负责人修改飞书中的链接或 Git 版的标题。
+- **`anchors` 在激活时算出**：激活后的第一次 Fetch，按 `feishu_token` 重新抓取原来的飞书文档（它保留、不删除），从这一次抓到的其他页面原文中找出指向它的链接，取出被链接到的标题块，按飞书版的标题算出锚点，再在 Git 版中找同一个锚点。都找得到，就记入 `anchors`；有找不到的，激活检查不通过（`ACTIVATE_CHECK_FAILED`），`detail` 中列出这些链接所在的页面，由文档负责人修改飞书中的链接或 Git 版的标题。
 - **之后出现的块 ID 不在 `anchors` 中**：链接只指到页面顶部，运行摘要中列出，不失败。
 
 ### 切换与激活
@@ -147,7 +147,7 @@ Phase 1 下线沿用飞书表格现有的做法，与其他页面相同（zdoc `
 - 记录已删除、目录还在：Fetch 不生成这一页，在运行摘要中提示删除目录。
 - 目录已删除、记录还在且 `Docs` 仍指向这个目录：这一页生成失败，保留 dev 中现有的版本并通知。
 
-尚未激活的页面被删除时，只是不再生成候选结果，不涉及 dev。
+尚未激活的页面被删除时，不涉及 dev：Fetch 本来就不为它生成。
 
 ### 一页完成迁移的标准
 
@@ -176,7 +176,7 @@ Phase 1 下线沿用飞书表格现有的做法，与其他页面相同（zdoc `
 <details>
 <summary>Delete Entities 的激活（示意）</summary>
 
-1. 接入 PR 合并后，Fetch 每次运行都为 Delete Entities 生成候选结果，不写入 dev，网站上仍是飞书版本。
+1. 接入 PR 合并后，网站上仍是飞书版本；Fetch 不为 Delete Entities 生成任何东西，候选结果只出现在 PR 校验中。
 2. 文档负责人发起一次“比较”运行，指定 `delete-entities`，查看 Git 版本与飞书当前版本的差异，确认飞书最近的修改已反映到 Git 中。
 3. 文档负责人在飞书表格中把 Delete Entities 记录的 `Docs` 换成 `https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-entities`。
 4. 下一次 Fetch 检查通过，在同一个 dev 提交中写入 `active.json`（加入 `delete-entities`，记下它原来的飞书文档 ID 与被链接的锚点，样例见上文）、Guides 与 BYOC 两份 MDX、导航和 `delete-entities.json` 记录文件。从这次提交起，飞书不再生成这一页；它在导航中的位置仍由飞书表格和目录决定。Insert Entities 等飞书页面中指向它的链接，按 `active.json` 换成 `./delete-entities` 与对应的锚点。
@@ -201,7 +201,7 @@ Phase 1 下线沿用飞书表格现有的做法，与其他页面相同（zdoc `
 
 **为什么 `active.json` 放在 dev、由 Fetch 写入。** zdoc 约定 master 放工具，dev 放内容和发布状态，`active.json` 属于发布状态。“这一页由 Git 管”和“这一页的 Git 生成结果”必须在同一个提交中生效，否则会出现清单说归 Git、dev 中却还是飞书内容的情况。
 
-**为什么激活前先比较一次。** 接入 PR 合并后，候选结果只在 Fetch 的临时产物中，没有地方可以看；接入之后，飞书上也可能又有人改过这一页。先比较一次，把 Git 版本与飞书当前版本的差异写出来，文档负责人才有东西可审。
+**为什么激活前先比较一次。** 接入 PR 合并后，候选结果只在 PR 校验中出现过一次，之后没有地方可以看；接入之后，飞书上也可能又有人改过这一页。先比较一次，把 Git 版本与飞书当前版本的差异写出来，文档负责人才有东西可审。
 
 </details>
 

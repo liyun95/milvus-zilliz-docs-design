@@ -128,8 +128,8 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 
 | 错误码 | 何时出现 | 结果 |
 |---|---|---|
-| `PUBLISH_IMAGE_UPLOAD_FAILED` | 图片上传或上传后的摘要核对失败 | 这次运行不写 dev |
-| `PUBLISH_REGEN_MISMATCH` | 重新生成的结果与记录文件不一致，或有 PR 修改了 dev 中的生成结果 | 不写 dev，或该 PR 检查失败；指出应改的源文件 |
+| `PUBLISH_IMAGE_UPLOAD_FAILED` | 图片上传或上传后的摘要核对失败 | 这次运行的 Guides 不写 dev，与飞书图片上传失败时相同 |
+| `PUBLISH_REGEN_MISMATCH` | 重新生成的结果与记录文件不一致，或有 PR 修改了 dev 中的生成结果 | 这一页保留 dev 中现有的版本，或该 PR 检查失败；指出应改的源文件 |
 | `RECOVER_INPUT_MISSING` | 恢复时源、配置或图片缺失 | 恢复失败，不回退到最新版本 |
 | `OWNERSHIP_DUPLICATE_PATH` | 同一个输出路径既有飞书页面又有 Git 页面 | 生成失败 |
 | `OWNERSHIP_PATH_MISMATCH` | 飞书记录的发布目标或路径与 `publish` 不一致 | 该页生成失败 |
