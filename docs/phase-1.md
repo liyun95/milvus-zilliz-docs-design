@@ -127,7 +127,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | 换图规则 | milvus-docs 中换图用新文件名、不覆盖已上传的图片（[产品需求场景 5](./prd.md#场景-5链接与图片)）。仓库调研见[技术设计 02b](./design/02b-links-and-images.md#图片)。已定：由推动者写进 milvus-docs 的贡献说明 | — |
 | 代码位置 | 已定：zdoc 的 `packages/docs-tooling/src/shared-docs/`，见[技术设计 README](./design/README.md#代码位置) | — |
 | `alert warning` 的样式 | 已定：与 zdoc 现有页面一致，转为 `<Admonition type="warning" icon="🚧" title="Warning">`（[技术设计 07](./design/07-site-adaptation.md#提示框)） | — |
-| Fetch 的接入点 | 已定方向：`Docs` 指向页面目录的记录，在渲染 Guides 表时改用 `shared-docs build` 生成，结果放在飞书页面原本的位置，之后的组装与检查点照常；Fetch 不为未激活的页面生成候选（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）。具体改哪些文件，以及下面几项，由 WP9 的计划给出：覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活前的“比较”以什么形式提供；PR 校验读 dev 中的表格快照 `guides-uat-last-success.json`（已定，见[技术设计 04](./design/04-channels-and-lock.md#只在一个通道存在的页面)）；链接查找中“同名页面”的名单从哪里读取（[技术设计 02b](./design/02b-links-and-images.md#链接)）（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
+| Fetch 的接入点 | 已定方向：`Docs` 指向页面目录的记录，在抓取 Guides 原文的任务中改用 `shared-docs build` 生成并上传图片，渲染时把结果放在飞书页面原本的位置，之后的组装与检查点照常；Fetch 不为未激活的页面生成候选（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）。具体改哪些文件，以及下面几项，由 WP9 的计划给出：覆盖率、归属与翻译清单等检查需要改哪些地方（[技术设计 05](./design/05-publish-handoff.md#交接发生在哪里)）；激活前的“比较”以什么形式提供；PR 校验读 dev 中的表格快照 `guides-uat-last-success.json`（已定，见[技术设计 04](./design/04-channels-and-lock.md#只在一个通道存在的页面)）；链接查找中“同名页面”的名单从哪里读取（[技术设计 02b](./design/02b-links-and-images.md#链接)）（[技术设计 05b](./design/05b-cutover-and-ownership.md#切换与激活)） | zdoc 维护者 |
 | 重新生成比对的接法 | Fetch 写 dev 前怎样比对；修改 dev 中共享页生成结果的 PR 由哪个检查拦下（[技术设计 05](./design/05-publish-handoff.md#发布保护)） | zdoc 维护者 |
 
 每项确认都要留下接口约定、负责人和对应测试。未确认的接口不能按“直接复用”估为零工作量；若影响 md2md 发版或其他仓库，同步调整排期。

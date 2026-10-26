@@ -19,8 +19,8 @@
 | 顺序 | 做什么 | 是否交接 |
 |---|---|---|
 | 1. PR 合并前 | PR 校验：生成一遍候选结果，检查能否合并（见下文） | 否，不写 dev |
-| 2. 合并后，Fetch 运行 | Fetch 照常读飞书表格；`Docs` 指向页面目录的记录（见 [05b](./05b-cutover-and-ownership.md#开关docs-链接)）不抓飞书正文，在渲染这一张表时改用 `shared-docs build` 生成；工具代码与 `shared-docs/` 都从 master 读取，不必等 master→dev 同步 | — |
-| 3. 交接 | 生成的页面 MDX 放在飞书渲染这一页时本来要放的位置，之后的组装、身份核对、检查点都照常进行；同时交出记录文件与图片 | 是 |
+| 2. 合并后，Fetch 运行 | Fetch 照常读飞书表格；`Docs` 指向页面目录的记录（见 [05b](./05b-cutover-and-ownership.md#开关docs-链接)）不抓飞书正文：在抓取 Guides 原文的任务中，与抓取飞书正文、上传飞书图片放在一起，用 `shared-docs build` 一次生成两个手册的 MDX，并上传它的图片；工具代码与 `shared-docs/` 都从 master 读取，不必等 master→dev 同步 | — |
+| 3. 交接 | 渲染这一张表时，把生成好的 MDX 放在飞书渲染这一页时本来要放的位置，之后的组装、身份核对、检查点都照常进行；同时交出记录文件 | 是 |
 | 4. 现有发布流程 | 导航生成、校验、试构建、打包，上传图片，写入 dev | — |
 
 #### 触发时机
@@ -130,6 +130,13 @@ generated/en/manifests/shared-pages/
         { "path": "shared-docs/guides/Variables.json", "sha256": "…" }
       ]
     },
+    "dev": {
+      "commit": "<这次运行的 dev 基线 commit>",
+      "files": [
+        { "path": "packages/docs-tooling/src/lark/meta/snapshots/guides-uat-last-success.json", "sha256": "…" }
+      ]
+    },
+    "fetch": { "navigation": "sha256…", "image_base_url": "https://…" },
     "tools": { "zdoc": "<tooling commit>", "md2md": "1.3.0" },
     "images": [
       { "source": "https://milvus-docs.s3.us-west-2.amazonaws.com/assets/filtered-search.png", "sha256": "3f9a…", "object": "shared/3f9a….png" }
@@ -154,6 +161,8 @@ generated/en/manifests/shared-pages/
 | `inputs.milvus_docs.files[]` | 用到的每个原文与片段：`path` 相对于仓库根目录，`current`、`next` 是它在两个版本中的摘要 | 判断输入是否变化 |
 | `inputs.zdoc.repository`、`commit` | zdoc 仓库，以及 `shared-docs/` 所在的 master commit | 重新生成 |
 | `inputs.zdoc.files[]` | 用到的页面配置、Cloud 内容文件、变量文件、链接映射表，各自的路径与摘要 | 判断输入是否变化 |
+| `inputs.dev.commit`、`files[]` | 这次运行的 dev 基线 commit，以及生成时读到的 dev 文件（Cloud 页面清单、表格快照等）的路径与摘要 | 重新生成 |
+| `inputs.fetch` | 这次 Fetch 读到的导航信息（标签、排序、通道）的摘要或内容地址，以及图片基地址；不含任何凭据 | 重新生成 |
 | `inputs.tools` | 生成工具的 commit 与 md2md 的精确版本 | 用同样的版本重新生成 |
 | `inputs.images[]` | 每张图片的原地址（`source`）、摘要（`sha256`）与转存地址（`object`）；外部图片用完整地址 | 恢复时核对图片 |
 | `outputs[]` | 每个手册的输出路径与内容摘要 | 覆盖率检查、重新生成比对、恢复 |
@@ -170,7 +179,7 @@ generated/en/manifests/shared-pages/
 
 | 运行 | 做什么 |
 |---|---|
-| 正式运行（定时、master 推送触发、激活；开关为 `write`） | 写入 dev 之前，把还不存在的图片按内容地址上传到 zdoc 现有的图片存储，上传后核对摘要；任何一张失败，这次运行不写 dev |
+| 正式运行（定时、master 推送触发、激活；开关为 `write`） | 在抓取 Guides 原文的任务中、与飞书图片上传放在一起，把还不存在的图片按内容地址上传到 zdoc 现有的图片存储，上传后核对摘要；任何一张失败，这次运行的 Guides 不写 dev，与飞书图片上传失败时相同 |
 | 候选运行（PR 校验；开关为 `skip`） | 只算出最终地址，不上传 |
 
 - 候选结果中的图片地址与正式结果完全相同，所以新出现的图片在 PR 预览中暂时显示不出来，合并后的正式运行才会上传。上游更新 PR 的报告列出本次新增或变化的图片及其原地址，供审核人查看。
@@ -225,8 +234,8 @@ generated/en/manifests/shared-pages/
 | 情况 | 结果 |
 |---|---|
 | PR 校验不通过 | PR 不能合并；各项的出错规则见上文“PR 校验” |
-| 图片上传或上传后的摘要核对失败 | 这次正式运行不写 dev |
-| 重新生成比对不一致 | Fetch 不写 dev；修改生成结果的 PR 检查失败。都指出应改的源文件 |
+| 图片上传或上传后的摘要核对失败 | 这次运行的 Guides 不写 dev，与飞书图片上传失败时相同；其他组照常 |
+| 重新生成比对不一致 | 这一页保留 dev 中现有的版本，其他页面照常；修改生成结果的 PR 检查失败。都指出应改的源文件 |
 | 恢复时源、配置或图片缺失 | 恢复失败，不回退到最新版本 |
 
 ## 例子
