@@ -135,7 +135,7 @@ allow:                                  # 确实要保留的写法
 | 提升 | zdoc GitHub Actions，“提升”工作流 | 文档工程师 | [场景 8](./prd.md#场景-8功能上线时提升) |
 | 新页面上线：`Release Channel` 从 `NEXT` 改为 `CURRENT` | 飞书表格 | 文档工程师 | [场景 6](./prd.md#场景-6让内容先只在-uat-显示) |
 | 比较 | zdoc GitHub Actions | 文档负责人 | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |
-| 激活：placement type 改为 `git` | 飞书表格 | 文档负责人 | 同上 |
+| 激活：`Docs` 换成页面目录地址 | 飞书表格 | 文档负责人 | 同上 |
 | 下线：`Release Channel` 改为 `RETIRE-IN-NEXT` | 飞书表格 | 文档工程师 | [场景 10](./prd.md#场景-10下线一页) |
 | 下线完成：删除表格记录与飞书节点 | 飞书表格与目录 | 文档工程师 | 同上 |
 | 删除页面目录 | zdoc 普通 PR | 文档工程师 | 同上 |

@@ -34,8 +34,9 @@ shared-docs/guides/source.yaml, Variables.json, links.yaml, product-names.yaml, 
 | 可以改 | 不能改 |
 |---|---|
 | `packages/docs-tooling/src/shared-docs/` 中写死 `shared-docs/pages`、`shared-docs/source.yaml` 等路径的代码：`commands/` 的四个命令、`adapters/read-page.ts`、`inspect-page.ts`、`build-page.ts`、`core/config.ts`、`core/variables.ts`、`core/links/seed.ts`、`core/product-names/` 中的报错位置 | 任何生成结果：同样的输入，MDX、`images.json`、报错的错误码与行号都不变，只有报错中的文件路径多一层组名 |
-| `fixtures/`、`testing/` 中的路径与期望报错 | `spec/pending.json`：本工作包不覆盖编号 |
-| `spec/requirements.json`：从设计仓库逐字节复制最新的 [`requirements.json`](../requirements.json)。只有 `5-2` 的文字变了（映射表改为每组一份） | |
+| `fixtures/`、`testing/` 中的路径与期望报错 | `spec/pending.json` 中的其他条目：本工作包不覆盖编号 |
+| `spec/requirements.json`：从设计仓库逐字节复制最新的 [`requirements.json`](../requirements.json)。与 zdoc 现有的副本相比，`5-2`、`9-3`、T07 与三个错误码的文字变了，新增了 `9-9` | |
+| `spec/pending.json`：只把新增的 `9-9` 登记为 `"WP9"` | |
 | `.github/workflows/shared-docs-lock.yml`、`shared-docs-validate.yml` 的触发路径与读取的文件 | 其他工作流 |
 | `scripts/validate-workflow-policy.js` 及其测试、`scripts/docs-workflow/test-matrix.json` 中与这两个工作流相关的规则 | `lark/` 与 dev 上的任何文件 |
 | `packages/docs-tooling/src/shared-docs/README.md` 中的路径与命令示例 | |

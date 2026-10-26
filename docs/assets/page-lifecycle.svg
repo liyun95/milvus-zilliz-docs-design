@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="855" height="250" viewBox="0 0 1710 500" role="img" aria-labelledby="title desc">
 <title id="title">一个共享页的生命周期：Git 主线与Phase 1 过渡</title>
-<desc id="desc">上半部分是一页在 Git 中的生命周期，由 lock 决定版本：文档工程师写 page.yaml 接入，工具写入 lock；之后上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线完成后用普通 PR 删除页面目录与 lock。下半部分是 Phase 1 过渡，由飞书表格决定来源与整页通道，飞书退出后不再需要：接入之后文档负责人激活，即把 placement type 改为 Git，网站从飞书版换成 Git 版；下线时文档工程师把 Release Channel 改为 RETIRE-IN-NEXT，UAT 不再显示；发版时删除表格记录与飞书节点，这一页从网站和导航中移除，之后再删页面目录。</desc>
+<desc id="desc">上半部分是一页在 Git 中的生命周期，由 lock 决定版本：文档工程师写 page.yaml 接入，工具写入 lock；之后上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线完成后用普通 PR 删除页面目录与 lock。下半部分是 Phase 1 过渡，由飞书表格决定来源与整页通道，飞书退出后不再需要：接入之后文档负责人激活，即把 Docs 链接换成 Git 中的页面目录，网站从飞书版换成 Git 版；下线时文档工程师把 Release Channel 改为 RETIRE-IN-NEXT，UAT 不再显示；发版时删除表格记录与飞书节点，这一页从网站和导航中移除，之后再删页面目录。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.lane{font-size:19px;font-weight:600;}.lanesub{font-size:15px;fill:#64748b;}.head{font-size:20px;font-weight:600;}.t{font-size:16px;fill:#475569;}.note{font-size:15px;fill:#64748b;}.lbl{font-size:15px;fill:#475569;text-anchor:middle;}.act{font-size:16px;font-weight:600;fill:#374151;text-anchor:middle;}.dep{font-size:15px;fill:#b45309;text-anchor:middle;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}.guide{fill:none;stroke:#d97706;stroke-width:1.5;stroke-dasharray:5 5;}</style></defs>
 <rect width="1710" height="500" fill="#ffffff"/>
@@ -38,7 +38,7 @@
 <rect x="550" y="290" width="300" height="140" rx="12" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
 <text x="570" y="326" class="head">Git 版</text>
 <text x="570" y="360" class="t">Prod 用 current，UAT 用 next</text>
-<text x="570" y="388" class="note">placement type 为 Git</text>
+<text x="570" y="388" class="note">Docs 指向 Git 页面目录</text>
 <text x="570" y="414" class="note">导航仍由飞书表格决定</text>
 <rect x="980" y="290" width="250" height="140" rx="12" fill="#ffffff" stroke="#94a3b8"/>
 <text x="1000" y="326" class="head">待下线</text>

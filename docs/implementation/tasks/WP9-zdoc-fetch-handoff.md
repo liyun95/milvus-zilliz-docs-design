@@ -1,34 +1,40 @@
-# WP9 接入 Fetch：生成与交接
+# WP9 接入 Fetch：按 `Docs` 链接分流与交接
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8](./WP8-zdoc-build-and-validate.md) 已合并（WP8a [zilliztech/zdoc#822](https://github.com/zilliztech/zdoc/pull/822)，WP8b [#832](https://github.com/zilliztech/zdoc/pull/832)，commit [`8680736`](https://github.com/zilliztech/zdoc/commit/86807361cdca0f2b768f51d7ff47c5b78461bee8)）。改动 Fetch，计划与上游 PR 都要 zdoc 文档负责人 review　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8c](./WP8c-zdoc-group-layout.md) 已合并（`shared-docs/guides/` 的目录结构）。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：2026-10-26 按新的激活方式重写了任务卡；按旧卡写的计划（liyun95/zdoc#11）作废，要重写
 
 ## 目标
 
-做完后，zdoc 的发布工作流 Fetch：
+文档负责人在飞书表格中，把一页记录的 `Docs` 换成它在 zdoc master 上的页面目录地址（[技术设计 05b](../../design/05b-cutover-and-ownership.md#开关docs-链接)）：
 
-- **每次运行都生成全部共享页**：用 master 上的 `shared-docs/` 与工具，跑一遍 `shared-docs build`，结果留在这次运行的产物中。生成失败只报告，不让 Fetch 失败。这一页还没激活，网站上仍是飞书版。
-- **对已激活的页面，把结果交给发布**：
-  - 页面 MDX 放进 Guides 的组装目录，替换飞书渲染的同一页；
-  - 写入每页的记录文件；
-  - 上传还不存在的图片；
-  - 写 dev 之前，按记录文件重新生成一遍并比对。
+```
+https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-entities
+```
 
-  这些任何一步失败，这一页保留 dev 上现有的版本，其他页面照常发布。
-- **dev 上的共享页生成结果不能被手改**：修改它们的 PR，检查失败，并指出应改的源文件。
+做完 WP9 后，下一次 Fetch 就改由 Git 生成这一页，并写入 dev：
 
-哪些页面已激活，读 dev 上的 `generated/en/manifests/shared-pages/active.json`（格式见技术设计 05b）。这个文件由 WP14 生成；现在 dev 上还没有它，就当作没有页面激活。所以 WP9 合并后，网站不会有任何变化。真正的第一次写入在 WP14 激活第一篇页面时发生。
+- **分流**：Fetch 照常读飞书表格。`Docs` 是页面目录地址的记录，不抓飞书正文，在渲染这一张 Guides 表时改用 `shared-docs build` 生成，结果放在飞书页面原本的位置。之后的组装、身份核对、检查点、导航都照常进行。
+- **交接**：在同一个 dev 提交中写入两个手册的 MDX、每页的记录文件和 `active.json`；上传还不存在的图片。
+- **保住链接**：其他飞书页面指向这一页的链接，包括带锚点的，按 `active.json` 换算，仍指向正确的位置。
+- **及时生效**：只改了 milvus-docs 原文或 Cloud 配置、飞书没有变化时，下一次 Fetch 也会重新生成这一页。
+- **出错只影响这一页**：检查不通过时，这一页保留 dev 上现有的版本，其他页面照常发布，并用飞书卡片通知文档负责人。
+
+Fetch 不为还没激活的页面生成任何东西。表格中一个页面目录地址都没有时，Fetch 写入 dev 的内容与现在逐字节相同。
+
+WP9 分两个 PR 交付：
+
+- **WP9a**：分流、交接、链接、及时生效、图片上传，以及 Fetch 中的激活检查。合并后，第一篇试点页面就能激活。
+- **WP9b**：写 dev 前的重新生成比对；已采用的图片保持不变。
 
 ## 要读的
 
 | 文档 | 章节 | 读它为了什么 |
 |---|---|---|
-| [产品需求](../../prd.md) | 第 6 节：发布保护、及时生效、时延；场景 5：系统行为 5-3、5-5、5-6；场景 9：系统行为 | 行为 |
-| [技术设计 05](../../design/05-publish-handoff.md) | 全文 | 交接物、记录文件的格式、图片上传、发布保护、缓存与运行、出错时 |
-| [技术设计 05b](../../design/05b-cutover-and-ownership.md) | 生效配置、切换与激活、激活之后的归属规则 | `active.json` 的格式；哪些归 WP14 |
+| [技术设计 05b](../../design/05b-cutover-and-ownership.md) | 开关；生效配置；指向已激活页面的链接；切换与激活的第 3–5 步；出错时 | 本工作包的主要行为 |
+| [技术设计 05](../../design/05-publish-handoff.md) | 交接发生在哪里；交给发布的三样东西；记录文件；图片上传；缓存与运行；发布保护 | 交接物的格式 |
+| [产品需求](../../prd.md) | 场景 9 的系统行为；场景 5 的 5-3；第 6 节中的“及时生效”“发布保护” | 行为 |
 | [技术设计 02b](../../design/02b-links-and-images.md) | 图片 | 已采用版本的图片以第一次转存为准 |
 | [技术设计 08](../../design/08-workflows-and-permissions.md) | 现有做法、失败通知 | 并发组、飞书卡片 |
 | [技术设计 09](../../design/09-error-catalog.md) | 发布与切换 | 错误码 |
-| [实施计划](../../phase-1.md) | 6.1 节中的“Fetch 的接入点”“重新生成比对的接法” | 要在计划中回答的两项 |
 | [WP8 走读](../walkthroughs/WP8.md) | 全文 | 要接入的生成命令 |
 | [实现指南](../README.md) | 第 3 节 L4、第 5 节 | 回放测试、规则 |
 
@@ -36,97 +42,149 @@
 
 | 可以改 | 不能改 |
 |---|---|
-| `.github/workflows/fetch-docs.yml`：新增调用生成共享页的任务 | 其他工作流的行为，除非计划审阅时批准 |
-| 新建 `.github/workflows/_render-shared-pages.yml`（或计划中提出的等价写法） | |
-| `.github/workflows/_assemble-guides.yml`：恢复共享页的产物，对已激活的页面替换组装目录中的同一页 | 飞书侧的抓取与渲染逻辑：WP14 再让飞书跳过 `git` 记录 |
-| `scripts/docs-workflow/` 中组装、校验、检查点相关的脚本：只做接入共享页所需的最小改动 | `lark/` 中的记录语义（placement type `git` 归 WP14） |
-| `packages/docs-tooling/src/shared-docs/` 下：记录文件、重新生成比对、图片上传的代码与测试；`commands/` 新增需要的子命令 | `active.json` 的生成与比较运行（WP14） |
-| 图片上传：复用 zdoc 现有的图片存储上传代码，实现 WP0 定义的 `ImageStore` 适配器 | 翻译清单、恢复脚本、缓存（WP15） |
-| 回放测试：复用 zdoc 现有的回放测试工具（`pnpm test:replay`） | 真实的 dev 分支、真实的图片存储：测试中都用隔离的替身 |
+| `packages/docs-tooling/src/lark/` 中按飞书文档 ID 工作的模块（05b“开关”一节的表）：认得 `Docs` 是页面目录地址的记录；转换链接时先查 `active.json` | 飞书记录的其他语义：placement type 的取值、导航的生成、`Release Channel` |
+| `scripts/docs-workflow/` 中渲染 Guides 表、组装身份、缓存、检查点相关的脚本：只做接入共享页所需的最小改动 | 其他工作流的行为，除非计划审阅时批准 |
+| `.github/workflows/_render-guides-table.yml`、`_assemble-guides.yml`、`fetch-docs.yml`：接入所需的检出、步骤与产物 | 新开一条发布线，或新建一个并行的生成任务 |
+| `packages/docs-tooling/src/shared-docs/` 下：`active.json`、记录文件、锚点、重新生成比对、图片上传的代码与测试；在 `commands/` 中新增需要的子命令 | 改写 `active.json` 中已有的页面：WP9 只在激活时加入，下线时的移除归 WP14 |
+| 图片上传：在 zdoc 现有的上传代码旁新增一个“只上传、不覆盖”的函数，实现 WP0 定义的 `ImageStore` 适配器 | 现有上传函数（`larkImageDownloader.js` 的 `__uploadToS3`）的行为 |
+| 回放测试：复用 zdoc 现有的回放测试工具（`pnpm test:replay`） | 真实的 dev 分支、真实的图片存储、真实的飞书表格：测试中都用隔离的替身 |
 | `scripts/docs-workflow/test-matrix.json`、工作流规则检查与测试 | |
-| `spec/pending.json`：删掉本工作包的编号；把下表中改归 WP9 的三个错误码改为 `"WP9"` | `spec/requirements.json` |
+| `spec/pending.json`：删掉本工作包覆盖的编号 | `spec/requirements.json`：WP8c 已复制最新版本 |
 
 ## 怎样接
 
-### 每次运行都生成（候选）
+### 分流（WP9a）
 
-- **触发**：Fetch 的每次运行，定时与手动都算，都新增一个任务，和 Guides 各表的渲染并行。
-- **输入**：master 上的工具与 `shared-docs/`（技术设计 05：不必等 master→dev 同步）；milvus-docs 跟踪分支的检出，要求与 WP8 相同：本地分支、完整历史；dev 的组装基线。
-- **输出**：每页、每个手册的 MDX，`images.json`，每页记录文件的草稿，都放进这次运行的产物中，不写 dev。
-- **失败**：
-  - 仓库根目录没有 `shared-docs/` 时，这个任务直接成功；
-  - 生成失败时，在运行摘要与飞书卡片中列出页面与错误，Fetch 照常继续；
-  - 只有已激活的页面失败才影响它自己：保留 dev 上现有的版本（产品需求 9-1）。
-- **及时生效**：共享页每次都重新生成，不读飞书侧的“未变化”缓存。所以只改了 Cloud 的变量或内容文件，下一次运行也会生效（产品需求第 6 节）。
+- **认出共享页记录**：`Docs` 以 `https://github.com/zilliztech/zdoc/tree/master/shared-docs/` 开头，后面是 `<组>/pages/<页面标识>`，末尾可以带一个 `/`。
+  - Phase 1 只认 `guides` 组。
+  - 以下情况，这一行都失败（`OWNERSHIP_CONFIG_MISSING`）：
+    - 页面目录在 master 上不存在、组不对，或地址写法不对；
+    - canonical 记录的 `Docs` 既不是飞书文档链接，也不是页面目录地址。不能把它当成 `section` 处理，`guidesPlacementType` 现在就是这样做的。
+- **按飞书文档 ID 工作的模块**：05b“开关”一节的表列出了已知的 8 个文件。计划中逐个说明怎样处理，再在全仓库搜一遍 `doc_token`，确认没有遗漏。还要在计划中写清两件事：
+  - 换掉链接后，增量抓取计划会把旧 ID 看成“记录删除”。要查清这会触发什么（删除输出？删除译文？），并避免它发生。
+  - 快照 `guides-uat-last-success.json` 中共享页记录的格式。WP8 的 PR 校验会读这个快照。
+- **在哪里生成**：渲染这一张 Guides 表时，对共享页记录调用 `shared-docs build --page <页面标识>`，把两个手册的 MDX 放到飞书渲染这一页时本来要放的路径。
+  - 渲染任务要有 milvus-docs 跟踪分支的检出，要求与 WP8 相同：本地分支、完整历史。
+  - Cloud 页面清单用这次运行的组装基线，与 WP8 读 dev 的方式一致。
+- **front matter**：
+  - `token: shared-<页面标识>`（技术设计 05 的“页面身份”）；
+  - `custom_edit_url` 指向 milvus-docs 跟踪分支上原文的编辑页：`https://github.com/milvus-io/milvus-docs/edit/<跟踪分支>/<source.file>`。WP4 的站点适配要能接受这个字段，计划中说明怎样传入。
+  - `sidebar_label`、`sidebar_position` 按飞书记录填写。
+- **及时生效**：组装身份（`guides-assembly-identity.js`）与缓存判断，要把 `shared-docs/guides/` 的内容和各页 lock 中的上游 commit 算进去。它们变了，增量计划就要把共享页所在的表标为需要重新渲染。
 
-### 交接（只对已激活的页面）
+### 交接（WP9a）
 
-1. **页面 MDX**：在 `_assemble-guides.yml` 中恢复共享页的产物，用 Git 生成的 MDX 替换组装目录中同一路径上的文件，两个手册分别替换。导航仍按飞书记录生成，与技术设计 05b 中的“导航（Phase 1）”相同。
-2. **记录文件**：
-   - 按技术设计 05 的格式，写到 `generated/en/manifests/shared-pages/<页面标识>.json`，与页面 MDX 在同一个 dev 提交中；
+1. **`active.json`**：Fetch 按表格生成，放在 `generated/en/manifests/shared-pages/guides/active.json`，格式见 05b。
+   - 激活后的第一次 Fetch 加入一项：`feishu_token` 取自上一次成功的快照中这条记录的飞书文档 ID，`anchors` 的算法见下文。之后的运行照抄。
+   - 已在清单中的页面，`Docs` 被改回飞书链接时，Fetch 失败（`OWNERSHIP_REVERTED`），页面保持 Git 版。
+2. **记录文件**：按技术设计 05 的格式，写到 `generated/en/manifests/shared-pages/guides/<页面标识>.json`，与 MDX、`active.json` 在同一个 dev 提交中。
    - `inputs` 中的摘要都按实际读到的字节计算；
    - `outputs` 是最终写入 dev 的 MDX 的摘要。
 3. **图片**：
-   - 沿用 Fetch 的 `media_upload_mode`：`write` 时，把存储中还没有的对象按 `shared/<摘要>.<扩展名>` 上传，上传后读回核对摘要；`skip` 时只算地址；
-   - 已存在的对象不覆盖；
-   - 任何一张失败，这次运行不写 dev，报 `PUBLISH_IMAGE_UPLOAD_FAILED`。
-4. **已采用的图片不变**：上一次的记录文件中记过的图片，把“原地址 → 摘要”作为 `recorded` 传给 WP5。原地址内容变了时，沿用记录的摘要，发飞书卡片通知文档工程师（`IMAGE_SOURCE_CHANGED`，不算错误）。
-5. **重新生成比对**：写 dev 之前，按记录文件中的输入，在一个干净的目录中重新生成，与 `outputs` 的摘要逐个比对。不一致时这次运行不写这一页，报 `PUBLISH_REGEN_MISMATCH`，指出不一致的文件。
-6. **编辑入口**：生成的页面在 front matter 中加 `custom_edit_url`，指向 milvus-docs 跟踪分支上原文的编辑页（`https://github.com/milvus-io/milvus-docs/edit/<跟踪分支>/<source.file>`）。这样预览与网站上的“编辑此页”指向真正的源文件，而不是生成的 MDX（技术设计 05 的“源 PR”一行，技术设计 07 的 front matter 表）。WP4 的站点适配要能接受这个字段，计划中说明怎样传入。
+   - 沿用 Fetch 的 `media_upload_mode`：
+     - `write` 时，把存储中还没有的对象按 `shared/<摘要>.<扩展名>` 上传，上传后读回核对摘要；
+     - `skip` 时只算地址。
+   - 已存在的对象不覆盖。
+   - 任何一张上传失败，这次运行不写 dev（`PUBLISH_IMAGE_UPLOAD_FAILED`）。
+   - MDX 中的图片地址要带上 zdoc 现有的图片基地址 `IMAGE_BED_URL`，因为 WP5 返回的是相对路径 `shared/...`。
+4. **Fetch 中的激活检查**（9-1 的 Fetch 部分）：
+   - 能生成；
+   - 图片与链接都能解析；
+   - 记录的发布目标与路径与 `page.yaml` 的 `publish` 一致（`OWNERSHIP_PATH_MISMATCH`）；
+   - 被其他页面链接的锚点都在 Git 版中（见下文）。
 
-### dev 上的保护
+   任何一项不通过，报 `ACTIVATE_CHECK_FAILED`：这一页保留 dev 上现有的版本，用飞书卡片通知文档负责人，其他页面照常发布。
 
-有 PR 修改 dev 中已激活页面的生成结果（MDX 或记录文件）时，检查失败，报 `PUBLISH_REGEN_MISMATCH`，指出应改的源文件：`shared-docs/guides/pages/<页面标识>/` 或 milvus-docs 的原文。判断依据是 `active.json` 与记录文件中的 `outputs` 摘要。由哪个现有检查承担，在计划中提出，例如站点校验中的 “Gate dev-owned paths”。Fetch 自己写 dev 的提交要能通过。
+### 保住指向已激活页面的链接（WP9a）
+
+- **转换**：渲染其他飞书页面时，链接中的文档 ID 等于 `active.json` 中某一项的 `feishu_token`，就换成 `./<页面标识>`。
+  - 带块 ID 时，按 `anchors` 换成锚点；块 ID 不在 `anchors` 中时，只指到页面顶部，并在运行摘要中列出。
+  - 可以复用现有的 `--linkShim`。计划中说明 `active.json` 怎样传到渲染各张表的任务中。
+- **`anchors` 的计算**：在激活后的第一次 Fetch 中进行。
+  1. 从上一次抓取的飞书原文中，找出被其他页面链接到的标题块；
+  2. 按飞书版的标题，用 zdoc 现有的算法算出锚点；
+  3. 在 Git 版中找同一个锚点。
+
+  有找不到的，激活检查不通过，`detail` 中列出链接所在的页面。计划中要说明：上一次的飞书原文在这次运行中从哪里取（缓存、dev 还是快照）；怎样知道哪些块被链接过，因为现有的 `outgoing_tokens` 只记文档 ID，不记块 ID。
+
+### 写 dev 前的保护（WP9b）
+
+1. **重新生成比对**：写 dev 之前，按记录文件中的输入，在一个干净的目录中重新生成一遍，与 `outputs` 的摘要逐个比对。不一致时这一页不写，报 `PUBLISH_REGEN_MISMATCH`，指出不一致的文件。比对放在哪一步，在计划中提出。
+2. **已采用的图片不变**：上一次的记录文件中记过的图片，把“原地址 → 摘要”作为 `recorded` 传给 WP5。原地址的内容变了时，沿用记录的摘要，并发飞书卡片通知文档工程师（`IMAGE_SOURCE_CHANGED`，不算错误）。
+
+### 试点的激活
+
+WP9a 合并后，Delete Entities 按以下步骤激活：
+
+1. 用 `shared-docs build` 生成 Git 版，与 dev 中现有的 MDX 手工比较（比较运行由 WP14 提供）；
+2. 文档负责人确认；
+3. 在表格中换掉 `Docs`；
+4. 等下一次 Fetch，或手动运行一次。
+
+这一步由推动者与文档负责人在真实环境中进行，不交给 Agent。
 
 ## 要覆盖的编号
 
-| 编号 | 怎样测 |
-|---|---|
-| `5-3` | 图片存储中已有的对象不覆盖；同一张图被两个版本、两个页面引用时只上传一次；在回放测试中，一页的图片换了之后，旧对象仍在 |
-| `T06` | 回放测试中激活一篇合成的页面，组装后的站点试构建通过。检查 Tabs 可切换、语言完整，锚点、导航、链接、图片、编辑入口都正确；缺图、图片字节变化、不认识的写法都让这一页失败 |
-| `PUBLISH_IMAGE_UPLOAD_FAILED`（从 WP14 改归 WP9） | 上传失败、上传后读回的摘要不一致，各一个样例；这次运行不写 dev |
-| `PUBLISH_REGEN_MISMATCH`（从 WP14 改归 WP9） | 写 dev 前重新生成不一致；PR 修改了 dev 中已激活页面的 MDX；PR 修改了记录文件，各一个样例 |
-| `IMAGE_SOURCE_CHANGED`（从 WP14 改归 WP9） | 记录中的图片在原地址被同名覆盖：沿用记录的摘要，发出通知，不失败 |
+| 编号 | PR | 怎样测 |
+|---|---|---|
+| `3-6` | 9a | 页面目录已合并、表格中的 `Docs` 仍是飞书链接：Fetch 照常用飞书版，dev 与改动前逐字节相同 |
+| `9-1`（Fetch 部分） | 9a | 生成失败、图片或链接解析失败、发布目标或路径不一致、被链接的锚点不在 Git 版中，各一个样例：这一页保留 dev 上现有的版本，其他页面照常发布 |
+| `9-2` | 9a | 回放测试中激活一篇合成的页面：MDX、导航、记录文件、`active.json` 在同一个 dev 提交中 |
+| `9-3` | 9a | `active.json` 中的页面，`Docs` 改回飞书链接：Fetch 失败，页面保持 Git 版 |
+| `9-6` | 9a | 激活后，导航的位置、顺序、标签仍来自飞书记录；指向它的 `ref` 记录照常有效 |
+| `9-9` | 9a | 一篇飞书页面中有两处链接指向被激活的页面，一处不带锚点、一处带块 ID：渲染结果分别是 `./<页面标识>` 与正确的锚点；激活之后新出现的块 ID 指到页面顶部，并在摘要中列出 |
+| `5-3` | 9a | 图片存储中已有的对象不覆盖；同一张图被两个版本、两个页面引用时只上传一次；一页的图片换了之后，旧对象仍在 |
+| `T06` | 9a | 回放测试中激活后，组装后的站点试构建通过：Tabs 可切换、语言完整，锚点、导航、链接、图片、编辑入口都正确；缺图、图片字节变化、不认识的写法都让这一页失败 |
+| `PUBLISH_IMAGE_UPLOAD_FAILED` | 9a | 上传失败、上传后读回的摘要不一致，各一个样例；这次运行不写 dev |
+| `ACTIVATE_CHECK_FAILED` | 9a | 见 `9-1` |
+| `OWNERSHIP_PATH_MISMATCH` | 9a | 记录的发布路径与 `publish[].path` 不同 |
+| `OWNERSHIP_CONFIG_MISSING` | 9a | 页面目录不存在；组不是 `guides`；`Docs` 既不是飞书链接也不是页面目录地址 |
+| `OWNERSHIP_REVERTED` | 9a | 见 `9-3` |
+| `PUBLISH_REGEN_MISMATCH` | 9b | 写 dev 前重新生成的结果不一致。PR 修改 dev 的情况由 WP14 补测试 |
+| `IMAGE_SOURCE_CHANGED` | 9b | 记录中的图片在原地址被同名覆盖：沿用记录的摘要，发出通知，不失败 |
 
-另外两条不对应编号，但要有测试：
+`pending.json` 中的归属：
 
-- **候选失败不影响 Fetch**：一篇没激活的共享页生成失败，Fetch 其余部分照常成功，运行摘要中列出错误。
-- **没有 `active.json` 时什么都不交接**：dev 与合并前逐字节相同，只多了这次运行的候选产物。
+- 上表中除 `5-3`、`T06`、`9-9` 以外的编号，现在都登记为 WP14，改为由 WP9 覆盖；
+- `9-9` 是新增的编号，WP8c 复制需求清单时已经按 WP9 登记。
+
+另外两条不对应编号，但也要有测试：
+
+- **及时生效**：只改 Cloud 的变量、飞书没有变化时，下一次运行重新生成这一页，并更新记录文件。
+- **没有共享页记录时什么都不变**：表格中没有页面目录地址时，一次 Fetch 写入 dev 的内容与改动前逐字节相同。
 
 ## 完成的定义
 
-- [ ] `pnpm test:shared-docs`、`pnpm test:workflow-policy`、`pnpm test:replay` 与 `pnpm test:for-change` 给出的全部命令通过；`pnpm typecheck` 通过
-- [ ] 回放测试：在隔离的本地 Git 远端上，用一份合成的 `active.json` 激活一篇合成的页面，一次 Fetch 在同一个 dev 提交中写入 MDX 与记录文件；再改一次 Cloud 的变量，下一次运行重新生成并更新这两样
-- [ ] 没有激活任何页面时，Fetch 写入 dev 的内容与合并前逐字节相同
-- [ ] 在 fork 中手动运行一次 Fetch 的候选部分（不写 dev、不上传图片），把运行链接写进 PR 说明。不能运行时说明原因
+- [ ] `pnpm test:shared-docs`、`pnpm test:workflow-policy`、`pnpm test:replay`，以及 `pnpm test:for-change` 给出的全部命令都通过；`pnpm typecheck` 通过
+- [ ] 回放测试：在隔离的本地 Git 远端上，用一份合成的飞书表格快照，把一篇合成页面的 `Docs` 换成页面目录地址。一次 Fetch 在同一个 dev 提交中写入 MDX、记录文件与 `active.json`；另一篇飞书页面指向它的链接与锚点都正确。再改一次 Cloud 的变量，下一次运行重新生成这一页并更新记录文件
+- [ ] 表格中没有页面目录地址时，Fetch 写入 dev 的内容与合并前逐字节相同
 - [ ] PR 说明按[实现指南第 5 节](../README.md#pr-说明的格式)的六个部分写，“How to try it”演示回放测试
 
-## 计划中要回答、并请 zdoc 文档负责人确认的事
+## 计划中要回答的事
 
-实施计划 6.1 节把下面两项留给 zdoc 维护者。WP9 的计划要基于 zdoc 现有的代码给出具体方案；计划审阅时，推动者把计划转给文档负责人确认，确认后才开始实现。
+计划要基于 zdoc 现有的代码给出具体方案，推动者审阅后才开始实现。
 
-1. **Fetch 的接入点**：
-   - 生成共享页的任务放在哪里、需要哪些检出与密钥；
-   - 共享页的产物怎样进入 `_assemble-guides.yml`，参照各表渲染结果的恢复方式；
-   - 组装身份、缓存、检查点、覆盖率检查（如 `validate-guides-coverage.js`）中，哪些要认得共享页，哪些先不动、留给 WP14。
-2. **重新生成比对的接法**：
-   - 写 dev 前的比对放在哪一步；
-   - dev 上的保护由哪个现有检查承担。
-3. **图片存储**：
-   - 复用哪段现有的上传代码；
-   - `shared/` 前缀下的对象是否会被存储的生命周期规则清理（产品需求 5-3 要求不能）。
+1. **按飞书文档 ID 工作的模块**：逐个说明怎样处理；换掉链接后“记录删除”会带来什么后果；快照中共享页记录的格式。
+2. **在哪里生成**：在 Guides 表渲染的哪一步调用，需要哪些检出与密钥；BYOC 手册中的同一页怎样放进去。
+3. **组装身份与缓存**：哪些地方要把共享页的输入算进去。
+4. **链接**：`active.json` 怎样传给各张表的渲染任务；计算 `anchors` 用的上一次飞书原文从哪里取；怎样知道哪些块被链接过。
+5. **图片**：复用哪段现有的上传代码；在哪一步上传；`shared/` 前缀下的对象会不会被存储的生命周期规则清理（产品需求 5-3 要求不能清理）。
+6. **重新生成比对**（WP9b）：放在写 dev 前的哪一步。
 
 ## 不做
 
-- placement type `git`、`active.json` 的生成、激活前的“比较”运行、归属规则（飞书让路、不许重复、旧任务遵守归属）：WP14。WP9 只在组装时让 Git 的结果替换同一路径上飞书渲染的文件。WP14 接入后，飞书会跳过 `git` 记录，同一路径上再出现两个来源时改为报 `OWNERSHIP_DUPLICATE_PATH`。
+- 以下归 WP14：激活前的“比较”运行；旧任务遵守归属（全量抓取、旧缓存、删除清单、恢复）；同一路径有两个来源；下线；拦截修改 dev 中生成结果的 PR。
+- 在 Fetch 中为未激活的页面生成候选：PR 校验（WP8b）与比较运行（WP14）已经覆盖。
 - 翻译清单读记录文件、恢复脚本、缓存的身份：WP15。
-- 两版合并：WP11。两个版本不同的页面，按 WP8 的做法拒绝，并作为这一页的失败处理。
-- 中文站：Phase 1 共享页只发英文站的 Guides 与 BYOC。
+- 两版合并：WP11。两个版本不同的页面，按 WP8 的做法拒绝，作为这一页的失败处理。
+- `guides` 以外的组、SDK Reference：由其他工作包做。它们会复用本工作包的 `active.json`、记录文件、图片上传与重新生成比对，所以这些代码不要写死 Guides。
+- 中文站：Phase 1 的共享页只发英文站的 Guides 与 BYOC。
 
 ## 已知的坑
 
-- Fetch 很长，中位 69 分钟，而且与 Translation 共用串行队列 `docs-production-dev`。改动要能在回放测试中验证，不靠真实运行来试。
-- 组装阶段有严格的身份核对（`guides-assembly-identity.js` 等）。共享页的产物要纳入它，不能绕开。
-- 生成共享页时的 dev 基线，要与这次运行的组装基线是同一个提交，否则链接查找用到的 Cloud 页面清单可能不一致。
+- Fetch 很长，中位 69 分钟，而且与 Translation 共用串行队列 `docs-production-dev`。改动要能在回放测试中验证，不要靠真实运行来试。
+- 组装阶段有严格的身份核对（`guides-assembly-identity.js` 等）。共享页的输入要纳入核对，不能绕开。
+- 飞书页面之间的链接找不到目标时，现在只打一行日志，链接变成普通文字，运行不会失败。所以 `9-9` 的测试要检查渲染结果中的链接本身，不能只看运行是否成功。
+- 生成共享页时用的 dev 基线，要与这次运行的组装基线是同一个提交，否则链接查找用到的 Cloud 页面清单可能不一致。
 - 图片下载在 GitHub 的 runner 上通常很快，但仍要用 WP8 的 `--image-timeout`，不要把超时写死。
-- 要另起进程的测试，按 [#824](https://github.com/zilliztech/zdoc/pull/824) 设 120 秒的文件级时限。
+- 需要另起进程的测试，按 [#824](https://github.com/zilliztech/zdoc/pull/824) 设 120 秒的文件级时限。
