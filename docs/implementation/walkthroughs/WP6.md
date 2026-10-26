@@ -47,7 +47,7 @@ WP6 检查**生成后的页面**，出现规则文件 `product-names.yaml` 中�
    3. 用到的片段；
    4. 用到的变量的值。
 
-   每处找到的位置报一条 `PRODUCT_NAME_FOUND`，指向作者要改的文件与行号；变量的命中指向 `shared-docs/Variables.json` 与键名。同一个片段被引用多次，也只报一条。所有输入中都找不到时（写法来自站点适配），报在页面原文上，不给行号。
+   每处找到的位置报一条 `PRODUCT_NAME_FOUND`，指向作者要改的文件与行号；变量的命中指向 `shared-docs/guides/Variables.json` 与键名。同一个片段被引用多次，也只报一条。所有输入中都找不到时（写法来自站点适配），报在页面原文上，不给行号。
 
 ## 一个例子走一遍
 
@@ -61,7 +61,7 @@ example.md:2 PRODUCT_NAME_FOUND  Generated guides page contains "Milvus"
 只报第 2 行。然后在规则文件的 `allow` 中加一个单词 `Milvus`：
 
 ```
-shared-docs/product-names.yaml:4 PRODUCT_NAMES_INVALID  allow entries must contain a space separating two nonempty parts
+shared-docs/guides/product-names.yaml:4 PRODUCT_NAMES_INVALID  allow entries must contain a space separating two nonempty parts
 ```
 
 对三篇试点页的原文运行（内容对齐前，经 WP3 的读取与预处理），每个版本、每个手册的命中数：
@@ -92,7 +92,7 @@ check:
 - 产品名、连接地址、用户名与密码：改成变量；
 - `milvus.yaml` 这类写法：说明这一段讲的是 Cloud 没有的功能，要用变换删掉或替换这一段。
 
-正式的 `shared-docs/product-names.yaml` 在接入第一篇页面时按这份清单建。
+正式的 `shared-docs/guides/product-names.yaml` 在接入第一篇页面时按这份清单建。
 
 ## 自己试一试
 

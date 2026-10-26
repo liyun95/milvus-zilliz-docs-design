@@ -30,7 +30,7 @@ WP8 不写 dev、不上传图片。合并后进入 Fetch、真正发布，是 WP
 ### WP8a：`shared-docs build`
 
 ```bash
-pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs 检出> --dev <zdoc dev 检出> --out <输出目录> [--page <页面标识>] [--image-timeout <秒>]
+pnpm docs-tooling shared-docs build --shared-docs <组目录，如 shared-docs/guides> --repo <milvus-docs 检出> --dev <zdoc dev 检出> --out <输出目录> [--page <页面标识>] [--image-timeout <秒>]
 ```
 
 1. **先读全部配置**：`source.yaml`、`Variables.json`、`links.yaml`、`product-names.yaml`、Tabs 规则，以及每一页的 `page.yaml` 与 `lock.yaml`。即使只生成一页，也要知道全部共享页，因为别的页面可能链接到它。
@@ -57,7 +57,7 @@ pnpm docs-tooling shared-docs build --shared-docs <目录> --repo <milvus-docs �
 
 | | `shared-docs-validate` | `shared-docs-lock` |
 |---|---|---|
-| 什么时候跑 | 每个发往 master 的 PR，打开、更新、重新打开时；也可以被手动触发（由 lock 工作流使用） | 发往 master、并且改了 `shared-docs/pages/**` 的 PR |
+| 什么时候跑 | 每个发往 master 的 PR，打开、更新、重新打开时；也可以被手动触发（由 lock 工作流使用） | 发往 master、并且改了 `shared-docs/*/pages/**` 的 PR |
 | 权限 | 只读，不用任何 secret | 可以向 PR 分支推送、触发其他工作流；只在推送与触发这两步拿到令牌 |
 | 做什么 | 没改 `shared-docs/` 的 PR 约 10 秒通过，不装依赖也不生成；改了的就完整跑一遍 `shared-docs build` | 给还没有 `lock.yaml` 的新页面写入（两个版本都取跟踪分支的最新提交），推送到 PR 分支，再触发校验并等它跑完 |
 | fork 来的 PR | 照常校验（只读） | 不写任何东西，在检查结果中提示“请改从仓库内的分支提交”（`LOCK_FORK_PR`） |

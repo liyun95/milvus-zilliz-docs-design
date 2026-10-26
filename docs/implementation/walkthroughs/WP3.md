@@ -180,13 +180,13 @@ corepack enable && pnpm install --frozen-lockfile
 3. 运行 `inspect`，看到 `Lock: planned (no lock.yaml)`、两个版本的 commit 与展开后的 Markdown。演示用的原文没有命名块，所以清单为空：
 
    ```bash
-   pnpm docs-tooling shared-docs inspect --pages "$wp3_demo/shared-docs/pages" --page delete-entities --repo "$wp3_demo/milvus-docs"
+   pnpm docs-tooling shared-docs inspect --shared-docs "$wp3_demo/shared-docs/guides" --page delete-entities --repo "$wp3_demo/milvus-docs"
    ```
 
 4. 把 `page.yaml` 中的手册改成不存在的名字，再运行上一条命令，看到 `page.yaml:7 … CONFIG_MANUAL_UNKNOWN`，命令以 1 结束：
 
    ```bash
-   sed -i.bak 's/manual: guides$/manual: unknown-manual/' "$wp3_demo/shared-docs/pages/delete-entities/page.yaml"
+   sed -i.bak 's/manual: guides$/manual: unknown-manual/' "$wp3_demo/shared-docs/guides/pages/delete-entities/page.yaml"
    ```
 
 ## 值得读的测试
