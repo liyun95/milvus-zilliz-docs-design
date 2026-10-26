@@ -117,6 +117,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 | `type` | `origin` |
 | `displayed_sidebar` | `default` |
 | `token` | `shared-<页面标识>`，见 [05](./05-publish-handoff.md#页面身份token) |
+| `custom_edit_url` | 指向 milvus-docs 跟踪分支上原文的编辑页，如 `https://github.com/milvus-io/milvus-docs/edit/v3.0.x/site/en/userGuide/insert-and-delete/delete-entities.md`。网站与预览上的“编辑此页”因此指向源文件，而不是生成的 MDX（见 [05](./05-publish-handoff.md#发布保护) 的“源 PR”） |
 | `channel` | 整页只在一边存在时，由飞书表格的 `Release Channel` 决定，见 [04](./04-channels-and-lock.md#只在一个通道存在的页面) |
 
 原文 front matter 中的其他字段（如 Milvus 的 `beta`、`id`）不输出。
