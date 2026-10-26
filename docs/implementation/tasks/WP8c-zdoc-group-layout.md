@@ -1,6 +1,6 @@
 # WP8c `shared-docs/` 按组分目录
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8](./WP8-zdoc-build-and-validate.md) 已合并（WP8b [zilliztech/zdoc#832](https://github.com/zilliztech/zdoc/pull/832)，commit [`8680736`](https://github.com/zilliztech/zdoc/commit/86807361cdca0f2b768f51d7ff47c5b78461bee8)）。要在 [WP9](./WP9-zdoc-fetch-handoff.md) 开工和第一篇试点页面提交之前合并　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8](./WP8-zdoc-build-and-validate.md) 已合并（WP8b [zilliztech/zdoc#832](https://github.com/zilliztech/zdoc/pull/832)，commit [`8680736`](https://github.com/zilliztech/zdoc/commit/86807361cdca0f2b768f51d7ff47c5b78461bee8)）。要在 [WP9](./WP9-zdoc-fetch-handoff.md) 开工和第一篇试点页面提交之前合并　**状态**：已合并（[zilliztech/zdoc#849](https://github.com/zilliztech/zdoc/pull/849)，commit [`e9ab23f`](https://github.com/zilliztech/zdoc/commit/e9ab23fadbedb35b7069b83dd1a92d77b8fbdc49)）
 
 ## 目标
 

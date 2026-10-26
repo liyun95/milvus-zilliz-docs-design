@@ -1,6 +1,6 @@
 # WP9 接入 Fetch：按 `Docs` 链接分流与交接
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8c](./WP8c-zdoc-group-layout.md) 已合并（`shared-docs/guides/` 的目录结构）。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：2026-10-26 按新的激活方式重写了任务卡；按旧卡写的计划（liyun95/zdoc#11）作废，要重写
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8c](./WP8c-zdoc-group-layout.md) 已合并（[zilliztech/zdoc#849](https://github.com/zilliztech/zdoc/pull/849)，commit `e9ab23f`），可以开工。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：2026-10-26 按新的激活方式重写了任务卡；按旧卡写的计划（liyun95/zdoc#11）作废，要重写
 
 ## 目标
 
