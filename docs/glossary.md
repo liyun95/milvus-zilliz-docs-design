@@ -26,10 +26,11 @@
 - **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，Phase 1 由飞书表格的 `Release Channel` 决定，作者不在 zdoc 中写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
 - **接入**：文档工程师开 PR 新增页面目录（`page.yaml`，需要时加 Cloud 内容文件），工具在同一个 PR 中写入 `lock.yaml`。接入后只生成候选结果，不改变网站（见 [04](./design/04-channels-and-lock.md#接入一页)）。
 - **飞书表格（DocsList）**：zdoc 现有的飞书多维表格，Guides 的每一页一条记录，决定导航、发布目标与整页通道。Phase 1 共享页仍在其中保留记录。
-- **placement type**：飞书表格中每条记录的字段，说明这一行在导航中是什么，现有 `canonical`、`section`、`link`、`ref`。Phase 1 新增 `git`，表示这一页由 Git 生成（见 [05b](./design/05b-cutover-and-ownership.md#切换与激活)）。
+- **placement type**：飞书表格中每条记录的字段，说明这一行在导航中是什么，现有 `canonical`、`section`、`link`、`ref`。共享页的记录仍是 `canonical`。
+- **`Docs` 链接**：飞书表格中页面记录的一列，说明这一页的内容在哪里：飞书文档链接，或共享页在 zdoc master 上的页面目录地址。Fetch 按它决定这一页由飞书还是 Git 生成（见 [05b](./design/05b-cutover-and-ownership.md#开关docs-链接)）。
 - **Release Channel**：飞书表格中每条记录的字段，`CURRENT`、`NEXT` 或 `RETIRE-IN-NEXT`，决定整页只在 Prod、只在 UAT 还是两边都显示。Phase 1 共享页的整页通道沿用它。
-- **激活**：一页从飞书切换到 Git 生成。文档负责人先运行比较，再在飞书表格中把 placement type 改为 `git`，一页只做一次（见 [05b](./design/05b-cutover-and-ownership.md#切换与激活)）。与提升无关。
-- **生效配置**：dev 中的 `active.json`，列出已切换到 Git 的页面；由 Fetch 按飞书表格生成，激活后的第一次 Fetch 加入、下线完成时移除，人不手改（见 [05b](./design/05b-cutover-and-ownership.md#生效配置activejson)）。
+- **激活**：一页从飞书切换到 Git 生成。文档负责人先运行比较，再在飞书表格中把这一页的 `Docs` 换成页面目录地址，一页只做一次（见 [05b](./design/05b-cutover-and-ownership.md#切换与激活)）。与提升无关。
+- **生效配置**：dev 中的 `active.json`，每组一份，列出已切换到 Git 的页面及其原来的飞书文档 ID 与被链接的锚点；由 Fetch 按飞书表格生成，激活后的第一次 Fetch 加入、下线完成时移除，人不手改（见 [05b](./design/05b-cutover-and-ownership.md#生效配置activejson)）。
 - **提升（promotion）**：功能上线时，按页把 lock 中 `current` 的 commit 值改成 `next` 的 commit 值，Prod 由此采用 UAT 已在显示的版本。沿用 zdoc 对上线的叫法。
 - **下线**：Phase 1 沿用飞书表格：把这一页的 `Release Channel` 改为 `RETIRE-IN-NEXT`，UAT 先不再显示；发版时删除表格记录与飞书节点，由 Fetch 把它从网站移除；之后用普通 PR 删除页面目录（见 [05b](./design/05b-cutover-and-ownership.md#下线完成)）。
 
@@ -37,7 +38,7 @@
 
 - **Fetch**：zdoc 现有的发布工作流，每天定时运行 3 次，也可以手动触发，一次约 70 分钟；抓取飞书内容、生成共享页，校验后写入 dev（见 [05](./design/05-publish-handoff.md#交接发生在哪里)）。
 - **docs-tooling**：zdoc 中的 `packages/docs-tooling`，是 Fetch 等工作流调用的工具包，入口是 `pnpm docs-tooling`。共享页的生成代码放在其中的 `src/shared-docs/`（见[技术设计 README](./design/README.md#代码位置)）。
-- **候选结果（候选运行）**：不写 dev、不上传图片、不需要 Cloud 凭据的生成，用于 PR 校验，以及激活之前的共享页（见 [05](./design/05-publish-handoff.md#pr-校验)）。
+- **候选结果（候选运行）**：不写 dev、不上传图片、不需要 Cloud 凭据的生成，用于 PR 校验与激活前的比较运行（见 [05](./design/05-publish-handoff.md#pr-校验)）。
 - **dev**：zdoc 存放生成结果的分支，由 Fetch 写入；网站从它构建，Prod 与 UAT 用同一个 dev 提交，部署时才区分。人编写的文件在 master，不在 dev。
 - **stage**：zdoc 现有发布流程中的内容暂存区，生成结果在这里校验后进入发布。
 - **记录文件（receipt）**：每个已切换的共享页在 dev 中的一份记录，说明一次构建用到的输入（按仓库分组）与输出摘要，兼作来源记录；用于追溯、重新生成比对和恢复（见 [05](./design/05-publish-handoff.md#记录文件)）。

@@ -177,7 +177,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP7 | zdoc | 初始链接映射表的生成命令 | 技术设计 02b；不覆盖编号 | WP5 |
 | WP8 | zdoc | WP8a：把读取、链接与图片、站点适配、产品名检查接成一条生成命令，读取 dev 上的飞书表格快照（`GuidesBase` 的真实实现）；WP8b：工作流，接入时写 lock、PR 校验 | `3-2`、`3-3`、`3-4`，T12 的候选部分 | WP4、WP5、WP6；WP8a 在 WP7 之后；WP8b 在 WP8a 之后 |
 | WP8c | zdoc | `shared-docs/` 按组分子目录（Phase 1 只有 `guides`）：命令接收组目录，两个 PR 工作流按组运行；只改路径，不改生成结果 | 不覆盖编号 | WP8b；在 WP9 与第一篇试点页面提交之前 |
-| WP9 | zdoc | Fetch 接入：每次运行生成全部共享页（候选）；对已激活的页面交接：组装时替换、记录文件、图片上传、写 dev 前的重新生成比对；dev 上的保护；回放测试 | 第 6 节“及时生效”“发布保护”，`5-3`，T06，`PUBLISH_IMAGE_UPLOAD_FAILED`、`PUBLISH_REGEN_MISMATCH`、`IMAGE_SOURCE_CHANGED` | WP8；计划与上游 PR 要 zdoc 文档负责人 review |
+| WP9 | zdoc | Fetch 接入：按 `Docs` 链接分流，共享页在 Guides 表渲染时改用 Git 生成；交接：MDX、记录文件、`active.json`、图片上传；保住指向已激活页面的飞书链接；及时生效；Fetch 中的激活检查。WP9b：写 dev 前的重新生成比对、已采用的图片不变 | 第 6 节“及时生效”“发布保护”，`3-6`、`5-3`、`9-1`（Fetch 部分）、`9-2`、`9-3`、`9-6`、`9-9`，T06，`PUBLISH_IMAGE_UPLOAD_FAILED`、`PUBLISH_REGEN_MISMATCH`、`IMAGE_SOURCE_CHANGED`、`ACTIVATE_CHECK_FAILED`、`OWNERSHIP_PATH_MISMATCH`、`OWNERSHIP_CONFIG_MISSING`、`OWNERSHIP_REVERTED` | WP8c |
 
 ### 4.2 Phase 1b
 
@@ -187,7 +187,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP11 | zdoc | 两版合并与 `channel` 变换 | `6-1`–`6-7`，T13 | WP10 |
 | WP12 | zdoc | 上游更新：发现、每页一个 PR、影响报告 | `7-1`–`7-10`，T05 | WP11 |
 | WP13 | zdoc | 提升工作流 | `8-1`–`8-4` | WP11 |
-| WP14 | zdoc | 激活与下线：placement type `git`、比较运行、`active.json`、归属检查 | `3-6`、`9-1`–`9-8`、`10-1`–`10-4`，发布与切换中其余的错误码（`RECOVER_INPUT_MISSING` 归 WP15），T07 | WP9 |
+| WP14 | zdoc | 比较运行；旧任务遵守归属；同一路径两个来源；下线；拦截修改 dev 中生成结果的 PR | `9-1`（比较部分）、`9-4`、`9-5`、`9-7`、`9-8`、`10-1`–`10-4`，`OWNERSHIP_DUPLICATE_PATH`、`OWNERSHIP_WRITE_DENIED`、`RETIRE_DIR_LEFTOVER`，T07 | WP9 |
 | WP15 | zdoc | 翻译、恢复与缓存的接入 | 第 6 节“翻译”“恢复”，T08、T09、T10 | WP14 |
 
 ### 4.3 并行与关键路径
@@ -215,7 +215,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
 | 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 已合并到上游（`zilliztech/zdoc` `8680736`）；WP12、WP13 未开始 | [WP8](./walkthroughs/WP8.md) |
 | 目录结构 | `shared-docs/` 按组分子目录 | WP8c | 任务卡已写，未开始 | — |
-| 发布与切换 | 接入 Fetch；激活与下线；翻译与恢复 | WP9、WP14、WP15 | WP9 任务卡已写，计划要 zdoc 文档负责人确认；WP14、WP15 未开始 | — |
+| 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9 任务卡于 2026-10-26 按 `Docs` 链接分流重写，计划要重写；WP14、WP15 未开始 | — |
 
 ## 5. 任务卡
 
@@ -235,7 +235,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP7 | [生成初始链接映射表](./tasks/WP7-zdoc-links-seed.md) |
 | WP8 | [生成命令与 PR 校验](./tasks/WP8-zdoc-build-and-validate.md) |
 | WP8c | [`shared-docs/` 按组分目录](./tasks/WP8c-zdoc-group-layout.md) |
-| WP9 | [接入 Fetch：生成与交接](./tasks/WP9-zdoc-fetch-handoff.md) |
+| WP9 | [接入 Fetch：按 `Docs` 链接分流与交接](./tasks/WP9-zdoc-fetch-handoff.md) |
 
 其余的在对应工作包开始前写，写完由推动者确认。
 

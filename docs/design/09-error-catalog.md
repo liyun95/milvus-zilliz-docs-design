@@ -134,9 +134,9 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `OWNERSHIP_DUPLICATE_PATH` | 同一个输出路径既有飞书页面又有 Git 页面 | 生成失败 |
 | `OWNERSHIP_PATH_MISMATCH` | 飞书记录的发布目标或路径与 `publish` 不一致 | 该页生成失败 |
 | `OWNERSHIP_WRITE_DENIED` | 飞书任务试图改写或删除已切换的页面 | 失败，页面保持不变 |
-| `ACTIVATE_CHECK_FAILED` | 比较时，或标为 `git` 后的 Fetch 中，激活前的检查不通过；`detail` 中列出是哪一项 | 比较时：不应激活；Fetch 中：这一页保留现有版本 |
-| `OWNERSHIP_CONFIG_MISSING` | 飞书表格标为 `git`，但没有对应的页面目录 | 这一页生成失败，保留现有版本；补回目录，或先删表格记录 |
-| `OWNERSHIP_REVERTED` | `active.json` 中的页面，placement type 被改回其他值 | Fetch 失败，页面保持 Git 版；把表格改回 `git` |
+| `ACTIVATE_CHECK_FAILED` | 比较时，或 `Docs` 换成页面目录地址后的 Fetch 中，激活前的检查不通过，包括被其他飞书页面链接的锚点在 Git 版中找不到；`detail` 中列出是哪一项 | 比较时：不应激活；Fetch 中：这一页保留现有版本 |
+| `OWNERSHIP_CONFIG_MISSING` | 飞书表格中记录的 `Docs` 既不是飞书文档链接，也不是存在的页面目录地址 | 这一页生成失败，保留现有版本；改正链接、补回目录，或先删表格记录 |
+| `OWNERSHIP_REVERTED` | `active.json` 中的页面，`Docs` 被改回飞书链接 | Fetch 失败，页面保持 Git 版；把 `Docs` 改回页面目录地址 |
 | `RETIRE_DIR_LEFTOVER` | 表格记录已删除，页面目录还在 | 不算错误，不生成这一页，运行摘要中提示删除目录 |
 | `IMAGE_SOURCE_CHANGED` | 已记录的图片在原地址的内容变了（同名覆盖） | 不算错误，沿用记录中的图片，通知文档工程师 |
 

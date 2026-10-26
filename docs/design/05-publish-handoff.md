@@ -19,8 +19,8 @@
 | 顺序 | 做什么 | 是否交接 |
 |---|---|---|
 | 1. PR 合并前 | PR 校验：生成一遍候选结果，检查能否合并（见下文） | 否，不写 dev |
-| 2. 合并后，Fetch 运行 | 新增的“生成共享页”步骤与抓取飞书正文并行；工具代码与 `shared-docs/` 都从 master 读取，不必等 master→dev 同步 | — |
-| 3. 交接 | 生成的页面 MDX 放进 Guides 的临时组装目录，与飞书渲染出的 MDX 放在一起；同时交出记录文件与图片 | 是 |
+| 2. 合并后，Fetch 运行 | Fetch 照常读飞书表格；`Docs` 指向页面目录的记录（见 [05b](./05b-cutover-and-ownership.md#开关docs-链接)）不抓飞书正文，在渲染这一张表时改用 `shared-docs build` 生成；工具代码与 `shared-docs/` 都从 master 读取，不必等 master→dev 同步 | — |
+| 3. 交接 | 生成的页面 MDX 放在飞书渲染这一页时本来要放的位置，之后的组装、身份核对、检查点都照常进行；同时交出记录文件与图片 | 是 |
 | 4. 现有发布流程 | 导航生成、校验、试构建、打包，上传图片，写入 dev | — |
 
 #### 触发时机
@@ -62,10 +62,10 @@ zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更�
 | 交接物 | 是什么 | 放在哪 | 谁用 |
 |---|---|---|---|
 | 页面 MDX | 每个手册一份，两个版本已合并 | 先放进 Guides 的临时组装目录，最终写入 dev 中该手册的内容目录 | 站点构建、路由插件、翻译 |
-| 记录文件 | 每页一份 JSON，记录这次生成用了哪些输入、产出了什么 | dev 中的 `generated/en/manifests/shared-pages/<页面标识>.json` | 翻译清单、覆盖率检查、重新生成比对、恢复 |
+| 记录文件 | 每页一份 JSON，记录这次生成用了哪些输入、产出了什么 | dev 中的 `generated/en/manifests/shared-pages/<组>/<页面标识>.json` | 翻译清单、覆盖率检查、重新生成比对、恢复 |
 | 图片 | 按内容摘要命名的图片文件 | zdoc 现有的图片存储 | 页面 MDX 引用 |
 
-只有已激活的页面才交接、写入 dev。激活之前，这三样只存在于 Fetch 的临时产物中（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
+只有已激活的页面才交接、写入 dev。Fetch 不为还没激活的页面生成；激活之前的生成结果只出现在 PR 校验与比较运行中（见 [05b](./05b-cutover-and-ownership.md#切换与激活)）。
 
 ### 页面 MDX
 
@@ -99,9 +99,10 @@ zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更�
 
 ```
 generated/en/manifests/shared-pages/
-  active.json              # 生效配置：已切换到 Git 的页面清单（见 05b）
-  delete-entities.json     # 每个已激活的页面一份记录文件
-  openai.json
+  guides/                  # 每组一个目录
+    active.json            # 生效配置：已切换到 Git 的页面清单（见 05b）
+    delete-entities.json   # 每个已激活的页面一份记录文件
+    openai.json
 ```
 
 以 Filtered Search 为例（示意）：
@@ -159,7 +160,7 @@ generated/en/manifests/shared-pages/
 | `channel` | 整页通道：`null`（两个版本都有这一页）、`next` 或 `retire-in-next` | 与 front matter 一致，供核对 |
 | `notes[]` | 生成时的提示，例如“两个版本的 front matter 不同，已沿用 current” | 审核与排查 |
 
-- 只有已激活的页面才有记录文件；切换前的候选结果只存在于 Fetch 的临时产物中。
+- 只有已激活的页面才有记录文件。
 - 用到来源记录的地方（覆盖率检查、翻译清单、归属检查）改为同时读取飞书记录与这些记录文件。
 - 记录文件用于追溯，不是签名或授权。
 
@@ -216,7 +217,7 @@ generated/en/manifests/shared-pages/
 ### 缓存与运行
 
 - 同一仓库的同一 commit 只检出一次；每个源文件只解析一次，只展开实际用到的部分。
-- 缓存身份包含记录文件中的全部输入与生效配置，冷、热构建的结果一致；飞书侧的“内容未变”不能跳过 Git 输入的变化。
+- 缓存身份包含记录文件中的全部输入与生效配置，冷、热构建的结果一致；飞书侧的“内容未变”不能跳过 Git 输入的变化。zdoc 现在判断能否复用上一次组装结果的 `scripts/docs-workflow/guides-assembly-identity.js` 只看飞书快照、导航与工具文件，要把 `shared-docs/<组>/` 的内容与各页 lock 中锁定的上游 commit 一起算进去；增量抓取计划也要据此把共享页所在的表标为要重新渲染。
 - 展开深度、体积、下载并发和超时都设上限，沿用原发布队列。
 
 ## 出错时

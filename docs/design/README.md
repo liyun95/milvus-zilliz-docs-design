@@ -29,7 +29,7 @@ packages/docs-tooling/src/shared-docs/
   adapters/    按 commit 读 milvus-docs、调 md2md、图片、GitHub；飞书表格复用 lark/ 的读取
   commands/    build、check、lock、compare、upstream-plan、promote-plan，注册到 cli-main.ts
   fixtures/    测试用的合成 milvus-docs 仓库、试点页输入与基准输出
-packages/docs-tooling/src/lark/guidesBaseRecordSemantics.js   # placement type 加一个值
+packages/docs-tooling/src/lark/                                # 认得 Docs 指向页面目录的记录；链接按 active.json 换算
 .github/workflows/shared-docs-*.yml       # 只负责触发与权限，调用 pnpm docs-tooling shared-docs …
 ```
 
@@ -73,9 +73,9 @@ packages/docs-tooling/src/lark/guidesBaseRecordSemantics.js   # placement type �
 | 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/guides/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
 | 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/guides/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
 | 版本记录 `lock.yaml` | zdoc master `shared-docs/guides/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
-| 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch，按飞书表格生成 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
-| placement type、`Release Channel` | 飞书表格（DocsList）中每页的记录 | 文档负责人、文档工程师 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
-| 记录文件 `<页面标识>.json` | zdoc dev `generated/en/manifests/shared-pages/` | Fetch | [05](./05-publish-handoff.md#记录文件) |
+| 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/<组>/` | Fetch，按飞书表格生成 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
+| `Docs` 链接、`Release Channel` | 飞书表格（DocsList）中每页的记录 | 文档负责人、文档工程师 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
+| 记录文件 `<页面标识>.json` | zdoc dev `generated/en/manifests/shared-pages/<组>/` | Fetch | [05](./05-publish-handoff.md#记录文件) |
 | 页面 MDX | zdoc dev 各手册的内容目录 | Fetch | [05](./05-publish-handoff.md#页面-mdx) |
 | 图片 | zdoc 现有的图片存储，按内容摘要命名 | Fetch | [02b](./02b-links-and-images.md#图片)、[05](./05-publish-handoff.md#图片上传) |
 

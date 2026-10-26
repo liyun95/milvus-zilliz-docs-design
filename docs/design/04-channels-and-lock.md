@@ -53,9 +53,9 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 读取
 |---|---|---|
 | `lock.yaml` | Git 生成时，Prod 与 UAT 各用 Milvus 原文的哪个版本 | 本篇 |
 | `page.yaml` | 拿到原文后怎样加工 | [02](./02-page-config.md) |
-| 飞书表格（placement type、`Release Channel`） | 网站上这一页用 Git 生成的版本还是飞书的版本；整页在哪一边显示。只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md) |
+| 飞书表格（`Docs` 链接、`Release Channel`） | 网站上这一页用 Git 生成的版本还是飞书的版本；整页在哪一边显示。只在 Phase 1 过渡时存在 | [05b](./05b-cutover-and-ownership.md) |
 
-激活之前，Git 照样按 `lock.yaml` 生成两个版本，只是作为候选结果，网站上仍是飞书版；`lock.yaml` 的变化要等激活之后才体现在网站上。
+激活之前，PR 校验与比较运行照样按 `lock.yaml` 生成两个版本，只是作为候选结果，网站上仍是飞书版；`lock.yaml` 的变化要等激活之后才体现在网站上。
 
 ### 两个版本怎样合并成一页
 
@@ -127,7 +127,7 @@ milvus-docs 有新提交时，工具每天自动开 PR，把受影响页面的 `
 
 Phase 1 下线沿用飞书表格（见 [05b](./05b-cutover-and-ownership.md#下线完成)）：`Release Channel` 改为 `RETIRE-IN-NEXT`，发版时删除表格记录与飞书节点，Fetch 把这一页从网站移除。之后文档工程师开一个普通 PR，删除 `shared-docs/guides/pages/<页面标识>/`。
 
-- 要先删表格记录、再删目录。目录先删时，表格中仍标为 `git`，这一页生成失败，网站保留现有的版本。
+- 要先删表格记录、再删目录。目录先删时，表格中的 `Docs` 仍指向它，这一页生成失败，网站保留现有的版本。
 - 表格记录已删除、目录还在时，PR 校验与 Fetch 提示删除目录，不生成这一页。
 - 还没激活的页面不再需要时，同样用普通 PR 删除目录，网站上的版本照现有做法在飞书中处理。
 
