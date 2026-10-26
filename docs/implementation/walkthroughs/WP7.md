@@ -4,7 +4,7 @@
 
 ## 解决什么问题
 
-Milvus 原文中的站内链接写的是 Milvus 的文件名，如 `boolean.md`。WP5 生成页面时按四步把它换成 Cloud 的页面；第 2 步查的是全站一份的链接映射表 `shared-docs/links.yaml`（[产品需求场景 5](../../prd.md#场景-5链接与图片)）。这张表一开始是空的。只靠同名页面，User Guide 中被链接的 181 个 Milvus 页面要人逐个登记 121 个。
+Milvus 原文中的站内链接写的是 Milvus 的文件名，如 `boolean.md`。WP5 生成页面时按四步把它换成 Cloud 的页面；第 2 步查的是 Guides 组的链接映射表 `shared-docs/guides/links.yaml`（[产品需求场景 5](../../prd.md#场景-5链接与图片)）。这张表一开始是空的。只靠同名页面，User Guide 中被链接的 181 个 Milvus 页面要人逐个登记 121 个。
 
 WP7 提供一条一次性的命令 `shared-docs links-seed`，替文档工程师起草这张表：
 
@@ -121,7 +121,7 @@ corepack enable && pnpm install --frozen-lockfile
    ```
 
    ```bash
-   pnpm docs-tooling shared-docs links-seed --repo "$seed/milvus-docs" --commit "$(git -C "$seed/milvus-docs" rev-parse HEAD)" --dev "$seed/zdoc-dev" --out "$seed/links.yaml"
+   pnpm docs-tooling shared-docs links-seed --shared-docs shared-docs/guides --repo "$seed/milvus-docs" --commit "$(git -C "$seed/milvus-docs" rev-parse HEAD)" --dev "$seed/zdoc-dev" --out "$seed/links.yaml"
    ```
 
    结果在 `$seed/links.yaml`。
@@ -135,7 +135,7 @@ corepack enable && pnpm install --frozen-lockfile
 
 ## 刻意没做的
 
-- **提交正式的 `shared-docs/links.yaml`**：要等文档工程师审核候选表，另开 PR。
+- **提交正式的 `shared-docs/guides/links.yaml`**：要等文档工程师审核候选表，另开 PR。
 - **BYOC 手册与中文页面**：Phase 1 的初始表只按英文 Guides 生成。
 - **生成页面时按标题自动匹配**：只在这里给候选，生成时不用（产品需求 5-7）。
 
