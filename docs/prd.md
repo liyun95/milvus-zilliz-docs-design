@@ -467,6 +467,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 |---|---|
 | 目录名等于这一页现有的 slug，只用小写字母、数字和连字符 | `/delete-entities` 对应目录 `delete-entities` |
 | 不写 `lock.yaml` | 工具写入；要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可 |
+| `metadata.beta` 照抄这一页现在的标签。工具不读飞书表格的 `Beta`，漏写就变成 `FALSE`，标签会消失 | StructArray 现在是 Public Preview，写 `beta: PUBLIC`；查 dev 上这一页 front matter 的 `beta` |
 | 正文的标题和章节结构随原文，不在配置中重复 | — |
 | Phase 1 只能接入飞书目录中已有节点的页面；全新的页面先在飞书表格和目录中建好记录与节点。导航位置、顺序、标签在飞书目录中调整。导航迁到 Git 后取消这条限制 | 要移动这一页，在飞书目录中操作，并同步修改 `publish[].path` |
 | PR 要从 zdoc 仓库内的分支提交 | 来自 fork 的 PR，工具无权写入 `lock.yaml` |
@@ -495,7 +496,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 </details>
 
-**不做与已知局限**：front matter 中的 `keywords`、`hide_title`、`hide_table_of_contents` 不开放。接入后、激活前在哪里看到生成的页面，见[第 7 节](#7-待确认的问题)。
+**不做与已知局限**：front matter 中的 `keywords`、`hide_title`、`hide_table_of_contents` 不开放。激活后，飞书表格的 `Beta` 对这一页不再生效，改标签（如 GA 后去掉 Public Preview）要改 `page.yaml`。接入后、激活前在哪里看到生成的页面，见[第 7 节](#7-待确认的问题)。
 
 **验收**：T06、T12（预览部分）。
 
