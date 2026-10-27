@@ -45,7 +45,7 @@
 | `publish[].path` | 是 | 页面在手册中的路径；Phase 1 与飞书节点一致 | 同上 |
 | `metadata.title` | 否 | 默认取原文的 `title` | 同上 |
 | `metadata.description` | 否 | 默认取原文的 `summary` | 同上 |
-| `metadata.beta` | 否 | `FALSE`（默认）、`PUBLIC`、`PRIVATE`、`ON REQUEST`、`NEAR DEPRECATE`、`DEPRECATED`、`CONTACT SALES`；以 zdoc 的标签定义为准 | 同上 |
+| `metadata.beta` | 否 | `FALSE`（默认）、`PUBLIC`、`PRIVATE`、`ON REQUEST`、`NEAR DEPRECATE`、`DEPRECATED`、`CONTACT SALES`；以 zdoc 的标签定义为准。照抄这一页现在的标签，漏写就是 `FALSE` | 同上 |
 | `transforms[].operation` | 是 | `add`、`replace`、`remove` | [场景 4](./prd.md#场景-4写-cloud-的差异) |
 | `transforms[].target.block` | 是 | 命名块 ID | 同上 |
 | `transforms[].target.language` | 否 | 代码块的语言名，如 `python`、`javascript`、`bash`、`shell`；只用于代码组 | 同上 |
