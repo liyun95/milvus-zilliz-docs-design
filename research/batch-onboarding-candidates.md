@@ -1,4 +1,4 @@
-# 下周共享页批量接入候选调研（2026-10-27）
+# 共享页批量接入候选调研（2026-10-27）
 
 建议把 **View Collections、Alter Collection Field、StructArray Overview、VarChar Field、RRF Ranker** 作为 2026-11-02 至 11-08 的 **5 篇内容对齐后接入批次**。它们均有明确的上游修正未反映到 Cloud，没有 Cloud 独有业务章节，快照均为 `current`，Guides/BYOC 均有现存页面。Delete Entities 按已完成试点排除。
 
