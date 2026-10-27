@@ -1,6 +1,6 @@
 # WP9 接入 Fetch：按 `Docs` 链接分流与交接
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8c](./WP8c-zdoc-group-layout.md) 已合并（[zilliztech/zdoc#849](https://github.com/zilliztech/zdoc/pull/849)，commit `e9ab23f`），可以开工。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：2026-10-26 按新的激活方式重写了任务卡；按旧卡写的计划（liyun95/zdoc#11）作废，要重写。2026-10-27 按计划审阅改为：在抓取原文的任务中生成并上传图片；`anchors` 在激活的这次运行中重新抓取旧文档来算；记录文件增加 `inputs.dev` 与 `inputs.fetch`
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP8c](./WP8c-zdoc-group-layout.md) 已合并（[zilliztech/zdoc#849](https://github.com/zilliztech/zdoc/pull/849)，commit `e9ab23f`），可以开工。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：2026-10-26 按新的激活方式重写了任务卡；按旧卡写的计划（liyun95/zdoc#11）作废，要重写。2026-10-27 按计划审阅改为：在抓取原文的任务中生成并上传图片；`anchors` 在激活的这次运行中重新抓取旧文档来算；记录文件增加 `inputs.dev` 与 `inputs.fetch`。WP9a 已开上游 PR（[zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)），待文档负责人审；NEXT 内容中标题的跳转问题记为 [zilliztech/zdoc#864](https://github.com/zilliztech/zdoc/issues/864)，不在 WP9 范围
 
 ## 目标
 

@@ -215,7 +215,8 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
 | 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 已合并到上游（`zilliztech/zdoc` `8680736`）；WP12、WP13 未开始 | [WP8](./walkthroughs/WP8.md) |
 | 目录结构 | `shared-docs/` 按组分子目录 | WP8c | 已合并到上游（`zilliztech/zdoc` `e9ab23f`） | — |
-| 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9 任务卡于 2026-10-26 按 `Docs` 链接分流重写，已请 agent 重写计划（liyun95/zdoc#11）；WP14、WP15 未开始 | — |
+| 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9a 已开上游 PR（`zilliztech/zdoc#863`，待文档负责人审）；WP9b 在 WP9a 合并后开始；WP14、WP15 未开始 | — |
+| 试点页接入 | Delete Entities 的原文对齐与页面配置 | 内容（不属于工作包） | milvus-docs 原文已对齐（`milvus-io/milvus-docs#3719`、`#3722`）；zdoc 已接入（`zilliztech/zdoc#861`，lock 锁在 `3e6b749`）；等 WP9a 合并后激活 | — |
 
 ## 5. 任务卡
 
