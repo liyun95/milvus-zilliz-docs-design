@@ -157,9 +157,13 @@ zdoc 原有的很多代码默认每条 canonical 记录都有飞书文档 ID。W
    - `delete-entities.json` 记录文件；
    - `active.json`，其中一项是 `delete-entities`。
 5. **部署 UAT**，验收页面：8 种语言的代码 Tabs、连接处显示 `YOUR_CLUSTER_ENDPOINT`、“编辑此页”指向 milvus-docs 的原文。
-6. **确认 `active.json` 里有这一页、UAT 验收通过后**，再停用原来的飞书文档。之后其他页面指向它的链接只靠 `active.json` 换算。
+6. **确认 `active.json` 里有这一页、UAT 验收通过后**，可以停用原来的飞书文档。[zilliztech/zdoc#884](https://github.com/zilliztech/zdoc/pull/884) 之后，这一步只是内容整理（避免有人再链接到旧文档的块），Fetch 不再依赖它；其他页面指向它的链接只靠 `active.json` 换算。
 
 建议激活前先跑一次不换链接的 Fetch，确认它写入 dev 的结果正常，再换链接。这样激活出了问题，不会与其他改动混在一起。
+
+实际的激活：Delete Entities 在 2026-10-27 的运行 `40517911974` 中激活，dev 提交 [`010552860`](https://github.com/zilliztech/zdoc/commit/010552860) 中同时有两份页面、记录文件与 `active.json`；Manage Partitions 中指向它的锚点链接换成了 `./delete-entities#delete-entities-from-partitions`。在此之前的第一次尝试失败了，见下文“审阅与真实运行中发现的问题”。
+
+**只能改 Guides 表格中的链接。** 这条激活通路只接到了英文 Guides：SDK 参考的表格记录换成 GitHub 地址后不会激活，反而会让那一组的生成失败；REST 参考没有飞书链接。SDK Reference 的激活方式另行设计。
 
 ## 自己试一试
 
@@ -201,6 +205,7 @@ pnpm test:replay:shared-pages
 - **`active.json` 只记一个飞书文档 ID**：同一篇文档如果被人用另一种链接格式引用，激活后不会被换算。改为记录全部别名，放在 WP9b。
 - **每次运行都完整克隆 milvus-docs**：页面少时不影响，激活的页面多起来之前要加缓存。
 - **合并后的第一次 Fetch 会慢一些**：组装身份把新增的模块算了进去，第一次会重新渲染全部 Guides 表，结果应与之前相同。
+- **失效链接报告把指向已激活页面的链接列为 “missing canonical”**：`guides-broken-content-links.json` 的检查不知道旧的飞书文档 ID 已由共享页接管。页面中的链接本身是对的，只是报告误报，放在 WP9b。
 
 ## 审阅与真实运行中发现的问题
 
@@ -209,8 +214,13 @@ pnpm test:replay:shared-pages
 | 删掉已激活的记录时，Fetch 在组装时反复失败，说不清原因（P1-1） | zdoc 文档负责人读代码 | `dd64b581c`：抓取原文时先核对 `active.json` 中的每条记录，不在或不再是可发布的 canonical 记录，就报 `OWNERSHIP_REVERTED`，见第 1 节 |
 | SDK 参考的 6 个 Drive 表格生成失败（P0） | 文档负责人的只生成不发布的真实 Fetch（运行 `40438506088`） | `cf376e013`：Drive 表格的文档 ID 恢复原来的写法，见第 2 节。新增的回归测试把真实格式的表格记录一路跑到写出文件，只模拟飞书的响应 |
 | 中文 Guides 抓取报 341/342 不完整 | 同一次运行 | 不是 WP9 引起的：一条中文记录被同事有意换成了 wiki 之外的独立 docx，原有代码不支持这种文档。修复单独提交为 [zilliztech/zdoc#867](https://github.com/zilliztech/zdoc/pull/867)，先于 #863 合并 |
+| 合并后第一次正式发布，两个中文单元在发布前的中文站点构建中失败 | 运行 `40475497180` | 不是 WP9 引起的：同一天合并的 [zilliztech/zdoc#866](https://github.com/zilliztech/zdoc/pull/866) 需要 Node 22.12 以上，`fetch-docs.yml` 固定用 22.6。[#878](https://github.com/zilliztech/zdoc/pull/878) 保留了完整的验证日志，[#880](https://github.com/zilliztech/zdoc/pull/880) 改成 Node 22 |
+| 第一次激活失败：旧飞书文档的缓存与新的共享页来源对应同一条记录，按记录查找时有歧义；保留旧版时又因为快照中的 `output_paths` 总是空的，一个文件都没保留下来 | 换链接后的运行 `40508619925`（没有写 dev，页面仍是飞书版） | [zilliztech/zdoc#882](https://github.com/zilliztech/zdoc/pull/882)：查找时只取共享页那一份；保留的文件改为按旧来源在目录中的位置推出 |
+| 激活之后，每一次全量 Fetch 都失败：旧文档缺少正文块，被完整性检查拦下 | 激活后的定时运行 `40558320151` | [zilliztech/zdoc#884](https://github.com/zilliztech/zdoc/pull/884)：已激活记录的旧文档不再重抓、不再写入，完整性检查跳过它；停用旧文档因此不再是必需的一步 |
 
 原有的测试没有发现 P0：Drive 的单元测试直接填好了文档 ID 映射，命令行测试把抓取和写出都换成了模拟。因此，以后改动飞书记录的解析，合并前要先对一个 SDK 分组跑一次只生成不发布的 Fetch。
+
+回放测试也没有发现后两个问题：回放的输入是合成的，没有旧文档缓存与新来源并存的状态，快照的 `output_paths` 也是填好的；激活之后只跑了指定页面的抓取，没有再跑一次全量。后两个问题由 zdoc 文档负责人在真实运行中定位并修复。
 
 ## 证据
 
@@ -218,3 +228,4 @@ pnpm test:replay:shared-pages
 - 审阅人在 `35176d996` 上重跑 shared-docs、共享页回放、工作流规则检查与类型检查，结果相同；P1-1 的修复（`dd64b581c`）跑过 `pnpm test:for-change` 选出的全部检查，包括 `test:replay:all`（2026-10-27）。
 - zdoc 文档负责人在 `35176d996` 上独立重跑了主要测试，并确认不换 `Docs` 链接时这些改动完全不生效。他的只生成不发布的真实 Fetch（运行 `40438506088`）发现了上表中的 P0。
 - 修复后，agent 的 `pnpm test:replay:all` 65 项全部通过；文档负责人把 #863 与 #867 合在一起（`99e51b9fc`）重跑真实 Fetch（运行 `40458642814`），成功后合并。
+- 生产上：不换链接的运行 `40475497180` 中，英文 Guides 与全部 SDK 正常发布，Delete Entities 仍是飞书版；#882 之后的运行 `40517911974` 激活了 Delete Entities；#884 之后的运行 `40611109266` 带着已激活的页面成功，页面没有变化。
