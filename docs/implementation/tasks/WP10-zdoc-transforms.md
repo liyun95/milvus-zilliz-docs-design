@@ -1,6 +1,6 @@
 # WP10 变换：命名块、语言、代码行三级的 add / replace / remove
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP4](./WP4-zdoc-site-adaptation.md)、[WP8](./WP8-zdoc-build-and-validate.md)、[WP9](./WP9-zdoc-fetch-handoff.md) 已合并（WP9a [zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)，commit [`8289d74`](https://github.com/zilliztech/zdoc/commit/8289d7451b85a710ab5f075640a7ebec63752739)）。从最新的 master 开分支　**状态**：进行中（计划已批准，[liyun95/zdoc#13](https://github.com/liyun95/zdoc/pull/13)）
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP4](./WP4-zdoc-site-adaptation.md)、[WP8](./WP8-zdoc-build-and-validate.md)、[WP9](./WP9-zdoc-fetch-handoff.md) 已合并（WP9a [zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)，commit [`8289d74`](https://github.com/zilliztech/zdoc/commit/8289d7451b85a710ab5f075640a7ebec63752739)）。从最新的 master 开分支　**状态**：已合并（[zilliztech/zdoc#900](https://github.com/zilliztech/zdoc/pull/900)）
 
 ## 目标
 
