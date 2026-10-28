@@ -33,6 +33,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
   - `https://github.com/zilliztech/zdoc/tree/master/shared-docs/` 开头：共享页，组与页面标识取自路径，不抓飞书正文，改用 Git 生成的结果；导航仍按这条记录生成；
   - 其他写法：这一行失败（`OWNERSHIP_CONFIG_MISSING`）。
 - 地址在浏览器中打开就是这一页的源文件目录，编辑可以直接从表格找到它。
+- Phase 1 只有 Guides 表接入了这个开关：共享页的路由只在抓取英文 Guides 原文的任务中启用，页面目录地址只认 `shared-docs/guides/pages/`。SDK Reference 表的记录换成 GitHub 地址不会激活，反而会让那一组生成失败；REST Reference 没有飞书链接。SDK Reference 的激活另行设计。
 
 共享页的记录没有飞书文档 ID。zdoc 现有的代码默认每条 `canonical` 记录都有这个 ID，下面这些模块都要认得共享页的记录：按共享页处理，或者明确报错，不能悄悄跳过。
 
@@ -80,7 +81,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
 - **它有四个用处**：
   - Git 中有一份可以追溯的记录；
   - dev 上的检查不调用飞书，就能拦住改写已激活页面的提交；
-  - Fetch 每次把表格与上一次的清单对比，发现 `Docs` 被改回飞书链接时失败（见下文“出错时”）；
+  - Fetch 每次把表格与上一次的清单对比，发现已激活的记录被改回飞书链接、被删除或不再是可发布的 `canonical` 记录时失败（见下文“出错时”）；
   - 其他飞书页面指向这一页的链接，靠它换算（见下文）。
 - 飞书退出时，`active.json` 可以直接改为正式来源，不再从表格生成。
 
@@ -104,7 +105,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
 
 1. **比较。** 文档负责人手动发起一次“比较”运行，指定这一页。运行把两份 MDX 逐个手册比较：一份是按 `lock.yaml` 与 `page.yaml` 生成的 Git 版本（两个版本已合并），一份是 dev 中这一页现有的 MDX，也就是网站当前的内容。差异中单独列出锚点的变化（飞书版中的锚点在 Git 版中没有了，以及其中哪些被其他页面链接）。同时做激活前的检查：能生成；图片与链接都能解析；飞书表格记录的发布目标与路径与页面配置一致。差异与检查结果写进这次运行的结果（如运行摘要或可下载的产物），不写 dev。比较运行做好之前，试点页面用 `shared-docs build` 生成，与 dev 中的 MDX 手工比较。
 2. **确认。** 文档负责人看过差异，确认飞书最近的修改已反映到 Git 中（或这一页已在飞书暂时冻结），并确认候选结果已审核。这两项由人判断，工具不检查。
-3. **激活。** 文档负责人在飞书表格中把这一页记录的 `Docs` 换成页面目录地址。原来的飞书文档保留、不再编辑，不要删除。
+3. **激活。** 文档负责人在飞书表格中把这一页记录的 `Docs` 换成页面目录地址。原来的飞书文档保留、不再编辑；激活完成前不要删除，第一次激活要读它算出锚点。激活完成、网站验收后，可以把它停用（如移出目录、标注已迁移），这只是内容整理，避免有人再链接到它的块；已激活记录的旧文档，Fetch 不再重新抓取、也不检查它的完整性（[zilliztech/zdoc#884](https://github.com/zilliztech/zdoc/pull/884)），所以不依赖这一步。
 4. **下一次 Fetch 同一个提交写入。** Fetch 读到这条记录，再做一遍第 1 步的检查，并算出 `anchors`。通过后，在同一个 dev 提交中写入 `active.json`、两个手册的 MDX、导航与记录文件；从这次提交起，飞书不再生成这一页。不通过时，这一页保留 dev 中现有的版本（第一次激活时就是飞书版），不退回飞书重新生成，并发飞书卡片通知文档负责人。
 5. **部署。** 站点部署在激活之后进行，不与激活在同一个事务中；失败时走既有的重试或镜像回滚，编辑来源仍是 Git，不自动交回飞书。
 
@@ -119,7 +120,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
 | 飞书让路 | 这条记录不再指向飞书文档，Fetch 不抓它的飞书正文；原来的飞书文档被修改或删除，都不能改写或删除这一页的输出与译文 |
 | 不许重复 | 同一个输出路径既有飞书页面又有 Git 页面时，生成失败 |
 | 旧任务遵守归属 | 飞书全量抓取、旧缓存、删除清单和恢复任务都不能改变已迁移的页面；重复路由或 ID、错误来源的写入和删除直接失败；未迁移页面照常更新。Milvus 侧若仍有飞书导入任务，也要撤销它对已迁移共享原文的覆盖能力 |
-| 不切回飞书 | Phase 1 不提供切回飞书：`active.json` 中的页面，`Docs` 被改回飞书链接时 Fetch 失败。激活后出了问题，用 dev 的恢复流程或镜像回滚处理（见 [05](./05-publish-handoff.md#恢复)） |
+| 不切回飞书 | Phase 1 不提供切回飞书：`active.json` 中的页面，`Docs` 被改回飞书链接，或记录被删除、不再是可发布的 `canonical` 记录时，Fetch 在抓取原文时就失败（`OWNERSHIP_REVERTED`）。激活后出了问题，用 dev 的恢复流程或镜像回滚处理（见 [05](./05-publish-handoff.md#恢复)） |
 
 ### 导航（Phase 1）
 
@@ -168,7 +169,7 @@ Phase 1 下线沿用飞书表格现有的做法，与其他页面相同（zdoc `
 | 比较时检查不通过（不能生成、图片或链接无法解析、表格记录不一致） | 运行结果中列出，不应激活 |
 | `Docs` 换成页面目录地址后，Fetch 检查不通过（包括被链接的锚点在 Git 版中找不到） | 这一页保留 dev 中现有的版本，通知文档负责人 |
 | `Docs` 既不是飞书文档链接，也不是存在的页面目录地址 | 这一页生成失败，保留 dev 中现有的版本 |
-| `active.json` 中的页面，`Docs` 被改回飞书链接 | Fetch 失败，页面保持 Git 版；要切回飞书不在 Phase 1 范围内 |
+| `active.json` 中的页面，`Docs` 被改回飞书链接，或记录被删除、placement type 不再是 `canonical`、`Progress` 改成不发布 | Fetch 失败（`OWNERSHIP_REVERTED`），页面保持 Git 版；恢复表格中的记录。要切回飞书不在 Phase 1 范围内 |
 | zdoc 中按飞书文档 ID 工作的模块遇到没有 ID 的共享页记录，又不认得它 | 失败，不能悄悄跳过这一行 |
 
 ## 例子
