@@ -1,5 +1,7 @@
 # 共享页批量接入候选调研（2026-10-27）
 
+> **状态（2026-10-28）**：本报告推荐的 5 篇中，View Collections、Alter Collection Field、StructArray Overview、VarChar Field 已在 milvus-docs 对齐（milvus-io/milvus-docs#3733–#3742）并接入 zdoc（zilliztech/zdoc#872），正在激活；RRF Ranker 暂停，等 WP10 与图片存储检查（P1-2）。下一批从第 6 名起选。报告的结论保持写作时的原样，固定输入的 milvus-docs 提交 `d631183` 早于上述对齐。
+
 建议把 **View Collections、Alter Collection Field、StructArray Overview、VarChar Field、RRF Ranker** 作为 2026-11-02 至 11-08 的 **5 篇内容对齐后接入批次**。它们均有明确的上游修正未反映到 Cloud，没有 Cloud 独有业务章节，快照均为 `current`，Guides/BYOC 均有现存页面。Delete Entities 按已完成试点排除。
 
 **这不是 5 篇可以原样切换的页面。** 按“凡 Cloud 有而 Milvus 无的内容都算 Cloud-only”的严格口径，其中 4 篇仍有 **37 个新增语言代码块**，RRF 还有 Go/cURL 占位待补齐；必须先把可共用示例回补到 Milvus、对齐正文，再接入。若本批要求完全不做上游内容对齐、也不用 WP10，则本次没有足够证据推荐满足条件的 5–10 篇，不能为了凑数把缺失代码说成零成本。下面把“独有业务章节”和“上游缺失的通用代码/图片”分别列出，后者同样属于接入前的阻断项。
