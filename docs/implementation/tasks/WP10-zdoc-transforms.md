@@ -59,8 +59,8 @@
 
 - 只能是 `page.yaml` 所在目录中的文件，路径用 `realpath` 检查，不能用 `..` 或符号链接逃出这个目录（`TRANSFORM_CONTENT_NOT_FOUND`）。
 - 不能有命名块标记，也不能有手写的 `<Tabs>`、`<TabItem>`、`<Admonition>`（`TRANSFORM_CONTENT_MARKUP`）。
-- **产品过滤**：沿用 zdoc 飞书侧的写法和语义（`lark/larkDocWriter.js` 的 `categorize_node`、`__filter_content`）。`<include target="…">`、`<exclude target="…">` 与 `</include>`、`</exclude>` 各占一行，可以嵌套；Guides 的目标是 `zilliz.saas`，BYOC 是 `zilliz.paas`。只在插入的内容上执行，按手册分别执行。实现时不要引用 `lark/`，在 `core/` 中按同样的语义重写，并用测试对照飞书侧的结果。
-- 图片：外部图片地址交给现有的图片阶段处理。页面目录中的图片文件这次不做，遇到时明确报错，不能静默丢掉；用哪个现有错误码，在计划中提出。
+- **产品过滤**：沿用 zdoc 飞书侧的写法和语义（`lark/larkDocWriter.js` 的 `categorize_node`、`__filter_content`）。`<include target="…">`、`<exclude target="…">` 与 `</include>`、`</exclude>` 各占一行，可以嵌套。飞书侧的当前目标是 Guides `zilliz.saas`、BYOC `zilliz.paas`，按 `.` 拆成词后逐个比较，所以标签中写一个词，如 `saas`、`paas`、`zilliz`；嵌套按栈正确配对，不照搬 `categorize_node` 中提前结束跳过的计数写法；标签不配对时报 `TRANSFORM_CONTENT_MARKUP`。只在插入的内容上执行，按手册分别执行。实现时不要引用 `lark/`，在 `core/` 中按同样的语义重写，并用测试对照飞书侧的结果。
+- 图片：外部图片地址交给现有的图片阶段处理。页面目录中的图片文件这次不做，遇到时报 `TRANSFORM_CONTENT_MARKUP`，指向内容文件中的那一行，说明可以改用外部图片地址；不能静默丢掉。
 
 **`channel`。** 只做到产品需求与技术设计 02 已经写明的部分：
 
@@ -82,7 +82,7 @@
 | `4-2` | Markdown 块上写 `language`，或 `lines` 没有 `language`：`TRANSFORM_TARGET_KIND`；单个代码块和带切换栏的代码组都按代码组处理 |
 | `4-3` | 定位行缩进 8 个空格、新内容有两级缩进：写入后分别是 8 和 12 个空格；Tab 缩进的原文写入后仍是 Tab；替换、删除后不留多余空行 |
 | `4-4` | 给代码组加 `shell`：Tabs 按规则排序，显示为 Zilliz CLI；删掉 Python：`TABS_REQUIRED_MISSING` |
-| `4-5` | 内容文件中的变量取 Cloud 的值；片段展开；Milvus 写法的提示框转成 `Admonition`；`.md` 链接按 `links.yaml` 改写；`<include target="zilliz.paas">` 只出现在 BYOC 的输出中 |
+| `4-5` | 内容文件中的变量取 Cloud 的值；片段展开；Milvus 写法的提示框转成 `Admonition`；`.md` 链接按 `links.yaml` 改写；`<include target="paas">` 中的内容只出现在 BYOC 的输出中 |
 | `4-6` | 同一份原文，`page.yaml` 中有没有变换，md2md 给 Milvus 站点的输出都相同 |
 | `T04` | 用 OpenAI 的凭证参数作真实用例，在每种语言中验证代码行的 `replace` 与 `add`，覆盖 T04 列出的全部失败情况。fixture 在 [`fixtures/pilots/openai`](https://github.com/zilliztech/zdoc/tree/master/packages/docs-tooling/src/shared-docs/fixtures/pilots/openai) 的原文上加命名块标记，只放在测试 fixture 中 |
 | 16 个错误码 | `TRANSFORM_TARGET_NOT_FOUND` 到 `TRANSFORM_CHANNEL_INVALID`，以及 `LINE_NOT_FOUND`、`LINE_AMBIGUOUS`、`LINE_TOO_MANY`、`LINE_INVALID`：每个至少一个失败用例，放在 `fixtures/errors/` 下，断言错误码、文件与行号 |
