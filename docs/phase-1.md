@@ -135,7 +135,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 ### 6.2 切换前必须核实的运行条件
 
 - 候选页的拟议修订适用于目标产品和 SDK 版本，尤其是 Filtered Search 的 top-K 与 limit、结果说明和图片，以及各篇补齐的语言。
-- 外部 Jenkins 的实际触发、审批、UAT / Prod 接线和运行版本。
+- 外部 Jenkins 的实际触发、审批、UAT / Prod 接线和运行版本。已核实的部分（2026-10-28，zdoc README）：UAT 与 Prod 由外部 Jenkins 用同一个 dev 提交构建，整页通道由运行时的 `ZDOC_RELEASE_CHANNEL` 决定（UAT 为 `next`，Prod 为 `current`）；Phase 1a 每页的 `current` 与 `next` 相同，所以 Prod 部署包含激活提交的 dev 版本时，共享页随之上线，不需要另外的流水线。谁在什么时候触发 Prod 部署，仍要与 zdoc 维护者确认。
 - Git 分支保护、工作流身份和部署权限能否落实发布保护。
 - 图片对象版本、保留策略和镜像回滚窗口，只为确认的缺口补能力。
 - 整页通道（飞书表格的 `Release Channel`，见[技术设计 04](./design/04-channels-and-lock.md#只在一个通道存在的页面)）在共享页各语言译文中的传递方式。
