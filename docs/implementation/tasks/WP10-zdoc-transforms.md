@@ -1,6 +1,6 @@
 # WP10 变换：命名块、语言、代码行三级的 add / replace / remove
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP4](./WP4-zdoc-site-adaptation.md)、[WP8](./WP8-zdoc-build-and-validate.md)、[WP9](./WP9-zdoc-fetch-handoff.md) 已合并（WP9a [zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)，commit [`8289d74`](https://github.com/zilliztech/zdoc/commit/8289d7451b85a710ab5f075640a7ebec63752739)）。从最新的 master 开分支　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP4](./WP4-zdoc-site-adaptation.md)、[WP8](./WP8-zdoc-build-and-validate.md)、[WP9](./WP9-zdoc-fetch-handoff.md) 已合并（WP9a [zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)，commit [`8289d74`](https://github.com/zilliztech/zdoc/commit/8289d7451b85a710ab5f075640a7ebec63752739)）。从最新的 master 开分支　**状态**：进行中（计划已批准，[liyun95/zdoc#13](https://github.com/liyun95/zdoc/pull/13)）
 
 ## 目标
 
@@ -70,9 +70,23 @@
 
 两遍生成结果不同时，`buildPage` 现在会报“two-version merging requires WP11”。这个行为保持不变，两版合并留给 WP11。
 
-**报错的位置。** 原文中的问题指向 milvus-docs 中的文件和行号，现在 `originalPageLine` 已经这样做。插入内容中的问题（链接解析不了、产品名、Tabs）要指向 Cloud 内容文件和它的行号；`content.lines` 中的问题指向 `page.yaml` 中那一项。插入内容之后，后面阶段的行号与原文对不上，要维护一张行号对照表，不能让报错指到错误的文件。
+**报错的位置。** 原文中的问题指向 milvus-docs 中的文件和行号，现在 `originalPageLine` 已经这样做。插入内容中的问题（链接解析不了、产品名、Tabs）要指向 Cloud 内容文件和它的行号；`content.lines` 中的问题指向 `page.yaml` 中那一项。插入内容之后，后面阶段的行号与原文对不上，要维护一张行号对照表，不能让报错指到错误的文件。对照表只覆盖变换、去掉标记、产品过滤这几步；md2md 展开变量与片段后，行数不变时行号要准确，行数变了时不比现在对原文的处理差。不另写一套 md2md 的展开逻辑来追踪行号；要做到完全准确，需要 md2md 提供输出的行号对照，列为后续工作。
 
 **记录文件。** Fetch 写的记录文件已经列出 `shared-docs/guides/` 下的全部文件（`inputs.zdoc.files`），内容文件应当自动包括在内。用一个带内容文件的页面确认这一点；没有包括时，在 PR 中说明，不要自己改 Fetch。
+
+## 计划审阅的决定
+
+在 [liyun95/zdoc#13](https://github.com/liyun95/zdoc/pull/13) 中审定，以 PR 中的[裁决评论](https://github.com/liyun95/zdoc/pull/13#issuecomment-6459791357)为准：
+
+| 问题 | 决定 |
+|---|---|
+| 产品过滤的目标 | 只按飞书侧的拆词语义，标签中写一个词；不接受 `zilliz.paas` 这种带点的完整目标 |
+| 同一位置多条 `add` | 块的前后、同一组定位行的前后都允许，按列表顺序输出；同一种语言增加两次、重复的 `replace` / `remove`、范围相交、上下级重叠报 `TRANSFORM_CONFLICT` |
+| 删除语言 | WP4 不改：只检查必须有的语言，默认语言不在时取第一种可用的语言。删掉代码组中仅剩的一种语言报 `TRANSFORM_TARGET_KIND`，提示改为删除整块 |
+| T04 的证据 | 真实的 OpenAI Python 原文（只加命名块标记）加上标明为合成的多语言用例；PR 中写明哪些部分由合成用例覆盖，真实的多语言证据在 C3 内容对齐后补 |
+| `shared-docs inspect` | 仍只看原文，不改 `commands/inspect.ts`，在 README 中说明 |
+| 页面目录中的图片 | `TRANSFORM_CONTENT_MARKUP`，不用 `IMAGE_NOT_IN_COMMIT` |
+| 合并时机 | 第一批 4 篇在 UAT 验收后，再开上游 PR 并合并 |
 
 ## 要覆盖的编号
 
@@ -110,7 +124,7 @@
 - **块清单的行号**：`inventoryBlocks` 的 `startLine` 是标记后的第一行（从 0 开始），`endLine` 与它的约定不同。先读懂再用，并在测试中覆盖块在文件开头和结尾的情况。
 - **执行顺序**：同一个块上的多条规则（比如前后各加一段）要按列表顺序输出；先算好全部位置再统一写入，不要边改边算，否则后面的行号会偏。
 - **对刚插入的内容再变换**：例如先给代码组加了 `java`，又对 `java` 写了代码行规则。这种情况报 `TRANSFORM_ON_INSERTED`，不要按插入后的内容去匹配。
-- **一个代码组中同一种语言出现两次**：语言级和代码行级的规则都无法确定目标。在计划中提出怎样报错，不要新增错误码。
+- **一个代码组中同一种语言出现两次**（按别名归一后）：语言级和代码行级的规则都无法确定目标，报 `ADAPT_UNSUPPORTED_MARKUP`，指向第二个代码块。
 - **`content.lines` 与 YAML**：`|` 块的末尾有换行，比较和写入前先去掉；行内的注释符号（`#`、`//`）是代码的一部分，不能当成 YAML 注释。
 - **产品名检查的来源**：WP6 按来源（原文、片段、变量、内容文件）报告问题，类型中已有 `content-file`。内容文件中出现 `Milvus` 时，报告的来源要是内容文件。
 - 要另起进程的测试，按 [#824](https://github.com/zilliztech/zdoc/pull/824) 设 120 秒的文件级时限。
