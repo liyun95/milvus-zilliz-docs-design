@@ -237,6 +237,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP8 | [生成命令与 PR 校验](./tasks/WP8-zdoc-build-and-validate.md) |
 | WP8c | [`shared-docs/` 按组分目录](./tasks/WP8c-zdoc-group-layout.md) |
 | WP9 | [接入 Fetch：按 `Docs` 链接分流与交接](./tasks/WP9-zdoc-fetch-handoff.md) |
+| WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 
 其余的在对应工作包开始前写，写完由推动者确认。
 
