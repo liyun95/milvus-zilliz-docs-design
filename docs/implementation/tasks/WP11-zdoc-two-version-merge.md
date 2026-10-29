@@ -1,6 +1,6 @@
 # WP11 两版合并与 `channel`
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP10](./WP10-zdoc-transforms.md) 已合并（[zilliztech/zdoc#900](https://github.com/zilliztech/zdoc/pull/900)）。从最新的 master 开分支　**状态**：实现已审阅（[liyun95/zdoc#14](https://github.com/liyun95/zdoc/pull/14)），待开上游 PR
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP10](./WP10-zdoc-transforms.md) 已合并（[zilliztech/zdoc#900](https://github.com/zilliztech/zdoc/pull/900)）。从最新的 master 开分支　**状态**：已合并（[zilliztech/zdoc#921](https://github.com/zilliztech/zdoc/pull/921)，commit [`8404678`](https://github.com/zilliztech/zdoc/commit/8404678a8ec6dc91c890b367b6c243426bd4cd80)）
 
 ## 目标
 
