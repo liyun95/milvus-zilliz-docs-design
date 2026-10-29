@@ -194,6 +194,31 @@ transforms:
 - PR 中列出改动的页面与生成结果的差异；新增、删除、改名的页面及因此改变的地址；产品名警告；新出现的模块。
 - 生成失败时 PR 照样开，标明失败原因；dev 上保持已采用的版本。
 
+### 为什么 current 和 next 一起更新
+
+Guides 分开 current 与 next，是因为 Milvus 的功能文档常写在 Cloud 上线之前：新参数先出现在 UAT，等 Cloud 发版时再进 Prod。SDK Reference 的情况不同：
+
+| | Guides | SDK Reference |
+|---|---|---|
+| 写的是什么 | 产品功能，Milvus 与 Cloud 上线的时间不同 | 已经发布的 SDK 的接口 |
+| 上游何时更新 | 功能开发期间就会写 | SDK 发版之后，如 “Update milvus-sdk-rust API Reference to v3.0.3” |
+| 读者看到文档时 | 功能可能还没在 Cloud 上线 | SDK 已经能从 crates.io 安装 |
+
+- **仍有检查的时间：** UAT 与 Prod 构建同一个 dev，Prod 只在发版时更新。上游更新 PR 合并后，下一次 Fetch 就能在 UAT 上看到，下次发版才进 Prod。只有要让内容跨过几次发版都不进 Prod 时，才需要 next。
+- **工程上更简单：** 整本手册一个 lock，current 与 next 不同时，每页的差异都要成对输出，整本手册的提升也要另外设计。一起更新，Rust 就不涉及两版合并与提升。
+- **以后可以再开：** `lock.yaml` 本来就有两个字段，只是 Phase 1 让它们相同；需要时再分开，两版合并可以直接复用。
+
+**放弃了什么：** SDK 已经支持、Zilliz Cloud 服务端还没开放的功能，会随下次发版进 Prod。按现有 SDK Reference 的做法处理：
+
+| 情况 | 做法 | 例子 |
+|---|---|---|
+| Cloud 只对部分用户开放 | `metadata` 中把 `beta` 设为 `ON REQUEST` 或 `PRIVATE` | 各 SDK 的 Snapshots |
+| Cloud 不支持整页或整个模块 | `exclude`；支持后再删掉这一项 | ResourceGroup |
+| 页面中一两个参数 Cloud 不支持 | `transforms` 中 `remove` | `replica_number` |
+| 这次上游更新整体都还不能上 | 暂不合并上游更新 PR | — |
+
+做不到的只有“同一页 Prod 显示旧内容、UAT 显示新内容”。对 SDK Reference 来说，旧内容对应旧版本的 SDK，读者升级 SDK 后反而是错的，所以很少需要。
+
 ## 场景 R4：上线
 
 **用户故事**：作为文档工程师，接入的配置合并后，我知道 Rust 什么时候、经过哪些步骤出现在 Cloud 网站上。
@@ -216,7 +241,7 @@ transforms:
 | 页面里的 `token` 填什么 | 每个 zdoc 页面的 front matter 都有 `token`（原本是飞书文档 ID）和 `type`（来源类型）。Rust 没有飞书文档，照已上线的 Guides 共享页，填 `token: shared-rust-<模块>-<文件名>`、`type: origin`。请确认翻译、修订记录、侧边栏等工具不要求它是真实的飞书 ID | |
 | dev 上的初始内容 | 新手册第一次 Fetch 前，dev 上要先有页面、侧边栏、清单文件三样（原因见场景 R4）。照 C++ 的先例，我们准备一个分支，请文档负责人检查后放进 dev；中文侧边栏是否也要放 | |
 | 页面内删除内容 | Cloud 不暴露的参数（如 `replica_number`、`resource_groups`），在 web-content 中用命名块标出，`manual.yaml` 的 `transforms` 中写 `remove`。命名块是 HTML 注释，milvus.io 不显示。Phase 1 只支持 `remove`。需要 web-content 的维护者配合加标记 | |
-| Phase 1 不区分 current / next | 上游更新 PR 同时改这两个值。SDK Reference 写的是已经发布的 SDK，不需要先只在 UAT 显示 | |
+| Phase 1 不区分 current / next | 上游更新 PR 同时改这两个值：SDK Reference 写的是已经发布的 SDK，发版前在 UAT 上检查即可（理由见场景 R3）。请确认 Cloud 是否常有“SDK 已发布、Cloud 很久后才支持”的情况；常见的话要重新考虑 | |
 | 以后迁移其他 SDK | 每个 SDK 一个组目录，各有自己的 `source.yaml`、`Variables.json`、lock，与 Fetch 的分组一一对应 | |
 
 ## 分工与节奏
