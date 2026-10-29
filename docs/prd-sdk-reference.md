@@ -194,7 +194,10 @@ transforms:
 - PR 中列出改动的页面与生成结果的差异；新增、删除、改名的页面及因此改变的地址；产品名警告；新出现的模块。
 - 生成失败时 PR 照样开，标明失败原因；dev 上保持已采用的版本。
 
-### 为什么 current 和 next 一起更新
+> **为什么 current 和 next 一起更新：** SDK Reference 写的是已经发布的 SDK，上游在 SDK 发版之后才更新，不需要先只在 UAT 显示；合并后 UAT 马上能看到，下次发版才进 Prod，仍有检查的时间。`lock.yaml` 保留 `current`、`next` 两个字段，都由工具写入、始终相同，格式与 Guides 一致，以后需要时可以再分开。
+
+<details>
+<summary>与 Guides 的对比、这样放弃了什么、怎样应对</summary>
 
 Guides 分开 current 与 next，是因为 Milvus 的功能文档常写在 Cloud 上线之前：新参数先出现在 UAT，等 Cloud 发版时再进 Prod。SDK Reference 的情况不同：
 
@@ -218,6 +221,8 @@ Guides 分开 current 与 next，是因为 Milvus 的功能文档常写在 Cloud
 | 这次上游更新整体都还不能上 | 暂不合并上游更新 PR | — |
 
 做不到的只有“同一页 Prod 显示旧内容、UAT 显示新内容”。对 SDK Reference 来说，旧内容对应旧版本的 SDK，读者升级 SDK 后反而是错的，所以很少需要。
+
+</details>
 
 ## 场景 R4：上线
 
