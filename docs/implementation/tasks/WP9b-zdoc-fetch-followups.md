@@ -52,7 +52,7 @@ WP9b-1 改变已激活页面的生成结果（只少了空行），要单独合�
 
 1. **删除后的空行（4-3）。** 现在删除一个命名块，会连同标记行一起去掉块的内容，块前和块后各留下一个空行，MDX 中出现两个连续的空行。第三批的 Stop 删掉两个块，就多了两个空行。改为删除后只留一个空行，和 `add` 现在的处理（`core/transforms/spacing.ts`）一致。补一个用例：命名块两侧各有一个空行，删除后前后的块之间只剩一个空行；删除位于文件开头和结尾的块时，不留空行。
 2. **`failures` 死代码。** WP11 之后 `buildPage` 不再产生 `BuildFailure`，删掉这个类型和返回值中的 `failures`，以及调用处的处理。行为不变。
-3. **同步需求清单。** 把本仓库的 `requirements.json` 复制为 `spec/requirements.json`。目前只有 `9-3` 的文字不同。
+3. **同步需求清单。** 把本仓库的 `requirements.json` 复制为 `spec/requirements.json`。两份清单的 `9-3`、`OWNERSHIP_REVERTED` 的文字与 `source.prd_commit` 不同，逐字节复制。
 
 ### WP9b-2：Fetch
 
@@ -64,7 +64,7 @@ WP9b-1 改变已激活页面的生成结果（只少了空行），要单独合�
 7. **只在需要锚点时抓取旧文档。** 现在激活时总是重新抓取原来的飞书文档。改为只在有带锚点的链接指向它时才抓取；没有这种链接时，旧文档已经删掉也能激活。WP9a 中有 5 个测试的 fixture 假定总是抓取，按新的条件更新。
 8. **记录文件的 `notes`。** WP11 的 `BuiltPage.notes`（两版 front matter 不同、已沿用 `current`）写进记录文件的 `notes[]`，格式见技术设计 05。
 9. **失效链接报告。** `guides-broken-content-links.json` 把指向已激活页面的飞书链接列为 “missing canonical”。页面中的链接是对的，报告不知道旧的飞书文档 ID 已由共享页接管。改为按 `active.json` 的别名识别这些链接，不再列出。
-10. **编号覆盖。** zdoc 的编号覆盖检查（`spec/coverage.ts`）只扫描 shared-docs 下的 `*.test.ts(x)`。WP9a 的测试在 `scripts/docs-workflow/` 与 `lark/` 中，是 `.js` 文件，所以 `pending.json` 中 `9-1`、`9-2`、`9-3`、`9-6`、`T06`、`ACTIVATE_CHECK_FAILED`、`OWNERSHIP_PATH_MISMATCH`、`OWNERSHIP_CONFIG_MISSING`、`OWNERSHIP_REVERTED`、`PUBLISH_IMAGE_UPLOAD_FAILED` 仍记在 WP14 名下。做法见“决定”第 2 条。
+10. **编号覆盖。** zdoc 的编号覆盖检查（`spec/coverage.ts`）只扫描 shared-docs 下的 `*.test.ts(x)`。WP9a 的测试在 `scripts/docs-workflow/` 与 `lark/` 中，是 `.js` 文件，所以 `pending.json` 中 `9-1`、`9-2`、`9-3`、`9-6`、`ACTIVATE_CHECK_FAILED`、`OWNERSHIP_PATH_MISMATCH`、`OWNERSHIP_CONFIG_MISSING`、`OWNERSHIP_REVERTED`、`PUBLISH_IMAGE_UPLOAD_FAILED` 仍记在 WP14 名下（`T06` 记在 WP9 名下）。做法见“决定”第 2 条。
 
 ## 决定
 
@@ -73,6 +73,22 @@ WP9b-1 改变已激活页面的生成结果（只少了空行），要单独合�
 1. **别名的格式。** 在 `pages[]` 中增加 `feishu_aliases`（字符串数组），包括 `feishu_token` 本身；`feishu_token` 保留不变，旧的读取代码不受影响。格式已写入[技术设计 05b](../../design/05b-cutover-and-ownership.md)。不把 `feishu_token` 改成数组：那样所有读取 `active.json` 的地方都要同时改。
 2. **Fetch 侧测试怎样计入覆盖。** 扩展 `spec/coverage.ts`，同时扫描共享页相关的 `.js` 测试（`scripts/docs-workflow/` 与 `lark/` 中的），在这些测试的标题中写上编号，再把上面的编号从 `pending.json` 中删掉。扫描哪些文件在计划中列出。不只把归属从 WP14 改成 WP9：那样检查看不到它们是否真的有测试。
 3. **只剩一个三级标题时的警告：这次不做。** [产品需求场景 4](../../prd.md#场景-4写-cloud-的差异)已规定作者在删除时一起删掉单独剩下的三级标题，工具不自动删；等出现漏删再加提示。
+
+## 计划审阅的决定
+
+在 [liyun95/zdoc#15](https://github.com/liyun95/zdoc/pull/15) 中审定，以 PR 中的[裁决评论](https://github.com/liyun95/zdoc/pull/15#issuecomment-6489562573)为准。要点：
+
+| 问题 | 决定 |
+|---|---|
+| WP9b-2 改到 shared-docs 与飞书卡片 | 允许小范围修改 `build-page.ts`、`core/handoff/` 中的状态与别名索引，以及 `collect-build-card-notes.js`（让 `IMAGE_SOURCE_CHANGED` 走现有的卡片） |
+| 已有的 `active.json` 补别名 | 允许，只补 `feishu_aliases`，其他字段不变；技术设计 05b 已同步 |
+| 找不到的别名 | 只警告，不冻结页面。只在 `active.json`、同一记录的旧源缓存、dev 上快照文件的历史中查找，不为此调用飞书 |
+| 真实运行 | WP9b-2 合并前，zdoc 维护者跑两次只生成不发布的 Fetch：`guides` 与一个 SDK 分组，因为链接换算是各分组共用的代码 |
+| 重新生成比对 | 用新记录文件中的输入重放并比对；旧记录文件在新工具下的结果只作升级对照，不拦发布 |
+| 图片地址的整页替换 | 由比对发现，不改生成端 |
+| `IMAGE_BED_URL` | 只在本次运行有共享页时检查；workflow 已经传入，不改 workflow；合并前由 zdoc 维护者确认仓库变量已设置 |
+| 记录文件的 `notes` | 仍是字符串数组 |
+| 计划文件 | 同 WP10、WP11：WP9b-1 从 master 开分支，不含计划；WP9b-2 标为 ready 前删除 `.claude/plans/` |
 
 ## 要覆盖的编号
 
