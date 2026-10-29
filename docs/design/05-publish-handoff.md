@@ -136,7 +136,7 @@ generated/en/manifests/shared-pages/
         { "path": "packages/docs-tooling/src/lark/meta/snapshots/guides-uat-last-success.json", "sha256": "…" }
       ]
     },
-    "fetch": { "navigation": "sha256…", "image_base_url": "https://…" },
+    "fetch": { "navigation": "sha256…", "image_base_url": "https://…", "render_targets": { "version": 1, "targets": [ … ] } },
     "tools": { "zdoc": "<tooling commit>", "md2md": "1.3.0" },
     "images": [
       { "source": "https://milvus-docs.s3.us-west-2.amazonaws.com/assets/filtered-search.png", "sha256": "3f9a…", "object": "shared/3f9a….png" }
@@ -163,6 +163,7 @@ generated/en/manifests/shared-pages/
 | `inputs.zdoc.files[]` | 用到的页面配置、Cloud 内容文件、变量文件、链接映射表，各自的路径与摘要 | 判断输入是否变化 |
 | `inputs.dev.commit`、`files[]` | 这次运行的 dev 基线 commit，以及生成时读到的 dev 文件（Cloud 页面清单、表格快照等）的路径与摘要 | 重新生成 |
 | `inputs.fetch` | 这次 Fetch 读到的导航信息（标签、排序、通道）的摘要或内容地址，以及图片基地址；不含任何凭据 | 重新生成 |
+| `inputs.fetch.render_targets` | 交给生成的每个发布目标：手册、路径、扩展名、导航标签、排序位置、通道，带版本号。只记生成用到的值，不含凭据；没有这一项的旧记录文件仍然有效，用它重放只作升级对照，不拦发布（WP9b 加入） | 逐字节重新生成 |
 | `inputs.tools` | 生成工具的 commit 与 md2md 的精确版本 | 用同样的版本重新生成 |
 | `inputs.images[]` | 每张图片的原地址（`source`）、摘要（`sha256`）与转存地址（`object`）；外部图片用完整地址 | 恢复时核对图片 |
 | `outputs[]` | 每个手册的输出路径与内容摘要 | 覆盖率检查、重新生成比对、恢复 |
