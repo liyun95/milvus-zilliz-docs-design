@@ -60,6 +60,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
       "page": "delete-entities",
       "record": "recXXXXXXXX",
       "feishu_token": "WkLmdoxcnAbCdEf",
+      "feishu_aliases": ["WkLmdoxcnAbCdEf", "doxcnAbCdEfGhIj"],
       "anchors": { "doxcnQ1w2e3r4": "delete-entities-by-filter" },
       "activated_in": "11873360452"
     }
@@ -73,6 +74,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
 | `pages[].page` | 已交给 Git 的页面标识 |
 | `pages[].record` | 飞书表格中对应记录的 ID |
 | `pages[].feishu_token` | 激活前这条记录的飞书文档 ID，取自上一次成功的 Fetch 快照；全新的页面为 `null` |
+| `pages[].feishu_aliases` | 同一篇飞书文档的全部 ID（`doc_token`、`node_token`、`origin_node_token`、`obj_token`），包括 `feishu_token`；全新的页面为空。WP9b 加入，之前写入的项由下一次 Fetch 补齐 |
 | `pages[].anchors` | 激活前飞书版中被其他页面链接到的标题块：块 ID → Git 版中的锚点；全新的页面为空 |
 | `pages[].activated_in` | 第一次按 Git 生成这一页的 Fetch 运行编号（GitHub Actions 的运行 ID），用于追溯 |
 
@@ -89,7 +91,7 @@ https://github.com/zilliztech/zdoc/tree/master/shared-docs/guides/pages/delete-e
 
 其他飞书页面链接到这一页时，链接中写的是这一页的飞书文档 ID；链接到某一节时，锚点是飞书的块 ID。zdoc 转换这种链接，要读目标页这次抓下来的飞书原文，从中取 slug，再按标题文字算出锚点（`lark/larkDocWriter.js` 的 `__convert_link`）。找不到原文时，链接变成普通文字，只在日志中打一行，运行不会失败。激活之后这一页不再抓飞书原文，所以要另外保住这些链接：
 
-- **转换时先查 `active.json`**：飞书页面中的链接，文档 ID 等于某一项的 `feishu_token`，就换成 `./<页面标识>`；带块 ID 时，按 `anchors` 换成锚点。zdoc 现有的 `--linkShim`（按文档 ID 替换链接）可以复用。
+- **转换时先查 `active.json`**：飞书页面中的链接，文档 ID 是某一项 `feishu_aliases` 中的任何一个，就换成 `./<页面标识>`；带块 ID 时，按 `anchors` 换成锚点。zdoc 现有的 `--linkShim`（按文档 ID 替换链接）可以复用。
 - **`anchors` 在激活时算出**：激活后的第一次 Fetch，按 `feishu_token` 重新抓取原来的飞书文档（它保留、不删除），从这一次抓到的其他页面原文中找出指向它的链接，取出被链接到的标题块，按飞书版的标题算出锚点，再在 Git 版中找同一个锚点。都找得到，就记入 `anchors`；有找不到的，激活检查不通过（`ACTIVATE_CHECK_FAILED`），`detail` 中列出这些链接所在的页面，由文档负责人修改飞书中的链接或 Git 版的标题。
 - **之后出现的块 ID 不在 `anchors` 中**：链接只指到页面顶部，运行摘要中列出，不失败。
 
