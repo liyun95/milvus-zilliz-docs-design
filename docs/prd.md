@@ -467,7 +467,8 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 |---|---|
 | 目录名等于这一页现有的 slug，只用小写字母、数字和连字符 | `/delete-entities` 对应目录 `delete-entities` |
 | 不写 `lock.yaml` | 工具写入；要重新取最新提交，删掉 PR 中的 `lock.yaml` 即可 |
-| `metadata.beta` 照抄这一页现在的标签。工具不读飞书表格的 `Beta`，漏写就变成 `FALSE`，标签会消失 | StructArray 现在是 Public Preview，写 `beta: PUBLIC`；查 dev 上这一页 front matter 的 `beta` |
+| `metadata.beta` 照抄这一页现在的标签。工具不读飞书表格的 `Beta`，漏写就变成 `FALSE`，标签会消失；现在是 `FALSE` 的不用写 | StructArray 现在是 Public Preview，写 `beta: PUBLIC`；查 dev 上这一页 front matter 的 `beta` |
+| `metadata.description` 只在原文的 `summary` 有 Milvus 独有的内容时写。变换只改正文，改不到 `summary` | Decompounder 的 `summary` 提到 file resource，写 Cloud 的描述；Stop 的 `summary` 两边通用，不写 |
 | 正文的标题和章节结构随原文，不在配置中重复 | — |
 | Phase 1 只能接入飞书目录中已有节点的页面；全新的页面先在飞书表格和目录中建好记录与节点。导航位置、顺序、标签在飞书目录中调整。导航迁到 Git 后取消这条限制 | 要移动这一页，在飞书目录中操作，并同步修改 `publish[].path` |
 | PR 要从 zdoc 仓库内的分支提交 | 来自 fork 的 PR，工具无权写入 `lock.yaml` |
@@ -536,6 +537,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 | 整节不同 | 替换整个命名块 | 例 1 |
 | Cloud 要在某一节前后多一段 | 在命名块前或后增加 | 例 1 后的说明 |
 | 某一节只属于 Milvus | 删除整个命名块 | 例 1 后的说明 |
+| 一段中只有一句属于 Milvus | 在原文中把这句拆成单独一段，包成命名块后删除 | Decompounder 开头一段讲 file resource 的最后一句 |
 | Cloud 独有一种语言的示例，如 Zilliz CLI | 给代码组增加一种语言 | 例 2 |
 | 某种语言的示例整个不同 | 替换或删除这种语言 | 例 2 后的说明 |
 | 代码只差一两行 | 替换、增加或删除这几行 | 例 3 |
@@ -709,6 +711,8 @@ Cloud 内容文件放 `add` 与 `replace` 的新内容，与 `page.yaml` 在同�
 | 给代码组加语言时，这种语言原来必须没有；替换或删除语言时必须已有 | — |
 | 不再需要 Cloud 自己加的语言，直接删掉那条 `add`，不要再加一条 `remove` | — |
 | 删除代码组不会删掉它外面的标题或说明，命名块要覆盖完整的语义范围 | 删掉一个示例后，检查是否留下“下面的代码……”这类悬空的说明 |
+| Cloud 只是少一部分内容时，用 `remove`，不要用 `replace` 写一份删减后的副本 | 副本不随原文更新，上游改了措辞，Cloud 仍是旧的 |
+| 删除后，一个二级标题下只剩一个三级标题时，这个三级标题也删掉：让删除的命名块把它一起包住。工具不自动删标题 | Stop 删掉 file resource 一节后只剩 “Inline stop-words list”，它和前面列出两种来源的那句一起包进 `stop-words-sources` 删除 |
 | 同一位置有多条 `add` 时，按列表顺序输出 | 同一块的前或后、同一组定位行的前或后，都可以有多条 `add` |
 | 同一个目标在同一个通道中只能有一条变换（上一行的多条 `add` 除外），不同级别的变换不能重叠 | 整块替换后，不能再改这一块中的某种语言 |
 
@@ -802,6 +806,8 @@ transforms:
 **为什么代码行的差异写在 zdoc。** 另两种做法都会把 Cloud 的负担带给 Milvus：在原文中写产品行指令，Milvus 作者改代码时要同时照顾 Cloud 的行，Milvus 发布链还要新增一套过滤；在代码中加区域标记，标记要按每种语言写成注释，还要在代码内部清除。
 
 **为什么 Cloud 内容文件用 Milvus 的写法。** 工具对内容文件和原文做同一套转换，作者不用学第二种写法。
+
+**为什么没有句子级的变换。** 一段中只有一句不同时，在原文中拆段即可，代价是 Milvus 页面多出一个段落。句子级的标记要让 md2md 和 Milvus 站点都支持段落中的注释，两版合并也要在句子中切分，Phase 1 不做，见[技术设计 02](./design/02-page-config.md#设计理由)。
 
 </details>
 
