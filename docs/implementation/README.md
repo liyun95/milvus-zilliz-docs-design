@@ -208,17 +208,17 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 命名块（md2md） | 检查标记写法；Milvus 发布前删掉标记 | WP1 | 已合并到上游（`zilliztech/md2md` `07855e4`），已随 1.3.0 发布 | [WP1](./walkthroughs/WP1.md) |
 | 变量与片段（md2md） | 只做预处理的入口；发版 | WP2 | 已合并到上游（`zilliztech/md2md` `a143b27`），1.3.0 已发布；milvus-docs `v3.0.x` 已升级（#3697） | [WP2](./walkthroughs/WP2.md) |
 | 读取 | 读页面配置与 lock；按 commit 取原文；定位命名块、判断类型 | WP3 | 已合并到上游（`zilliztech/zdoc` WP3a `5844587`、WP3b `31a9b54`） | [WP3](./walkthroughs/WP3.md) |
-| 变换 | 按页面配置做 add / replace / remove | WP10 | 未开始 | — |
+| 变换 | 按页面配置做 add / replace / remove | WP10 | 已合并到上游（`zilliztech/zdoc#900`，`a9aac9b`）；第三批 3 篇是第一批用变换的真实页面（`zilliztech/zdoc#916`） | — |
 | 变量展开 | 调用 md2md 的预处理入口，换成 Cloud 的值 | WP3 | 已合并到上游（WP3b `31a9b54`） | [WP3](./walkthroughs/WP3.md) |
 | 站点适配 | 生成 Tabs、提示框、front matter、标题锚点 | WP4 | 已合并到上游（`zilliztech/zdoc` `09859d7`） | [WP4](./walkthroughs/WP4.md) |
 | 链接与图片 | 换算链接与锚点；图片按内容命名 | WP5、WP7 | WP5 已合并到上游（`zilliztech/zdoc` `ca1cbd5`）；WP7 已合并（`f19966c`） | [WP5](./walkthroughs/WP5.md)、[WP7](./walkthroughs/WP7.md) |
 | 产品名检查 | 漏换的产品名报错 | WP6 | 已合并到上游（`zilliztech/zdoc` `ca64aa6`） | [WP6](./walkthroughs/WP6.md) |
-| 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | 未开始 | — |
+| 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | fork 上审阅通过（`liyun95/zdoc#14`），待开上游 PR | — |
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
 | 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 已合并到上游（`zilliztech/zdoc` `8680736`）；WP12、WP13 未开始 | [WP8](./walkthroughs/WP8.md) |
 | 目录结构 | `shared-docs/` 按组分子目录 | WP8c | 已合并到上游（`zilliztech/zdoc` `e9ab23f`） | — |
-| 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9a 已开上游 PR（`zilliztech/zdoc#863`，待文档负责人审）；WP9b 在 WP9a 合并后开始；WP14、WP15 未开始 | [WP9a](./walkthroughs/WP9.md) |
-| 试点页接入 | Delete Entities 的原文对齐与页面配置 | 内容（不属于工作包） | milvus-docs 原文已对齐（`milvus-io/milvus-docs#3719`、`#3722`）；zdoc 已接入（`zilliztech/zdoc#861`，lock 锁在 `3e6b749`）；等 WP9a 合并后激活 | — |
+| 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9a 已合并到上游（`zilliztech/zdoc#863`，`8289d74`）；WP9b 任务卡已写，WP11 合并后开始；WP14、WP15 未开始 | [WP9a](./walkthroughs/WP9.md) |
+| 试点页接入 | 原文对齐与页面配置，分批接入 | 内容（不属于工作包） | 试点 Delete Entities 与第一、二批共 12 篇已激活并上 Prod（`zilliztech/zdoc#861`、`#872`、`#903`）；第三批 3 篇已接入（`#916`），等激活 | — |
 
 ## 5. 任务卡
 
@@ -239,6 +239,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP8 | [生成命令与 PR 校验](./tasks/WP8-zdoc-build-and-validate.md) |
 | WP8c | [`shared-docs/` 按组分目录](./tasks/WP8c-zdoc-group-layout.md) |
 | WP9 | [接入 Fetch：按 `Docs` 链接分流与交接](./tasks/WP9-zdoc-fetch-handoff.md) |
+| WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
 
