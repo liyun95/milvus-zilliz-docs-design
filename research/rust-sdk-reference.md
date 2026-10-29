@@ -191,7 +191,7 @@ management calls with authorization disabled; ...
 | 新增来源类型、手册级的 lock，是否算改框架 | 在 `registry.ts` 中新增一种来源类型；整本手册一个 `lock.yaml`，上游更新开一个 PR |
 | workflow 中 `$GROUP != rest` 的判断 | 改为按“没有飞书来源”判断 |
 | 地址与标题 | `/reference/rust/rust/<模块>-<页面>`，不加 `v2-`；标题后缀 `\| Rust` |
-| 不发布的模块与页面 | 先照 Go：ResourceGroup、副本管理；CDC、Snapshots 逐页核对 |
+| 不发布的模块与页面 | 先照 Go 排除 ResourceGroup（Rust 的副本管理也在这个模块中）；CDC、Snapshots 逐页核对 |
 | Snapshots 的 `beta` | 照其他 SDK 写 `ON REQUEST` |
 | 着陆页 | 由 Cloud 编写，放在 master，登记在 `masterAuthoritativePaths` |
 | 上线 | 手册登记合并后的第一次 Fetch 就写入 dev，发版前在 UAT 检查 |
