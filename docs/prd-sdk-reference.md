@@ -4,19 +4,6 @@
 
 **方案**：Rust SDK Reference 直接从 web-content 生成到 zdoc，不经过飞书，也不改 web-content 和 Milvus 的发布流程。整本手册一份配置，放进 Fetch 现有的 SDK 分组；手册登记合并后，第一次 Fetch 就写入 dev。
 
-## 会上要定的事
-
-| 事项 | 我们的方案 | 结论 |
-|---|---|---|
-| 新增来源类型 | `registry.ts` 的来源类型里加 `shared`：Fetch 的 fetch 一步遇到它时，调用 shared-docs 生成页面（见场景 R4） | |
-| workflow 里 REST 的例外 | `_fetch-content-group.yml` 里写死的 `$GROUP != rest`（除 REST 外每个分组都必须有飞书快照），改成按“这个分组没有飞书来源”判断 | |
-| 地址与标题 | `/reference/rust/rust/<模块>-<文件名>`，不加 `v2-`；标题后缀 `\| Rust`。上线后不能再改 | |
-| 不发布的模块与页面 | 先照 Go 排除 ResourceGroup，副本管理也在这个模块里；CDC、Snapshots 逐页核对 | |
-| 页面里的 `token` 填什么 | 每个 zdoc 页面的 front matter 都有 `token`（原本是飞书文档 ID）和 `type`（来源类型）。Rust 没有飞书文档，照已上线的 Guides 共享页，填 `token: shared-rust-<模块>-<文件名>`、`type: origin`。请确认翻译、修订记录、侧边栏等工具不要求它是真实的飞书 ID | |
-| dev 上的初始内容 | 新手册第一次 Fetch 前，dev 上要先有页面、侧边栏、清单文件三样（原因见场景 R4）。照 C++ 的先例，我们准备一个分支，请文档负责人检查后放进 dev；中文侧边栏是否也要放 | |
-| Phase 1 不区分 current / next | 上游更新 PR 同时改这两个值。SDK Reference 写的是已经发布的 SDK，不需要先只在 UAT 显示 | |
-| 以后迁移其他 SDK | 每个 SDK 一个组目录，各有自己的 `source.yaml`、`Variables.json`、lock，与 Fetch 的分组一一对应 | |
-
 ## 概述
 
 ### 背景
@@ -193,6 +180,19 @@ metadata:
 4. **UAT 检查，发版上 Prod**：UAT 与 Prod 构建同一个 dev SHA，Prod 只在发版时更新。
 
 **为什么要放初始内容**：Fetch 生成页面前，要求这本手册的侧边栏文件已经在 dev 上；而这个文件本来要由 Fetch 生成，第一次跑时还不存在，第一次 Fetch 会失败。zdoc 的新手册都这样处理：C++ 手册当初由维护者直接提交到 dev（提交 `07ae595c5`，“seed C++ reference content, sidebar, and localization inventory”）。这三样不能经 master 提交：`content/`、`generated/` 归 dev，master 的检查会拦下，同步也不会搬。
+
+## 会上要定的事
+
+| 事项 | 我们的方案 | 结论 |
+|---|---|---|
+| 新增来源类型 | `registry.ts` 的来源类型里加 `shared`：Fetch 的 fetch 一步遇到它时，调用 shared-docs 生成页面（见场景 R4） | |
+| workflow 里 REST 的例外 | `_fetch-content-group.yml` 里写死的 `$GROUP != rest`（除 REST 外每个分组都必须有飞书快照），改成按“这个分组没有飞书来源”判断 | |
+| 地址与标题 | `/reference/rust/rust/<模块>-<文件名>`，不加 `v2-`；标题后缀 `\| Rust`。上线后不能再改 | |
+| 不发布的模块与页面 | 先照 Go 排除 ResourceGroup，副本管理也在这个模块里；CDC、Snapshots 逐页核对 | |
+| 页面里的 `token` 填什么 | 每个 zdoc 页面的 front matter 都有 `token`（原本是飞书文档 ID）和 `type`（来源类型）。Rust 没有飞书文档，照已上线的 Guides 共享页，填 `token: shared-rust-<模块>-<文件名>`、`type: origin`。请确认翻译、修订记录、侧边栏等工具不要求它是真实的飞书 ID | |
+| dev 上的初始内容 | 新手册第一次 Fetch 前，dev 上要先有页面、侧边栏、清单文件三样（原因见场景 R4）。照 C++ 的先例，我们准备一个分支，请文档负责人检查后放进 dev；中文侧边栏是否也要放 | |
+| Phase 1 不区分 current / next | 上游更新 PR 同时改这两个值。SDK Reference 写的是已经发布的 SDK，不需要先只在 UAT 显示 | |
+| 以后迁移其他 SDK | 每个 SDK 一个组目录，各有自己的 `source.yaml`、`Variables.json`、lock，与 Fetch 的分组一一对应 | |
 
 ## 分工与节奏
 
