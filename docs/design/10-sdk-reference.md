@@ -10,7 +10,7 @@
 
 - **试点：** Rust SDK Reference。Cloud 上还没有 Rust 手册，不涉及从飞书迁移、切换与归属。以后其他 SDK 照同一条路迁过来，REST 最后。
 - **原文：** web-content 的 `API_Reference/milvus-sdk-rust/v3.0.x/`。它在 web-content 中手写维护（web-content 的 `AGENTS.md`：“hand-curated”），不是 md2md 的输出，没有变量。
-- **不改上游：** 不改 web-content 的内容格式，不改 milvus.io 的构建与 Milvus 的发布流程。
+- **不改上游的发布：** 不改 milvus.io 的构建与 Milvus 的发布流程。web-content 只在 Cloud 要删除内容的地方加命名块（HTML 注释，milvus.io 不显示）。
 - **只做 v3.0.x、只做英文。** 中文由现有的机器翻译从 dev 生成，不做人工校对。
 - **与 Guides 的区别：** Guides 以页面为单位接入、变换与激活；SDK Reference 以整本手册为单位，不做页面内的内容定制（原因见下文“Cloud 的差异”）。
 
@@ -70,6 +70,19 @@ metadata:
     deprecate_since: v3.0.x
   Collections/drop_collection_function.md:
     deprecate_since: v3.0.x
+
+# 页面内的删除：写法与 Guides 的 page.yaml 相同；Phase 1 只支持 remove
+transforms:
+  Collections/load_collection.md:
+    - operation: remove
+      target:
+        block: load-collection-replica-fields
+    - operation: remove
+      target:
+        block: load-collection-example
+        language: rust
+        lines:
+          - ".replica_number(1)"
 ```
 
 </details>
@@ -85,6 +98,7 @@ metadata:
 | `milvus_values.<变量名>` | 否 | 这个变量在原文中写死的 Milvus 值；变量名与 `Variables.json` 中的一致 |
 | `metadata.<模块>/` | 否 | 对整个模块生效的元数据，只能写 `beta` |
 | `metadata.<页面>.md` | 否 | 对一页生效的元数据，可以写 `beta`、`deprecate_since`、`added_since`、`description` |
+| `transforms.<页面>.md` | 否 | 这一页的变换列表，写法与 `page.yaml` 的 `transforms` 相同（技术设计 [02](./02-page-config.md#变换的执行)）；Phase 1 只接受 `operation: remove`，写 `add`、`replace` 报 `CONFIG_FIELD_UNKNOWN`。`channel` 不可用，因为 Phase 1 不区分 `current` 与 `next` |
 
 优先级：页面级高于模块级，模块级高于默认值。其他 front matter 字段由规则生成，不开放覆盖。`source.dir` 下新增的模块与页面默认发布，不需要改配置；它们在上游更新 PR 中单独列出，由审核的人决定是否排除。
 
@@ -94,16 +108,17 @@ metadata:
 
 ### 生成
 
-工具读取 `manual.yaml` 时，把 `source.dir` 下每个未排除的 `.md` 文件展开成内存中的一份页面配置，所有页面共用同一个 lock。之后的读取、站点适配、链接、产品名检查与 MDX 编译沿用 Guides 的实现（技术设计 [02](./02-page-config.md)、[02b](./02b-links-and-images.md)、[07](./07-site-adaptation.md)）。不调用 md2md：原文中没有变量与片段。
+工具读取 `manual.yaml` 时，把 `source.dir` 下每个未排除的 `.md` 文件展开成内存中的一份页面配置，所有页面共用同一个 lock；`transforms` 中这一页的变换放进这份页面配置。之后的读取、站点适配、链接、产品名检查与 MDX 编译沿用 Guides 的实现（技术设计 [02](./02-page-config.md)、[02b](./02b-links-and-images.md)、[07](./07-site-adaptation.md)）。不调用 md2md：原文中没有变量与片段。
 
 一页的处理顺序：
 
 1. 按 lock 中的 commit 读原文；
-2. 连接值认回变量，换成 Cloud 的值（见下文）；
-3. 站点适配，生成 front matter；
-4. 链接换算；
-5. 产品名检查；
-6. MDX 编译。
+2. 执行这一页的 `remove`：与 Guides 相同，在带命名块标记的原文上执行，之后清除标记（技术设计 [02](./02-page-config.md#变换的执行)）；
+3. 连接值认回变量，换成 Cloud 的值（见下文）；
+4. 站点适配，生成 front matter；
+5. 链接换算；
+6. 产品名检查；
+7. MDX 编译。
 
 ### 地址、路径与 front matter
 
@@ -155,7 +170,7 @@ metadata:
 | 正文中指代产品的说法 | 由上游逐步改成中性的说法；zdoc 只警告 |
 | 元数据 | `metadata` |
 | 着陆页 | Cloud 编写 |
-| 页面内的增加、替换、删除 | 不支持 |
+| 页面内 Cloud 不暴露的参数或代码行 | web-content 中用命名块标出，`transforms` 中写 `remove`；不支持增加、替换 |
 
 ### 连接值
 
@@ -177,9 +192,15 @@ web-content 中的 `http://localhost:19530`、`root:Milvus` 就是 milvus-docs `
 
 这要求 `product-names.yaml` 的规则可以按条写严重程度（`error` 或 `warning`，默认 `error`）。Guides 组的规则不写，行为不变。Rust 的正文中共 24 处 “Milvus”，约 14 处属于“指代服务端”。
 
-### 为什么不支持页面内的内容定制
+### 页面内的删除
 
-变换（技术设计 [02](./02-page-config.md#变换的执行)）都以原文中的命名块为目标，代码行级的变换也要先指定命名块。web-content 中没有命名块，又定了不改 web-content，所以没有目标可用。以后某一页确实需要 Cloud 独有的内容，可以在 web-content 中加命名块、复用 WP10；前提是 milvus.io 渲染 `API_Reference/` 时不显示 HTML 注释，并且 web-content 的维护者愿意配合。
+对比 Python 的 Cloud Reference 与 web-content `pymilvus/v3.0.x`：两边都有的 281 页中，web-content 有、Cloud 页面完全没有提到的参数有 76 个（17 页）。其中 Cloud 有意隐藏的只有与资源组、副本有关的 `resource_groups`、`replica_number`（`load_collection`、`load_partitions` 与 ORM 的两个 `load`），与排除 ResourceGroup 模块同一原因；`bulk_import` 的 Cloud 页改写成了 Cloud 自己的导入参数；其余约 60 个是较新的参数或返回字段，属于 Cloud 文档没跟上。
+
+Rust 中需要页面内删除的是 3 页：`Collections/load_collection.md`（`replica_number`、`resource_groups` 两项，以及两处示例中的 `.replica_number(1)`）、`Partitions/load_partitions.md`（同类参数）、`Client/MilvusClientV2.md`（模块总览中介绍 ResourceGroup 的一条）。Rust 的 `DataImport/BulkImport.md` 已经同时讲了两种部署，不需要处理。
+
+- **标记：** 命名块是一对 HTML 注释（技术设计 [01](./01-named-blocks.md)）。web-content 的 Java、C++ Reference 已有 13 页用 HTML 注释记元数据（如 Java `v3.0.x/v2/CDC/dumpMessages.md` 中的 `<!-- category: CDC; action: CREATE; addedSince: v3.0.x -->`），milvus.io 上不显示，所以不用改 milvus.io 的构建。标记由 web-content 的维护者配合加入。
+- **只支持 `remove`：** 调研到的需求都是删除。`add`、`replace` 需要 Cloud 内容文件，会让 Cloud 维护一份随上游漂移的副本，Phase 1 不开放。
+- **执行：** 复用 WP10 的块、语言、代码行三级 `remove`，包括“先校验全部变换再执行”、匹配失败即失败（`TRANSFORM_TARGET_NOT_FOUND`、`LINE_NOT_FOUND` 等）。整本手册一个 lock，任何一页的变换失败都让整本手册的这次更新失败。
 
 ## 接入 Fetch
 
@@ -242,6 +263,7 @@ Phase 1 中 Rust 的 `current` 与 `next` 始终相同：上游更新 PR 同时�
 | 指代服务端的说法 | `PRODUCT_NAME_FOUND`，严重程度为 `warning` | 只提示 |
 | 链接指向被排除的页面 | 新增 `LINK_TARGET_EXCLUDED`（提示） | 只提示 |
 | 链接指向手册之外的 `.md` | `LINK_UNKNOWN_FORM` | 整本手册生成失败 |
+| `transforms` 中的命名块或代码行找不到，或写了 `remove` 以外的操作 | WP10 的 `TRANSFORM_*`、`LINE_*`；`CONFIG_FIELD_UNKNOWN` | 整本手册生成失败 |
 | MDX 编译失败 | `ADAPT_MDX_INVALID` | 整本手册生成失败 |
 
 整本手册只有一个 lock，所以任何错误都让整本手册的这次更新失败：PR 校验不通过；Fetch 中保留 dev 上现有的版本，其他分组照常发布。
@@ -260,13 +282,14 @@ Phase 1 中 Rust 的 `current` 与 `next` 始终相同：上游更新 PR 同时�
 | 着陆页 | Cloud 编写，master 维护 |
 | 上线 | 登记合并后的第一次 Fetch 即写入 dev |
 | dev 上的初始内容 | 我们准备文件，文档负责人放到 dev |
+| 页面内删除 | web-content 中加命名块，`transforms` 中写 `remove`；Phase 1 只支持 `remove`；需要 web-content 的维护者配合 |
 | Phase 1 不区分 `current` 与 `next` | 上游更新同时改两者 |
 
 ## 工作包
 
 | 工作包 | 内容 | 审阅 |
 |---|---|---|
-| **WP-R1**（只改 shared-docs） | 组目录与 `manual.yaml`、展开成虚拟页面、front matter、连接值、产品名检查的严重程度、排除、模块顺序、链接、`shared-docs lock` 与 `build` 支持手册组、PR 校验 | 发 FYI；PR 校验中能看到全部页面的生成结果 |
+| **WP-R1**（只改 shared-docs） | 组目录与 `manual.yaml`、展开成虚拟页面、页面内的 `remove`（复用 WP10）、front matter、连接值、产品名检查的严重程度、排除、模块顺序、链接、`shared-docs lock` 与 `build` 支持手册组、PR 校验 | 发 FYI；PR 校验中能看到全部页面的生成结果 |
 | **WP-R2**（Fetch 与上线） | `shared` 来源类型、`rust` 分组、workflow 中的判断、记录文件、`registry.ts` 登记与 7 步中 master 上的部分、着陆页 | 文档负责人评审；合并前跑一次只生成不发布的 Fetch |
 | 上游更新的手册级 PR | 在 WP12 中实现，与 Guides 的逐页 PR 共用发现与 PR 的逻辑 | 随 WP12 |
 

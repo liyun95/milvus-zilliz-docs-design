@@ -2,7 +2,7 @@
 
 **状态**：草稿，2026-10-30 与文档负责人讨论（会议文档在飞书，与本文同步）。会上定下的结论写回本文后，并入[产品需求](./prd.md)，系统行为届时编号并写进 `requirements.json`。工程细节见[技术设计 10](./design/10-sdk-reference.md)，调研见 [Rust SDK Reference 接入调研](../research/rust-sdk-reference.md)。
 
-**方案**：Rust SDK Reference 直接从 web-content 生成到 zdoc，不经过飞书，也不改 web-content 和 Milvus 的发布流程。整本手册一份配置，放进 Fetch 现有的 SDK 分组；手册登记合并后，第一次 Fetch 就写入 dev。
+**方案**：Rust SDK Reference 直接从 web-content 生成到 zdoc，不经过飞书，也不改 Milvus 的发布流程。整本手册一份配置，放进 Fetch 现有的 SDK 分组；手册登记合并后，第一次 Fetch 就写入 dev。
 
 ## 会上要定的事
 
@@ -14,6 +14,7 @@
 | 不发布的模块与页面 | 先照 Go 排除 ResourceGroup，副本管理也在这个模块里；CDC、Snapshots 逐页核对 | |
 | 页面里的 `token` 填什么 | 每个 zdoc 页面的 front matter 都有 `token`（原本是飞书文档 ID）和 `type`（来源类型）。Rust 没有飞书文档，照已上线的 Guides 共享页，填 `token: shared-rust-<模块>-<文件名>`、`type: origin`。请确认翻译、修订记录、侧边栏等工具不要求它是真实的飞书 ID | |
 | dev 上的初始内容 | 新手册第一次 Fetch 前，dev 上要先有页面、侧边栏、清单文件三样（原因见场景 R4）。照 C++ 的先例，我们准备一个分支，请文档负责人检查后放进 dev；中文侧边栏是否也要放 | |
+| 页面内删除内容 | Cloud 不暴露的参数（如 `replica_number`、`resource_groups`），在 web-content 中用命名块标出，`manual.yaml` 的 `transforms` 中写 `remove`。命名块是 HTML 注释，milvus.io 不显示。Phase 1 只支持 `remove`。需要 web-content 的维护者配合加标记 | |
 | Phase 1 不区分 current / next | 上游更新 PR 同时改这两个值。SDK Reference 写的是已经发布的 SDK，不需要先只在 UAT 显示 | |
 | 以后迁移其他 SDK | 每个 SDK 一个组目录，各有自己的 `source.yaml`、`Variables.json`、lock，与 Fetch 的分组一一对应 | |
 
@@ -27,16 +28,16 @@
 
 - 只做 web-content 中的 `API_Reference/milvus-sdk-rust/v3.0.x/`，164 页；Cloud 上每个 SDK 只发布一个版本。
 - 只做英文，中文由现有的机器翻译从 dev 生成。
-- 不改 web-content 的写法，不改 milvus.io 的构建与 Milvus 的发布流程。
+- 不改 milvus.io 的构建与 Milvus 的发布流程。web-content 只在 Cloud 要删除内容的地方加命名块（HTML 注释，milvus.io 不显示）。
 - Rust 在 Cloud 上还没有手册，不涉及从飞书迁移与切换。
 
 ### 与 Guides 的区别
 
 | | Guides 共享页 | Rust SDK Reference |
 |---|---|---|
-| 原文 | milvus-docs，有变量与命名块 | web-content，手写维护，没有变量与命名块 |
+| 原文 | milvus-docs，有变量与命名块 | web-content，手写维护，没有变量；只在 Cloud 要删除内容的地方加命名块 |
 | 配置 | 每页一份 `page.yaml`、一个 `lock.yaml` | 整本手册一份 `manual.yaml`、一个 `lock.yaml` |
-| Cloud 的差异 | 变量、页面内的增加 / 替换 / 删除 | 按模块或页面排除、连接值认回变量、元数据的例外；不支持页面内的定制 |
+| Cloud 的差异 | 变量、页面内的增加 / 替换 / 删除 | 按模块或页面排除、连接值认回变量、元数据的例外、页面内只支持删除 |
 | 上线 | 换掉飞书表格中的 `Docs` 链接 | 在 `registry.ts` 登记手册，第一次 Fetch 即写入 dev |
 | 上游更新 | 每页一个 PR，UAT 可以先于 Prod | 整本手册一个 PR，两者一起更新 |
 
@@ -59,9 +60,9 @@ shared-docs/rust/
 
 | 谁写 | 文件 | 在哪里 | 写什么 | 什么时候 |
 |---|---|---|---|---|
-| 不改 | Rust 原文 | web-content `API_Reference/milvus-sdk-rust/v3.0.x/` | — | 由上游维护 |
+| 上游 | Rust 原文 | web-content `API_Reference/milvus-sdk-rust/v3.0.x/` | 正文由上游维护；Cloud 要删除的内容用命名块标出 | 需要页面内删除时 |
 | 文档工程师 | `source.yaml` | zdoc master `shared-docs/rust/` | 上游仓库 web-content，跟踪分支 master | 接入时写一次 |
-| 文档工程师 | `manual.yaml` | 同上 | 原文目录、不发布的模块与页面、原文中写死的 Milvus 值、元数据的例外 | 接入时写；以后排除页面、改元数据都改这里 |
+| 文档工程师 | `manual.yaml` | 同上 | 原文目录、不发布的模块与页面、原文中写死的 Milvus 值、元数据的例外、页面内的删除 | 接入时写；以后排除页面、改元数据都改这里 |
 | 文档工程师 | `Variables.json` | 同上 | Cloud 的连接值，如 `YOUR_CLUSTER_ENDPOINT` | 接入时写一次 |
 | 文档工程师 | `product-names.yaml` | 同上 | 检查哪些写法，每条是失败还是警告 | 接入时写；发现新写法时补 |
 | 文档工程师 | 着陆页 `rust.md` | zdoc master `content/en/reference/api/rust/rust/` | Cloud 版的 SDK 介绍，包括怎样连接 Zilliz Cloud | 接入时写；登记为 master 维护，与其他 SDK 相同 |
@@ -123,6 +124,20 @@ metadata:
     beta: ON REQUEST
   Collections/add_collection_function.md:
     deprecate_since: v3.0.x
+
+# 页面内的删除：键是页面路径，值是变换列表，写法与 Guides 的 page.yaml 相同
+# 要删除的内容先在 web-content 中用命名块标出；Phase 1 只支持 remove
+transforms:
+  Collections/load_collection.md:
+    - operation: remove
+      target:
+        block: load-collection-replica-fields   # 包住 replica_number、resource_groups 两项
+    - operation: remove
+      target:
+        block: load-collection-example
+        language: rust
+        lines:
+          - ".replica_number(1)"           # 示例代码中的这一行
 ```
 
 **`manual.yaml` 的字段**
@@ -138,6 +153,7 @@ metadata:
 | `milvus_values.<变量名>` | 否 | 这个变量在原文中写死的 Milvus 值；变量名与 `Variables.json` 中的一致 |
 | `metadata.<模块>/` | 否 | 对整个模块生效的元数据，只能写 `beta` |
 | `metadata.<页面>.md` | 否 | 对一页生效的元数据，可以写 `beta`、`deprecate_since`、`added_since`、`description` |
+| `transforms.<页面>.md` | 否 | 这一页的变换列表，写法与 Guides 的 `page.yaml` 相同；Phase 1 只能写 `operation: remove`，目标可以是命名块、代码组中的一种语言或连续的几行 |
 
 **生成后的页面**（以 `Authentication/create_user.md` 为例）
 
@@ -163,6 +179,7 @@ metadata:
 | 代码中的连接值 | `manual.yaml` 的 `milvus_values` 与 `Variables.json` | `milvus_values` 记变量在原文中写死的 Milvus 值，`Variables.json` 记它的 Cloud 值，两者都是“变量名 → 值”。工具只在代码块中把前者换成后者。涉及 4 页；替换后仍残留 Milvus 值时失败 |
 | 正文中的产品名 | `product-names.yaml` | 见下表 |
 | 元数据 | `manual.yaml` 的 `metadata` | `beta` 可以按模块或按页面；`deprecate_since`、`added_since`、`description` 只能按页面 |
+| 页面内 Cloud 不暴露的参数或代码行 | web-content 中的命名块，与 `manual.yaml` 的 `transforms` | 在 web-content 中用命名块包住要删除的参数项或示例代码，`transforms` 中按页面写 `remove`。只支持删除 |
 | 着陆页 | 着陆页 `rust.md` | 由 Cloud 编写，不用原文的 `About.md` |
 
 | 产品名的写法 | 例子 | 处理 |
@@ -173,7 +190,15 @@ metadata:
 | 指代服务端 | “the connected Milvus server”、“a specific Milvus instance”（约 14 处） | 只警告，照常发布；上游逐步改成中性的说法 |
 | 连接值残留 | `localhost:19530`、`root:Milvus` | 失败 |
 
-**不支持页面内的增加、替换、删除。** Guides 的变换都以原文中的命名块为目标，web-content 中没有命名块，也定了不改 web-content。以后确实需要时，可以在 web-content 中加命名块、复用 Guides 的变换。
+**页面内为什么只支持删除。** 对比 Python 的 Cloud Reference 与 web-content：两边都有的 281 页中，web-content 有、Cloud 页面完全没有提到的参数有 76 个。其中 Cloud 有意隐藏的只有与资源组、副本有关的 `resource_groups`、`replica_number`（4 页），规律与排除 ResourceGroup 模块相同；其余大多是 Cloud 文档没跟上的新参数，改成共享生成后会自动补上。Rust 中需要页面内删除的是 3 页：
+
+| 页面 | 要删除的内容 |
+|---|---|
+| `Collections/load_collection.md` | 参数 `replica_number`、`resource_groups`；两处示例中的 `.replica_number(1)` |
+| `Partitions/load_partitions.md` | 与资源组、副本有关的参数 |
+| `Client/MilvusClientV2.md` | 模块总览中介绍 ResourceGroup 的一条 |
+
+命名块是一对 HTML 注释。web-content 的 Java、C++ Reference 已有 13 页用 HTML 注释记元数据，milvus.io 上看不到，所以加标记不影响 Milvus 的页面，也不用改它的构建。变换沿用 Guides 已上线的实现。
 
 ## 场景 R3：审核上游更新
 
@@ -197,5 +222,5 @@ metadata:
 ## 分工与节奏
 
 1. **WP-R1，只改 shared-docs**：手册配置、生成、连接值、产品名检查、排除规则。做完后，PR 校验里就能看到 164 页的生成结果。
-2. **WP-R2，接入 Fetch 与上线**：场景 R4 第 1 步的全部内容，需要文档负责人评审。
+2. **WP-R2，接入 Fetch 与上线**：场景 R4 第 1 步的全部内容，需要 zdoc 维护者评审。
 3. **上线**：场景 R4 第 2–4 步。
