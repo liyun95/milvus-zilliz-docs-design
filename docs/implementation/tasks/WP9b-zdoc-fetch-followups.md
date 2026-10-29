@@ -60,19 +60,19 @@ WP9b-1 改变已激活页面的生成结果（只少了空行），要单独合�
    - 同时检查：图片地址的改写是整页的字符串替换（`guides-shared-sources.js` 把 MDX 中的 `shared/<sha>.<ext>` 一律换成完整地址），代码块中出现同样的字符串时也会被替换。比对要能发现这种情况。
    - 生产环境中没有设置 `IMAGE_BED_URL` 时，现在会悄悄用默认的存储桶。改为必须设置，没有设置时 Guides 失败。
 5. **已采用的图片不变。** 按 WP9 任务卡第 2 条做：上一次的记录文件中记过的图片，把“原地址 → 摘要”作为 `recorded` 传给 WP5（`core/links/rewrite.ts` 已经支持）。原地址的内容变了时沿用记录的摘要，发飞书卡片通知文档工程师（`IMAGE_SOURCE_CHANGED`，不算错误）。
-6. **`active.json` 记录全部别名。** 现在 `feishu_token` 只记一个文档 ID（`doc_token` 或 `node_token`）。同一篇文档用 `docx/<obj_token>` 等另一种格式引用时，激活时登记不到，之后也不会被换算。改为记录这条记录的全部别名（`doc_token`、`node_token`、`origin_node_token`、`obj_token`，与 `incrementalFetchPlanner.js`、[zilliztech/zdoc#907](https://github.com/zilliztech/zdoc/pull/907) 中 `validate-guides-source-contract.js` 认的一组相同），激活时的扫描与之后的换算都按任一别名匹配。格式见下文“待定”第 1 条；已有的记录在下一次 Fetch 中补齐别名，不要求重新激活。
+6. **`active.json` 记录全部别名。** 现在 `feishu_token` 只记一个文档 ID（`doc_token` 或 `node_token`）。同一篇文档用 `docx/<obj_token>` 等另一种格式引用时，激活时登记不到，之后也不会被换算。改为记录这条记录的全部别名（`doc_token`、`node_token`、`origin_node_token`、`obj_token`，与 `incrementalFetchPlanner.js`、[zilliztech/zdoc#907](https://github.com/zilliztech/zdoc/pull/907) 中 `validate-guides-source-contract.js` 认的一组相同），激活时的扫描与之后的换算都按任一别名匹配。格式见下文“决定”第 1 条；已有的记录在下一次 Fetch 中补齐别名，不要求重新激活。
 7. **只在需要锚点时抓取旧文档。** 现在激活时总是重新抓取原来的飞书文档。改为只在有带锚点的链接指向它时才抓取；没有这种链接时，旧文档已经删掉也能激活。WP9a 中有 5 个测试的 fixture 假定总是抓取，按新的条件更新。
 8. **记录文件的 `notes`。** WP11 的 `BuiltPage.notes`（两版 front matter 不同、已沿用 `current`）写进记录文件的 `notes[]`，格式见技术设计 05。
 9. **失效链接报告。** `guides-broken-content-links.json` 把指向已激活页面的飞书链接列为 “missing canonical”。页面中的链接是对的，报告不知道旧的飞书文档 ID 已由共享页接管。改为按 `active.json` 的别名识别这些链接，不再列出。
-10. **编号覆盖。** zdoc 的编号覆盖检查（`spec/coverage.ts`）只扫描 shared-docs 下的 `*.test.ts(x)`。WP9a 的测试在 `scripts/docs-workflow/` 与 `lark/` 中，是 `.js` 文件，所以 `pending.json` 中 `9-1`、`9-2`、`9-3`、`9-6`、`T06`、`ACTIVATE_CHECK_FAILED`、`OWNERSHIP_PATH_MISMATCH`、`OWNERSHIP_CONFIG_MISSING`、`OWNERSHIP_REVERTED`、`PUBLISH_IMAGE_UPLOAD_FAILED` 仍记在 WP14 名下。做法见“待定”第 2 条。
+10. **编号覆盖。** zdoc 的编号覆盖检查（`spec/coverage.ts`）只扫描 shared-docs 下的 `*.test.ts(x)`。WP9a 的测试在 `scripts/docs-workflow/` 与 `lark/` 中，是 `.js` 文件，所以 `pending.json` 中 `9-1`、`9-2`、`9-3`、`9-6`、`T06`、`ACTIVATE_CHECK_FAILED`、`OWNERSHIP_PATH_MISMATCH`、`OWNERSHIP_CONFIG_MISSING`、`OWNERSHIP_REVERTED`、`PUBLISH_IMAGE_UPLOAD_FAILED` 仍记在 WP14 名下。做法见“决定”第 2 条。
 
-## 待定
+## 决定
 
-计划开始前由推动者决定：
+推动者在写卡后确定（2026-10-29）：
 
-1. **别名的格式。** 建议在 `pages[]` 中增加 `feishu_aliases`（字符串数组），保留 `feishu_token` 不变，旧的读取代码不受影响；技术设计 05b 随 PR 更新。另一种做法是把 `feishu_token` 改成数组，格式更干净，但所有读取 `active.json` 的地方都要同时改。
-2. **Fetch 侧测试怎样计入覆盖。** 建议扩展 `spec/coverage.ts`，同时扫描共享页相关的 `.js` 测试，在这些测试的标题中写上编号，再把上面的编号从 `pending.json` 中删掉。另一种做法是把 `pending.json` 中这些编号的归属从 WP14 改成 WP9，只改登记，不改检查，但检查就看不到它们是否真的有测试。
-3. **只剩一个三级标题时的警告。** [产品需求场景 4](../../prd.md#场景-4写-cloud-的差异)已规定作者在删除时一起删掉单独剩下的三级标题，工具不自动删。是否让 `shared-docs build` 在变换后某个二级标题下的三级标题从多个变成一个时给出提示：建议这次不做，等出现漏删再加。
+1. **别名的格式。** 在 `pages[]` 中增加 `feishu_aliases`（字符串数组），包括 `feishu_token` 本身；`feishu_token` 保留不变，旧的读取代码不受影响。格式已写入[技术设计 05b](../../design/05b-cutover-and-ownership.md)。不把 `feishu_token` 改成数组：那样所有读取 `active.json` 的地方都要同时改。
+2. **Fetch 侧测试怎样计入覆盖。** 扩展 `spec/coverage.ts`，同时扫描共享页相关的 `.js` 测试（`scripts/docs-workflow/` 与 `lark/` 中的），在这些测试的标题中写上编号，再把上面的编号从 `pending.json` 中删掉。扫描哪些文件在计划中列出。不只把归属从 WP14 改成 WP9：那样检查看不到它们是否真的有测试。
+3. **只剩一个三级标题时的警告：这次不做。** [产品需求场景 4](../../prd.md#场景-4写-cloud-的差异)已规定作者在删除时一起删掉单独剩下的三级标题，工具不自动删；等出现漏删再加提示。
 
 ## 要覆盖的编号
 
