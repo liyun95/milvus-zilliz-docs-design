@@ -1,6 +1,6 @@
 # WP11 两版合并与 `channel`
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP10](./WP10-zdoc-transforms.md) 已合并（[zilliztech/zdoc#900](https://github.com/zilliztech/zdoc/pull/900)）。从最新的 master 开分支　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP10](./WP10-zdoc-transforms.md) 已合并（[zilliztech/zdoc#900](https://github.com/zilliztech/zdoc/pull/900)）。从最新的 master 开分支　**状态**：实现已审阅（[liyun95/zdoc#14](https://github.com/liyun95/zdoc/pull/14)），待开上游 PR
 
 ## 目标
 
@@ -74,6 +74,22 @@ zdoc 中还要读：`apps/docs/plugins/next-channel-view.js`（静态产物怎�
 
 - `core/transforms/index.ts` 的 `dedent`：以第一个非空行而不是第一行的缩进作为基准。现在内容文件以空行开头时，公共缩进不会被去掉。加一个用例。
 - `adapters/build-page.ts`：带变换的页面现在每个手册都重新预处理一遍（最多 8 次 md2md 调用）。改为每个通道只预处理一次，再按手册做产品过滤。输出必须不变，用现有的变换测试证明。
+
+## 计划审阅的决定
+
+在 [liyun95/zdoc#14](https://github.com/liyun95/zdoc/pull/14) 中审定，以 PR 中的[裁决评论](https://github.com/liyun95/zdoc/pull/14#issuecomment-6463394698)为准：
+
+| 问题 | 决定 |
+|---|---|
+| 整页通道（R1） | 两个通道的变换都校验，但只输出可见的版本：`NEXT` 页输出 `next`，`RETIRE-IN-NEXT` 页输出 `current`，不输出成对标签；front matter 仍用 `current`。用 `fetchContext` 测试，不改单独运行的 CLI |
+| 相等的判据（R2） | 正文逐字节比较，只放宽块之间的空行；front matter 与组件 `import` 分开断言；front matter 不同时每个手册一条备注 |
+| 手写的通道标签与代码块中的通道指令（R3） | 原样保留在不可切分的块中，对齐时不解释、不生成；两种视图的还原测试对两边用同样的语义。上游的代码块指令只做兼容，不作为推荐写法 |
+| 标题锚点重复（R4） | 报 `ADAPT_UNSUPPORTED_MARKUP`，给出两处来源和修改办法（`channel` 变换或改标题）；不自动加后缀，不改链接 |
+| 计划文件（R5） | 同 WP10：标为 ready 之前用普通 commit 删掉 `.claude/plans/` |
+| 代码块中的 `<NextChannel` 字样（R6） | 成对区域中的代码块含这个字样时失败（Fetch 的检查会拒绝它），报 `ADAPT_UNSUPPORTED_MARKUP` 并指向那一行；在 README 中说明。不改检查，不改 `resolveNextChannelCurrentView` |
+| 两版相同的路径（R7） | 输出逐字节不变，md2md 调用次数可以减少。“相同”指站点适配后的内容相同，不是两个 commit 相同 |
+
+实现中还加了三处失败保护，PR 说明中有记录：未闭合的代码块、只在一个通道中的 Markdown 引用式链接定义（MDX 在通道判断之前全局解析它们），以及静态解析时会把生成的通道标签藏进代码块的长围栏写法。
 
 ## 要覆盖的编号
 
