@@ -1,6 +1,6 @@
 # 10 SDK Reference：从 web-content 生成（Rust 试点）
 
-本篇定义怎样把 web-content 中的 SDK Reference 生成到 zdoc，先以 Rust 试点。调研与选项见 [Rust SDK Reference 接入调研](../research/rust-sdk-reference.md)，本篇只写选定的做法。
+本篇定义怎样把 web-content 中的 SDK Reference 生成到 zdoc，先以 Rust 试点。要交付什么行为、文档工程师怎样写，见 [SDK Reference 产品需求](../prd-sdk-reference.md)；调研与选项见 [Rust SDK Reference 接入调研](../../research/rust-sdk-reference.md)。本篇只写工程上选定的做法。
 
 **参与方**：zdoc 生成（shared-docs）、zdoc 发布（Fetch）。
 
@@ -37,35 +37,35 @@ shared-docs/rust/
 <summary>例子：Rust 的完整 manual.yaml</summary>
 
 ```yaml
+# 配置格式的版本，固定为 1
 schema_version: 1
+
+# 原文在上游仓库中的位置
 source:
+  # 这本手册的原文目录：目录下的每个 .md 是一页，一级子目录是一个模块
   dir: API_Reference/milvus-sdk-rust/v3.0.x
-  previous: API_Reference/milvus-sdk-rust/v2.6.x   # 只用来推出 added_since
+  # 上一个版本的目录，只用来推出 added_since
+  previous: API_Reference/milvus-sdk-rust/v2.6.x
+
+# 发布到哪本手册：registry.ts 中的手册 ID
 publish:
-  manual: rust                    # registry.ts 中的手册 ID
+  manual: rust
+
+# 不发布的内容；没有列出的模块和页面都发布，新增的页面也自动发布
 exclude:
-  modules: [ResourceGroup]
+  modules: [ResourceGroup]        # source.dir 下的一级目录
   pages:
     - About.md                    # 着陆页由 Cloud 编写，见下文
-modules:                          # 侧边栏中模块的顺序
-  - Client
-  - Collections
-  - Vector
-  - Management
-  - Authentication
-  - Database
-  - Partitions
-  - DataImport
-  - Snapshots
-  - CDC
-  - FileResources
-connection:                       # 原文中的 Milvus 值 → Cloud 变量
-  "http://localhost:19530": example_endpoint
-  "root:Milvus": example_token
-defaults:                         # 按模块
-  Snapshots:
+
+# 原文中写死的 Milvus 值，键是 Variables.json 中的变量名
+milvus_values:
+  example_endpoint: "http://localhost:19530"
+  example_token: "root:Milvus"
+
+# 元数据的例外：以 / 结尾的是模块，.md 结尾的是一页；同一字段以页面为准
+metadata:
+  Snapshots/:
     beta: ON REQUEST
-overrides:                        # 按页面，只写例外
   Collections/add_collection_function.md:
     deprecate_since: v3.0.x
   Collections/drop_collection_function.md:
@@ -82,12 +82,11 @@ overrides:                        # 按页面，只写例外
 | `publish.manual` | 是 | `registry.ts` 中的手册 ID。地址前缀、标题后缀、侧边栏名从登记中取，不在这里重复 |
 | `exclude.modules` | 否 | 不发布的模块，即 `source.dir` 下的一级目录 |
 | `exclude.pages` | 否 | 不发布的页面，相对于 `source.dir` |
-| `modules` | 是 | 侧边栏中模块的顺序。原文中有、这里没有列出、也没有排除的模块，生成失败 |
-| `connection` | 否 | 原文代码中的 Milvus 值 → `Variables.json` 中的变量名 |
-| `defaults.<模块>` | 否 | 对整个模块生效的元数据，只能写 `beta` |
-| `overrides.<页面>` | 否 | 对一页生效的元数据，只能写 `beta`、`deprecate_since`、`added_since`、`description` |
+| `milvus_values.<变量名>` | 否 | 这个变量在原文中写死的 Milvus 值；变量名与 `Variables.json` 中的一致 |
+| `metadata.<模块>/` | 否 | 对整个模块生效的元数据，只能写 `beta` |
+| `metadata.<页面>.md` | 否 | 对一页生效的元数据，可以写 `beta`、`deprecate_since`、`added_since`、`description` |
 
-优先级：页面级高于模块级，模块级高于默认值。其他 front matter 字段由规则生成，不开放覆盖。`source.dir` 下新增的页面默认发布，不需要改配置。
+优先级：页面级高于模块级，模块级高于默认值。其他 front matter 字段由规则生成，不开放覆盖。`source.dir` 下新增的模块与页面默认发布，不需要改配置；它们在上游更新 PR 中单独列出，由审核的人决定是否排除。
 
 ### `lock.yaml`
 
@@ -116,19 +115,19 @@ overrides:                        # 按页面，只写例外
 | `slug` | `/rust/rust/<模块>-<文件名>` | `/rust/rust/Authentication-create_user`，网址 `/reference/rust/rust/Authentication-create_user` |
 | `title` | H1，加后缀 `\| Rust` | `create_user() \| Rust` |
 | `sidebar_label` | H1 | `create_user()` |
-| `description` | H1 下的第一段，加后缀 `\| Rust`；`overrides` 可以改写 | `Creates a user account with a username and password. \| Rust` |
-| `added_since` | 页面在 `source.previous` 中也有：`v2.6.x`；否则 `v3.0.x`；`overrides` 可以改写 | `v2.6.x` |
+| `description` | H1 下的第一段，加后缀 `\| Rust`；`metadata` 可以改写 | `Creates a user account with a username and password. \| Rust` |
+| `added_since` | 页面在 `source.previous` 中也有：`v2.6.x`；否则 `v3.0.x`；`metadata` 可以改写 | `v2.6.x` |
 | `last_modified` | `FALSE` | — |
-| `deprecate_since` | `false`；`overrides` 可以改写 | — |
-| `beta` | `false`；`defaults`、`overrides` 可以改写 | Snapshots 模块为 `ON REQUEST` |
+| `deprecate_since` | `false`；`metadata` 可以改写 | — |
+| `beta` | `false`；`metadata` 可以改写 | Snapshots 模块为 `ON REQUEST` |
 | `keywords` | 复用 Fetch 的 `keyword_picker`，加上版本标记 `rustv30` | — |
 | `displayed_sidebar` | 从 `registry.ts` 取 | `rustSidebar` |
-| `sidebar_position` | 模块按 `modules` 的顺序；模块内按文件名排序 | — |
+| `sidebar_position` | 模块按目录名、模块内按文件名的字母顺序，不区分大小写 | — |
 | `type`、`token` | 见“待确认” | — |
 
 - **`last_modified` 为什么写 `FALSE`。** 网站的 `docs-ui` `DocMetaTags.tsx` 取 `added_since`、`last_modified`、`deprecate_since` 中最大的版本，显示为 “Minimum SDK version”。全部写 `v3.0.x` 会让 v2.6 就有的方法也显示 v3.0.x。
 - **地址上线后不能改。** 原文文件名改了，地址随之改变。web-content 改名时，上游更新 PR 中列出改变的地址，由人确认。
-- **侧边栏。** 由 zdoc 现有的 `reference/sidebarDerivation.ts` 按生成的 front matter 推出，最前面是着陆页。
+- **侧边栏。** 输出 `generated/en/sidebars/rust.sidebar.js`，格式与其他 SDK 相同：最前面是着陆页，之后每个模块一个分类。由哪段现有代码生成（Fetch 的侧边栏生成，或 `reference/sidebarDerivation.ts`）在 WP-R2 的计划中确定；`sidebarDerivation.ts` 会按 front matter 的 `type: folder` 认分类的着陆页，`type` 的取值要与之相容。
 
 ### 链接
 
@@ -154,15 +153,15 @@ overrides:                        # 按页面，只写例外
 | 不适用于 Cloud 的模块或页面 | `exclude` |
 | 代码中的连接值 | 认回变量，换成 Cloud 的值 |
 | 正文中指代产品的说法 | 由上游逐步改成中性的说法；zdoc 只警告 |
-| 元数据 | `defaults`、`overrides` |
+| 元数据 | `metadata` |
 | 着陆页 | Cloud 编写 |
 | 页面内的增加、替换、删除 | 不支持 |
 
 ### 连接值
 
-web-content 中的 `http://localhost:19530`、`root:Milvus` 就是 milvus-docs `Variables.json` 中 `example_endpoint`、`example_token` 的 Milvus 值，相当于变量已经按 Milvus 展开过。工具只在代码块中，把 `connection` 中列出的值认回变量，再按组目录的 `Variables.json` 换成 Cloud 的值，例如 `YOUR_CLUSTER_ENDPOINT`。正文中的值不认回：正文说的是 Milvus 的默认地址，由产品名检查发现。
+web-content 中的 `http://localhost:19530`、`root:Milvus` 就是 milvus-docs `Variables.json` 中 `example_endpoint`、`example_token` 的 Milvus 值，相当于变量已经按 Milvus 展开过。工具只在代码块中，把 `milvus_values` 中列出的值认回变量，再按组目录的 `Variables.json` 换成 Cloud 的值，例如 `YOUR_CLUSTER_ENDPOINT`。正文中的值不认回：正文说的是 Milvus 的默认地址，由产品名检查发现。
 
-替换之后，`product-names.yaml` 仍检查 `localhost:19530`、`root:Milvus`，出现即失败（`PRODUCT_NAME_FOUND`）。上游出现新写法时（例如不带 `http://`），由人在 `connection` 中补一行。
+替换之后，`product-names.yaml` 仍检查 `localhost:19530`、`root:Milvus`，出现即失败（`PRODUCT_NAME_FOUND`）。上游出现新写法时（例如不带 `http://`），由人在 `milvus_values` 中补一行。
 
 涉及 4 页：`Client/ConnectConfig.md`、`Client/MilvusClientV2.md`、`DataImport/BulkImport.md`、`CDC/update_replicate_configuration.md`。
 
@@ -230,15 +229,14 @@ Phase 1 中 Rust 的 `current` 与 `next` 始终相同：上游更新 PR 同时�
 - 改动的页面与生成结果的差异；
 - 新增、删除、改名的页面，以及因此改变的地址；
 - 产品名警告；
-- 新出现、但没有列在 `modules` 中的模块（生成失败，要先补配置）。
+- 新出现的模块（默认发布，由审核的人决定是否排除）。
 
 ## 出错时
 
 | 情况 | 错误码 | 影响 |
 |---|---|---|
 | `manual.yaml` 格式不对、有不认识的字段、`publish.manual` 未登记 | 现有的 `CONFIG_*` | 整本手册生成失败 |
-| `exclude`、`modules`、`overrides` 中的模块或页面在原文中不存在 | `CONFIG_PATH_UNKNOWN` | 整本手册生成失败 |
-| 原文中有模块未列在 `modules` 中，也没有排除 | `CONFIG_PATH_UNKNOWN` | 整本手册生成失败 |
+| `exclude`、`metadata` 中的模块或页面在原文中不存在 | `CONFIG_PATH_UNKNOWN` | 整本手册生成失败 |
 | 两个文件生成同一个地址（如只差大小写） | 新增 `CONFIG_SLUG_DUPLICATE` | 整本手册生成失败 |
 | 连接值残留 | `PRODUCT_NAME_FOUND` | 整本手册生成失败 |
 | 指代服务端的说法 | `PRODUCT_NAME_FOUND`，严重程度为 `warning` | 只提示 |
@@ -296,7 +294,7 @@ WP-R1 做完，用真实的生成结果与文档负责人讨论 WP-R2。
 ## 验收
 
 - `shared-docs build` 对 `shared-docs/rust/` 生成 web-content v3.0.x 中全部未排除的页面，退出码 0；输出中没有 `localhost:19530`、`root:Milvus`，没有被排除的模块与页面。
-- 每页的 front matter 符合上表；侧边栏的模块顺序与 `modules` 一致。
+- 每页的 front matter 符合上表；侧边栏中模块与页面按字母顺序排列。
 - 指向被排除页面的链接变成文字，并给出提示；手册内其他链接都能打开。
 - 第一次 Fetch 后，dev 上有 Rust 的全部页面、侧边栏与记录文件，UAT 上可以浏览；Guides 与其他 SDK 的输出不变。
 - 上游改了若干页后，上游更新 PR 一次列出全部改动，合并后的 Fetch 只改这些页面。
