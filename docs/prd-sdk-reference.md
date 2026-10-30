@@ -44,6 +44,19 @@ shared-docs/rust/
   product-names.yaml   # 产品名检查规则（文档工程师）
 ```
 
+`source.yaml` 写上游是哪个仓库、跟踪哪个分支，格式与 Guides 的相同；写 lock、发现上游更新的工具对所有组都读它。`manual.yaml` 的 `source` 只写这个仓库里的目录，与 Guides 的 `page.yaml` 用 `source.file` 写原文路径一致。
+
+```yaml
+# shared-docs/rust/source.yaml
+
+# 配置格式的版本，固定为 1
+schema_version: 1
+# 上游仓库
+repository: https://github.com/milvus-io/web-content
+# 跟踪的分支：接入时与上游更新时，lock 取这个分支的最新提交
+track: master
+```
+
 | 谁写 | 文件 | 在哪里 | 写什么 | 什么时候 |
 |---|---|---|---|---|
 | 上游 | Rust 原文 | web-content `API_Reference/milvus-sdk-rust/v3.0.x/` | 正文由上游维护；Cloud 要删除的内容用命名块标出 | 需要页面内删除时 |
@@ -186,6 +199,8 @@ transforms:
 
 命名块是一对 HTML 注释。web-content 的 Java、C++ Reference 已有 13 页用 HTML 注释记元数据，milvus.io 上看不到，所以加标记不影响 Milvus 的页面，也不用改它的构建。变换沿用 Guides 已上线的实现。
 
+**本期只支持 `remove`。** 原因有两点：一是上面的对比中，Cloud 需要的差异全是删除，没有一处需要改写或增加；二是 `add`、`replace` 需要 Cloud 保存一份内容文件，它不随上游更新，会慢慢和上游不一致。`add`、`replace` 的代码 Guides 已经有，以后真的需要时再打开，大约多 1–2 天：要定 Cloud 内容文件放在哪里、内容文件中能否写变量（Rust 的流水线不调用 md2md）、禁用对单一语言代码不适用的“给代码组加语言”，并补测试。
+
 ## 场景 R3：审核上游更新
 
 **用户故事**：作为文档工程师，web-content 的 Rust 原文更新后，我在一个 PR 中看到整本手册的变化，决定是否采用。
@@ -245,7 +260,7 @@ Guides 分开 current 与 next，是因为 Milvus 的功能文档常写在 Cloud
 | 不发布的模块与页面 | 先照 Go 排除 ResourceGroup，副本管理也在这个模块里；CDC、Snapshots 逐页核对 | |
 | 页面里的 `token` 填什么 | 每个 zdoc 页面的 front matter 都有 `token`（原本是飞书文档 ID）和 `type`（来源类型）。Rust 没有飞书文档，照已上线的 Guides 共享页，填 `token: shared-rust-<模块>-<文件名>`、`type: origin`。请确认翻译、修订记录、侧边栏等工具不要求它是真实的飞书 ID | |
 | dev 上的初始内容 | 新手册第一次 Fetch 前，dev 上要先有页面、侧边栏、清单文件三样（原因见场景 R4）。照 C++ 的先例，我们准备一个分支，请文档负责人检查后放进 dev；中文侧边栏是否也要放 | |
-| 页面内删除内容 | Cloud 不暴露的参数（如 `replica_number`、`resource_groups`），在 web-content 中用命名块标出，`manual.yaml` 的 `transforms` 中写 `remove`。命名块是 HTML 注释，milvus.io 不显示。Phase 1 只支持 `remove`。需要 web-content 的维护者配合加标记 | |
+| 页面内删除内容 | Cloud 不暴露的参数（如 `replica_number`、`resource_groups`），在 web-content 中用命名块标出，`manual.yaml` 的 `transforms` 中写 `remove`。命名块是 HTML 注释，milvus.io 不显示。本期只支持 `remove`：目前的差异全是删除，`add`、`replace` 要维护随上游漂移的内容文件，需要时再打开，大约多 1–2 天（见场景 R2）。需要 web-content 的维护者配合加标记 | |
 | Phase 1 不区分 current / next | 上游更新 PR 同时改这两个值：SDK Reference 写的是已经发布的 SDK，发版前在 UAT 上检查即可（理由见场景 R3）。请确认 Cloud 是否常有“SDK 已发布、Cloud 很久后才支持”的情况；常见的话要重新考虑 | |
 | 以后迁移其他 SDK | 每个 SDK 一个组目录，各有自己的 `source.yaml`、`Variables.json`、lock，与 Fetch 的分组一一对应 | |
 
