@@ -215,7 +215,8 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 产品名检查 | 漏换的产品名报错 | WP6 | 已合并到上游（`zilliztech/zdoc` `ca64aa6`） | [WP6](./walkthroughs/WP6.md) |
 | 两版合并 | Prod 与 UAT 的版本合成一页 | WP11 | 已合并到上游（`zilliztech/zdoc#921`，`8404678`） | [WP11](./walkthroughs/WP11.md) |
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
-| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12、WP13 | WP8b 已合并到上游（`zilliztech/zdoc` `8680736`）；WP12、WP13 未开始 | [WP8](./walkthroughs/WP8.md) |
+| 上游变化分析 | 比较源与 Cloud 输出、锚点和采用依赖，生成报告 | WP12-A | 技术验收通过，进入 PR 审阅；未合并、未发布 | [WP12-A](./walkthroughs/WP12-A.md) |
+| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12-B、WP13 | WP8b 已合并（`8680736`）；WP12-B 与 WP13 未启动 | [WP8](./walkthroughs/WP8.md) |
 | 目录结构 | `shared-docs/` 按组分子目录 | WP8c | 已合并到上游（`zilliztech/zdoc` `e9ab23f`） | [WP8c](./walkthroughs/WP8c.md) |
 | 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9a 已合并到上游（`zilliztech/zdoc#863`，`8289d74`）；WP9b-1（[#950](https://github.com/zilliztech/zdoc/pull/950)）、WP9b-2（[#960](https://github.com/zilliztech/zdoc/pull/960)）已合并，工具链已同步 dev；走读已补，正式 Fetch/部署后验收待完成；WP14、WP15 未开始 | [WP9a](./walkthroughs/WP9.md)、[WP9b](./walkthroughs/WP9b.md) |
 | 试点页接入 | 原文对齐与页面配置，分批接入 | 内容（不属于工作包） | 试点 Delete Entities 与第一、二批共 12 篇已激活并上 Prod（`zilliztech/zdoc#861`、`#872`、`#903`）；第三批 3 篇已激活（`#916`，2026-10-29），等发版上 Prod | — |
@@ -242,8 +243,9 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
+| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A 技术验收通过，B 未启动） |
 
-其余的在对应工作包开始前写，写完由推动者确认。
+其余的在对应工作包开始前写，写完由推动者确认。任务分发与审阅按[主会话协作约定](./coordination.md)执行；WP12/WP13 的公共接口见[接口约定](./wp12-wp13-contract.md)。阶段验收不等于整个工作包需求结项。
 
 ### Agent 的规则
 
