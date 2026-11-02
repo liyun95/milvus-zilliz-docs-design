@@ -1,6 +1,6 @@
 # WP9b Fetch 收尾：写 dev 前的保护与真实运行的遗留问题
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP9a](./WP9-zdoc-fetch-handoff.md) 已合并（[zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)），[WP11](./WP11-zdoc-two-version-merge.md) 合并后开始（要用它的 `BuiltPage.notes`）。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：未开始
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1a　**依赖**：[WP9a](./WP9-zdoc-fetch-handoff.md) 已合并（[zilliztech/zdoc#863](https://github.com/zilliztech/zdoc/pull/863)），[WP11](./WP11-zdoc-two-version-merge.md) 合并后开始（要用它的 `BuiltPage.notes`）。改动 Fetch，计划与上游 PR 都要 zdoc 维护者 review　**状态**：开发已完成；WP9b-1 [#950](https://github.com/zilliztech/zdoc/pull/950)、WP9b-2 [#960](https://github.com/zilliztech/zdoc/pull/960) 已合并，[#968](https://github.com/zilliztech/zdoc/pull/968) 已同步工具链到 dev。合并前真实验证已通过；下一次正式 Fetch 与部署后验收另行记录。以下任务与检查清单保留原定范围；已核对的实现、证据与剩余边界见 [WP9b 走读](../walkthroughs/WP9b.md)。
 
 ## 目标
 
