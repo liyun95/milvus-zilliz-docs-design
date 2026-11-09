@@ -2,7 +2,7 @@
 
 WP12 要把 Milvus 上游变化变成可审核的 Cloud 更新 PR。A 先实现其中的变化分析与报告；B 才连接定时检查、生命周期快照、滚动 PR 和工作流。
 
-[A 的实现 PR](https://github.com/zilliztech/zdoc/pull/1027) 已通过主会话技术验收，固定 head [`68151311f`](https://github.com/zilliztech/zdoc/commit/68151311fafa25710b6f9c7c3a18f96cb522c0ec)；尚未合并或发布。范围见[任务卡](../tasks/WP12-zdoc-upstream-updates.md)；验证结果见下文“审阅与验证”。
+[A 的实现 PR](https://github.com/zilliztech/zdoc/pull/1027) 已通过主会话技术验收，固定 head [`68151311f`](https://github.com/zilliztech/zdoc/commit/68151311fafa25710b6f9c7c3a18f96cb522c0ec)；已于 2026-11-02 合并为 `0719a6698e72ea8a58dd2fee6bec6741c10699b7`。合并不等于自动更新流程上线，后续状态见 [B 阶段走读](./WP12-B.md)。范围见[任务卡](../tasks/WP12-zdoc-upstream-updates.md)；验证结果见下文“审阅与验证”。
 
 ## 从输入到报告
 
