@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-09）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3/B4 尚未实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-09）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已实现并提审（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），其余 B3 切片与 B4 尚未实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 精确计划主审已审定；第 3 片须先通过有界 API 预检，实现未开始 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片本地主审与验证通过，待上游 #1189 合并；第 2–4 片未实施，第 3 片须先通过有界 API 预检 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -75,7 +75,7 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 #### 执行与审阅流程
 
 - 本卡维护总计划；每片在 `liyun95/zdoc` 建一个 Draft PR，先提交 `.claude/plans/wp12-b3-slice-N.md` 的短实施计划，引用本卡固定版本，不复制或重做完整 B3 设计。计划列出接口、测试断言、允许路径和相对总计划的差异。
-- fork 内 PR 的 base 必须等于已核验的上游 master 基线；fork master 不适用时建立专用 review-base 分支，不重置已有分支。方案经主会话明确通过后，同一分支/PR 增量实现和修订；review 绑定精确 HEAD，作者逐条回复证据，由 reviewer 复核后解决线程。
+- fork 内 PR 的 base 必须等于已核验的上游 master 基线；fork master 不适用时建立专用 review-base 分支，不重置已有分支。方案经主会话明确通过后，同一分支/PR 增量实现和修订；先跑 focused 与快速检查，经主审及修正复核后，再在最终 HEAD 跑完整测试，避免旧版本全量阻塞修正；review 绑定精确 HEAD，作者逐条回复证据，由 reviewer 复核后解决线程。
 - 第一片只实现本卡两个允许产品文件。计划文件是 fork 审阅阶段的文档例外；上游提审前用普通提交移除它，计划和讨论仍保留在 fork PR 历史。完整 diff 必须再经 selector 核查，不能跳过 unmapped 路径。
 - 本地 code review 通过后，从同一 feature 分支向 `zilliztech/zdoc:master` 提 PR，附 fork review 链接与最终 HEAD 测试结果。fork PR 不必先合并到 fork master；上游 PR 仍需自己的 CI 和 review。每片上游合并后才开启下一片，不提前启动后续范围。
 
@@ -139,7 +139,9 @@ reconcileRemoteTransaction(intent, observedFacts): NextAction | Hold;
 
 原始 `404` 不自动等于 absent：先认证 repository 仍可读、端点范围正确，再用精确 ref/PR 清单与有界分页交叉确认；403/429/5xx/超时/GraphQL errors/截断/分页上限都为 unknown。API HTTP 200 内含 GraphQL errors 也不算成功。所有诊断脱敏，不保留 Authorization、子进程 stderr 或 token。
 
-#### 切片 1 — 纯远端观察与精确接受谓词（可立即执行）
+#### 切片 1 — 纯远端观察与精确接受谓词（已实现，待上游合并）
+
+**执行记录（2026-11-09）**：[fork Draft PR #18](https://github.com/liyun95/zdoc/pull/18) 保留方案、主审意见和修订；[上游 PR #1189](https://github.com/zilliztech/zdoc/pull/1189) 的 HEAD 为 `4d33a1131716c8db2b3063c0b08800b69e5caa7a`，净差异仅下列两个产品文件。主审已验证 base=M、触发者/写入者身份分离等修正；本地完整检查在该 HEAD 上通过：shared-docs 1352 passed / 0 failed / 6 既有 skipped、typecheck、matrix 25/25、policy 118/118、完整 diff selector 与 diff-check。上游 CI/审阅尚待完成，未合并、不启动下一片；此通过不代表真实远端认证、runner 或 Linux 资格完成。
 
 **允许路径**：新增 `packages/docs-tooling/src/shared-docs/core/updates/remote.ts`、`packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts`。无其他产品文件改动；不触网、不捕获工具集、不新增入口。
 
