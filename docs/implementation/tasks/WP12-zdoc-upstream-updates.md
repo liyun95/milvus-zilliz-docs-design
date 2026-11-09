@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-02）**：WP12-A 已完成技术验收，代码 head [`68151311f`](https://github.com/zilliztech/zdoc/commit/68151311fafa25710b6f9c7c3a18f96cb522c0ec)，[上游 PR #1027](https://github.com/zilliztech/zdoc/pull/1027) 审阅中；WP12-B 未启动。整个 WP12 尚未完成，所有需求 pending 编号保留。实现和验证结果见[走读](../walkthroughs/WP12-A.md)。
+**状态（2026-11-09）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3/B4 尚未实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -26,8 +26,11 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 
 | 阶段 | 内容 | 状态与停止点 |
 |---|---|---|
-| A：变化分析与报告 | 固定输入身份；原文、依赖和实际 Cloud 输出比较；锚点关系；采用单元；JSON/Markdown；只读生成观察 | 已技术验收，进入 PR 审阅；不写 lock，不做外部事务 |
-| B：自动更新流程 | 定时/手动发现；认证生命周期快照；只推进 next；滚动 PR、依赖合组、保留人工编辑、并发和恢复；校验工作流 | 尚未启动；先交精确计划、权限和验证矩阵给主会话审定 |
+| A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
+| B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
+| B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 下一项：先交精确实施计划给主会话审定 |
+| B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
 
@@ -49,11 +52,34 @@ A 的可改路径如下，均相对于 zdoc 根目录。计划和验证证据不
 - `packages/docs-tooling/src/shared-docs/fixtures/milvus-docs/build.test.ts`
 - `packages/docs-tooling/src/shared-docs/README.md`（只记录 A 已实现的内部接口）
 
-B 不能直接沿用下面的总体范围开工。下线证据缺失不能推断删除；完整 7-9 还需与 WP14 对接。Rust 手册级更新待 R1 契约稳定后单独细化，不计入已验收的 A。
+B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能推断删除；完整 7-9 还需与 WP14 对接。Rust 手册级更新待 R1 契约稳定后单独细化，不计入已验收的 A。
 
 ### B 的计划交付
 
 固定最新 master，细化 B 的精确路径、code-to-test selector、GitHub API 身份、权限、并发及失败恢复策略；明确默认只报告的 rollout 和真实外部 smoke。计划经主会话审定后才实施，不因 A 通过而自动获得 workflow、Base/dev、上传或付费翻译权限。
+
+### B2 收尾裁决与保留边界
+
+- #1155 于 2026-11-09 合并，merge SHA `98de1d8426b1d251b8393ea9b5ad91686de14776`。Guides 本地规划和候选准备完成；原始 B 路线图中的远端身份和 mutation 设想不计入 B2。
+- [scheduled Fetch 42599114207](https://github.com/zilliztech/zdoc/actions/runs/42599114207) 在含 B2 的工具版本 `15387649ba38bcea441366df8d3a5ccafae8ecfd` 上成功，10 个源发布单元全部写入 dev，中英文 assembly 和最终验证通过。这是合并后既有发布链兼容性证据，不是本地更新 CLI 或自动更新 PR 的执行记录。
+- 此次 `runTranslations=false`，不能声称下游 Translation 或线上部署完成；canonical-link 报告中的告警另作内容维护，run 成功不等于页面全部无问题。
+- Linux 可信工具集捕获仍由生产代码明确拒绝；SDK provider 仍返回 `PROVIDER_NOT_INSTALLED`。两项保持未交付，不能借 Fetch 在 Linux 成功而取消限制。
+- `7-1`—`7-10` / T05 不因阶段收尾从 pending 删除。完整生命周期仍与 WP14 衔接，Rust/SDK 更新另按已合并接口安排。
+
+### 下一项：B3 精确计划任务（先规划，再实现）
+
+主会话维护本卡和裁决；执行会话负责计划、实现、自测和修订，PR 回主会话 review。现有 B 路线图不是可直接执行的 API/路径清单。
+
+执行方先交可审阅计划：
+
+1. 固定包含 #1155 的最新 master SHA，核查 B2 实际 result/proof/journal 与命令契约，列出可复用模块及缺失的远端认证。不得把本地 proof 当 GitHub 身份认证。
+2. 先确定运行平台：提出已资格验证平台上的执行方案，或把 Linux 原生闭包支持列为独立前置；不得简单取消 skip 或 fail-closed 检查。SDK provider 不自动扩入 B3。
+3. 拆成小 PR：远端只读身份/精确 head 校验契约 → GitHub 事务与响应丢失恢复 → 受控接线。每项提供实际允许路径、code-to-test selector 联集和停止点。
+4. 绑定 repository/app/actor 与 master/dev/head；写入前重查 expected head，保留人工编辑。网络错误、缺失、未知状态分别报告，不 force-push，不靠删分支或自动回滚清除不确定性。
+5. 验证创建成功但响应丢失、人工并发提交、master/dev 移动、旧或错误 app 的检查、dispatch 响应不明、部分 donor 收尾。有效校验完成前不得关闭 donor；无法确认时 hold。
+6. 默认关闭远端写；本地用临时 Git 仓库和 API 故障服务。真实 smoke 的仓库、分支、写入、验证和清理范围单列，获准后执行。生产 Fetch/Translation、Base、dev、WP13 提升、WP14 下线不在 B3 实现权限内。
+
+精确计划通过主会话审阅后才实施；B4 再交付定时/手动入口与 rollout。当前不启动新生产 workflow，也不以此次 Fetch 代替 B3/B4 验收。
 
 ### B 可提议的范围（须由计划细化后批准）
 
