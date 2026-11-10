@@ -467,7 +467,7 @@ git diff --check
 - 通过独立 fixture 与 mock 边界验证环境、限额、脱敏、各项独立失败和实际 capture 仍被调用。最终冻结后按 selector 联集验证；不重复上一片实际 smoke，不沿用已经消费的一次 hosted 授权。
 - 只有取得同环境证据并审阅具体方案后，才考虑支持标准版本化 Xcode bundle；不得仅扩大路径前缀就宣称 hosted 支持。下一次外部运行另以冻结包审定。
 
-本片实现已冻结为 `28b33646f7efb331ad22af03afc22f3d517a0b1a`，见 [产品 Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 和 [Fork Draft #24](https://github.com/liyun95/zdoc/pull/24)。增量基线是 #1206 的 `35cee9397`，两个文件 +209/-7；主审修正平台测试假设、路径遍历观察、同步子进程终止与不可取消文件读取的错误超时表述后，focused 72/72、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。完整 [CI 42802409072](https://github.com/zilliztech/zdoc/actions/runs/42802409072) 待完成；没有新的真实 capture 结果。私有包已冻结为 `f6c2741fdd6928f30a467ad76a4344f0788d392b`，只更换两处工具 SHA，其他 wrapper/权限/时限保持；尚未 push 或 dispatch，正在申请对应的一次只读运行授权。
+本片实现已冻结为 `28b33646f7efb331ad22af03afc22f3d517a0b1a`，见 [产品 Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 和 [Fork Draft #24](https://github.com/liyun95/zdoc/pull/24)。增量基线是 #1206 的 `35cee9397`，两个文件 +209/-7；主审修正平台测试假设、路径遍历观察、同步子进程终止与不可取消文件读取的错误超时表述后，focused 72/72、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。完整 [CI 42802409072](https://github.com/zilliztech/zdoc/actions/runs/42802409072) 已通过：Linux / Node 22.23.4，四阶段 1504 passed / 0 failed / 96 既有平台 skipped，最终 gate 成功；测试合并提交 `6fdc862d00e9c5d74e8017e9e33158e4660f0988` 的 parent 为 master `47a7274` 与最终 HEAD `28b33646`。另一次本地 preflight-only 实测取得 13 项观察、0 项 unavailable，未运行 capture/worker；没有新的 hosted capture 结果。私有包已冻结为 `f6c2741fdd6928f30a467ad76a4344f0788d392b`，只更换两处工具 SHA，其他 wrapper/权限/时限保持；尚未 push 或 dispatch，正在申请对应的一次只读运行授权。
 
 #### 后续切片与准入条件
 

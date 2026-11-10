@@ -147,7 +147,7 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 ## 首版目标调整（2026-11-10）
 
-用户选择优先交付 Guides 单页的上游自动发现、`lock.next` 更新和 Draft PR 创建；已有未合并更新 PR 时暂停并报告，滚动更新和复杂恢复后续再启用。已有 B3 能力保留；去重、精确提交验证与未知远端结果停止仍是首版门槛。当前 [Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 已实现 B4.1 同环境前置观察与安全错误分类，72 个聚焦测试通过，完整 CI 待完成，避免把 setup 环境的观察当成实际 capture 失败原因。具体四个交付包、粗略预算与本片允许路径见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+用户选择优先交付 Guides 单页的上游自动发现、`lock.next` 更新和 Draft PR 创建；已有未合并更新 PR 时暂停并报告，滚动更新和复杂恢复后续再启用。已有 B3 能力保留；去重、精确提交验证与未知远端结果停止仍是首版门槛。当前 [Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 已实现 B4.1 同环境前置观察与安全错误分类，72 个聚焦测试通过，完整 CI 四阶段 1504/0/96 和 gate 均通过；本地 preflight-only 取得 13 项观察，未启动 capture/worker，避免把 setup 环境的观察当成实际 capture 失败原因。具体四个交付包、粗略预算与本片允许路径见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
 ## 收尾与下一步
 
