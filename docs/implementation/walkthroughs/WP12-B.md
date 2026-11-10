@@ -1,6 +1,6 @@
 # WP12-B 走读：本地更新准备已完成，远端自动化待实现
 
-截至 2026-11-10，B1 的只读报告、B2 的本地规划/准备与 B3 第一片的纯远端校验契约已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
+截至 2026-11-10，B1 的只读报告、B2 的本地规划/准备与 B3 前两片的纯远端校验契约、只读事实和历史认证已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
 
 ## 已交付的部分
 
@@ -9,6 +9,7 @@
 | B1 | 固定输入、生命周期观察、只读更新报告 | [#1055](https://github.com/zilliztech/zdoc/pull/1055)，`d06339345458a7465140a85389a9df5e9f68a603`，2026-11-03 |
 | B2 | `update-plan` / `update-prepare`、可信工具集、隔离 Git 候选、proof/journal 与恢复 | [#1155](https://github.com/zilliztech/zdoc/pull/1155)，`98de1d8426b1d251b8393ea9b5ad91686de14776`，2026-11-09 |
 | B3 第一片 | 远端观察的严格 schema、读取状态分类、精确验证收据的纯一致性校验 | [#1189](https://github.com/zilliztech/zdoc/pull/1189)，`87f103f926d27943861278181308ebbb7cb73fe0`，2026-11-10 |
+| B3 第二片 | 有界 GitHub 只读事实、artifact 证明和原始 Git 历史认证 | [#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`，2026-11-10 |
 
 B2 的含义是：在本地证明“这些固定输入应产生什么候选”，不自动推送分支、创建 PR 或发布。对真实 Guides 的收集和生成使用受约束的工具集；输入或身份不充分时输出 hold，不通过扩大权限继续运行。
 
@@ -26,9 +27,9 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 六个既有跳过项为四个可选 loopback 图片测试、需显式开启的 measured Guides collector 测试和一个需大小写敏感文件系统的用例，不计作通过。完整本地证据根为 `/Users/liyun/.cache/zdoc-vitest/run-koV6yc`。
 
-## B3 第二片：只读事实与历史认证（待上游合并）
+## B3 第二片：只读事实与历史认证
 
-[fork PR #19](https://github.com/liyun95/zdoc/pull/19) 已完成方案和代码主审；最终产品 HEAD 为 `9db162557a80450ba6cf7d922ab653bbadf2d6d2`，本地主审与最终验证通过，已提 [上游 PR #1193](https://github.com/zilliztech/zdoc/pull/1193)，尚未合并。
+[fork PR #19](https://github.com/liyun95/zdoc/pull/19) 已完成方案和代码主审；最终产品 HEAD 为 `9db162557a80450ba6cf7d922ab653bbadf2d6d2`，本地主审与最终验证通过，[上游 PR #1193](https://github.com/zilliztech/zdoc/pull/1193) 已在 CI 通过后于 2026-11-10 合并，merge SHA `38a721e3e720fee4a43d401a69b53663bdf423b4`。
 
 `createRemoteReads` 读取并绑定 GitHub repository/ref/PR/run/check、签名与 artifact；网络层只允许固定的 GET 和只读 GraphQL 查询。分页不完整、来源不明、归档不合法或前后观察变化都会停止。`inspectRemoteHistory` 独立核对原始 Git object 哈希、完整祖先、P/K/S 关系、next-only 改动及人工合并；分批保存原始对象和定位清单，避免逐提交写盘。`inspectRemotePulls` 只归组已认证的 subjects，未知来源或跨 unit key 重叠不继续。
 
@@ -101,4 +102,4 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189。第二片只读事实与远端历史认证已实现、通过主审和最终本地验证，上游 #1193 待 CI/合并；合并后才进入第三片。第三片的真实 API 可行性预检和 B4 平台资格仍保留。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189。第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。下一步是第三片入口的隔离 API 预检：先完成本地包和主审，获得具体仓库/执行授权后才运行；预检通过后再实施第三片产品代码。第三片的真实 API 可行性预检和 B4 平台资格仍保留。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。

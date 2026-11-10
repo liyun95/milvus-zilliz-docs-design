@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片已实现、通过主审与本地最终验证，已提 [#1193](https://github.com/zilliztech/zdoc/pull/1193) 待 CI/合并；第三/四片与 B4 尚未实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片正在准备有界 API 预检，第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片本地验收通过、上游 #1193 待 CI/合并，第 3–4 片未实施，第 3 片须先通过有界 API 预检 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片准备 API 预检，第 3–4 片产品代码未实施，第 3 片须先通过有界 API 预检 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -109,6 +109,12 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 
 #### 第 3 片入口：有界 API 可行性预检
 
+**执行准备（2026-11-10）**：第一/二片已合并，产品基线为 `38a721e3e720fee4a43d401a69b53663bdf423b4`，第二片收尾文档由设计 PR #79 合并（`6e7e93426656b0b3beedc45a7860b697cc541721`）。先准备并主审本地预检包，再申请具体隔离仓库/单次执行授权；第三片产品代码尚未开工。
+
+拟用新建私有仓库 `liyun95/zdoc-writer-preflight`，仅安装手动触发的预检 workflow 和无依赖脚本，使用该仓库自身 `GITHUB_TOKEN`。初始化 `main` 只承载经审阅的预检工具；实际 API 实验只操作一条由 run/attempt 派生的 staging ref。顺序固定为：上传精确 fixture objects → absent→K → 空文件变化 seal S → 错误旧值 CAS 被拒绝且仍为 S → 正确 CAS 到 S 的后继 F。成功响应丢弃后只读回验证，不自动重试；不自动删除分支或仓库。仓库创建、工具安装和一次 dispatch 均等待明确授权，生产 zdoc/milvus 仓库不在授权范围内。
+
+预检使用 reviewed checkout（不保存凭据）及专用 probe 步骤；fixture Git objects 始终作为数据。签名者、作者、committer 和执行 App/actor 分别记录，不能因为观察到某个 ID 就改写第二片的固定身份判定。测试只能证明 API 可行性，生产进程隔离和平台资格仍属 B4。
+
 这是 B4 资格工作的前置小项，用来及早验证事务架构依赖的 GitHub 行为；不等于完整 runner 资格或生产激活。本计划不执行任何外部写。第 1/2 片可以先完成；如果还没有获准的隔离测试仓库及写入授权，第 3 片保持草案，不大规模实现，第 4 片也不绕过此前置。
 
 - 在获准的隔离测试仓库使用该仓库真实 `GITHUB_TOKEN`，记录仓库 ID、token 所属 App/actor 与执行 run/attempt；不用 PAT 冒充。授权范围先固定：一组小型 Git objects（含普通双亲 merge 和确定性 K）、一个 `shared-update-staging/<transactionId>` ref、无 PR/生产分支/生产 workflow 写入；清理仅限该 ref，并另按已授予的清理范围执行。
@@ -160,7 +166,7 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote.tes
 
 #### 切片 2 — GitHub 只读事实与远端历史认证
 
-**执行状态（2026-11-10）**：产品基线 `87f103f926d27943861278181308ebbb7cb73fe0`；[fork Draft PR #19](https://github.com/liyun95/zdoc/pull/19) 已完成方案与代码主审。最终产品 HEAD `9db162557a80450ba6cf7d922ab653bbadf2d6d2` 已通过普通提交移除临时计划，完整 diff selector、shared-docs（1435 passed / 0 failed / 6 既有 skipped）、typecheck、matrix 25/25、policy 118/118 和 diff-check 均通过；已提 [上游 PR #1193](https://github.com/zilliztech/zdoc/pull/1193)，待上游 CI/合并。三个远端测试文件共 142 项全部执行通过（含 83 项新增）；完整全量仅在该最终 HEAD 跑一次。
+**执行状态（2026-11-10）**：产品基线 `87f103f926d27943861278181308ebbb7cb73fe0`；[fork Draft PR #19](https://github.com/liyun95/zdoc/pull/19) 已完成方案与代码主审。最终产品 HEAD `9db162557a80450ba6cf7d922ab653bbadf2d6d2` 已通过普通提交移除临时计划，完整 diff selector、shared-docs（1435 passed / 0 failed / 6 既有 skipped）、typecheck、matrix 25/25、policy 118/118 和 diff-check 均通过；[上游 PR #1193](https://github.com/zilliztech/zdoc/pull/1193) 的 CI 通过，于 2026-11-10 合并，merge SHA `38a721e3e720fee4a43d401a69b53663bdf423b4`。三个远端测试文件共 142 项全部执行通过（含 83 项新增）；完整全量仅在该最终 HEAD 跑一次。
 
 **允许路径**：新增 `adapters/updates/remote-github.ts`、`adapters/updates/remote-metadata.ts`、`testing/updates/remote-github.test.ts`、`testing/updates/remote-metadata.test.ts`；修改 `core/updates/remote.ts`、`testing/updates/remote.test.ts`。以上均在 `packages/docs-tooling/src/shared-docs/` 下。
 
@@ -259,7 +265,7 @@ B4 必备交接清单（仅定义条件，本卡不实施）：
 - 真 smoke 开始前列出获准仓库/branch 前缀、最多 PR/ref 数、固定输入、允许写入和清理路径；只操作该次创建对象，不 force/delete 他人 ref。第 3 片前的 API 预检与 B4 完整 smoke 均须取得各自范围的真实外部写入授权；本次计划和第 1/2 片无生产凭据前置。
 - PR ready/donor 自动 close 的非 CAS 竞态、精确检查是否为合并必需条件、人工更新后如何阻止误验收，须形成可测试 rollout 策略；默认人工确认保留。不得宣称“校验成功→关闭所有 donor”为跨 API 原子事务。
 
-**本次计划自审**：接口名/新旧 schema 边界、全部四片路径、focused/最终命令、K/S 身份、unknown 恢复、部分 donor、平台停止点与相对链接已检查。规划阶段仅更新本卡并检查文档；未执行产品测试或实现产品代码。设计文档提交/PR 不代表产品实现或远端事务已获验收。主审已审定本卡，首片已合并，第二片已完成 fork Draft PR 方案/代码审阅与本地最终验证、上游 #1193 待 CI/合并；第 3 片必须先通过有界 API 预检，未获准预检不阻止第 1/2 片交付。
+**本次计划自审**：接口名/新旧 schema 边界、全部四片路径、focused/最终命令、K/S 身份、unknown 恢复、部分 donor、平台停止点与相对链接已检查。规划阶段仅更新本卡并检查文档；未执行产品测试或实现产品代码。设计文档提交/PR 不代表产品实现或远端事务已获验收。主审已审定本卡，首片已合并，第二片已完成主审、最终本地验证和上游 CI，并合并 #1193；第 3 片必须先通过有界 API 预检，未获准预检不阻止第 1/2 片交付。
 
 ### B 可提议的范围（须由计划细化后批准）
 
