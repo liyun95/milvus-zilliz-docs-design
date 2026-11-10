@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正主审/CI 通过，待上游 #1197 合并；第 3 片事务/第 4 片编排尚未实施 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正已合并 #1197，第 3 片离线事务已通过主审与双平台完整测试，#1199 待合并；第 4 片编排尚未实施 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -180,7 +180,7 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 - [x] 本地实施入口修订审阅后，实施六文件兼容修正（`9dac6ad`，完整验证仍见下项）：`core/updates/remote.ts` 加必填策略与严格 author facts/pure checks；`adapters/updates/remote-github.ts` 加 author 双 API 一致性；`adapters/updates/remote-metadata.ts` 改必要身份谓词及调用参数，保留原始签名头验证；对应 `testing/updates/remote.test.ts`、`remote-github.test.ts`、`remote-metadata.test.ts` 增加下列矩阵。不得把预检 helper 的续行修正机械复制到已经按原始头解析的产品 verifier。
 - [x] focused 通过后按完整 diff selector 运行最终检查，走既定 fork Draft PR → 主审 → 上游 PR（#1197 主审及 CI 通过；保留下述 macOS 全量超时记录）；不接 CLI、Fetch/Translation、生产 workflow 或有效 producer registry。兼容修正通过后才继续第 3 片事务实现。
 
-**身份兼容修正实施记录（2026-11-10）**：[Fork Draft #20](https://github.com/liyun95/zdoc/pull/20)，提交 `9dac6ad800f001b9ec51d3a1a995984252653cca`，基线 master `63a76dc4fdf1b4de7de92f824f608d9a4c45cb6e`。仅上述六文件修改；主审完成代码/spec 检查，上游 [#1197](https://github.com/zilliztech/zdoc/pull/1197) 已通过 CI 并转为 ready for review，尚未合并；完整本地验证未通过的记录继续保留，不等于 B3 结项。未接 CLI、writer、Fetch/Translation 或有效 producer 注册表。
+**身份兼容修正实施记录（2026-11-10）**：[Fork Draft #20](https://github.com/liyun95/zdoc/pull/20)，提交 `9dac6ad800f001b9ec51d3a1a995984252653cca`，基线 master `63a76dc4fdf1b4de7de92f824f608d9a4c45cb6e`。仅上述六文件修改；主审完成代码/spec 检查，上游 [#1197](https://github.com/zilliztech/zdoc/pull/1197) 已通过 CI 并于 2026-11-10 合并（`678d8f1884fd5d734e8def0f31f03ad743231240`）；完整本地验证未通过的记录继续保留，不等于 B3 结项。未接 CLI、writer、Fetch/Translation 或有效 producer 注册表。
 
 本地验证（macOS / Node 26.7.0）：隔离临时目录下 focused 172/172、typecheck、matrix 25/25、完整 diff selector 与 diff-check 通过。原默认临时目录 focused 为 171 passed / 1 timeout，保留该失败。全量默认并发先在既有发布 replay 触发 120 秒超时；独立 replay 为 1/1 通过，不能替代全量。两 worker 的首次诊断因选定临时路径过长而无法建立 Unix socket；更换短路径并先完成同长度 listen probe 后，light 85/85 文件、transactions 与 local-runner 三阶段通过，但在 update-prepare 阶段触及原 15 分钟总上限。该全量结果为失败、计数不完整，无成功 terminal aggregate；stop receipt 确认本次拥有的进程已收束。没有修改测试时限/跳过规则。上述结果曾阻止转出 Draft；后续 CI 的完整结果见下段，不覆盖这些本地结果。
 
@@ -267,9 +267,27 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-git
 
 #### 切片 3 — 精确 ref CAS、draft PR 与响应丢失重建
 
+**实施记录（2026-11-10，受限离线范围验收，待合并）**：[Fork Draft #21](https://github.com/liyun95/zdoc/pull/21) 已记录主审源码/spec 结论；上游 [#1199](https://github.com/zilliztech/zdoc/pull/1199) 已通过 CI 并转为 ready for review。实现提交 `bfb7f4c7a5cfdea98d26d70d41e9266a4e8a7f2b`，测试时限跟进后的 HEAD 为 `db15eddd9989a62a88b39b93d5103606ccceaa1a`，基线 `678d8f1884fd5d734e8def0f31f03ad743231240`，仅下列七个已批准文件。生产入口始终 report-only；真实 capture/writer 桥接、producer/validator 安装与 B4 资格不在本次实现中。
+
+主审已检查原始对象/OID、确定性 B2 revision、next-only、已有 PR 的内部历史认证、完整同单元集合/subjects 重叠/并发观察、每次不明写后的停止，以及从读取适配器取得 API/artifact facts 驱动的精确验证（本片由离线 HTTP fixture 提供）。恢复复用已验证 S/ref/draft；ready 和 donor close 仅为建议。派发尝试记录只作同一 evidence store 的保守否决，不能授予权限；新建空 evidence root 不证明从未派发。未来桥接必须绑定原 evidence root、intent 和跨 run 协调，不能据此声称全局去重。
+
+首次主审全量在新增 Git/HTTP 正例的默认 5 秒时限停止，结果不完整，清理已收束（`/Users/liyun/.cache/g-uKUqHz/run-0xFOT6`）。跟进仅给新增集成场景设 30 秒单例时限，故障矩阵仍为 120 秒；产品/既有测试/全局门槛和 skips 未改，受影响完整文件 30/30 通过。专项 fixture 错误、超时和后续验证分别保留在 zdoc 本地 `.claude/preparation/wp12-b3-preflight/slice3-report.md`，不另加 tracked 状态文件；最终结果见下文。
+
+**最终验证**：HEAD `db15eddd9989a62a88b39b93d5103606ccceaa1a` 在 macOS / Node 26.7.0 上四阶段全量 **1500 passed / 0 failed / 6 既有 skipped**，exit 0；前后 HEAD/工作区摘要一致，独立 `readGateReport` 确认 committed/passed，约 747 秒，未超过原 900 秒门槛。证据根 `/Users/liyun/.cache/g-1Lsooo/run-HQEeQG`。最终 selector、typecheck、matrix 25/25、policy 118/118、diff-check 通过。6 个跳过项仍为 images 4、可选 measured Guides collector 1、大小写敏感文件系统用例 1。
+
+[CI 42759644433](https://github.com/zilliztech/zdoc/actions/runs/42759644433) 在 Linux / Node 22.23.4 上完成四阶段：**1410 passed / 0 failed / 96 既有平台 skipped**，所有 PR 检查通过。实际测试 merge 为 `a911d8c79b598bbcf2247f1bda1afa292815a9f1`，父提交为最终 HEAD 与当前 master `678d8f188`。96 项符合固定 skip 声明（images 4、collector 1、toolset 89、update-command 2），改动测试文件均未跳过；这不解除 Linux capture 限制。主审接受本片离线范围，#1199 尚未合并；第 4 片和 B4 尚未实施。旧 HEAD CI 随 PR 更新被既有并发策略取消，不作为通过证据。
+
+**实用性限制**：当前完整 scratch history/tree 物化受 64 MiB 和全局 512 操作预算限制（含本地读取、展开、证据操作）；10,000 object/path 是次级拒绝界限，不表示可处理 10,000 个对象。真实 zdoc 规模的远端事务尚未验证，可能因保守限额 hold。该限制、真实负例原因缺口、生产 raw-object 取得、持久 ledger 和 runner/token 资格均须在后续桥接/激活前处理，不能把离线正例称为生产可用。
+
 **入口条件**：第 1/2 片已合并；按照上文主审入口修订，仅开展本地库代码/故障测试，保留真实负例原因资格缺口。不能用 HTTP fixture 代替真实 API 资格，也不启用任何生产/额外远端动作。
 
-**允许路径**：新增 `adapters/updates/remote-transaction.ts`、`testing/updates/remote-transaction.test.ts`；修改 `adapters/updates/remote-github.ts`、`testing/updates/remote-github.test.ts`、`core/updates/remote.ts`、`testing/updates/remote.test.ts`。均在 shared-docs 下；不接 CLI/workflow。
+**允许路径**：新增 `adapters/updates/remote-transaction.ts`、`testing/updates/remote-transaction.test.ts`；修改 `adapters/updates/remote-github.ts`、`testing/updates/remote-github.test.ts`、`core/updates/remote.ts`、`testing/updates/remote.test.ts`。均在 shared-docs 下；不接 CLI/workflow。主审于实施前批准额外修改 `testing/updates/remote-metadata.test.ts`，仅适配由 API 认证的必填 PR `createdAt` fixture；不以请求自报时间决定 survivor。
+
+**实施边界补充（2026-11-10）**：#1197 与设计 #84 已合并，执行基线为 `678d8f1884fd5d734e8def0f31f03ad743231240`。本片 fixture harness 使用显式注入的可执行 transport/object reader 测试同一事务内核，不读取环境凭据、不安装默认网络 writer；fixture 能力不能交给生产入口启用写入。真实 mint/bridge 留待受信后续切片，普通请求 JSON/环境标记不能授权。
+
+下列响应丢失的“可继续/重试/复用”仅描述重建后的状态，必须服从 #83 裁决：本次调用发生任何未分类写错误、超时或不完整响应后立即停止所有后续 mutation，只读 reconcile；新显式调用须重新认证 capability、intent 与全部远端状态。不能把同一次调用的正例对照或重试移入产品流程。
+
+验证派发按 [GitHub workflow dispatch 的 branch/tag ref 契约](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event)使用固定 `master` 分支，输入另带精确 M/D/S/requestId；派发前后确认 master=M，接收时仍须认证实际 run 的 tools head=M、受信定义与精确 receipt，不把分支名当作不可变版本。当前既有 `shared-docs-validate.yml` 不是新事务的受信 M-tools validator，本片不复用或修改它；未安装 validator 时保持 draft/hold。模拟 dispatch 成功不构成真实派发资格。
 
 **入口**：`createRemoteTransaction({ reads, writerCapability, evidence })` 的 `apply(intent)` / `reconcile(intent)`；writer 是内存能力，不能由 journal 的 `authorized:true` 构造。`intent` 绑定 repository、M/D、unit、plan/proof、K/P、expected PR heads、staging ref 与 transactionId。journal 新增独立 schema，按动作前 intent/动作后读取事实落盘；journal 是恢复提示，所有远端成功状态都须读回重建。
 
@@ -280,17 +298,17 @@ authenticated intent → upload exact objects → staging absent→K CAS
 → discover/create draft PR → request exact validation → accepted/held
 ```
 
-- [ ] 先测试 mutation allowlist：对象 POST、staging/target ref 的 `updateRefs(force:false)`、seal、创建 draft PR、显式校验 dispatch；禁止 master/dev ref、force、删除 ref、merge、Base/图片/翻译、ready 和 close。缺 capability 时包含对象上传在内全部零写。
-- [ ] 对象上传只遍历已验证 scratch 闭包中远端缺失对象；已有对象按 OID 读回，新增对象逐项比 hash。不能重建人工提交来替代已有 OID；不支持的对象/签名头保留原对象或 hold，不能丢字段。
-- [ ] staging 名由固定前缀+transactionId 唯一确定。创建响应丢失后读取该精确 ref：K 可继续封签；满足同一 intent 的 S 可复用；其他值 hold。封签响应丢失读取 K 的唯一已验证后继，不能靠 `clientMutationId` 假设幂等；多个 seal/未知后继 hold。B3 不自动删 staging。
-- [ ] 写 target 前重读 M/D、H、donor heads、PR state/base/draft 与 authority。M/D 或任何 head 改变则原 intent 作废、重新规划；最终 ref CAS 再拒绝读取与写入之间的人工 push。M/D 不在同一次 ref CAS 锁内，写后再读发现移动则 held，不接受旧验证、不回滚。
-- [ ] 创建 PR 响应丢失：按已知 repository+exact head ref+base 列出 open/closed/merged PR，再验证 actor、seal/unit 身份；唯一匹配复用，无匹配且完整读取确认后才重试 create，同 ref 已 closed/merged 不重开/改名绕过，多匹配 hold。不能只用标题或 marker 去重。
-- [ ] ref 写响应丢失：远端等于 S → 确认写成；远端为 S 的人工后继 → 记录已写成但 stale、重新规划；仍是 H → 完整读取后重新预检才可再 CAS；其他 ancestry、读取失败 → `REMOTE_STATE_UNKNOWN`，不盲重试。
-- [ ] dispatch 带稳定 requestId 和 S/M/D；超时先按 workflow/request/run/attempt 查询，等待有界，歧义/未知即 hold。未找到不接受旧 green，也不循环派发。真实 workflow 尚未安装则 `VALIDATOR_NOT_INSTALLED`，PR 留 draft。
-- [ ] donor 选已认证集合中最早 `created_at`、相同时间按 PR number 的 survivor，合入所有 donor 精确 head。只有 S 精确验证成功才输出 close proposals；若仅部分 donor 已被人工关闭，重跑核对关闭状态和已保留 ancestry，只输出剩余且未变化者。任一 donor 新 push 则不提关闭；保留所有 branches。成功响应也必须读回。
+- [x] 先测试 mutation allowlist：对象 POST、staging/target ref 的 `updateRefs(force:false)`、seal、创建 draft PR、显式校验 dispatch；禁止 master/dev ref、force、删除 ref、merge、Base/图片/翻译、ready 和 close。缺 capability 时包含对象上传在内全部零写。
+- [x] 对象上传只遍历已验证 scratch 闭包中远端缺失对象；已有对象按 OID 读回，新增对象逐项比 hash。不能重建人工提交来替代已有 OID；不支持的对象/签名头保留原对象或 hold，不能丢字段。
+- [x] staging 名由固定前缀+transactionId 唯一确定。创建响应丢失后读取该精确 ref：K 可继续封签；满足同一 intent 的 S 可复用；其他值 hold。封签响应丢失读取 K 的唯一已验证后继，不能靠 `clientMutationId` 假设幂等；多个 seal/未知后继 hold。B3 不自动删 staging。
+- [x] 写 target 前重读 M/D、H、donor heads、PR state/base/draft 与 authority。M/D 或任何 head 改变则原 intent 作废、重新规划；最终 ref CAS 再拒绝读取与写入之间的人工 push。M/D 不在同一次 ref CAS 锁内，写后再读发现移动则 held，不接受旧验证、不回滚。
+- [x] 创建 PR 响应丢失：按已知 repository+exact head ref+base 列出 open/closed/merged PR，再验证 actor、seal/unit 身份；唯一匹配复用，无匹配且完整读取确认后才重试 create，同 ref 已 closed/merged 不重开/改名绕过，多匹配 hold。不能只用标题或 marker 去重。
+- [x] ref 写响应丢失：远端等于 S → 确认写成；远端为 S 的人工后继 → 记录已写成但 stale、重新规划；仍是 H → 完整读取后重新预检才可再 CAS；其他 ancestry、读取失败 → `REMOTE_STATE_UNKNOWN`，不盲重试。
+- [x] dispatch 带稳定 requestId 和 S/M/D；超时先按 workflow/request/run/attempt 查询，等待有界，歧义/未知即 hold。未找到不接受旧 green，也不循环派发。真实 workflow 尚未安装则 `VALIDATOR_NOT_INSTALLED`，PR 留 draft。
+- [x] donor 选已认证集合中最早 `created_at`、相同时间按 PR number 的 survivor，合入所有 donor 精确 head。只有 S 精确验证成功才输出 close proposals；若仅部分 donor 已被人工关闭，重跑核对关闭状态和已保留 ancestry，只输出剩余且未变化者。任一 donor 新 push 则不提关闭；保留所有 branches。成功响应也必须读回。
 
 ```bash
-pnpm test:for-change -- packages/docs-tooling/src/shared-docs/adapters/updates/remote-transaction.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-transaction.test.ts packages/docs-tooling/src/shared-docs/adapters/updates/remote-github.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/core/updates/remote.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts
+pnpm test:for-change -- packages/docs-tooling/src/shared-docs/adapters/updates/remote-transaction.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-transaction.test.ts packages/docs-tooling/src/shared-docs/adapters/updates/remote-github.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/core/updates/remote.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts
 pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-transaction.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts
 ```
 
@@ -343,7 +361,7 @@ B4 必备交接清单（仅定义条件，本卡不实施）：
 - 真 smoke 开始前列出获准仓库/branch 前缀、最多 PR/ref 数、固定输入、允许写入和清理路径；只操作该次创建对象，不 force/delete 他人 ref。第 3 片前的 API 预检与 B4 完整 smoke 均须取得各自范围的真实外部写入授权；本次计划和第 1/2 片无生产凭据前置。
 - PR ready/donor 自动 close 的非 CAS 竞态、精确检查是否为合并必需条件、人工更新后如何阻止误验收，须形成可测试 rollout 策略；默认人工确认保留。不得宣称“校验成功→关闭所有 donor”为跨 API 原子事务。
 
-**本次计划自审**：接口名/新旧 schema 边界、全部四片路径、focused/最终命令、K/S 身份、unknown 恢复、部分 donor、平台停止点与相对链接已检查。规划阶段仅更新本卡并检查文档；未执行产品测试或实现产品代码。设计文档提交/PR 不代表产品实现或远端事务已获验收。主审已审定本卡，首片已合并，第二片已完成主审、最终本地验证和上游 CI，并合并 #1193；第 3 片必须先通过有界 API 预检，未获准预检不阻止第 1/2 片交付。
+**本次计划自审**：接口名/新旧 schema 边界、全部四片路径、focused/最终命令、K/S 身份、unknown 恢复、部分 donor、平台停止点与相对链接已检查。规划阶段仅更新本卡并检查文档；未执行产品测试或实现产品代码。设计文档提交/PR 不代表产品实现或远端事务已获验收。主审已审定本卡，首片已合并，第二片已完成主审、最终本地验证和上游 CI，并合并 #1193；第 3 片按 #83 的显式裁决仅实施离线库和测试，原完整 API 资格缺口继续保留。
 
 ### B 可提议的范围（须由计划细化后批准）
 

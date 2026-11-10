@@ -37,6 +37,18 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 新增适配器尚未被 CLI、Fetch、Translation 或发布入口调用。真实 producer 默认未安装，生产 raw-object 获取与平台资格未交付；复杂 merge 和跨单元重叠保守 hold。历史 closure 是受信 producer 的摘要证明，不等于本次重新捕获工具或重跑 B2。
 
+## B3 第三片：离线事务内核（已审阅，待合并）
+
+[Fork Draft #21](https://github.com/liyun95/zdoc/pull/21) 保留主审结论；[上游 #1199](https://github.com/zilliztech/zdoc/pull/1199) 初始实现为 `bfb7f4c7a5cfdea98d26d70d41e9266a4e8a7f2b`，新增测试单例时限修正后为 `db15eddd9989a62a88b39b93d5103606ccceaa1a`。源码/spec 主审与完整本地门槛、上游 CI 均通过；本片仅按受限离线范围验收，上游尚未合并，不表示整个 B3 完成。
+
+新增 `adapters/updates/remote-transaction.ts` 及测试，并扩展既有 remote schema/只读适配器。生产 `createRemoteTransaction` 始终 report-only；fixture harness 通过显式可执行 transport/object source 验证对象上传、staging 封签、精确旧值 CAS、Draft PR、精确验证和只读恢复。已有 PR 必须内部认证历史 producer/原始对象；验证成功只输出 ready/donor-close 建议，不执行这些状态写。
+
+写入结果不明时，本次调用停止所有后续 mutation。重新发起须重新认证 intent/状态；同一 evidence store 的派发尝试记录只会阻止重复派发，不授予权限。run 暂时不可见也不会再次派发。这个机制尚不构成跨 run 全局去重，持久证据和授权桥接仍未安装。
+
+本地测试使用真实临时裸 Git 与合成 HTTP 服务，覆盖每个写入位置的故障、并发 ref/PR 变化、人工后继重建、原始候选绑定、目录树展开限额及 API/artifact 精确接收。64 MiB/全局 512 操作的保守限额可能使真实规模事务 hold；完整仓库规模、真实 dispatch、负例原因和生产资格继续保留。现有 CLI、Fetch、Translation、发布/恢复 workflow 及权限未修改。
+
+最终 HEAD 的 macOS / Node 26.7.0 全量为 **1500 passed / 0 failed / 6 既有 skipped**，四阶段与最终 committed terminal 均通过，约 747 秒；证据 `/Users/liyun/.cache/g-1Lsooo/run-HQEeQG`。typecheck、matrix 25/25、policy 118/118、selector、diff-check 通过。[Linux CI 42759644433](https://github.com/zilliztech/zdoc/actions/runs/42759644433) 在精确测试 merge `a911d8c79b598bbcf2247f1bda1afa292815a9f1` 上为 **1410 passed / 0 failed / 96 既有平台 skipped**，所有检查通过，改动测试未跳过。原 fixture 错误与首轮全量的新增用例默认 5 秒超时保留；跟进只调整新增集成测试单例时限，最终完整结果不改写历史失败。第 4 片桥接与 B4 未开始。
+
 ## 从固定输入到候选
 
 请求指定固定 master/dev/source 身份、待处理的页面和比较条件。`update-plan` 收集材料、分析源与实际 Cloud 输出、构造采用单元，必要时在隔离区准备合并基线；不修改真实输入仓库。
@@ -102,14 +114,14 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已实施，第三片事务代码尚未实施。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 待合并。
 
 前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
 
 [第四次诊断](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42747205536) 已取得正确值 CAS 成功及丢成功响应后的读回证据；错误旧值请求仍只有 GitHub 内部错误，没有可确认的原因码，run 保留 failure/held。主审提出显式入口修订：本设计 PR 审阅后，仅允许本地身份迁移与事务故障测试，所有不明 mutation 错误后停止本次调用的后续写入，只读核对远端状态。该修订不把完整 API 资格标为通过，也不继续重复同类实测；生产接线和 B4 仍保持关闭。详细证据、负例资格缺口及实施清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
-设计 PR #83 已合并，本地实施入口正式生效。身份兼容修正进入 [Fork Draft #20](https://github.com/liyun95/zdoc/pull/20)，固定提交 `9dac6ad800f001b9ec51d3a1a995984252653cca`；主审未发现阻塞代码问题，上游 [#1197](https://github.com/zilliztech/zdoc/pull/1197) 已通过 CI 并转为可审阅，尚未合并。新规则分别认证机器人 author、平台 signer 与成功 producer 的来源；旧 policy/committer facts 拒绝，GraphQL committer null 原样保留。实现核查同时纠正 evidence 描述：保留的是响应摘要与有界数字身份观察，不增加完整原始 API 响应留存。生产接线仍关闭。
+设计 PR #83 已合并，本地实施入口正式生效。身份兼容修正进入 [Fork Draft #20](https://github.com/liyun95/zdoc/pull/20)，固定提交 `9dac6ad800f001b9ec51d3a1a995984252653cca`；主审未发现阻塞代码问题，上游 [#1197](https://github.com/zilliztech/zdoc/pull/1197) 已通过 CI 并于 2026-11-10 合并（`678d8f1884fd5d734e8def0f31f03ad743231240`）。新规则分别认证机器人 author、平台 signer 与成功 producer 的来源；旧 policy/committer facts 拒绝，GraphQL committer null 原样保留。实现核查同时纠正 evidence 描述：保留的是响应摘要与有界数字身份观察，不增加完整原始 API 响应留存。生产接线仍关闭。
 
 本地 focused 172/172、typecheck 和 matrix 25/25 已通过。保留环境诊断中的失败记录；最终短路径、两 worker 的全量检查前三阶段通过，但在 update-prepare 阶段触及原 15 分钟总上限，没有完整计数或成功终态。这些本地失败与后续 CI 结果分开记录，不以单独 replay 或 focused 通过代替全量。
 
-随后 [CI 42750713023](https://github.com/zilliztech/zdoc/actions/runs/42750713023) 在 Linux / Node 22.23.4 的测试 merge `0c0d7255b5ec834c37028a865b1cfd3d7e6bac02` 上完成四阶段，1376 passed / 0 failed / 96 skipped；跳过项符合既有精确声明，三个改动测试文件均未列入。主审接受这一完整 CI 证据与 macOS focused 结果作为本次身份兼容修改的门槛，#1197 转为 ready for review。macOS 全量预算问题仍保留，不能宣称所有平台全量通过。当前仅身份兼容先决项完成，后续事务、生产 producer、真实 CAS 负例原因及 B4 资格均未因此完成。
+随后 [CI 42750713023](https://github.com/zilliztech/zdoc/actions/runs/42750713023) 在 Linux / Node 22.23.4 的测试 merge `0c0d7255b5ec834c37028a865b1cfd3d7e6bac02` 上完成四阶段，1376 passed / 0 failed / 96 skipped；跳过项符合既有精确声明，三个改动测试文件均未列入。主审接受这一完整 CI 证据与 macOS focused 结果作为本次身份兼容修改的门槛，#1197 转为 ready for review。当次 macOS 全量失败记录保留，不能改写为通过；第三片最终 HEAD 的新全量结果见上文。当时仅身份兼容先决项完成，后续事务、生产 producer、真实 CAS 负例原因及 B4 资格均未因此完成。
