@@ -381,7 +381,7 @@ B4 必备交接清单（仅定义条件，本卡不实施）：
 
 ### B4：先验证运行条件，再接工作流（2026-11-10 计划）
 
-**目标**：让已合并的 B3 库能够在已验证的运行环境中生成报告，随后在隔离仓库完成远端 PR 与精确验证，最后才讨论 zdoc 的定时激活。当前只是计划；生产 `apply` 仍为 `WRITER_DISABLED`，本节不授予 workflow dispatch、远端 mutation 或生产启用权限。
+**目标**：让已合并的 B3 库能够在已验证的运行环境中生成报告，随后在隔离仓库完成远端 PR 与精确验证，最后才讨论 zdoc 的定时激活。B4.1 已获准实施，诊断代码正在审阅验证；生产 `apply` 仍为 `WRITER_DISABLED`，本节不授予 workflow dispatch、远端 mutation 或生产启用权限。
 
 **固定基线**：zdoc `f932331a92d0a0ed6bc552282bbb08245e1041f3`（#1201），设计 `04a19be6900c9b8e44971556c39e9ad351542624`（#86）。B3 合并后 [master CI](https://github.com/zilliztech/zdoc/actions/runs/42784180256) 与 [工具同步](https://github.com/zilliztech/zdoc/actions/runs/42784180446) 均已通过；工具同步的独立候选校验 [42784287828](https://github.com/zilliztech/zdoc/actions/runs/42784287828) 也已通过。master 与该候选的共享文档四阶段均为 **1432 passed / 0 failed / 96 既有平台 skipped**；自动同步 PR #1204 已由原有 workflow 合并。主审据此关闭 B3 限定离线范围的合并后检查，用户已明确要求开始 B4.1；这不授予生产 writer 资格。后续每片仍采用一个执行 agent、主会话主审、一个 PR，最终 HEAD 完整验证一次；有新失败才追加针对性诊断，不重复全套设计。
 
@@ -423,6 +423,18 @@ git diff --check
 ```
 
 **停止条件**：任何 capture/native/权限不合格、运行身份不一致、输出超限或 worker 未收束，都保留失败 evidence 并停止；不临时启用 Linux，不修改 runner 全局权限，不追加同类碰运气重跑。对象规模已经超限不阻止采集独立 host 诊断，但阻止远端 writer 实验。诊断 JSON 永远不被产品作为信任凭据读取。
+
+#### B4.1 实施与实测记录（2026-11-10，未验收）
+
+代码审阅入口为 [上游 Draft #1206](https://github.com/zilliztech/zdoc/pull/1206) 与 [Fork Draft #23](https://github.com/liyun95/zdoc/pull/23)。Fork master 较旧，#23 使用固定 `review/wp12-b4-base`（`f932331a92d0a0ed6bc552282bbb08245e1041f3`）作为审阅基线，只显示本片两个文件；没有修改 fork master。新增内部诊断及测试，未改生产 workflow、CLI、adapter、权限或容量限额。报告始终 `productionQualified=false`，capture、worker、容量与报告完整性分别记账。
+
+本地真实 smoke 在 `0e276aebf88a411d93315d34da550dc9152c28d1` 上得到 capture 阶段成功（102,762 ms），closure 23,135,911 bytes，SHA-256 `17b95c8de665f0026f9335302dba027ef658bc58f04f6c86a43df108cc8f075f`。worker 在生成前停止（67,846 ms），没有 child settlement；不能称 worker 成功，也不能凭时间接近推定失败原因。该旧报告另因工具描述超过内联限额而错误降级 capture 状态；后续实现改为单独保留有界描述 blob，新增回归保证报告截断不能改写阶段事实。原实测报告保留原样，修复后的合成测试不替代真实 smoke。
+
+同一次实测的 M tree 下界为 82,893,980 bytes，超过 67,108,864 bytes 对象预算。当前 hosted 资格、真实 worker 正例、measured-child credential canary 与 filesystem/config 隔离均未取得。Linux 捕获继续拒绝，生产 writer 继续关闭。
+
+初始候选 `c6893dda7e7354e6edd28032d39e52bc86110718` 的 focused 54 项、typecheck、matrix 25 项和 workflow policy 118 项通过；[初次 CI 42791052524](https://github.com/zilliztech/zdoc/actions/runs/42791052524) 失败：新增 mocked-capture 测试直接使用 CI 浅克隆，诊断器正确在 binding 阶段拒绝。修复仅把测试输入改成独立完整 fixture，并补真实浅克隆拒绝回归，不修改 workflow 或放宽生产检查。最终提交 `35cee93976d6023da054ab78f2cd69e60f61288e` 仅修正测试 fixture，focused 55/55、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。[最终 CI 42792901136](https://github.com/zilliztech/zdoc/actions/runs/42792901136) 正在运行。此前 c689 的 macOS / Node 26 全量为 1576 passed / 0 failed / 6 既有平台 skipped；主审验证四阶段均收束、最终 terminal 已提交、原始计数完整、前后 HEAD/工作区一致，总 gate 765.809 秒。该本地结果保留为前一提交证据，不改写成最终提交的全量。
+
+私有 `liyun95/zdoc-writer-preflight` 的新手动诊断 workflow 已在本地准备：固定工具 SHA、action SHA、macos-15/arm64、Node 22.23.4、pnpm 10.33.0、只读权限；15 分钟 job，180 秒 launcher 与 15 秒收束宽限。主审已冻结本地包 `6c0fb150bda812b00ed1f4aad376029f19328f2c`（4 个新增文件），用户已授权在最终 CI 通过后向私有仓库安装并手动运行一次；旧 API mutation workflow 不在授权内。当前尚未 push 或 dispatch；绿色 transport 也不等于 runner 合格。
 
 #### 后续切片与准入条件
 

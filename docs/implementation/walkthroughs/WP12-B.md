@@ -139,6 +139,12 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 #1201 合并为 `f932331a92d0a0ed6bc552282bbb08245e1041f3`。[master CI 42784180256](https://github.com/zilliztech/zdoc/actions/runs/42784180256) 的四阶段与最终 gate 均成功，1432 passed / 0 failed / 96 既有平台 skipped。[工具同步 42784180446](https://github.com/zilliztech/zdoc/actions/runs/42784180446) 的独立候选校验 [42784287828](https://github.com/zilliztech/zdoc/actions/runs/42784287828) 同样通过四阶段，1432 / 0 / 96；原有 workflow 合并同步 PR #1204。主审读取实际 tooling 日志分别核实，两者不混作一个 run，亦不宣称网站已部署或 B4 已激活。后续按任务卡先实现 B4.1 环境与容量诊断。
 
+## B4.1 诊断包进展（2026-11-10）
+
+[产品 Draft #1206](https://github.com/zilliztech/zdoc/pull/1206) 新增 `testing/updates/runner-qualification.ts` 与测试，用于分别观察工具捕获、真实 worker、对象规模和证据完整性。没有生产调用入口，任何报告都不授予 writer 权限。完整实测与验证结果见 [任务卡 B4.1](../tasks/WP12-zdoc-upstream-updates.md#b41-实施与实测记录2026-11-10未验收)。
+
+当前真实 smoke 只取得 capture 阶段成功；worker 在生成前停止、无 settlement，对象规模也已超过既有 64 MiB 预算。初次 CI 还发现新测试依赖完整 checkout，而默认 CI 使用浅克隆；已改用独立完整 fixture 并通过 55 个聚焦测试，最终 CI 待完成；浅克隆拒绝策略保持。此前 c689 的 macOS 全量 1576/0/6 已通过并独立核实，不能冒充最终 HEAD 的全量。外部运行包已获一次运行授权，待最终 CI 通过后执行，B4.1 环境资格和 B4 整体均未完成。
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
