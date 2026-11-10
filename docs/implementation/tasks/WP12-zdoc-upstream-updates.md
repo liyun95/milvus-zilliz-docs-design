@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-09）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已实现并提审（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），其余 B3 切片与 B4 尚未实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片已实现、通过主审与本地最终验证，已提 [#1193](https://github.com/zilliztech/zdoc/pull/1193) 待 CI/合并；第三/四片与 B4 尚未实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片本地主审与验证通过，待上游 #1189 合并；第 2–4 片未实施，第 3 片须先通过有界 API 预检 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片本地验收通过、上游 #1193 待 CI/合并，第 3–4 片未实施，第 3 片须先通过有界 API 预检 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -77,7 +77,7 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 - 本卡维护总计划；每片在 `liyun95/zdoc` 建一个 Draft PR，先提交 `.claude/plans/wp12-b3-slice-N.md` 的短实施计划，引用本卡固定版本，不复制或重做完整 B3 设计。计划列出接口、测试断言、允许路径和相对总计划的差异。
 - fork 内 PR 的 base 必须等于已核验的上游 master 基线；fork master 不适用时建立专用 review-base 分支，不重置已有分支。方案经主会话明确通过后，同一分支/PR 增量实现和修订；先跑 focused 与快速检查，经主审及修正复核后，再在最终 HEAD 跑完整测试，避免旧版本全量阻塞修正；review 绑定精确 HEAD，作者逐条回复证据，由 reviewer 复核后解决线程。
 - 第一片只实现本卡两个允许产品文件。计划文件是 fork 审阅阶段的文档例外；上游提审前用普通提交移除它，计划和讨论仍保留在 fork PR 历史。完整 diff 必须再经 selector 核查，不能跳过 unmapped 路径。
-- 本地 code review 通过后，从同一 feature 分支向 `zilliztech/zdoc:master` 提 PR，附 fork review 链接与最终 HEAD 测试结果。fork PR 不必先合并到 fork master；上游 PR 仍需自己的 CI 和 review。每片上游合并后才开启下一片，不提前启动后续范围。
+- 本地 code review 通过后，从同一 feature 分支向 `zilliztech/zdoc:master` 提 PR，总结主审结论、引用固定设计版本并附最终 HEAD 测试结果；fork review 链接保留在本任务卡，不放入上游 PR 描述。fork PR 不必先合并到 fork master；上游 PR 仍需自己的 CI 和 review。每片上游合并后才开启下一片，不提前启动后续范围。
 
 #### 已核实的接口与缺口
 
@@ -139,9 +139,9 @@ reconcileRemoteTransaction(intent, observedFacts): NextAction | Hold;
 
 原始 `404` 不自动等于 absent：先认证 repository 仍可读、端点范围正确，再用精确 ref/PR 清单与有界分页交叉确认；403/429/5xx/超时/GraphQL errors/截断/分页上限都为 unknown。API HTTP 200 内含 GraphQL errors 也不算成功。所有诊断脱敏，不保留 Authorization、子进程 stderr 或 token。
 
-#### 切片 1 — 纯远端观察与精确接受谓词（已实现，待上游合并）
+#### 切片 1 — 纯远端观察与精确接受谓词（已合并）
 
-**执行记录（2026-11-09）**：[fork Draft PR #18](https://github.com/liyun95/zdoc/pull/18) 保留方案、主审意见和修订；[上游 PR #1189](https://github.com/zilliztech/zdoc/pull/1189) 的 HEAD 为 `4d33a1131716c8db2b3063c0b08800b69e5caa7a`，净差异仅下列两个产品文件。主审已验证 base=M、触发者/写入者身份分离等修正；本地完整检查在该 HEAD 上通过：shared-docs 1352 passed / 0 failed / 6 既有 skipped、typecheck、matrix 25/25、policy 118/118、完整 diff selector 与 diff-check。上游 CI/审阅尚待完成，未合并、不启动下一片；此通过不代表真实远端认证、runner 或 Linux 资格完成。
+**执行记录（2026-11-10 更新）**：[fork Draft PR #18](https://github.com/liyun95/zdoc/pull/18) 保留方案、主审意见和修订；[上游 PR #1189](https://github.com/zilliztech/zdoc/pull/1189) 的 HEAD 为 `4d33a1131716c8db2b3063c0b08800b69e5caa7a`，净差异仅下列两个产品文件。主审已验证 base=M、触发者/写入者身份分离等修正；本地完整检查在该 HEAD 上通过：shared-docs 1352 passed / 0 failed / 6 既有 skipped、typecheck、matrix 25/25、policy 118/118、完整 diff selector 与 diff-check。上游 CI 通过后于 2026-11-10 合并，merge SHA `87f103f926d27943861278181308ebbb7cb73fe0`；总计划亦已由设计 PR #78 合并（`4cc9e9436e6e9670443276196734979653065300`）。第二片从该产品基线开始准备短计划。此通过不代表真实远端认证、runner 或 Linux 资格完成。
 
 **允许路径**：新增 `packages/docs-tooling/src/shared-docs/core/updates/remote.ts`、`packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts`。无其他产品文件改动；不触网、不捕获工具集、不新增入口。
 
@@ -160,20 +160,24 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote.tes
 
 #### 切片 2 — GitHub 只读事实与远端历史认证
 
+**执行状态（2026-11-10）**：产品基线 `87f103f926d27943861278181308ebbb7cb73fe0`；[fork Draft PR #19](https://github.com/liyun95/zdoc/pull/19) 已完成方案与代码主审。最终产品 HEAD `9db162557a80450ba6cf7d922ab653bbadf2d6d2` 已通过普通提交移除临时计划，完整 diff selector、shared-docs（1435 passed / 0 failed / 6 既有 skipped）、typecheck、matrix 25/25、policy 118/118 和 diff-check 均通过；已提 [上游 PR #1193](https://github.com/zilliztech/zdoc/pull/1193)，待上游 CI/合并。三个远端测试文件共 142 项全部执行通过（含 83 项新增）；完整全量仅在该最终 HEAD 跑一次。
+
 **允许路径**：新增 `adapters/updates/remote-github.ts`、`adapters/updates/remote-metadata.ts`、`testing/updates/remote-github.test.ts`、`testing/updates/remote-metadata.test.ts`；修改 `core/updates/remote.ts`、`testing/updates/remote.test.ts`。以上均在 `packages/docs-tooling/src/shared-docs/` 下。
 
 **入口**：`createRemoteReads({ policy, transport, evidence })` 返回 typed `readRepository/readRef/readPull/scanPulls/readCommit/readRun/readChecks/readArtifact`；`inspectRemoteHistory({ head, donorHeads, master, policy }, reads, objects)` 返回 `verified` 的不可序列化 history capability 或 hold。GET/只读 GraphQL 查询 allowlist，不导出任意 URL/GraphQL 字符串接口。默认 transport 只访问 github.com/API 的固定 host；测试注入本地故障服务，不改生产 host。
 
-- [ ] 先用 API fixture 与真实临时 Git objects 测：伪造作者、复制 trailer、错误签名 actor、fork head、错 base、删除 ref、权限隐藏404、重复/漏分页、history 截断、大小超限和不可比较 revision，均 hold。
-- [ ] 实现受限 transport 与 evidence 留存；复用 B1 的规范化/摘要思想，不能扩大 `GitHubReads` 的放行表来获得隐式写入口。PR 全量扫描按同仓、base、namespace、已认证 subjects 分组；重叠但身份未知的 PR 必须阻止该 unit，不能忽略后重复创建。
-- [ ] 独立读取完整 Git graph，验证每个 seal 的签名/API identity、执行 provenance、唯一 K parent 和同 tree；再验证 K 的原始 BotRevision、P/previous chain、完整 next-only delta、保留人类 heads、报告/计划摘要。历史 M/tools 以该次受信运行验证，不能强制等于本次 M，也不能仅因为旧 M 是祖先就信任。
-- [ ] 本次 H 可以是 S 或 S 的人工后继；后继全部作为数据检查，保留普通 merge 祖先；候选执行路径有改动则 hold。失效/过期 provenance 无法独立重建时 hold，不降为本地一致性。
-- [ ] focused 绿后运行 selector；adapter contract 测试直接调用生产解析器和谓词，网络替身只模拟传输与竞态。
+- [x] 先用 API fixture 与真实临时 Git objects 测：伪造作者、复制 trailer、错误签名 actor、fork head、错 base、删除 ref、权限隐藏404、重复/漏分页、history 截断、大小超限和不可比较 revision，均 hold。
+- [x] 实现受限 transport 与 evidence 留存；复用 B1 的规范化/摘要思想，不能扩大 `GitHubReads` 的放行表来获得隐式写入口。PR 全量扫描按同仓、base、namespace、已认证 subjects 分组；重叠但身份未知的 PR 必须阻止该 unit，不能忽略后重复创建。
+- [x] 独立读取完整 Git graph，验证每个 seal 的签名/API identity、执行 provenance、唯一 K parent 和同 tree；再验证 K 的原始 BotRevision、P/previous chain、完整 next-only delta、保留人类 heads、报告/计划摘要。历史 M/tools 以该次受信运行验证，不能强制等于本次 M，也不能仅因为旧 M 是祖先就信任。
+- [x] 本次 H 可以是 S 或 S 的人工后继；后继全部作为数据检查，保留普通 merge 祖先；候选执行路径有改动则 hold。失效/过期 provenance 无法独立重建时 hold，不降为本地一致性。
+- [x] focused 绿后运行 selector；adapter contract 测试直接调用生产解析器和谓词，网络替身只模拟传输与竞态。
 
 ```bash
 pnpm test:for-change -- packages/docs-tooling/src/shared-docs/adapters/updates/remote-github.ts packages/docs-tooling/src/shared-docs/adapters/updates/remote-metadata.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts packages/docs-tooling/src/shared-docs/core/updates/remote.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts
 pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts
 ```
+
+**本片有界范围**：签名者、API committer 写入者和 Workflow 发起者分别验证；producer 必须命中受信调用方维护的历史定义，默认注册表为空。原始 Git object 读取依赖由受信调用方提供，本片不安装生产获取桥接。支持可证明的 disjoint 普通合并；冲突、attributes、跨 unit key 的已认证 subjects 重叠均 hold，不把它们当作互不相关的更新。历史 executable closure 与报告中的外部材料是 producer 证明的摘要引用，不宣称重新执行 B2。完整 producer、真实身份和平台资格仍为后续停止点。
 
 **验收/停止**：全程零 mutation 请求；全部图/身份/收据证据可以定位。`createMetadataStore` 原占位和 B2 local inspector 不被包装成远端认证；未有真实 trusted producer 时只用 fixture 证明契约，生产读取返回证据缺口。
 
@@ -255,7 +259,7 @@ B4 必备交接清单（仅定义条件，本卡不实施）：
 - 真 smoke 开始前列出获准仓库/branch 前缀、最多 PR/ref 数、固定输入、允许写入和清理路径；只操作该次创建对象，不 force/delete 他人 ref。第 3 片前的 API 预检与 B4 完整 smoke 均须取得各自范围的真实外部写入授权；本次计划和第 1/2 片无生产凭据前置。
 - PR ready/donor 自动 close 的非 CAS 竞态、精确检查是否为合并必需条件、人工更新后如何阻止误验收，须形成可测试 rollout 策略；默认人工确认保留。不得宣称“校验成功→关闭所有 donor”为跨 API 原子事务。
 
-**本次计划自审**：接口名/新旧 schema 边界、全部四片路径、focused/最终命令、K/S 身份、unknown 恢复、部分 donor、平台停止点与相对链接已检查。规划阶段仅更新本卡并检查文档；未执行产品测试或实现产品代码。设计文档提交/PR 不代表产品实现或远端事务已获验收。主审已审定本卡，首片可在独立产品 worktree 开始；第 3 片必须先通过有界 API 预检，未获准预检不阻止第 1/2 片交付。
+**本次计划自审**：接口名/新旧 schema 边界、全部四片路径、focused/最终命令、K/S 身份、unknown 恢复、部分 donor、平台停止点与相对链接已检查。规划阶段仅更新本卡并检查文档；未执行产品测试或实现产品代码。设计文档提交/PR 不代表产品实现或远端事务已获验收。主审已审定本卡，首片已合并，第二片已完成 fork Draft PR 方案/代码审阅与本地最终验证、上游 #1193 待 CI/合并；第 3 片必须先通过有界 API 预检，未获准预检不阻止第 1/2 片交付。
 
 ### B 可提议的范围（须由计划细化后批准）
 
