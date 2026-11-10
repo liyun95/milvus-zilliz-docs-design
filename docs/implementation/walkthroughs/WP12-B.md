@@ -102,4 +102,8 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189。第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行两次获准的隔离 API 预检，尚未通过。第二次已验证 7 个 fixture 对象及 absent→K、空文件变化 seal 创建；签名查询语法遗漏阻止了后续步骤。只读补证发现真实 author 为机器人、committer/signer 为 GitHub 平台身份，与冻结的 committer 规则不相容，另有签名续行字节重建遗漏。任务卡已给出 `github-app-author-v1` 修订：作者关联、平台签名和成功 producer 的精确来源证据联合认证；先完成预检包修订与额外获准的验证，再实施产品兼容修正；不以当前结果进入第三片产品实现。第三片的真实 API 可行性预检和 B4 平台资格仍保留。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；产品代码尚未实施。
+
+前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
+
+[第四次诊断](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42747205536) 已取得正确值 CAS 成功及丢成功响应后的读回证据；错误旧值请求仍只有 GitHub 内部错误，没有可确认的原因码，run 保留 failure/held。主审提出显式入口修订：本设计 PR 审阅后，仅允许本地身份迁移与事务故障测试，所有不明 mutation 错误后停止本次调用的后续写入，只读核对远端状态。该修订不把完整 API 资格标为通过，也不继续重复同类实测；生产接线和 B4 仍保持关闭。详细证据、负例资格缺口及实施清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。

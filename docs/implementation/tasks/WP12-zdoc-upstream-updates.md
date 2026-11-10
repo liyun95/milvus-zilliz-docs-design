@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行两次有界 API 预检，尚未通过（身份修订方案已形成，待落实与验证），第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；主审已提出下文限定本地实现的入口修订，生产资格缺口保留，第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片 API 预检未通过，身份修订方案已形成；第 3–4 片产品代码未实施，第 3 片须先通过有界 API 预检 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；第 3–4 片产品代码未实施，本地实施例外待本设计 PR 审阅 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -105,20 +105,24 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 7. **运行身份的限度**：GitHub commit 的作者关联和签名不单独证明是哪一个 workflow 使用了 token。远端 origin 认证还要求受信执行 run/attempt、工作流定义与不可变 artifact 收据共同绑定 S/K；不能让同 App 的任意 green check 冒充。现有 GITHUB_TOKEN 路线保留，不新增 PAT/App；token 只在独立 writer 进程可见，不进候选生成或报告。若预检中实际 GITHUB_TOKEN 不支持所需签名/API，则在第 3 片前停止并修订架构，不能悄悄放宽；测试仓库通过仍不等于生产平台资格。
 8. **PR 状态不是 CAS**：draft/ready/close API 没有 head 条件写。B3 默认新建 draft，已有 PR 必须确认 draft 后才尝试 ref CAS，前后重读检测人工变更；检测到变化立即 hold，保留分支和提交。默认不自动 ready、不自动 close donor；输出精确 `readyProposal` / `donorCloseProposals`，需后续明确接受这类非原子状态写的策略才能启用。这样不能宣称完整滚动 PR 收尾已验收；并发 ready/merge 的剩余窗口须在 B4 仓库保护与 smoke 中验证，不能只靠 draft 保证禁止合并。
 
-**对设计的有界差异**：B3 先交完整事务内核与默认保守策略；自动 ready/关闭 donor、可信验证 producer 和工作流激活仍未交付。保留 [06](../../design/06-upstream-changes.md) 的最终产品目标，不改设计或删 pending。第一片无待用户裁决问题；第 1/2 片不依赖真实写权限。API 可行性预检阻止第 3 片进入大规模实现；完整平台资格、生产身份和非 CAS 收尾策略继续阻止 B4 激活。
+**对设计的有界差异**：B3 先交完整事务内核与默认保守策略；自动 ready/关闭 donor、可信验证 producer 和工作流激活仍未交付。保留 [06](../../design/06-upstream-changes.md) 的最终产品目标，不改设计或删 pending。第一片无待用户裁决问题；第 1/2 片不依赖真实写权限。API 预检未全项通过；第 3 片仅按下文显式本地实施例外推进，不扩展远端执行；完整平台资格、生产身份和非 CAS 收尾策略继续阻止 B4 激活。
 
 #### 第 3 片入口：有界 API 可行性预检
 
-**执行记录（2026-11-10）**：第一/二片已合并，产品基线为 `38a721e3e720fee4a43d401a69b53663bdf423b4`；准备范围已由设计 PR #80 合并。用户分别授权了创建私有 `liyun95/zdoc-writer-preflight`、安装已审阅工具及首次 dispatch，和修正提交 `cafeb711e15938a8a472581ec9e3be36a055bf61` 后的一次新 dispatch。两次均已执行完毕，没有自动重跑、清理或生产仓库写入；第三片产品代码尚未开工。
+**执行记录（2026-11-10）**：第一/二片已合并，产品基线为 `38a721e3e720fee4a43d401a69b53663bdf423b4`；准备范围已由设计 PR #80 合并。用户分别授权了创建私有 `liyun95/zdoc-writer-preflight`、安装已审阅工具及首次 dispatch，和修正提交 `cafeb711e15938a8a472581ec9e3be36a055bf61` 后的一次新 dispatch。随后用户另行授权了 `503934de1b01939071771283c2fa3a8739cab59d` 与第三次单次 dispatch。用户随后又单独授权了诊断修订 `7da8ea2e767f6c3b0344d88b9c83da45985d8b23` 的一次配对验证。四次均已执行完毕，没有自动重跑、清理或生产仓库写入；第三片产品代码尚未开工。
 
 - [首次运行 42742884628](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42742884628) 在 REST commit-message JSON 省略末尾 LF 时停止。独立只读 Git fetch/cat-file 证明原始 217 字节与 OID 完全一致；修正仅允许 JSON 展示少一个末尾 LF，原始对象及 OID 检查未放宽。
 - [第二次运行 42743539633](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42743539633) 在 Node 22.23.4 上 14 项本地测试通过，7 个 fixture 对象上传/读回校验通过，absent→K CAS 和空文件变化 seal S 已执行并读回。随后因预检 GraphQL 查询少一个结束括号而失败；这是预检代码遗漏，不是 API 能力结论。错误旧值/正确旧值快进 CAS 尚未执行，不算通过。
 - 第二次的独立只读补证（操作员凭据，不冒称原 job-token 查询）确认 S 为 `402eadbae470ffbf48e8a9cbbceb1f295282586e`，唯一父为 K、内容树不变，REST/GraphQL 签名 payload 一致且 API 报告有效 GitHub 签名。原始 Git 对象取回并重算 OID 一致；预检重建函数漏了 `gpgsig` 尾部续行空行，需修正并按真实字节回归，不能用签名有效标志代替原始字节认证。
 - **设计阻塞**：真实 author 为 `github-actions[bot]`（41898282），REST committer 和 signer 为 `web-flow`（19864447），GraphQL `committer.user` 为 null。第二片冻结的 `writerAttribution.role=committer` 与此不相容；修正查询和字节编码也不能使该身份条件成立。不能把 `web-flow` 当成专属写入机器人，也不能在测试中静默切换到 author。
 
-保留私有仓库 ID 1452115569、两次 run/attempt、实际 token 权限和 artifact。第二次 artifact ID 13730331305，ZIP SHA-256 `b3acb03e1d5d658015e54d488b51c1994574e55deeacf3d1d9a8a63bb235e2cb` 已与下载内容核对；测试 staging ref 保留在 S。测试不触碰 zdoc/Milvus 的发布分支、Fetch 或 Translation。
+- [第三次运行 42745789192](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42745789192) 使用设计 PR #82 的显式测试身份方案，真实 job token 的 viewer/REST author/GraphQL author、平台 signer、nullable committer 和原始签名字节检查均通过；8 个对象上传/读回通过。错误旧 K→F 请求收到 HTTP 200 + GraphQL error，认证的前后 ref 均停留在 S `a30d1f6ff412dc8ff6b1739f433fba3b918bde72`。错误类型/路径被原诊断投影折叠，无法确认具体原因；运行在 `STALE_CAS_EXPECTED_OLD_REJECTION` 停止，正确 S→F 尚未执行，不能宣称 CAS 验证通过。Hosted Node 22.23.4 为 25 passed / 0 failed / 1 optional parser skipped；ZIP digest `62bd9ea96ae7259d36b5714c81eacdbe888264b0acfb74ace872c1da86f0ec6e` 已核对。
 
-**下一步裁决**：先设计并审阅作者、平台 committer/signer、受信 producer/run 证据的联合认证规则，明确它与第二片 schema/adapter/历史认证的兼容性及拒绝矩阵；仅换一个作者字段或 bot ID 不构成修复。具体主审方案见下节 `github-app-author-v1`；产品规则尚未实现。预检脚本语法/编码遗漏已本地修正并通过独立回归，身份方案审定后才准备下一次有界预检；本记录不授权额外 dispatch，第 3 片仍不进入大规模实现。
+- [第四次诊断 42747205536](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42747205536) 完成 34 次 API 请求/12 次 mutation：身份、签名原始字节、8 个对象、absent→K、空 seal、正确 S→F 与三次丢成功响应后的读回均通过。错误旧值请求返回 GitHub 通用内部错误，只有关联号 `D3C0:3D3BBA:546C0D7:10E78B0B:6AF28A34`，没有原因 code/type/path；前后 ref 保持 S `fe729e4a1998cb3944701e2dd6066e52695343a6`。独立正确值对照成功读回 F `cf6a6caa8fb6cbcfe65d013a070de2fe10de036f`。结果仍为 failure/held，不能把内部错误标为 CAS_CONFLICT 或改写为绿灯；前后读回也不证明两次观察之间完全无变化。Node 22.23.4 为 29 passed / 0 failed / 1 optional parser skipped；artifact 13731298842 的 ZIP SHA-256 `a02c5cf9711c3274b24b0a76d40a760fc6152cf4a01a4225f537382157e5f69f`、run/source 身份和独立 Git 原始对象均已核验。
+
+保留私有仓库 ID 1452115569、四次 run/attempt、实际 token 权限和 artifact。第二次 artifact ID 13730331305，ZIP SHA-256 `b3acb03e1d5d658015e54d488b51c1994574e55deeacf3d1d9a8a63bb235e2cb` 已与下载内容核对；测试 staging ref 保留在 S。测试不触碰 zdoc/Milvus 的发布分支、Fetch 或 Translation。
+
+**下一步**：身份修订已由设计 PR #82 合并，预检机制已有上述实测观察；不再追加同类试跑。先落实下文显式本地实施例外，再进行六文件身份兼容修正和第 3 片本地事务/故障测试；不宣称完整 API 资格或生产启用已通过。
 
 预检使用 reviewed checkout（不保存凭据）及专用 probe 步骤；fixture Git objects 始终作为数据。签名者、作者、committer 和执行 App/actor 分别记录，不能因为观察到某个 ID 就静默改写第二片身份判定；变更必须按下述显式契约修订及验证执行。测试只能证明 API 可行性，生产进程隔离和平台资格仍属 B4。
 
@@ -127,7 +131,23 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 - 在获准的隔离测试仓库使用该仓库真实 `GITHUB_TOKEN`，记录仓库 ID、token 所属 App/actor 与执行 run/attempt；不用 PAT 冒充。授权范围先固定：一组小型 Git objects（含普通双亲 merge 和确定性 K）、一个 `shared-update-staging/<transactionId>` ref、无 PR/生产分支/生产 workflow 写入；清理仅限该 ref，并另按已授予的清理范围执行。
 - 验证 REST 上传返回的每个 blob/tree/commit OID 与本地完全一致；验证零文件修改 seal S 的 `parent=[K]`、`tree(S)=tree(K)`、有效签名及实际 API actor。任何规范化、签名缺失或身份不符都停止，不用同树或作者字符串替代。
 - 仅在该单 staging ref 上验证 `updateRefs(beforeOid, afterOid, force:false)`：absent 创建、正确 expected-old 快进、错误 expected-old 拒绝且 ref 不变；用真实请求成功后故意丢弃客户端响应，再通过读取精确 ref/objects 重建结果，不盲重试。
-- 留存脱敏请求/响应、实际 object/ref OID、签名/actor、错误 CAS 前后 ref、丢响应读回结果。主审确认全部行为符合契约后才进入第 3 片；预检失败先修订本卡架构，不能先实现再将失败推迟 B4。测试仓库通过只证明 API 可行性，native closure、ACL、runner/权限隔离、可信 validation producer 与生产 smoke 仍由 B4 完成。
+- 留存脱敏请求/响应、实际 object/ref OID、签名/actor、错误 CAS 前后 ref、丢响应读回结果。原入口要求主审确认全部行为符合契约后才进入第 3 片；当前未满足，该入口由下文显式本地实施例外作有限修订，远端资格仍未通过。测试仓库通过只证明 API 可行性，native closure、ACL、runner/权限隔离、可信 validation producer 与生产 smoke 仍由 B4 完成。
+
+**第四次仅限隔离仓库的诊断配对（已另获授权并执行，仅保留实验边界）**：补保留有界、脱敏的 GraphQL 错误说明、code/type/path 和响应形状；token、Bearer、URL 及已知 ref/OID 做替换，不保留原始响应体/headers/env。保留严格的错误原因分类，不把任意错误当作 expected-old 拒绝。为一次收齐负例与正例证据，只有错误旧值请求明确返回 HTTP 200 + 有界 GraphQL errors、无成功 mutation payload，且独立认证的前后 ref 都是同一 S，才允许继续一次新的 `before=S, after=F, force:false` 正确值对照；这是既定同一 ref 上的独立测试动作，不重试旧请求。errors-only（无 data）、data:null 或 data.updateRefs:null 可记录为诊断形状；非 null 成功值、畸形响应、已知权限/认证/限流错误、网络不明或 ref 变化立即停止。对照成功也不豁免未知原因：记录完整观察后仍 held/exit 1，待主审核对保留原因；不能自动授予 API 验收或生产恢复能力。
+
+该诊断只改变收证顺序，仍最多 12 次 mutation / 64 次 API 请求、一个新 staging ref、原有对象/身份/签名检查和权限。四次 failure/held 结果、旧 refs 和 artifacts 保留，不自动清理。不扩展生产 `REMOTE_STATE_UNKNOWN` 语义；生产事务实现仍未开始。这次授权已消耗，不自动追加 dispatch。
+
+#### 主审入口修订 — 仅允许本地实现，保留负例资格缺口
+
+这是对原“全部 API 预检通过才开工”入口的显式有界修订，不是宣布原门槛已满足。依据已认证的正例/负例观察及 [GitHub `updateRefs` 的 beforeOid/原子更新契约](https://docs.github.com/en/graphql/reference/git#updaterefs)，主审允许六文件身份迁移和第 3 片库代码、本地裸仓/HTTP 故障测试继续；不得据此启用远端 writer、公开写 CLI、生产 workflow 或修改权限。文档保证 expected-old 的约束，但不保证某种错误格式；当前错误的内部原因仍未知。
+
+- 产品每次写入仍需受信内存 capability、完整固定 intent、精确 beforeOid、force:false 和允许的仓库/ref/object；不能改 expected-old 来“写成功”。
+- 任意未分类 mutation 错误、超时或不完整响应都进入 hold，保留脱敏错误/关联号及请求身份；本次调用中不得继续任何 mutation、正例对照、重试或 redispatch。第四次预检的受限对照例外绝不移植为产品策略。
+- 后续 reconcile 只读：报告当前精确 ref、原始对象、ancestry 和 intent 绑定。看到旧 H 不意味着可以重试；看到目标 S 只确认当前观察，不证明原错误原因，也不自动授权下一次写入。状态变化则 hold/重新规划，不 force/reset/回滚。新的显式调用须重新认证 capability、intent 和全部状态，journal 不能授予权限。
+- 本地故障矩阵必须覆盖写前内部错误、写后内部错误、响应丢失、错误旧值、并发 ref 移动和读取失败，并断言遇不明错误后无第二次写请求。保持真实失败 fixture 与合成测试的区分，不把后者称为真实负例原因证明。
+- 保留具名缺口 **live negative-CAS cause/error contract unconfirmed**。四次 run/CI 原结论不改写，分类器不放宽；B4 生产启用继续要求该缺口的明确处置及其余资格。仅在有新假设、上游指引或行为变化时，再提出具体有界实测；不会发送 GitHub support 消息或复跑来碰运气。
+
+该入口修订通过本设计 PR 审阅后执行；当前产品源码仍未修改，第 4 片/B4 不随之自动放行。
 
 #### 身份规则修订 — `github-app-author-v1`
 
@@ -155,9 +175,9 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 
 **最小实施顺序与允许路径**：产品路径均位于 `packages/docs-tooling/src/shared-docs/`。
 
-- [ ] 先调整独立预检包（测试仓库 `scripts/preflight.mjs`、`scripts/preflight.test.mjs`、`README.md`）：保留本地已修的查询语法/签名续行，固定测试仓库 bot 和 platform signer，要求 viewer/REST author/GraphQL author 一致，允许 GraphQL committer null；不得把此次 API 机械验证冒称完整 producer 认证。新增身份不符与缺失的拒绝测试；不修改工作流权限、不加 PAT。
-- [ ] 主审本地包后，再单独取得具体修订的一次 dispatch 授权。保持一条本次 run 派生 staging ref、原对象上传/空 seal/丢成功响应读回/错误旧值及正确旧值 CAS 顺序；旧 refs 和失败证据全部保留。任何 unknown 停止，不盲重试。通过仅解除 API 可行性门槛，不解除 B4 或完整 producer 门槛。
-- [ ] API 预检证据接受后，实施六文件兼容修正：`core/updates/remote.ts` 加必填策略与严格 author facts/pure checks；`adapters/updates/remote-github.ts` 加 author 双 API 一致性；`adapters/updates/remote-metadata.ts` 改必要身份谓词及调用参数，保留原始签名头验证；对应 `testing/updates/remote.test.ts`、`remote-github.test.ts`、`remote-metadata.test.ts` 增加下列矩阵。不得把预检 helper 的续行修正机械复制到已经按原始头解析的产品 verifier。
+- [x] 先调整独立预检包（测试仓库 `scripts/preflight.mjs`、`scripts/preflight.test.mjs`、`README.md`）：保留本地已修的查询语法/签名续行，固定测试仓库 bot 和 platform signer，要求 viewer/REST author/GraphQL author 一致，允许 GraphQL committer null；不得把此次 API 机械验证冒称完整 producer 认证。新增身份不符与缺失的拒绝测试；不修改工作流权限、不加 PAT。
+- [x] 已完成本地包主审及逐次明确授权的有界 dispatch。保持一条本次 run 派生 staging ref、原对象上传/空 seal/丢成功响应读回/错误旧值及正确旧值 CAS 顺序；旧 refs 和失败证据全部保留。网络/远端状态 unknown 停止，不盲重试；错误原因未分类时仅允许上文隔离诊断配对，仍不能算通过。四次证据已主审，严格全项可行性仍未通过；本地推进只依赖上述显式入口修订，不解除 B4 或完整 producer 门槛。
+- [ ] 本地实施入口修订审阅后，实施六文件兼容修正：`core/updates/remote.ts` 加必填策略与严格 author facts/pure checks；`adapters/updates/remote-github.ts` 加 author 双 API 一致性；`adapters/updates/remote-metadata.ts` 改必要身份谓词及调用参数，保留原始签名头验证；对应 `testing/updates/remote.test.ts`、`remote-github.test.ts`、`remote-metadata.test.ts` 增加下列矩阵。不得把预检 helper 的续行修正机械复制到已经按原始头解析的产品 verifier。
 - [ ] focused 通过后按完整 diff selector 运行最终检查，走既定 fork Draft PR → 主审 → 上游 PR；不接 CLI、Fetch/Translation、生产 workflow 或有效 producer registry。兼容修正通过后才继续第 3 片事务实现。
 
 **验收矩阵**：正例必须包括真实保留 S 的 1182 字节、机器人 author/平台 signer、REST 平台 committer + GraphQL null，以及完整合成历史/收据链。真实 S 的固定 fixture 消息不是产品 `RemoteSealV1`，只能用于字节/身份 helper 回归，不能伪称完整历史验收。拒绝项必须覆盖：author 缺失/两 API 冲突/错误 ID；两侧非 null committer 冲突；signer 缺失/错误 ID/签名无效；旧 policy/committer facts；facts 的 author 与 derived attribution 冲突；修改签名尾部续行、payload、raw OID；相同 bot/App 的错误 workflow/tools/定义/run/attempt/仓库；成功 seal 却缺少/过期/混用 provenance；重放旧 S 去满足不同 transaction/plan/proof。已有图/保留人类改动/并发读取拒绝测试继续执行。
@@ -241,7 +261,7 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-git
 
 #### 切片 3 — 精确 ref CAS、draft PR 与响应丢失重建
 
-**入口条件**：第 1/2 片已合并，且上述有界 API 预检证据已由主审接受。未满足时本片仅为草案，不开始大规模实现；不能用 HTTP fixture 代替真实 API 可行性。
+**入口条件**：第 1/2 片已合并；按照上文主审入口修订，仅开展本地库代码/故障测试，保留真实负例原因资格缺口。不能用 HTTP fixture 代替真实 API 资格，也不启用任何生产/额外远端动作。
 
 **允许路径**：新增 `adapters/updates/remote-transaction.ts`、`testing/updates/remote-transaction.test.ts`；修改 `adapters/updates/remote-github.ts`、`testing/updates/remote-github.test.ts`、`core/updates/remote.ts`、`testing/updates/remote.test.ts`。均在 shared-docs 下；不接 CLI/workflow。
 
@@ -268,7 +288,7 @@ pnpm test:for-change -- packages/docs-tooling/src/shared-docs/adapters/updates/r
 pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-transaction.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts
 ```
 
-**验收/停止**：本地 Git + HTTP 故障服务覆盖每次 mutation 前后中断/响应丢失/并发写，断言请求序列、ref、PR 数量、preserved ancestry 和 hold 原因。本片实施测试除临时裸仓/fixture 服务外无真实远端写；CAS、原样 OID、签名及 GITHUB_TOKEN 的 API 可行性必须已有入口预检证据，完整 runner 与生产可用性仍列 B4 资格项。禁止声称跨 PR 原子事务或完整 donor 自动收尾。
+**验收/停止**：本地 Git + HTTP 故障服务覆盖每次 mutation 前后中断/响应丢失/并发写，断言请求序列、ref、PR 数量、preserved ancestry 和 hold 原因。本片实施测试除临时裸仓/fixture 服务外无真实远端写；原样 OID、签名及 GITHUB_TOKEN 正例已有预检观察；CAS 负例原因缺口必须保留并按上文 hold/只读 reconcile 实现，完整 runner、负例资格处置与生产可用性仍列 B4 停止条件。禁止声称跨 PR 原子事务或完整 donor 自动收尾。
 
 #### 切片 4 — B2/远端历史桥接与默认只读编排
 
