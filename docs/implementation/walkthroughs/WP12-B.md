@@ -102,8 +102,14 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；产品代码尚未实施。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已实施，第三片事务代码尚未实施。
 
 前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
 
 [第四次诊断](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42747205536) 已取得正确值 CAS 成功及丢成功响应后的读回证据；错误旧值请求仍只有 GitHub 内部错误，没有可确认的原因码，run 保留 failure/held。主审提出显式入口修订：本设计 PR 审阅后，仅允许本地身份迁移与事务故障测试，所有不明 mutation 错误后停止本次调用的后续写入，只读核对远端状态。该修订不把完整 API 资格标为通过，也不继续重复同类实测；生产接线和 B4 仍保持关闭。详细证据、负例资格缺口及实施清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+
+设计 PR #83 已合并，本地实施入口正式生效。身份兼容修正进入 [Fork Draft #20](https://github.com/liyun95/zdoc/pull/20)，固定提交 `9dac6ad800f001b9ec51d3a1a995984252653cca`；主审未发现阻塞代码问题，上游 [#1197](https://github.com/zilliztech/zdoc/pull/1197) 已通过 CI 并转为可审阅，尚未合并。新规则分别认证机器人 author、平台 signer 与成功 producer 的来源；旧 policy/committer facts 拒绝，GraphQL committer null 原样保留。实现核查同时纠正 evidence 描述：保留的是响应摘要与有界数字身份观察，不增加完整原始 API 响应留存。生产接线仍关闭。
+
+本地 focused 172/172、typecheck 和 matrix 25/25 已通过。保留环境诊断中的失败记录；最终短路径、两 worker 的全量检查前三阶段通过，但在 update-prepare 阶段触及原 15 分钟总上限，没有完整计数或成功终态。这些本地失败与后续 CI 结果分开记录，不以单独 replay 或 focused 通过代替全量。
+
+随后 [CI 42750713023](https://github.com/zilliztech/zdoc/actions/runs/42750713023) 在 Linux / Node 22.23.4 的测试 merge `0c0d7255b5ec834c37028a865b1cfd3d7e6bac02` 上完成四阶段，1376 passed / 0 failed / 96 skipped；跳过项符合既有精确声明，三个改动测试文件均未列入。主审接受这一完整 CI 证据与 macOS focused 结果作为本次身份兼容修改的门槛，#1197 转为 ready for review。macOS 全量预算问题仍保留，不能宣称所有平台全量通过。当前仅身份兼容先决项完成，后续事务、生产 producer、真实 CAS 负例原因及 B4 资格均未因此完成。
