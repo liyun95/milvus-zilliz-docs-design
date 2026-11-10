@@ -1,6 +1,6 @@
 # WP12-B 走读：本地更新准备已完成，远端自动化待实现
 
-截至 2026-11-10，B1 的只读报告、B2 的本地规划/准备与 B3 前两片的纯远端校验契约、只读事实和历史认证已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
+截至 2026-11-10，B1 的只读报告、B2 的本地规划/准备与 B3 前三片的纯远端校验契约、只读事实和历史认证、离线事务内核已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
 
 ## 已交付的部分
 
@@ -37,9 +37,9 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 新增适配器尚未被 CLI、Fetch、Translation 或发布入口调用。真实 producer 默认未安装，生产 raw-object 获取与平台资格未交付；复杂 merge 和跨单元重叠保守 hold。历史 closure 是受信 producer 的摘要证明，不等于本次重新捕获工具或重跑 B2。
 
-## B3 第三片：离线事务内核（已审阅，待合并）
+## B3 第三片：离线事务内核（已合并）
 
-[Fork Draft #21](https://github.com/liyun95/zdoc/pull/21) 保留主审结论；[上游 #1199](https://github.com/zilliztech/zdoc/pull/1199) 初始实现为 `bfb7f4c7a5cfdea98d26d70d41e9266a4e8a7f2b`，新增测试单例时限修正后为 `db15eddd9989a62a88b39b93d5103606ccceaa1a`。源码/spec 主审与完整本地门槛、上游 CI 均通过；本片仅按受限离线范围验收，上游尚未合并，不表示整个 B3 完成。
+[Fork Draft #21](https://github.com/liyun95/zdoc/pull/21) 保留主审结论；[上游 #1199](https://github.com/zilliztech/zdoc/pull/1199) 初始实现为 `bfb7f4c7a5cfdea98d26d70d41e9266a4e8a7f2b`，新增测试单例时限修正后为 `db15eddd9989a62a88b39b93d5103606ccceaa1a`。源码/spec 主审与完整本地门槛、上游 CI 均通过；本片仅按受限离线范围验收，上游已合并，merge 为 `90441eff566a67f33823555ac7524e2fe2211394`；设计记录 #85 也已合并。这不表示整个 B3 完成。
 
 新增 `adapters/updates/remote-transaction.ts` 及测试，并扩展既有 remote schema/只读适配器。生产 `createRemoteTransaction` 始终 report-only；fixture harness 通过显式可执行 transport/object source 验证对象上传、staging 封签、精确旧值 CAS、Draft PR、精确验证和只读恢复。已有 PR 必须内部认证历史 producer/原始对象；验证成功只输出 ready/donor-close 建议，不执行这些状态写。
 
@@ -47,7 +47,32 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 本地测试使用真实临时裸 Git 与合成 HTTP 服务，覆盖每个写入位置的故障、并发 ref/PR 变化、人工后继重建、原始候选绑定、目录树展开限额及 API/artifact 精确接收。64 MiB/全局 512 操作的保守限额可能使真实规模事务 hold；完整仓库规模、真实 dispatch、负例原因和生产资格继续保留。现有 CLI、Fetch、Translation、发布/恢复 workflow 及权限未修改。
 
-最终 HEAD 的 macOS / Node 26.7.0 全量为 **1500 passed / 0 failed / 6 既有 skipped**，四阶段与最终 committed terminal 均通过，约 747 秒；证据 `/Users/liyun/.cache/g-1Lsooo/run-HQEeQG`。typecheck、matrix 25/25、policy 118/118、selector、diff-check 通过。[Linux CI 42759644433](https://github.com/zilliztech/zdoc/actions/runs/42759644433) 在精确测试 merge `a911d8c79b598bbcf2247f1bda1afa292815a9f1` 上为 **1410 passed / 0 failed / 96 既有平台 skipped**，所有检查通过，改动测试未跳过。原 fixture 错误与首轮全量的新增用例默认 5 秒超时保留；跟进只调整新增集成测试单例时限，最终完整结果不改写历史失败。第 4 片桥接与 B4 未开始。
+最终 HEAD 的 macOS / Node 26.7.0 全量为 **1500 passed / 0 failed / 6 既有 skipped**，四阶段与最终 committed terminal 均通过，约 747 秒；证据 `/Users/liyun/.cache/g-1Lsooo/run-HQEeQG`。typecheck、matrix 25/25、policy 118/118、selector、diff-check 通过。[Linux CI 42759644433](https://github.com/zilliztech/zdoc/actions/runs/42759644433) 在精确测试 merge `a911d8c79b598bbcf2247f1bda1afa292815a9f1` 上为 **1410 passed / 0 failed / 96 既有平台 skipped**，所有检查通过，改动测试未跳过。原 fixture 错误与首轮全量的新增用例默认 5 秒超时保留；跟进只调整新增集成测试单例时限，最终完整结果不改写历史失败。第 4 片主审与最终验证见下文；B4 未开始。
+
+
+## B3 第四片：远端历史桥接与只读编排（已审阅，待合并）
+
+以下为初次验收记录；当前整合状态见本节末。
+
+[上游 #1201](https://github.com/zilliztech/zdoc/pull/1201) 的实现提交是 `dee8c76f621a58920914fa5ca4a64b64a3b41bd4`，新增测试单例时限修正后的 HEAD 为 `83443879b96292c6e9c99aea07aa9c5633fab448`，以已合并第三片 `90441eff566a67f33823555ac7524e2fe2211394` 为基线。九个允许路径内新增内部 runner，旧本地命令仍只认 owned local journal；既有 Fetch/Translation、CLI、权限与 dev 内容未修改。
+
+观察器认证远端 PR、ref 与 K/S 历史，在全新证据目录重新合并、采集、规划，保留人工内容和原始历史 proof。当前 master 更新工具时，远端专用准备先检查历史分支相对共同基线只改数据，合并后的 P/K 必须匹配当前受信工具集。人工改工具、两侧改 lock、部分页面重叠、同 ref 多 PR、远端状态变化和缺失证据均停止；noop 不生成 K/S/PR。
+
+源码主审已通过。冻结源码整链测试 1 passed、完整 remote-runner/transactions 20 passed、capability binding 1 passed；主审 typecheck、selector、matrix 25/25、policy 118/118、diff-check 通过。首次固定 HEAD 全量在新增 runner 用例默认 5 秒时限停止，raw counts 不完整；只给八个新 Git/IO 用例补充 30 秒单例时限后，受影响完整文件 9/9 通过，全局门槛与既有 skips 未动。
+
+最终 HEAD 的 macOS / Node 26.7.0 全量 **1513 passed / 0 failed / 6 既有 skipped**，四阶段与 committed terminal 校验通过，862.015 秒仍在 900 秒内；证据 `/Users/liyun/.cache/g-e0r1hgz8/run-tztCpZ`。
+
+[CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。主审接受本片限定离线范围，#1201 待合并，B4 未开始。之前混合源码运行的 132 passed / 1 failed 和夹具失败保留，不能称为本 HEAD 通过。
+
+**合并后门禁修复与当前整合（2026-11-10）**：第三片的 [master push 42765032875](https://github.com/zilliztech/zdoc/actions/runs/42765032875) 曾在 900 秒总时限处停止，尽管它与合并前绿色运行的代码树相同。修复 [#1202](https://github.com/zilliztech/zdoc/pull/1202) 对独立祖先检查做有界并发，并协调同一 store 的同路径 blob 写入；检查仍每次重做，失败不重试，已完成结果不作为信任缓存。首轮本地全量暴露的半写文件竞态失败仍保留。
+
+#1202 已合并为 `ec64fd2779f676cbfbdd7186b9906e5305ca62d1`；[合并后 master CI 42777811717](https://github.com/zilliztech/zdoc/actions/runs/42777811717) 完整四阶段 **1419 passed / 0 failed / 96 既有 skipped**，约 432 秒；[自动 master→dev 同步工作流](https://github.com/zilliztech/zdoc/actions/runs/42777811659) 也成功。上述结果只证明各自工作流结果，不表示 B4 生产 writer 已启用。
+
+第四片首次整合 HEAD `780ea96c0` 的 [CI 42778266615](https://github.com/zilliztech/zdoc/actions/runs/42778266615) donor-history 用例及本地 created-journal 恢复用例分别达到 30 秒单例上限，完整结果均不成立。保留 trace 显示恢复在 28.6 秒完成 validated、29.4 秒进入最后一次 collection；原时限下单独运行五个相关用例均通过。跟进只将这四个恢复变体和一个 donor 场景调为 60 秒，保持全部断言、平台 skips、普通单例预算及 900 秒总门槛。
+
+当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 已通过五项聚焦用例、typecheck、matrix、policy、完整 selector 和 diff-check。macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 和独立 committed terminal 校验通过；运行前后 HEAD/源码/harness 一致，789.643 秒小于 900 秒，证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过，约 816 秒；实际测试 merge `1e27edf63c42408c773c3674802ea1e3fe4393b1` 将当前 HEAD 合入 `ec64fd277`。主审接受本次组合，#1201 待合并；合并后继续核对 master push 检查。新结果不改写前述两次单例超时，B4 未开始。
+
+生产写入仍禁用。恢复仅作只读重建并报告 raw/exact receipt 缺口；新准备目录与持久尝试记录分离，不授予重发权。真实平台、Linux capture、producer/validator、CAS/dispatch、跨运行去重与 ready/close 策略的资格仍待 B4；本片不是工作流激活。
 
 ## 从固定输入到候选
 
@@ -114,7 +139,7 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 待合并。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202，组合复验通过，#1201 待合并。先合并 #1201 与设计记录并核对合并后 master 检查，再进入 B4 精确接线与资格计划；生产写入尚未启用。
 
 前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
 

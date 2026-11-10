@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已实现并进入审阅，生产资格缺口保留，第三片事务/第四片编排与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已合并 #1197；第三片离线事务已合并 #1199（`90441eff566a67f33823555ac7524e2fe2211394`），设计记录 #85 已合并。第四片桥接与只读编排已带入已合并的 #1202 门禁修复，组合复验通过，#1201 待合并；生产资格缺口保留，B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正已合并 #1197，第 3 片离线事务已通过主审与双平台完整测试，#1199 待合并；第 4 片编排尚未实施 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正已合并 #1197，第 3 片离线事务已通过主审与双平台完整测试，#1199 已合并；第 4 片已带入 #1202，组合复验通过，#1201 待合并 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -267,7 +267,7 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-git
 
 #### 切片 3 — 精确 ref CAS、draft PR 与响应丢失重建
 
-**实施记录（2026-11-10，受限离线范围验收，待合并）**：[Fork Draft #21](https://github.com/liyun95/zdoc/pull/21) 已记录主审源码/spec 结论；上游 [#1199](https://github.com/zilliztech/zdoc/pull/1199) 已通过 CI 并转为 ready for review。实现提交 `bfb7f4c7a5cfdea98d26d70d41e9266a4e8a7f2b`，测试时限跟进后的 HEAD 为 `db15eddd9989a62a88b39b93d5103606ccceaa1a`，基线 `678d8f1884fd5d734e8def0f31f03ad743231240`，仅下列七个已批准文件。生产入口始终 report-only；真实 capture/writer 桥接、producer/validator 安装与 B4 资格不在本次实现中。
+**实施记录（2026-11-10，受限离线范围验收，已合并）**：[Fork Draft #21](https://github.com/liyun95/zdoc/pull/21) 已记录主审源码/spec 结论；上游 [#1199](https://github.com/zilliztech/zdoc/pull/1199) 已通过 CI 并合并，merge 为 `90441eff566a67f33823555ac7524e2fe2211394`。实现提交 `bfb7f4c7a5cfdea98d26d70d41e9266a4e8a7f2b`，测试时限跟进后的 HEAD 为 `db15eddd9989a62a88b39b93d5103606ccceaa1a`，基线 `678d8f1884fd5d734e8def0f31f03ad743231240`，仅下列七个已批准文件。生产入口始终 report-only；真实 capture/writer 桥接、producer/validator 安装与 B4 资格不在本次实现中。
 
 主审已检查原始对象/OID、确定性 B2 revision、next-only、已有 PR 的内部历史认证、完整同单元集合/subjects 重叠/并发观察、每次不明写后的停止，以及从读取适配器取得 API/artifact facts 驱动的精确验证（本片由离线 HTTP fixture 提供）。恢复复用已验证 S/ref/draft；ready 和 donor close 仅为建议。派发尝试记录只作同一 evidence store 的保守否决，不能授予权限；新建空 evidence root 不证明从未派发。未来桥接必须绑定原 evidence root、intent 和跨 run 协调，不能据此声称全局去重。
 
@@ -275,7 +275,7 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-git
 
 **最终验证**：HEAD `db15eddd9989a62a88b39b93d5103606ccceaa1a` 在 macOS / Node 26.7.0 上四阶段全量 **1500 passed / 0 failed / 6 既有 skipped**，exit 0；前后 HEAD/工作区摘要一致，独立 `readGateReport` 确认 committed/passed，约 747 秒，未超过原 900 秒门槛。证据根 `/Users/liyun/.cache/g-1Lsooo/run-HQEeQG`。最终 selector、typecheck、matrix 25/25、policy 118/118、diff-check 通过。6 个跳过项仍为 images 4、可选 measured Guides collector 1、大小写敏感文件系统用例 1。
 
-[CI 42759644433](https://github.com/zilliztech/zdoc/actions/runs/42759644433) 在 Linux / Node 22.23.4 上完成四阶段：**1410 passed / 0 failed / 96 既有平台 skipped**，所有 PR 检查通过。实际测试 merge 为 `a911d8c79b598bbcf2247f1bda1afa292815a9f1`，父提交为最终 HEAD 与当前 master `678d8f188`。96 项符合固定 skip 声明（images 4、collector 1、toolset 89、update-command 2），改动测试文件均未跳过；这不解除 Linux capture 限制。主审接受本片离线范围，#1199 尚未合并；第 4 片和 B4 尚未实施。旧 HEAD CI 随 PR 更新被既有并发策略取消，不作为通过证据。
+[CI 42759644433](https://github.com/zilliztech/zdoc/actions/runs/42759644433) 在 Linux / Node 22.23.4 上完成四阶段：**1410 passed / 0 failed / 96 既有平台 skipped**，所有 PR 检查通过。实际测试 merge 为 `a911d8c79b598bbcf2247f1bda1afa292815a9f1`，父提交为最终 HEAD 与当前 master `678d8f188`。96 项符合固定 skip 声明（images 4、collector 1、toolset 89、update-command 2），改动测试文件均未跳过；这不解除 Linux capture 限制。主审接受本片离线范围，#1199 已合并；第 4 片验证见下文，B4 尚未实施。旧 HEAD CI 随 PR 更新被既有并发策略取消，不作为通过证据。
 
 **实用性限制**：当前完整 scratch history/tree 物化受 64 MiB 和全局 512 操作预算限制（含本地读取、展开、证据操作）；10,000 object/path 是次级拒绝界限，不表示可处理 10,000 个对象。真实 zdoc 规模的远端事务尚未验证，可能因保守限额 hold。该限制、真实负例原因缺口、生产 raw-object 取得、持久 ledger 和 runner/token 资格均须在后续桥接/激活前处理，不能把离线正例称为生产可用。
 
@@ -316,17 +316,33 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-tra
 
 #### 切片 4 — B2/远端历史桥接与默认只读编排
 
+**初次实施记录（2026-11-10，限定离线范围验收，待合并）**：[上游 #1201](https://github.com/zilliztech/zdoc/pull/1201)，实现提交 `dee8c76f621a58920914fa5ca4a64b64a3b41bd4`；新增测试单例时限修正后的 HEAD 为 `83443879b96292c6e9c99aea07aa9c5633fab448`，基线为第三片 merge `90441eff566a67f33823555ac7524e2fe2211394`。仅下列九个允许路径；未改 workflow、CLI 注册、依赖、权限或 dev-owned 内容。Fork Draft #22 保留本会话主审结论。
+
+主审关闭了新计划与既有不同 unit 的部分 subject 重叠、既有 target/donor ref 的 all-state PR 歧义，以及仅测试 bridge 而未走完整 observe 的覆盖缺口。历史 capability 绑定 exact reads/policy/当前 M/H/donors；新证据目录复制旧 raw object batches 和原始 proof/member bytes，并在生成候选前重新读取。历史 API observation refs 保留原来源语义，不能当成新目录中的 owned journal。
+
+远端专用 `prepareRemote` 以每个历史 head 与当前 M 的唯一 merge-base 检查数据变化，普通合并后严格比对当前 capture 的 P/K。这样允许 master 已审工具更新，仍拒绝人工改工具和 `BOTH_SIDES_LOCK_CHANGED`；B2 纯本地准备边界不变。真实临时 Git 的整链测试覆盖旧 M→当前 M 工具更新、P/K/S/人工后继/新 P/新 K、人工内容保留、旧 K predecessor、旧 S intent、noop、歧义及缺失证据停止。
+
+冻结源码专项：整链 1 passed（73.25 秒，其余 49 项因选择器未运行）；完整 remote-runner/transactions 20 passed；capability binding 1 passed（其余 62 项因选择器未运行）。主审 typecheck、完整 diff selector、matrix 25/25、policy 118/118、diff-check 通过。首次固定 HEAD 完整 gate 在新增 runner 用例默认 5 秒时限处停止，raw counts 不完整；证据 `/Users/liyun/.cache/g-j147qbzn/run-lKHbuu`。修正仅给八个新增 Git/IO 用例设 30 秒单例时限，断言、产品、既有 skips 和全局 15 分钟门槛不变；最终 HEAD 的完整 affected file 9/9、typecheck、selector、diff-check 通过。最终 HEAD 的 macOS / Node 26.7.0 完整 gate 为 **1513 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 与独立 committed terminal 校验通过，862.015 秒小于 900 秒门槛；证据 `/Users/liyun/.cache/g-e0r1hgz8/run-tztCpZ`，前后 HEAD/干净状态/harness hash 一致。6 项为 images 4、可选 collector 1、case-sensitive update-command 1，无新增跳过。开发中一次四文件运行混用了旧缓存模块与新测试，132 passed / 1 failed，不能作为固定 HEAD 的验证；夹具失败、该日志与最终专项日志均保留于 zdoc 本地 `.claude/preparation/wp12-b3-preflight/`。
+
+[CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。主审接受本片限定离线范围，#1201 待合并，B4 未开始。
+
+**当前整合复验（2026-11-10，已通过，待合并）**：门禁修复 [#1202](https://github.com/zilliztech/zdoc/pull/1202) 已合并为 `ec64fd2779f676cbfbdd7186b9906e5305ca62d1`；[合并后 master CI 42777811717](https://github.com/zilliztech/zdoc/actions/runs/42777811717) 四阶段通过，**1419 passed / 0 failed / 96 既有平台 skipped**。第四片普通合并该修复后，整合提交 `780ea96c0` 的 Linux donor 历史用例及本地 created-journal 恢复用例分别触发原有 30 秒单例时限，两个不完整结果保留，不能沿用前述旧 HEAD 的通过结论。
+
+主审核对有限阶段进展并测得五个完整聚焦用例在原时限下通过后，仅将四个 interruption/resume 变体及一个 donor-history 用例改为 60 秒。生产逻辑、断言、跳过规则及 900 秒总门禁不变；五个聚焦用例复测通过。此项额外允许 `testing/updates/remote-transaction.test.ts` 的单例预算修改；原九个功能路径不扩展。当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 的 macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 与独立 committed terminal 校验通过，789.643 秒小于 900 秒；证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段及最终 site gate 通过，约 816 秒。主审接受当前组合，#1201 待合并；合并后仍须核对 master push 检查，B4 未开始。详见 [B 走读](../walkthroughs/WP12-B.md)。
+
+`apply` 仍无条件 `WRITER_DISABLED`；`reconcile` 只重读事实并保留 raw/exact receipt holds，不认证生产完成状态。准备目录与持久 transaction-attempt store 分离，换准备目录不能清除 dispatch veto。生产 raw/capture/writer 安装、精确 producer/validator、真实 CAS/dispatch 与跨运行资格仍属于下文 B4 条件。合并后进入 B4 精确接线与资格计划，不直接开启生产写入；需求 pending 保留。
+
 **允许路径**：新增 `adapters/updates/remote-runner.ts`、`testing/updates/remote-runner.test.ts`；修改 `adapters/updates/local-runner.ts`、`adapters/updates/transactions.ts`、`adapters/updates/remote-metadata.ts`、`testing/updates/local-runner.test.ts`、`testing/updates/transactions.test.ts`、`testing/updates/remote-metadata.test.ts`、`README.md`（此项仅指 shared-docs 包内 README）。均在 `packages/docs-tooling/src/shared-docs/` 下。不改根 README、package scripts、CLI 注册或现有 workflows。
 
 **入口/边界**：`createRemoteUpdateRunner({ capture, reads, policy, writerCapability? })` 为内部库入口。`observe` 生成 intent/holds；只有调用方已持有 writer capability 才能 `apply`。capture 仍由真实 `captureTrustedToolset` 提供，保留 Linux 拒绝；request 不能提供 runtime、provider 或 trusted flag。必要纯编排 seam 只供测试，沿用 B2 的内部注入模式。
 
-- [ ] 测试先证明旧命令契约不变：`LocalUpdateRequest.existing.localEvidence` 仍只认 owned local journal；把远端 seal/S 路径伪装为 localEvidence 会拒绝，`operations: []` 仍成立。未经 remote inspection 的 S 不可作为可信 origin。
-- [ ] 新增 `prepareRemoteCandidate` 桥接：消费第 2 片在同进程创建的 history capability，重读 H/donors/M/D；在新的 evidence root 调用 `createScratchTransaction.prepare` 普通合并，调用 `collectFixedGuidesUnits(capture, ...)` 和 `planUpdateBatch` 重新采集/规划，再 `createCandidate/validateCandidate` 得到新的 P/K/proof。复用 B2 的 fresh/source/access 检查，抽出最小内部 helper，不复制整套 runner。
-- [ ] 远端历史 K/S 的 provenance 作为独立 `remote-origin` 证据留存，不能重造 B2 owned journal。新 candidate 的 `previousBotCommit` 指向已认证的旧 K，`previousSeal` 只在新 seal 中记录；旧 S 是 H 的普通祖先。历史 M 可不同于当前 M，旧 proof 不改写；本次计划与 proof 完全基于当前 M。无法验证旧 origin 或完成桥接就 hold，不回退成 new PR。
-- [ ] 使用 capability 授权的旧 origin 边界校验新 K；B2 的 `createLocalMetadataInspector` 继续只处理纯本地链。`createScratchTransaction` 如需新增 history 验证 helper，仍仅处理 Git facts，不访问 GitHub。新 K 不要求被旧 local inspector 当成纯本地 origin；远端 reader 负责后续跨运行认证。
-- [ ] 人工改配置/Cloud 内容且在允许数据路径内时按新 H 重算，tree 和祖先都保留；改工具/依赖/工作流则 hold。master 合并提升导致 current/next 两侧同改时沿用 `BOTH_SIDES_LOCK_CHANGED` 安全停止并报告，不自行解决冲突；不做 WP13。无变化不增 K/S、不新建 PR，draft-failure 可保留失败报告但不得产生 ready/close proposals。
-- [ ] 恢复不信 journal phase：遗失本地输出可从远端身份/objects/收据恢复观察并重新规划；缺 raw 证据或精确验证 receipt 就 hold。重跑相同完成 intent 无新 commit/PR；新增内容变化才生成新 intent。
-- [ ] 包内 README 写清库状态、P/K/S、默认零写、未知状态和恢复输出，明确无公开写命令。根 operator README 与真实 workflow 使用说明一起由 B4 更新，不能提前记载不存在的命令。
+- [x] 测试先证明旧命令契约不变：`LocalUpdateRequest.existing.localEvidence` 仍只认 owned local journal；把远端 seal/S 路径伪装为 localEvidence 会拒绝，`operations: []` 仍成立。未经 remote inspection 的 S 不可作为可信 origin。
+- [x] 新增 `prepareRemoteCandidate` 桥接：消费第 2 片在同进程创建的 history capability，重读 H/donors/M/D；在新的 evidence root 调用 `createScratchTransaction.prepareRemote`（与本地 `prepare` 共用普通合并内核），调用 `collectFixedGuidesUnits(capture, ...)` 和 `planUpdateBatch` 重新采集/规划，再 `createCandidate/validateCandidate` 得到新的 P/K/proof。复用 B2 的 fresh/source/access 检查，抽出最小内部 helper，不复制整套 runner。
+- [x] 远端历史 K/S 的 provenance 作为独立 `remote-origin` 证据留存，不能重造 B2 owned journal。新 candidate 的 `previousBotCommit` 指向已认证的旧 K，`previousSeal` 只在新 seal 中记录；旧 S 保留为 H/donors 汇入的新 P 的普通祖先。历史 M 可不同于当前 M，旧 proof 不改写；本次计划与 proof 完全基于当前 M。无法验证旧 origin 或完成桥接就 hold，不回退成 new PR。
+- [x] 使用 capability 授权的旧 origin 边界校验新 K；B2 的 `createLocalMetadataInspector` 继续只处理纯本地链。`createScratchTransaction` 如需新增 history 验证 helper，仍仅处理 Git facts，不访问 GitHub。新 K 不要求被旧 local inspector 当成纯本地 origin；远端 reader 负责后续跨运行认证。
+- [x] 人工改配置/Cloud 内容且在允许数据路径内时按新 H 重算，tree 和祖先都保留；改工具/依赖/工作流则 hold。master 合并提升导致 current/next 两侧同改时沿用 `BOTH_SIDES_LOCK_CHANGED` 安全停止并报告，不自行解决冲突；不做 WP13。无变化不增 K/S、不新建 PR，draft-failure 可保留失败报告但不得产生 ready/close proposals。
+- [x] 恢复不信 journal phase：遗失本地输出可从远端身份/objects/收据恢复观察并重新规划；缺 raw 证据或精确验证 receipt 就 hold。重跑相同完成 intent 无新 commit/PR；新增内容变化才生成新 intent。
+- [x] 包内 README 写清库状态、P/K/S、默认零写、未知状态和恢复输出，明确无公开写命令。根 operator README 与真实 workflow 使用说明一起由 B4 更新，不能提前记载不存在的命令。
 
 ```bash
 pnpm test:for-change -- packages/docs-tooling/src/shared-docs/adapters/updates/remote-runner.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-runner.test.ts packages/docs-tooling/src/shared-docs/adapters/updates/local-runner.ts packages/docs-tooling/src/shared-docs/adapters/updates/transactions.ts packages/docs-tooling/src/shared-docs/adapters/updates/remote-metadata.ts packages/docs-tooling/src/shared-docs/testing/updates/local-runner.test.ts packages/docs-tooling/src/shared-docs/testing/updates/transactions.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts packages/docs-tooling/src/shared-docs/README.md
