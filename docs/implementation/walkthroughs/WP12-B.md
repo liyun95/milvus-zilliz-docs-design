@@ -145,6 +145,10 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 当前真实 smoke 只取得 capture 阶段成功；worker 在生成前停止、无 settlement，对象规模也已超过既有 64 MiB 预算。初次 CI 还发现新测试依赖完整 checkout，而默认 CI 使用浅克隆；已改用独立完整 fixture 并通过 55 个聚焦测试；最终 CI 四阶段 1487/0/96 和 gate 均通过，浅克隆拒绝策略保持。此前 c689 的 macOS 全量 1576/0/6 已通过并独立核实，不能冒充最终 HEAD 的本地全量。获准的私有运行 [42794595610](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42794595610) 已执行一次：Actions 成功，实际 capture=held（未分类拒绝），worker=not-run，对象下界 82,898,876 bytes 超预算；产物摘要已核验。setup 的版本化 Xcode Git 路径与现有规则不兼容，但首个拒绝原因尚未被准确证实。下一步先处理拒绝诊断与供应路径兼容性，B4.1 环境资格和 B4 整体均未完成。
 
+## 首版目标调整（2026-11-10）
+
+用户选择优先交付 Guides 单页的上游自动发现、`lock.next` 更新和 Draft PR 创建；已有未合并更新 PR 时暂停并报告，滚动更新和复杂恢复后续再启用。已有 B3 能力保留；去重、精确提交验证与未知远端结果停止仍是首版门槛。当前 [Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 已实现 B4.1 同环境前置观察与安全错误分类，72 个聚焦测试通过，完整 CI 待完成，避免把 setup 环境的观察当成实际 capture 失败原因。具体四个交付包、粗略预算与本片允许路径见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。

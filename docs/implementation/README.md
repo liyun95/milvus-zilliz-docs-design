@@ -244,7 +244,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
-| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2、B3 前两片已合并；身份兼容修正已合并 #1197，早期 macOS 超时记录保留；第 3 片离线事务主审和双平台全量通过（#1199 已合并），第 4 片已带入 #1202 并合并 #1201（合并后 master CI 与工具同步均通过），CAS 负例原因资格缺口保留，B4.1 诊断包主审与 CI 通过（#1206）；私有实测 capture=held、worker 未运行，运行环境资格未取得；详细证据见任务卡） |
+| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2、B3 前两片已合并；身份兼容修正已合并 #1197，早期 macOS 超时记录保留；第 3 片离线事务主审和双平台全量通过（#1199 已合并），第 4 片已带入 #1202 并合并 #1201（合并后 master CI 与工具同步均通过），CAS 负例原因资格缺口保留，B4.1 诊断包主审与 CI 通过（#1206）；私有实测 capture=held，正补同环境前置观察。首版限定单页新建 Draft PR，已有 PR 则暂停；详细证据见任务卡） |
 
 其余的在对应工作包开始前写，写完由推动者确认。任务分发与审阅按下文协作规则执行；WP12/WP13 的公共接口见 [WP12 任务卡](./tasks/WP12-zdoc-upstream-updates.md#接口)。阶段验收不等于整个工作包需求结项。
 

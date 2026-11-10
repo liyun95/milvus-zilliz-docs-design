@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已合并 #1197；第三片离线事务已合并 #1199（`90441eff566a67f33823555ac7524e2fe2211394`），设计记录 #85 已合并。第四片桥接与只读编排已带入 #1202，组合复验通过并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`）；设计 #86 已合并。合并后 master CI 与工具同步均通过；生产资格缺口保留，B4.1 诊断包已获准开始实现，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已合并 #1197；第三片离线事务已合并 #1199（`90441eff566a67f33823555ac7524e2fe2211394`），设计记录 #85 已合并。第四片桥接与只读编排已带入 #1202，组合复验通过并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`）；设计 #86 已合并。合并后 master CI 与工具同步均通过；生产资格缺口保留，B4.1 诊断代码通过 #1206 审阅；首次 hosted capture held，#1208 正补同环境前置观察，首版限定新建 Draft PR、已有 PR 时暂停；整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -402,9 +402,9 @@ B4 必备交接清单（仅定义条件，本卡不实施）：
 
 执行顺序：
 
-- [ ] 按上述路径运行实时 selector，确认 master 归属和命令联集；先核对现有 capture/worker 测试 helper，能复用就不复制实现。新增内部 `collectRunnerQualification` 接受固定工具 checkout、完整 M SHA 和新的 evidence 目录；配置不提供 writer/token/任意环境覆盖。用于调用该内部模块的本地 launcher 与外部运行包留在 `.claude/`，未审阅脚本不进入受信工具集。
+- [x] 按上述路径运行实时 selector，确认 master 归属和命令联集；先核对现有 capture/worker 测试 helper，能复用就不复制实现。新增内部 `collectRunnerQualification` 接受固定工具 checkout、完整 M SHA 和新的 evidence 目录；配置不提供 writer/token/任意环境覆盖。用于调用该内部模块的本地 launcher 与外部运行包留在 `.claude/`，未审阅脚本不进入受信工具集。
 - [ ] 先写诊断契约测试：报告固定 `kind=shared-update-runner-diagnostic`、`schemaVersion=1`、`productionQualified=false`；区分 `capture=passed|held|not-run` 与 `capacity=over-budget|not-proven`，缺项不能变成 pass。记录 M、平台/工具观察、closure 摘要/字节、计时、实际阶段、容量统计与明确失败原因；不记录 token、完整 env 或原始敏感错误对象。另测 M/closure 不匹配拒绝、held 不能因命令 exit 0 变成成功、candidate 可执行 tripwire 未触发、credential canary 不进入真实 child/保留输出、worker settlement 不完整为 held；测试 seam 不能产生真实资格。
-- [ ] 容量部分按 blob OID 去重，分开报告文件条目数、唯一对象数、字节数和已知下界；同 OID 重复路径只累计一次，非法/截断 Git 输出拒绝。仅用当前树下界判定超限，不把低于限额判为整个历史通过；大仓库输入必须有固定读数/时间/输出上限，超限保留不完整状态。
+- [x] 容量部分按 blob OID 去重，分开报告文件条目数、唯一对象数、字节数和已知下界；同 OID 重复路径只累计一次，非法/截断 Git 输出拒绝。仅用当前树下界判定超限，不把低于限额判为整个历史通过；大仓库输入必须有固定读数/时间/输出上限，超限保留不完整状态。
 - [ ] capture 部分必须调用真实 `captureTrustedToolset`；Linux 拒绝是 held，不是资格成功。保留 UID/GID、实际工具版本与路径、闭包和访问证据；不 chmod 既有目录、不放宽 ACL/owner/native 策略、不把 setup 后的环境描述当捕获结果。使用默认 helper 覆盖，不传 `helpers: []` 绕过 gh/Python。固定 worker 的 smoke 直接复用 `createGuidesProvider` 的真实子进程边界和 settlement，先只用本地 fixture，无 credential、无外部内容请求；capture 失败时后续 worker 为 not-run。capture 本身不提供 AbortSignal；内部只做阶段间截止检查，整体时限由 `.claude/` 的独立 launcher 管理本次 owned 进程组并确认清理，不能用 Promise 超时掩盖仍存活的工作或伪造 child 完成报告。
 - [ ] 先跑新文件 focused，再 typecheck；冻结最终代码后运行完整 selector 联集和 workflow policy。外部 GitHub runner 尚未执行时，报告只能称“诊断包已验证”，不能称“runner 已合格”。
 - [ ] 本地审阅后准备隔离仓库 probe 的具体 diff：固定 reviewed 工具 SHA、action SHA、runner label/架构、工具版本、只读 setup 与新的 owned0700 目录，`persist-credentials:false`，无 PR/ref 写入、无 schedule。setup 下载与 captured worker 分阶段；captured worker 使用新的进程、固定小环境且无 credential helper，排除 GitHub/Cloud/Actions runtime/cache bearer 凭据。除了环境变量，还核对文件/config 可达性；不能只凭 sanitizer 函数存在就宣称隔离完成。artifact 上传位于 worker 外部。先提交可审阅包，再为一次明确的外部运行取得对应授权；以前 API mutation 预检授权不沿用。
@@ -441,6 +441,33 @@ git diff --check
 保留 [artifact 13752948914](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42794595610/artifacts/13752948914)，下载 ZIP SHA-256 `d77275fa28f81539b5dd40ebb71e6f3104a2c0ae807c8f31195091f1173fc1b6` 与 GitHub artifact digest 一致；5 个成员、5,240 bytes 展开内容，路径与大小检查通过。包括 setup observations、launcher receipt 和 diagnostic.json；workflow 成功仅表示诊断和上传完成。
 
 **下一步仍在 B4.1**：先补稳定的拒绝原因分类，并审定 hosted 工具供应路径与现有 capture 策略的兼容方案。setup 观察的 xcrun Git 为 `/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/git`，不满足当前仅接受 `/Applications/Xcode.app/` 或 `/Library/Developer/` 的规则；这是可确认的配置兼容缺口，但观察发生在 setup 环境，当前报告又没有保留准确异常，不能断言它就是本次首个失败原因。下一片需先用固定 fixture 测试合法供应路径、伪造/别名/可写路径与完整 native/ACL/身份闭包，再决定是否修改 capture；不直接放宽前缀、设置环境绕过、升预算或重复 hosted run。当前只完成诊断代码主审与一次受限观察，环境资格未通过，不进入 B4.2 实施或生产接线。
+
+#### 首版范围裁决与工期预算（2026-11-10）
+
+用户明确优先尽快交付“上游更新自动发现、修改 commit、发起 PR”，并选择：**首版先自动创建 PR，已有 PR 时暂停更新**。这里修改 commit 指只更新 Guides 页面的 `lock.next` 为已验证的上游目标 SHA；不改 `current`，人工审阅合并。
+
+首版限定为一个已接入的 Guides 试点页：定时/手动发现 → 固定输入验证 → next-only 候选 → 创建 Draft PR → 精确提交检查与报告。发现同一页面已有未合并更新 PR 时，保留原 PR，报告新变化并停止写入；不自动更新其 head、不合并人工改动、不自动 ready/关闭 donor。不确定 PR 清单、路径/依赖需要扩大、陈旧输入或远端结果未知均停止。重复运行不得重复建 PR；创建/上传/验证 dispatch 的未知结果仍须持久记录并只读核对，不能借“复杂恢复延后”删除这些基本保护。新建 staging/target ref 和 seal 仍使用当前事务约束，原 CAS 资格缺口不能自动视作豁免。
+
+滚动 PR 更新、复杂人工修改整合与自动恢复另做后续版本；保留已有 B3 实现，不删需求 pending。SDK provider、完整退役处理也不纳入首版。计划预算暂为 **4–7 个工程工作日**，是以现有内核可复用、运行环境和传输问题可在局部解决为前提的粗估；前两项尚未验证，不构成上线承诺。
+
+| 首版交付包 | 完成标志 |
+|---|---|
+| 1. 运行环境与诊断 | 同一受限环境的供应路径/身份前置条件可观察，真实 capture 和固定 worker 完成，凭据隔离证据明确 |
+| 2. 真实规模对象传输 | 已认证基线处的边界及 next-only 增量在真实仓库规模内可验证；不盲目上传完整历史或提高预算 |
+| 3. 发现、精确验证与只读工作流 | 自动选目标 SHA，固定 M/D/页面；报告与精确候选提交关联，已有 PR 时 hold，先手动 report-only |
+| 4. 隔离创建与单页启用 | 私有仓库完成新建 Draft PR、重复运行去重和未知结果停止；资格通过后单页上线并逐步定时 |
+
+#### B4.1 后续小片：同环境前置观察与安全拒绝分类
+
+本次继续开发在 `35cee93976d6023da054ab78f2cd69e60f61288e` 上叠加；#1206/#87 尚未合并，不把继续开发解释为合并授权。仍只修改 `testing/updates/runner-qualification.ts` 与对应测试，辅助脚本留 `.claude/`；不改 capture 的路径/权限/native/身份策略。
+
+- 复用 `trustedLauncherEnvironment`，用与 capture 相同的固定小环境观察 `/usr/bin/xcrun --find git` 和 `--find python3`，不执行返回位置的程序。Linux 标记该观察不可用，实际 capture 继续按原策略拒绝。
+- 仅观察固定 Node、Git/Python 位置及可严格推导的 stdlib、固定 gh、固定 Search.plist 与其祖先的有界元数据。固定目标数/路径/输出/子进程时限，无任意路径或命令注入接口，无递归遍历、环境转储、原始错误、plist/ACL 解析器。元数据和路径存在不等于访问资格；观察失败继续采集其他独立项，不替代实际 capture。
+- 补充已知 Git/Python provisioning、identity/profile、native 和环境错误的稳定分类。仅精确字符串/已知前缀映射固定 token；未知错误保留未分类，不复制动态后缀。
+- 通过独立 fixture 与 mock 边界验证环境、限额、脱敏、各项独立失败和实际 capture 仍被调用。最终冻结后按 selector 联集验证；不重复上一片实际 smoke，不沿用已经消费的一次 hosted 授权。
+- 只有取得同环境证据并审阅具体方案后，才考虑支持标准版本化 Xcode bundle；不得仅扩大路径前缀就宣称 hosted 支持。下一次外部运行另以冻结包审定。
+
+本片实现已冻结为 `28b33646f7efb331ad22af03afc22f3d517a0b1a`，见 [产品 Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 和 [Fork Draft #24](https://github.com/liyun95/zdoc/pull/24)。增量基线是 #1206 的 `35cee9397`，两个文件 +209/-7；主审修正平台测试假设、路径遍历观察、同步子进程终止与不可取消文件读取的错误超时表述后，focused 72/72、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。完整 [CI 42802409072](https://github.com/zilliztech/zdoc/actions/runs/42802409072) 待完成；没有新的真实 capture 结果。私有包已冻结为 `f6c2741fdd6928f30a467ad76a4344f0788d392b`，只更换两处工具 SHA，其他 wrapper/权限/时限保持；尚未 push 或 dispatch，正在申请对应的一次只读运行授权。
 
 #### 后续切片与准入条件
 
