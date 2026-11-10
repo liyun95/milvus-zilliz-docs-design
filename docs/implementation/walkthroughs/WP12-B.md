@@ -1,6 +1,6 @@
 # WP12-B 走读：本地更新准备已完成，远端自动化待实现
 
-截至 2026-11-09，B1 的只读报告与 B2 的本地规划/准备已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
+截至 2026-11-10，B1 的只读报告、B2 的本地规划/准备与 B3 第一片的纯远端校验契约已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
 
 ## 已交付的部分
 
@@ -8,10 +8,23 @@
 |---|---|---|
 | B1 | 固定输入、生命周期观察、只读更新报告 | [#1055](https://github.com/zilliztech/zdoc/pull/1055)，`d06339345458a7465140a85389a9df5e9f68a603`，2026-11-03 |
 | B2 | `update-plan` / `update-prepare`、可信工具集、隔离 Git 候选、proof/journal 与恢复 | [#1155](https://github.com/zilliztech/zdoc/pull/1155)，`98de1d8426b1d251b8393ea9b5ad91686de14776`，2026-11-09 |
+| B3 第一片 | 远端观察的严格 schema、读取状态分类、精确验证收据的纯一致性校验 | [#1189](https://github.com/zilliztech/zdoc/pull/1189)，`87f103f926d27943861278181308ebbb7cb73fe0`，2026-11-10 |
 
 B2 的含义是：在本地证明“这些固定输入应产生什么候选”，不自动推送分支、创建 PR 或发布。对真实 Guides 的收集和生成使用受约束的工具集；输入或身份不充分时输出 hold，不通过扩大权限继续运行。
 
 Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返回 `PROVIDER_NOT_INSTALLED`。这些不是成功分支，也不因常规 CI 或 Fetch 在 Linux 运行就视为已支持。
+
+## B3 第一片：纯远端校验契约
+
+新增 [core/updates/remote.ts](https://github.com/zilliztech/zdoc/blob/87f103f926d27943861278181308ebbb7cb73fe0/packages/docs-tooling/src/shared-docs/core/updates/remote.ts) 和对应 `testing/updates/remote.test.ts`，没有接入现有 CLI 或生产 workflow。
+
+`classifyRemoteRead` 区分已找到、已证明不存在与未知；HTTP 404 本身不能证明不存在。`acceptExactValidation` 检查独立取得的远端观察和收据是否一致：PR base 必须等于固定 master，producer/validator 运行分开，workflow 触发者与实际写入者分开，工具 M 的运行检查与候选 S 的目标检查分开，archive/member/output 的摘要也分别绑定。证据缺失、过期、错配或歧义时返回 hold。
+
+这些纯函数只检查一致性。JSON、签名标记或一个成功 check 不能自行产生真实远端身份；API/签名/工作流来源、归档成员归属和 Git 历史的认证留给第二片及后续接线。第一片不会创建 PR、改 ref、执行候选代码或解除 Linux 限制。
+
+方案和代码审阅保留在 [fork PR #18](https://github.com/liyun95/zdoc/pull/18)。最终产品 HEAD `4d33a1131716c8db2b3063c0b08800b69e5caa7a` 的本地验收为 1352 passed / 0 failed / 6 既有 skipped；59 个新增测试全部执行。typecheck、matrix 25/25、policy 118/118、完整 diff selector 和 diff-check 均通过；[上游 CI](https://github.com/zilliztech/zdoc/actions/runs/42635810941) 亦通过。此处记录已有留存结果，本次文档收尾未重跑产品测试。
+
+六个既有跳过项为四个可选 loopback 图片测试、需显式开启的 measured Guides collector 测试和一个需大小写敏感文件系统的用例，不计作通过。完整本地证据根为 `/Users/liyun/.cache/zdoc-vitest/run-koV6yc`。
 
 ## 从固定输入到候选
 
@@ -60,7 +73,7 @@ pnpm test:workflow-matrix
 
 遵循仓库固定工具链与 README 中的运行环境要求。Linux 下跳过的真实捕获用例不能被记作通过；运行器支持 Linux 不等于可信捕获支持 Linux。
 
-## 审阅与验证证据
+## B2 审阅与验证证据（2026-11-09）
 
 合并前审阅修复了缓存执行、原生库查找位置、悬空/多层符号链接和遍历路径等安全边界问题；Linux 捕获入口保持明确拒绝。全量本地与 CI 的资格结论有各自的固定环境和跳过范围，不将一个平台的结论转移到另一个平台。本次收尾没有重新执行这些昂贵测试，以下新增核验是读取 GitHub 的不可变 run 与留存结果。
 
@@ -78,4 +91,4 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-下一项是 B3 精确计划：先解决远端身份/精确 head 校验契约与执行平台选择，再拆分 GitHub 事务和失败恢复的实施 PR。计划与权限由主会话审定，执行会话实现，PR 回主会话审阅。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md#下一项b3-精确计划任务先规划再实现)。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189。下一项是第二片：GitHub 只读事实与远端历史认证；先在 fork Draft PR 审短计划，再实现和主审，最后在最终 HEAD 执行完整验证。第三片的真实 API 可行性预检和 B4 平台资格仍保留。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
