@@ -217,7 +217,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
 | 上游变化分析 | 比较源与 Cloud 输出、锚点和采用依赖，生成报告 | WP12-A | 已合并 #1027 | [WP12-A](./walkthroughs/WP12-A.md) |
 | 本地更新准备 | 只读发现、固定输入规划、隔离候选与 proof/journal | WP12-B1/B2 | 已合并 #1055 / #1155；B2 限定范围收尾，Linux 捕获与 SDK provider 未交付 | [WP12-B](./walkthroughs/WP12-B.md) |
-| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12-B、WP13 | WP8b 已合并（`8680736`）；WP12-B3 前两片已合并 #1189/#1193；第 3 片 API 预检未通过，身份修订方案已形成，待验证，生产接线/B4 与 WP13 未实现 | [WP8](./walkthroughs/WP8.md) |
+| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12-B、WP13 | WP8b 已合并（`8680736`）；WP12-B3 前两片已合并 #1189/#1193；第 3 片 API 预检未通过，新身份观测已验证，CAS 诊断待完成，生产接线/B4 与 WP13 未实现 | [WP8](./walkthroughs/WP8.md) |
 | 目录结构 | `shared-docs/` 按组分子目录 | WP8c | 已合并到上游（`zilliztech/zdoc` `e9ab23f`） | [WP8c](./walkthroughs/WP8c.md) |
 | 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9a 已合并到上游（`zilliztech/zdoc#863`，`8289d74`）；WP9b-1（[#950](https://github.com/zilliztech/zdoc/pull/950)）、WP9b-2（[#960](https://github.com/zilliztech/zdoc/pull/960)）已合并，工具链已同步 dev；走读已补，正式 Fetch/部署后验收待完成；WP14、WP15 未开始 | [WP9a](./walkthroughs/WP9.md)、[WP9b](./walkthroughs/WP9b.md) |
 | 试点页接入 | 原文对齐与页面配置，分批接入 | 内容（不属于工作包） | 试点 Delete Entities 与第一、二批共 12 篇已激活并上 Prod（`zilliztech/zdoc#861`、`#872`、`#903`）；第三批 3 篇已激活（`#916`，2026-10-29），等发版上 Prod | — |
@@ -244,7 +244,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
-| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2、B3 前两片已合并；第 3 片 API 预检未通过，身份修订方案已形成，待验证，B4 未开始） |
+| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2、B3 前两片已合并；第 3 片 API 预检未通过，新身份观测已验证，CAS 诊断待完成，B4 未开始） |
 
 其余的在对应工作包开始前写，写完由推动者确认。任务分发与审阅按下文协作规则执行；WP12/WP13 的公共接口见 [WP12 任务卡](./tasks/WP12-zdoc-upstream-updates.md#接口)。阶段验收不等于整个工作包需求结项。
 
