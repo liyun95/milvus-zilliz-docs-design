@@ -480,6 +480,16 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 下一片须合并评估版本化 Xcode 的 Git/Python 供应布局、Search.plist 可读性与身份策略，先提出保持原生闭包、访问检查和身份认证约束的精确本地修复方案；不能只扩大路径前缀、跳过身份配置或提高权限后反复试跑。B4.2 容量方案独立处理，不以提高 64 MiB 预算替代认证的对象传输设计。本次一次 hosted 授权已消费，不重跑、不放宽权限、不合并产品 PR；B4.1 环境资格及 B4 仍未完成。
 
+#### B4.1 本地兼容修复实施入口
+
+主会话依据 run 42806608231 释放本地实现，不授予 hosted 再运行或配置修改权限。基线 `28b33646`，允许 `adapters/updates/toolset.ts` 和 `testing/updates/toolset.test.ts`（均在 shared-docs 下），以及 `scripts/testing/expected-platform-skips.json` 中 toolset 的 Linux 精确跳过数声明；其他平台和文件声明不变。新增真实 macOS 捕获用例依赖该平台，需要声明准确跳过数，不能让 CI 静默扩大跳过范围。Git/Python 共用私有固定 xcrun 解析器，仅接受标准 CLT、Xcode.app 与数字版本 Xcode bundle 的精确工具位置。拒绝非规范路径、错误工具名、伪装 bundle 和跨 developer-root 的真实目标；词法入口及解析链都进入现有访问检查。Python framework、stdlib、原生依赖、闭包字节、owner/mode/ACL、身份与使用前复核继续按原规则认证，不增加公共信任开关。
+
+身份配置仍从原固定路径读取并测量、使用前重读；权限不足必须拒绝。不得用 dscl 投影或副本替代原配置，也不以 root 运行整个 worker。需另行准备一次受控 disposable runner 配置方案：让普通用户能读取原 root-owned 配置、保持其不可被普通用户修改，并先评估内容是否适合开放读取。当前不执行 chmod/sudo 或其他环境变更；无法满足时保持 held。
+
+验证以实际 capture 调用路径为主：合法版本化 Git/Python 到达测量流程；错误位置、目标逃逸、词法路径可写、权限拒绝、后捕获变化均停止；保留 Python 隔离启动和原生依赖回归。先聚焦测试，再执行 selector 联集（vitest-groups、shared-docs、frontend、typecheck、workflow-matrix、diff-check）。本地测试成功只确认兼容修复，不授予 hosted 资格。此片与 B4.2 容量设计分离。
+
+本地修复已提交为 `0554c8dd216475d9b54607808bd55eaac7e4c0e0`，见 [产品 Draft #1209](https://github.com/zilliztech/zdoc/pull/1209)（依赖 #1208/#1206）及 [Fork Draft #25](https://github.com/liyun95/zdoc/pull/25)。增量三文件 +126/-11；主审已核对私有解析器、词法/真实路径检查接线和原身份字节绑定，修正了 JavaScript 末尾换行匹配边界。18 个新增 Darwin 用例通过，Linux toolset 精确跳过声明 89→107；typecheck、matrix 25/25、vitest-groups 64/64 已通过。完整 shared-docs/frontend 与最终 CI 正在执行；保持 Draft，不宣称完整验收或 hosted 资格。
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |
