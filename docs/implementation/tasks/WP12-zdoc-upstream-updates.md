@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行两次有界 API 预检，尚未通过（身份规则与实际提交角色不一致），第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行两次有界 API 预检，尚未通过（身份修订方案已形成，待落实与验证），第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片 API 预检未通过，身份规则待裁决；第 3–4 片产品代码未实施，第 3 片须先通过有界 API 预检 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片 API 预检未通过，身份修订方案已形成；第 3–4 片产品代码未实施，第 3 片须先通过有界 API 预检 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -118,9 +118,9 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 
 保留私有仓库 ID 1452115569、两次 run/attempt、实际 token 权限和 artifact。第二次 artifact ID 13730331305，ZIP SHA-256 `b3acb03e1d5d658015e54d488b51c1994574e55deeacf3d1d9a8a63bb235e2cb` 已与下载内容核对；测试 staging ref 保留在 S。测试不触碰 zdoc/Milvus 的发布分支、Fetch 或 Translation。
 
-**下一步裁决**：先设计并审阅作者、平台 committer/signer、受信 producer/run 证据的联合认证规则，明确它与第二片 schema/adapter/历史认证的兼容性及拒绝矩阵；仅换一个作者字段或 bot ID 不构成修复。该规则尚未批准或实现。预检脚本自身的语法/编码遗漏单独修正，身份规则收敛后才准备下一次有界预检；本记录不授权额外 dispatch，第 3 片仍不进入大规模实现。
+**下一步裁决**：先设计并审阅作者、平台 committer/signer、受信 producer/run 证据的联合认证规则，明确它与第二片 schema/adapter/历史认证的兼容性及拒绝矩阵；仅换一个作者字段或 bot ID 不构成修复。具体主审方案见下节 `github-app-author-v1`；产品规则尚未实现。预检脚本语法/编码遗漏已本地修正并通过独立回归，身份方案审定后才准备下一次有界预检；本记录不授权额外 dispatch，第 3 片仍不进入大规模实现。
 
-预检使用 reviewed checkout（不保存凭据）及专用 probe 步骤；fixture Git objects 始终作为数据。签名者、作者、committer 和执行 App/actor 分别记录，不能因为观察到某个 ID 就改写第二片的固定身份判定。测试只能证明 API 可行性，生产进程隔离和平台资格仍属 B4。
+预检使用 reviewed checkout（不保存凭据）及专用 probe 步骤；fixture Git objects 始终作为数据。签名者、作者、committer 和执行 App/actor 分别记录，不能因为观察到某个 ID 就静默改写第二片身份判定；变更必须按下述显式契约修订及验证执行。测试只能证明 API 可行性，生产进程隔离和平台资格仍属 B4。
 
 这是 B4 资格工作的前置小项，用来及早验证事务架构依赖的 GitHub 行为；不等于完整 runner 资格或生产激活。本计划本身不授予外部写入权限；上述两次执行各有单独授权。第 1/2 片可以先完成；如果还没有获准的隔离测试仓库及写入授权，第 3 片保持草案，不大规模实现，第 4 片也不绕过此前置。
 
@@ -128,6 +128,51 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 - 验证 REST 上传返回的每个 blob/tree/commit OID 与本地完全一致；验证零文件修改 seal S 的 `parent=[K]`、`tree(S)=tree(K)`、有效签名及实际 API actor。任何规范化、签名缺失或身份不符都停止，不用同树或作者字符串替代。
 - 仅在该单 staging ref 上验证 `updateRefs(beforeOid, afterOid, force:false)`：absent 创建、正确 expected-old 快进、错误 expected-old 拒绝且 ref 不变；用真实请求成功后故意丢弃客户端响应，再通过读取精确 ref/objects 重建结果，不盲重试。
 - 留存脱敏请求/响应、实际 object/ref OID、签名/actor、错误 CAS 前后 ref、丢响应读回结果。主审确认全部行为符合契约后才进入第 3 片；预检失败先修订本卡架构，不能先实现再将失败推迟 B4。测试仓库通过只证明 API 可行性，native closure、ACL、runner/权限隔离、可信 validation producer 与生产 smoke 仍由 B4 完成。
+
+#### 身份规则修订 — `github-app-author-v1`
+
+**主审方案（2026-11-10，设计 PR #81 合并后的下一步）**：采用作者、平台签名、受信 producer 证据三层联合认证。下述为明确的契约修订，替代第 1/2 片未获真实验证的 committer 假设；产品代码尚未修改，API 预检仍未完成。签名者不能被称为写入机器人，作者字段也不单独产生信任能力。[GitHub API 的 Authorship/Commit Signing 说明](https://docs.github.com/en/graphql/reference/commits#createcommitonbranch)与已保留真实提交相符：该 mutation 的作者来自凭据主体，committer 使用平台身份。
+
+**角色与严格契约**：
+
+| 证据 | 修订后的要求 | 不得替代的证据 |
+| --- | --- | --- |
+| API author | 同一 S 的 REST `author.id` 与 GraphQL `author.user.databaseId` 均为正整数且相等，再与受信 `writerActorId` 比较 | login/email/commit message、PR marker 或 signer |
+| 平台 signature | REST verified/reason 与 GraphQL isValid/state/wasSignedByGitHub 均满足既有有效条件；数字 signer ID 必须等于受信策略中的平台 signer ID | 只有绿色 Verified 标记、作者相等或 committer 相等 |
+| committer | 保留原始响应/字节与 nullable GraphQL 观察；null 不再单独否决 seal，不回填 signer/author/REST 值；两侧都有数字 committer ID 却冲突时停止 | 不再用它断言 credential owner；不把 `web-flow` 赋给 writerActorId |
+| 精确 Git 对象 | 从原始 S 提取签名头，验证 payload/signature 字节、重建 OID、唯一 K parent 和同 tree；K/P/next-only 与摘要绑定仍全部检查 | REST JSON message 展示值或同 tree 的另一提交 |
+| 历史 producer | 既有历史定义注册表、固定 tools/workflow ID/path/定义摘要、同仓 run/attempt/event/dispatch actor、成功状态，以及唯一 artifact/原始 ZIP digest/provenance 的精确 S/K/transaction/plan/proof 绑定 | 全局 Actions App ID、共享 bot ID 或 run 名称；同 App 的其他 workflow |
+
+受信 `RemotePolicy` 新增必填 `sealIdentity: { scheme: 'github-app-author-v1', platformSignerActorId: positive }`，无默认值、无任意角色选择或兼容开关。`writerActorId` 仍用于机器人作者及 PR actor；producer/validator 的 `actorId` 仍表示 workflow 发起者，不强制等于机器人。数字 ID 只能由受信部署策略显式提供，测试仓库观察值不能自动注册为生产策略。
+
+`RemoteFacts.seal.writerAttribution` 改为严格 `{ role: 'author', actorId: positive }`，由受信 adapter 在完成上述检查后构造。`acceptExactValidation` 必须同时检查 authorActorId、writerAttribution、平台 signer 与完整既有 producer/validator/receipt 绑定，不能只比 derived attribution。`RemoteCommitSchema.committerActorId` 仍是原有 nullable GraphQL 观察；`readCommit` 对 author 做 REST/GraphQL 双侧认证，不通过 committer 的 API 缺失推导新值。REST committer 保留在现有原始响应 evidence 中，不额外新增同义字段；两侧非 null 却冲突时停止。
+
+历史接收与活动写入分开：`verifyRemoteSealSignature(raw, fact, { writerActorId, platformSignerActorId })` 仅证明必要的字节/签名/作者条件，不产生完整历史来源 capability。当前受信 writer 可在同一活动 run 中核对自己 intent 下刚创建的 staging S；这不要求自身 run 已完成，也不等于历史验收。跨 run 的历史采纳仍由 `inspectRemoteHistory` 验证成功 producer 与不可混用的 artifact；run 失败、过期或 provenance 缺失继续 hold，不借恢复路径豁免。默认 producer 注册表保持空，未安装真实 producer 时无生产接收能力。
+
+**producer 信任前提**：作者是 GitHub 账户关联观察，单凭它和平台签名不能证明某个唯一 workflow。已批准 producer 必须只为自己的授权 intent、实际 mutation 及独立读回的 S/K 生成 receipt，不能替调用者任意提交的 S 做背书。相同 App/bot 的其他 workflow、伪造作者 metadata 或复制 run ID，仍须被精确且不可混用的 producer artifact/provenance 拒绝。工作流文件摘要不单独证明其可执行依赖或 token 隔离；这些保持 B4 资格条件。再次读取同一真实历史可以幂等，但不能当作当前 head 的新验证。
+
+**兼容性**：这是未激活 B3 内部策略/事实格式的明确不兼容修订。缺少新策略字段、`role=committer` 的旧事实均拒绝，不自动转写。S 的 `RemoteSealV1`、B2 BotRevision/proof、producer/validator v1 收据内容不因这次角色更正而改版；它们已有精确对象和 run 绑定。旧材料必须重新读取并按新规则全量认证，不能因旧结果曾通过就直接接受。第 2 片历史完成记录保留，增加修订说明，不改写当时的测试结果。
+
+**最小实施顺序与允许路径**：产品路径均位于 `packages/docs-tooling/src/shared-docs/`。
+
+- [ ] 先调整独立预检包（测试仓库 `scripts/preflight.mjs`、`scripts/preflight.test.mjs`、`README.md`）：保留本地已修的查询语法/签名续行，固定测试仓库 bot 和 platform signer，要求 viewer/REST author/GraphQL author 一致，允许 GraphQL committer null；不得把此次 API 机械验证冒称完整 producer 认证。新增身份不符与缺失的拒绝测试；不修改工作流权限、不加 PAT。
+- [ ] 主审本地包后，再单独取得具体修订的一次 dispatch 授权。保持一条本次 run 派生 staging ref、原对象上传/空 seal/丢成功响应读回/错误旧值及正确旧值 CAS 顺序；旧 refs 和失败证据全部保留。任何 unknown 停止，不盲重试。通过仅解除 API 可行性门槛，不解除 B4 或完整 producer 门槛。
+- [ ] API 预检证据接受后，实施六文件兼容修正：`core/updates/remote.ts` 加必填策略与严格 author facts/pure checks；`adapters/updates/remote-github.ts` 加 author 双 API 一致性；`adapters/updates/remote-metadata.ts` 改必要身份谓词及调用参数，保留原始签名头验证；对应 `testing/updates/remote.test.ts`、`remote-github.test.ts`、`remote-metadata.test.ts` 增加下列矩阵。不得把预检 helper 的续行修正机械复制到已经按原始头解析的产品 verifier。
+- [ ] focused 通过后按完整 diff selector 运行最终检查，走既定 fork Draft PR → 主审 → 上游 PR；不接 CLI、Fetch/Translation、生产 workflow 或有效 producer registry。兼容修正通过后才继续第 3 片事务实现。
+
+**验收矩阵**：正例必须包括真实保留 S 的 1182 字节、机器人 author/平台 signer、REST 平台 committer + GraphQL null，以及完整合成历史/收据链。真实 S 的固定 fixture 消息不是产品 `RemoteSealV1`，只能用于字节/身份 helper 回归，不能伪称完整历史验收。拒绝项必须覆盖：author 缺失/两 API 冲突/错误 ID；两侧非 null committer 冲突；signer 缺失/错误 ID/签名无效；旧 policy/committer facts；facts 的 author 与 derived attribution 冲突；修改签名尾部续行、payload、raw OID；相同 bot/App 的错误 workflow/tools/定义/run/attempt/仓库；成功 seal 却缺少/过期/混用 provenance；重放旧 S 去满足不同 transaction/plan/proof。已有图/保留人类改动/并发读取拒绝测试继续执行。
+
+```bash
+# 实施前：全部路径归属 master-tooling；本次规划已确认 selector 无未映射项。
+pnpm test:for-change -- packages/docs-tooling/src/shared-docs/core/updates/remote.ts packages/docs-tooling/src/shared-docs/adapters/updates/remote-github.ts packages/docs-tooling/src/shared-docs/adapters/updates/remote-metadata.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts
+pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts
+# 最终产品 HEAD，只在新增变化/失败需要时重复昂贵全量。
+pnpm test:for-change -- --base origin/master --head HEAD
+pnpm test:shared-docs
+pnpm typecheck
+pnpm test:workflow-matrix
+git diff --check
+```
 
 #### 公共远端契约（新增，不覆盖 B2 schema）
 
@@ -190,7 +235,7 @@ pnpm test:for-change -- packages/docs-tooling/src/shared-docs/adapters/updates/r
 pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-github.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote-metadata.test.ts packages/docs-tooling/src/shared-docs/testing/updates/remote.test.ts
 ```
 
-**本片有界范围**：签名者、API committer 写入者和 Workflow 发起者分别验证；producer 必须命中受信调用方维护的历史定义，默认注册表为空。原始 Git object 读取依赖由受信调用方提供，本片不安装生产获取桥接。支持可证明的 disjoint 普通合并；冲突、attributes、跨 unit key 的已认证 subjects 重叠均 hold，不把它们当作互不相关的更新。历史 executable closure 与报告中的外部材料是 producer 证明的摘要引用，不宣称重新执行 B2。完整 producer、真实身份和平台资格仍为后续停止点。
+**本片有界范围（合并时状态）**：签名者、API committer 写入者和 Workflow 发起者分别验证；这一 committer 假设已被真实预检否定，须按上文身份规则修订，不代表现有代码已兼容；producer 必须命中受信调用方维护的历史定义，默认注册表为空。原始 Git object 读取依赖由受信调用方提供，本片不安装生产获取桥接。支持可证明的 disjoint 普通合并；冲突、attributes、跨 unit key 的已认证 subjects 重叠均 hold，不把它们当作互不相关的更新。历史 executable closure 与报告中的外部材料是 producer 证明的摘要引用，不宣称重新执行 B2。完整 producer、真实身份和平台资格仍为后续停止点。
 
 **验收/停止**：全程零 mutation 请求；全部图/身份/收据证据可以定位。`createMetadataStore` 原占位和 B2 local inspector 不被包装成远端认证；未有真实 trusted producer 时只用 fixture 证明契约，生产读取返回证据缺口。
 
