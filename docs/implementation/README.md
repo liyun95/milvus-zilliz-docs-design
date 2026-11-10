@@ -244,7 +244,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
-| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2、B3 第一片已合并；B3 第二片进入计划审阅，B4 未开始） |
+| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2、B3 第一片已合并；B3 第二片已验收本地实现、上游 #1193 待 CI/合并，B4 未开始） |
 
 其余的在对应工作包开始前写，写完由推动者确认。任务分发与审阅按下文协作规则执行；WP12/WP13 的公共接口见 [WP12 任务卡](./tasks/WP12-zdoc-upstream-updates.md#接口)。阶段验收不等于整个工作包需求结项。
 

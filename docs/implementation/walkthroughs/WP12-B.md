@@ -26,6 +26,16 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 六个既有跳过项为四个可选 loopback 图片测试、需显式开启的 measured Guides collector 测试和一个需大小写敏感文件系统的用例，不计作通过。完整本地证据根为 `/Users/liyun/.cache/zdoc-vitest/run-koV6yc`。
 
+## B3 第二片：只读事实与历史认证（待上游合并）
+
+[fork PR #19](https://github.com/liyun95/zdoc/pull/19) 已完成方案和代码主审；最终产品 HEAD 为 `9db162557a80450ba6cf7d922ab653bbadf2d6d2`，本地主审与最终验证通过，已提 [上游 PR #1193](https://github.com/zilliztech/zdoc/pull/1193)，尚未合并。
+
+`createRemoteReads` 读取并绑定 GitHub repository/ref/PR/run/check、签名与 artifact；网络层只允许固定的 GET 和只读 GraphQL 查询。分页不完整、来源不明、归档不合法或前后观察变化都会停止。`inspectRemoteHistory` 独立核对原始 Git object 哈希、完整祖先、P/K/S 关系、next-only 改动及人工合并；分批保存原始对象和定位清单，避免逐提交写盘。`inspectRemotePulls` 只归组已认证的 subjects，未知来源或跨 unit key 重叠不继续。
+
+最终 HEAD 的完整测试为 1435 passed / 0 failed / 6 既有 skipped；142 个远端契约/API/历史测试全部执行，其中 83 项是第二片新增。完整 diff selector、typecheck、matrix 25/25、policy 118/118 和 diff-check 均通过。全量只执行一次，约 700 秒；证据根为 `/Users/liyun/.cache/zdoc-vitest/run-wgVDW0`。接近当前仓库规模的 3,003 个提交头 fixture 约 3–5 秒完成校验；这是本地有界读写验证，不代表真实平台资格。
+
+新增适配器尚未被 CLI、Fetch、Translation 或发布入口调用。真实 producer 默认未安装，生产 raw-object 获取与平台资格未交付；复杂 merge 和跨单元重叠保守 hold。历史 closure 是受信 producer 的摘要证明，不等于本次重新捕获工具或重跑 B2。
+
 ## 从固定输入到候选
 
 请求指定固定 master/dev/source 身份、待处理的页面和比较条件。`update-plan` 收集材料、分析源与实际 Cloud 输出、构造采用单元，必要时在隔离区准备合并基线；不修改真实输入仓库。
@@ -91,4 +101,4 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189。下一项是第二片：GitHub 只读事实与远端历史认证；先在 fork Draft PR 审短计划，再实现和主审，最后在最终 HEAD 执行完整验证。第三片的真实 API 可行性预检和 B4 平台资格仍保留。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189。第二片只读事实与远端历史认证已实现、通过主审和最终本地验证，上游 #1193 待 CI/合并；合并后才进入第三片。第三片的真实 API 可行性预检和 B4 平台资格仍保留。具体交付清单见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
