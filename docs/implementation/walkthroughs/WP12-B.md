@@ -147,7 +147,9 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 ## 首版目标调整（2026-11-10）
 
-用户选择优先交付 Guides 单页的上游自动发现、`lock.next` 更新和 Draft PR 创建；已有未合并更新 PR 时暂停并报告，滚动更新和复杂恢复后续再启用。已有 B3 能力保留；去重、精确提交验证与未知远端结果停止仍是首版门槛。当前 [Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 已实现 B4.1 同环境前置观察与安全错误分类，72 个聚焦测试通过，完整 CI 四阶段 1504/0/96 和 gate 均通过；本地 preflight-only 取得 13 项观察，未启动 capture/worker，避免把 setup 环境的观察当成实际 capture 失败原因。具体四个交付包、粗略预算与本片允许路径见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+用户选择优先交付 Guides 单页的上游自动发现、`lock.next` 更新和 Draft PR 创建；已有未合并更新 PR 时暂停并报告，滚动更新和复杂恢复后续再启用。已有 B3 能力保留；去重、精确提交验证与未知远端结果停止仍是首版门槛。当前 [#1208](https://github.com/zilliztech/zdoc/pull/1208) 已实现 B4.1 同环境前置观察与安全错误分类，72 个聚焦测试通过，完整 CI 四阶段 1504/0/96 和 gate 均通过；本地 preflight-only 取得 13 项观察，未启动 capture/worker，避免把 setup 环境的观察当成实际 capture 失败原因。具体四个交付包、粗略预算与本片允许路径见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+
+随后获准的一次 [hosted 诊断 42806608231](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42806608231) 已完成，artifact 摘要与 GitHub 元数据一致。实际 capture 仍 held，但本次准确归因为 `git-provisioning-unsupported`：同环境选择版本化 `Xcode_16.4.app`，当前策略不支持。worker 未运行；另观察到 root-owned `0600` 身份配置，后续读取/身份兼容性尚需验证。对象下界 82,915,524 bytes 仍超 64 MiB。诊断代码验证通过不等于 hosted 环境资格通过；下一片合并评估 Git/Python 供应布局及身份配置可读性，保持安全检查，再处理容量与生产接线。
 
 ## 收尾与下一步
 

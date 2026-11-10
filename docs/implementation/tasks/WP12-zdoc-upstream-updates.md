@@ -467,7 +467,18 @@ git diff --check
 - 通过独立 fixture 与 mock 边界验证环境、限额、脱敏、各项独立失败和实际 capture 仍被调用。最终冻结后按 selector 联集验证；不重复上一片实际 smoke，不沿用已经消费的一次 hosted 授权。
 - 只有取得同环境证据并审阅具体方案后，才考虑支持标准版本化 Xcode bundle；不得仅扩大路径前缀就宣称 hosted 支持。下一次外部运行另以冻结包审定。
 
-本片实现已冻结为 `28b33646f7efb331ad22af03afc22f3d517a0b1a`，见 [产品 Draft #1208](https://github.com/zilliztech/zdoc/pull/1208) 和 [Fork Draft #24](https://github.com/liyun95/zdoc/pull/24)。增量基线是 #1206 的 `35cee9397`，两个文件 +209/-7；主审修正平台测试假设、路径遍历观察、同步子进程终止与不可取消文件读取的错误超时表述后，focused 72/72、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。完整 [CI 42802409072](https://github.com/zilliztech/zdoc/actions/runs/42802409072) 已通过：Linux / Node 22.23.4，四阶段 1504 passed / 0 failed / 96 既有平台 skipped，最终 gate 成功；测试合并提交 `6fdc862d00e9c5d74e8017e9e33158e4660f0988` 的 parent 为 master `47a7274` 与最终 HEAD `28b33646`。另一次本地 preflight-only 实测取得 13 项观察、0 项 unavailable，未运行 capture/worker；没有新的 hosted capture 结果。私有包已冻结为 `f6c2741fdd6928f30a467ad76a4344f0788d392b`，只更换两处工具 SHA，其他 wrapper/权限/时限保持；尚未 push 或 dispatch，正在申请对应的一次只读运行授权。
+本片实现已冻结为 `28b33646f7efb331ad22af03afc22f3d517a0b1a`，见 [产品 #1208](https://github.com/zilliztech/zdoc/pull/1208) 和 [Fork Draft #24](https://github.com/liyun95/zdoc/pull/24)。增量基线是 #1206 的 `35cee9397`，两个文件 +209/-7；主审修正平台测试假设、路径遍历观察、同步子进程终止与不可取消文件读取的错误超时表述后，focused 72/72、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。完整 [CI 42802409072](https://github.com/zilliztech/zdoc/actions/runs/42802409072) 已通过：Linux / Node 22.23.4，四阶段 1504 passed / 0 failed / 96 既有平台 skipped，最终 gate 成功；测试合并提交 `6fdc862d00e9c5d74e8017e9e33158e4660f0988` 的 parent 为 master `47a7274` 与最终 HEAD `28b33646`。另一次本地 preflight-only 实测取得 13 项观察、0 项 unavailable，未运行 capture/worker；该本地观察不构成 hosted capture 结果。私有包 `f6c2741fdd6928f30a467ad76a4344f0788d392b` 只更换两处工具 SHA，其他 wrapper/权限/时限保持；用户随后授权一次只读诊断，已正常快进推送并执行，结果如下。
+
+
+#### 同环境 hosted 诊断结果（2026-11-10）
+
+[42806608231](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42806608231) 使用包 `f6c2741`、工具 `28b33646`，workflow_dispatch / attempt 1；macOS image `20261104.0514.1`、arm64、Node 22.23.4、UID 501 / GID 20。Actions 约 71 秒成功，仅代表诊断与上传完成：实际 capture=held，`CAPTURE_REFUSED / native / git-provisioning-unsupported`，worker=not-run、generation=false、settlement=null、closure=null，productionQualified=false。
+
+同一 sanitizer 环境的前置观察有 13 项、无 unavailable：Git 解析到 `/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/git`。与当前 `captureRuntime` 的路径检查及实际错误一致，首次拒绝原因现在已确认；不改写前次 run 的未分类结果。Python 同样来自该版本化 Xcode，解析到 framework 内 Python 3.9；stdlib 存在。`Search.plist` 是 root-owned `0600` 文件，而诊断 UID 为 501；这提示后续读取/身份检查兼容性需要解决，尚未执行到该读取，不能称其为本次实际失败原因，也不能仅凭元数据断言 ACL 或身份资格。
+
+master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），仍超过 67,108,864 bytes 预算。parent 1507 ms 正常退出，group absent，无 timeout、forced termination 或 cleanup errors；worker settlement、凭据隔离和真实 closure 仍无证据。artifact `13759350683`：ZIP 3807 bytes、5 members / 8185 expanded bytes，SHA-256 `756ffc976e1fbea46c086b3919513dc3e95bdda621d0238797aff8f9c49fa8bd` 与 GitHub 元数据一致，已保留安全解包结果。
+
+下一片须合并评估版本化 Xcode 的 Git/Python 供应布局、Search.plist 可读性与身份策略，先提出保持原生闭包、访问检查和身份认证约束的精确本地修复方案；不能只扩大路径前缀、跳过身份配置或提高权限后反复试跑。B4.2 容量方案独立处理，不以提高 64 MiB 预算替代认证的对象传输设计。本次一次 hosted 授权已消费，不重跑、不放宽权限、不合并产品 PR；B4.1 环境资格及 B4 仍未完成。
 
 #### 后续切片与准入条件
 
