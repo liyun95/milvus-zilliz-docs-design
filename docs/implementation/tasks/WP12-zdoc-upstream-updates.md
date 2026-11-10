@@ -424,7 +424,7 @@ git diff --check
 
 **停止条件**：任何 capture/native/权限不合格、运行身份不一致、输出超限或 worker 未收束，都保留失败 evidence 并停止；不临时启用 Linux，不修改 runner 全局权限，不追加同类碰运气重跑。对象规模已经超限不阻止采集独立 host 诊断，但阻止远端 writer 实验。诊断 JSON 永远不被产品作为信任凭据读取。
 
-#### B4.1 实施与实测记录（2026-11-10，未验收）
+#### B4.1 实施与实测记录（2026-11-10，诊断代码通过，环境资格 held）
 
 代码审阅入口为 [上游 Draft #1206](https://github.com/zilliztech/zdoc/pull/1206) 与 [Fork Draft #23](https://github.com/liyun95/zdoc/pull/23)。Fork master 较旧，#23 使用固定 `review/wp12-b4-base`（`f932331a92d0a0ed6bc552282bbb08245e1041f3`）作为审阅基线，只显示本片两个文件；没有修改 fork master。新增内部诊断及测试，未改生产 workflow、CLI、adapter、权限或容量限额。报告始终 `productionQualified=false`，capture、worker、容量与报告完整性分别记账。
 
@@ -432,9 +432,15 @@ git diff --check
 
 同一次实测的 M tree 下界为 82,893,980 bytes，超过 67,108,864 bytes 对象预算。当前 hosted 资格、真实 worker 正例、measured-child credential canary 与 filesystem/config 隔离均未取得。Linux 捕获继续拒绝，生产 writer 继续关闭。
 
-初始候选 `c6893dda7e7354e6edd28032d39e52bc86110718` 的 focused 54 项、typecheck、matrix 25 项和 workflow policy 118 项通过；[初次 CI 42791052524](https://github.com/zilliztech/zdoc/actions/runs/42791052524) 失败：新增 mocked-capture 测试直接使用 CI 浅克隆，诊断器正确在 binding 阶段拒绝。修复仅把测试输入改成独立完整 fixture，并补真实浅克隆拒绝回归，不修改 workflow 或放宽生产检查。最终提交 `35cee93976d6023da054ab78f2cd69e60f61288e` 仅修正测试 fixture，focused 55/55、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。[最终 CI 42792901136](https://github.com/zilliztech/zdoc/actions/runs/42792901136) 正在运行。此前 c689 的 macOS / Node 26 全量为 1576 passed / 0 failed / 6 既有平台 skipped；主审验证四阶段均收束、最终 terminal 已提交、原始计数完整、前后 HEAD/工作区一致，总 gate 765.809 秒。该本地结果保留为前一提交证据，不改写成最终提交的全量。
+初始候选 `c6893dda7e7354e6edd28032d39e52bc86110718` 的 focused 54 项、typecheck、matrix 25 项和 workflow policy 118 项通过；[初次 CI 42791052524](https://github.com/zilliztech/zdoc/actions/runs/42791052524) 失败：新增 mocked-capture 测试直接使用 CI 浅克隆，诊断器正确在 binding 阶段拒绝。修复仅把测试输入改成独立完整 fixture，并补真实浅克隆拒绝回归，不修改 workflow 或放宽生产检查。最终提交 `35cee93976d6023da054ab78f2cd69e60f61288e` 仅修正测试 fixture，focused 55/55、typecheck、matrix 25/25、workflow policy 118/118 和 diff-check 通过。[最终 CI 42792901136](https://github.com/zilliztech/zdoc/actions/runs/42792901136) 已通过：Linux / Node 22.23.4，四阶段 1487 passed / 0 failed / 96 既有平台 skipped，最终 gate 成功；测试合并提交 `ba7a7ca778575683b5453940cce15820e36a78d3` 的两个 parent 为当时 master `47a7274cb6afa16f0fbac3582502bbd865743388` 和最终 HEAD。此前 c689 的 macOS / Node 26 全量为 1576 passed / 0 failed / 6 既有平台 skipped；主审验证四阶段均收束、最终 terminal 已提交、原始计数完整、前后 HEAD/工作区一致，总 gate 765.809 秒。该本地结果保留为前一提交证据，不改写成最终提交的全量。
 
-私有 `liyun95/zdoc-writer-preflight` 的新手动诊断 workflow 已在本地准备：固定工具 SHA、action SHA、macos-15/arm64、Node 22.23.4、pnpm 10.33.0、只读权限；15 分钟 job，180 秒 launcher 与 15 秒收束宽限。主审已冻结本地包 `6c0fb150bda812b00ed1f4aad376029f19328f2c`（4 个新增文件），用户已授权在最终 CI 通过后向私有仓库安装并手动运行一次；旧 API mutation workflow 不在授权内。当前尚未 push 或 dispatch；绿色 transport 也不等于 runner 合格。
+私有 `liyun95/zdoc-writer-preflight` 的新手动诊断 workflow 已在本地准备：固定工具 SHA、action SHA、macos-15/arm64、Node 22.23.4、pnpm 10.33.0、只读权限；15 分钟 job，180 秒 launcher 与 15 秒收束宽限。主审已冻结本地包 `6c0fb150bda812b00ed1f4aad376029f19328f2c`（4 个新增文件），用户已授权在最终 CI 通过后向私有仓库安装并手动运行一次；旧 API mutation workflow 不在授权内。授权后已正常快进安装并只 dispatch 一次，[私有运行 42794595610](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42794595610) 为 attempt 1、包 HEAD `6c0fb15`，Actions 成功但实际报告为 **held**；未重跑。
+
+**私有实测结论**：实际 image 为 `macos-15-arm64` / `20261104.0514.1`，Node 22.23.4、UID 501/GID 20。绑定与容量测量成功；capture 在 11 ms 拒绝（`CAPTURE_REFUSED` / `unknown` / `unclassified`），没有 closure，worker 为 `not-run`、generation=false、settlement=null。owned parent 在 1,112 ms 退出 0，进程组 absent、无超时/强杀/清理错误；这不证明未启动的 worker 资格。对象下界为 8,153 条、7,646 个唯一 blob、82,898,876 bytes，仍超过 67,108,864 bytes。measured-child canary 与 filesystem/config 隔离未证明。
+
+保留 [artifact 13752948914](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42794595610/artifacts/13752948914)，下载 ZIP SHA-256 `d77275fa28f81539b5dd40ebb71e6f3104a2c0ae807c8f31195091f1173fc1b6` 与 GitHub artifact digest 一致；5 个成员、5,240 bytes 展开内容，路径与大小检查通过。包括 setup observations、launcher receipt 和 diagnostic.json；workflow 成功仅表示诊断和上传完成。
+
+**下一步仍在 B4.1**：先补稳定的拒绝原因分类，并审定 hosted 工具供应路径与现有 capture 策略的兼容方案。setup 观察的 xcrun Git 为 `/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/git`，不满足当前仅接受 `/Applications/Xcode.app/` 或 `/Library/Developer/` 的规则；这是可确认的配置兼容缺口，但观察发生在 setup 环境，当前报告又没有保留准确异常，不能断言它就是本次首个失败原因。下一片需先用固定 fixture 测试合法供应路径、伪造/别名/可写路径与完整 native/ACL/身份闭包，再决定是否修改 capture；不直接放宽前缀、设置环境绕过、升预算或重复 hosted run。当前只完成诊断代码主审与一次受限观察，环境资格未通过，不进入 B4.2 实施或生产接线。
 
 #### 后续切片与准入条件
 

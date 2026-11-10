@@ -141,9 +141,9 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 ## B4.1 诊断包进展（2026-11-10）
 
-[产品 Draft #1206](https://github.com/zilliztech/zdoc/pull/1206) 新增 `testing/updates/runner-qualification.ts` 与测试，用于分别观察工具捕获、真实 worker、对象规模和证据完整性。没有生产调用入口，任何报告都不授予 writer 权限。完整实测与验证结果见 [任务卡 B4.1](../tasks/WP12-zdoc-upstream-updates.md#b41-实施与实测记录2026-11-10未验收)。
+[产品 Draft #1206](https://github.com/zilliztech/zdoc/pull/1206) 新增 `testing/updates/runner-qualification.ts` 与测试，用于分别观察工具捕获、真实 worker、对象规模和证据完整性。没有生产调用入口，任何报告都不授予 writer 权限。完整实测与验证结果见 [任务卡 B4.1](../tasks/WP12-zdoc-upstream-updates.md)。
 
-当前真实 smoke 只取得 capture 阶段成功；worker 在生成前停止、无 settlement，对象规模也已超过既有 64 MiB 预算。初次 CI 还发现新测试依赖完整 checkout，而默认 CI 使用浅克隆；已改用独立完整 fixture 并通过 55 个聚焦测试，最终 CI 待完成；浅克隆拒绝策略保持。此前 c689 的 macOS 全量 1576/0/6 已通过并独立核实，不能冒充最终 HEAD 的全量。外部运行包已获一次运行授权，待最终 CI 通过后执行，B4.1 环境资格和 B4 整体均未完成。
+当前真实 smoke 只取得 capture 阶段成功；worker 在生成前停止、无 settlement，对象规模也已超过既有 64 MiB 预算。初次 CI 还发现新测试依赖完整 checkout，而默认 CI 使用浅克隆；已改用独立完整 fixture 并通过 55 个聚焦测试；最终 CI 四阶段 1487/0/96 和 gate 均通过，浅克隆拒绝策略保持。此前 c689 的 macOS 全量 1576/0/6 已通过并独立核实，不能冒充最终 HEAD 的本地全量。获准的私有运行 [42794595610](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42794595610) 已执行一次：Actions 成功，实际 capture=held（未分类拒绝），worker=not-run，对象下界 82,898,876 bytes 超预算；产物摘要已核验。setup 的版本化 Xcode Git 路径与现有规则不兼容，但首个拒绝原因尚未被准确证实。下一步先处理拒绝诊断与供应路径兼容性，B4.1 环境资格和 B4 整体均未完成。
 
 ## 收尾与下一步
 
