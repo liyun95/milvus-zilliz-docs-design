@@ -151,7 +151,7 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 随后获准的一次 [hosted 诊断 42806608231](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42806608231) 已完成，artifact 摘要与 GitHub 元数据一致。实际 capture 仍 held，但本次准确归因为 `git-provisioning-unsupported`：同环境选择版本化 `Xcode_16.4.app`，当前策略不支持。worker 未运行；另观察到 root-owned `0600` 身份配置，后续读取/身份兼容性尚需验证。对象下界 82,915,524 bytes 仍超 64 MiB。诊断代码验证通过不等于 hosted 环境资格通过；下一片合并评估 Git/Python 供应布局及身份配置可读性，保持安全检查，再处理容量与生产接线。
 
-对应的本地路径兼容修复已进入 [Draft #1209](https://github.com/zilliztech/zdoc/pull/1209)，只支持严格识别的 Git/Python developer 路径，并把词法入口交给原访问检查。身份配置读取和原生闭包规则保持不变；18 个新增聚焦用例通过，完整回归仍待结束。修复、受控环境配置与 hosted 资格是三个不同的状态。
+对应的本地路径兼容修复已进入 [#1209](https://github.com/zilliztech/zdoc/pull/1209)，只支持严格识别的 Git/Python developer 路径，并把词法入口交给原访问检查。身份配置读取和原生闭包规则保持不变。最终 `9a567e9a` 的 CI shared-docs 1504/0/114、稳定 macOS frontend 五阶段 2950/0/6、补齐本地历史对象后的 Translation 回放 16/16 均通过，主审完成。此前中途提交导致的终态拒绝、两处旧测试问题及回放对象缺失记录保留；修复的是两个测试声明/等待条件，没有改变生产发布锁。修复、受控环境配置与 hosted 资格是三个不同的状态。
 
 ## 收尾与下一步
 

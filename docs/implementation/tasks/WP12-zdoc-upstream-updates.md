@@ -488,7 +488,22 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 验证以实际 capture 调用路径为主：合法版本化 Git/Python 到达测量流程；错误位置、目标逃逸、词法路径可写、权限拒绝、后捕获变化均停止；保留 Python 隔离启动和原生依赖回归。先聚焦测试，再执行 selector 联集（vitest-groups、shared-docs、frontend、typecheck、workflow-matrix、diff-check）。本地测试成功只确认兼容修复，不授予 hosted 资格。此片与 B4.2 容量设计分离。
 
-本地修复已提交为 `0554c8dd216475d9b54607808bd55eaac7e4c0e0`，见 [产品 Draft #1209](https://github.com/zilliztech/zdoc/pull/1209)（依赖 #1208/#1206）及 [Fork Draft #25](https://github.com/liyun95/zdoc/pull/25)。增量三文件 +126/-11；主审已核对私有解析器、词法/真实路径检查接线和原身份字节绑定，修正了 JavaScript 末尾换行匹配边界。18 个新增 Darwin 用例通过，Linux toolset 精确跳过声明 89→107；typecheck、matrix 25/25、vitest-groups 64/64 已通过。完整 shared-docs/frontend 与最终 CI 正在执行；保持 Draft，不宣称完整验收或 hosted 资格。
+本地修复已提交为 `0554c8dd216475d9b54607808bd55eaac7e4c0e0`，见 [产品 Draft #1209](https://github.com/zilliztech/zdoc/pull/1209)（依赖 #1208/#1206）及 [Fork Draft #25](https://github.com/liyun95/zdoc/pull/25)。增量三文件 +126/-11；主审已核对私有解析器、词法/真实路径检查接线和原身份字节绑定，修正了 JavaScript 末尾换行匹配边界。18 个新增 Darwin 用例通过，Linux toolset 精确跳过声明 89→107；typecheck、matrix 25/25、vitest-groups 64/64 已通过。当时完整 shared-docs/frontend 与最终 CI 尚待执行；最终结果见下文，不据此宣称 hosted 资格。
+
+验证期间发现现有 `packages/docs-tooling/src/runtime-contract.test.ts` 的精确依赖列表漏了已声明且由 `markdown/accidentalMathSpans.js` 动态导入的 `katex`（从基线到当前均未修改）。主审允许该测试增加这一条预期，禁止修改依赖版本或删除依赖检查，并补 runtime-contract、typescript-runtime-boundary、workflow-policy 的 selector 检查。先提交修正再重跑 frontend，保持运行期间 HEAD 不变。本地 shared-docs 四阶段 1612/0/6，但因主会话中途提交引发 source identity changed，终态失败，原记录保留；CI 42809313807 在准确合并提交 5b2623a（master47a7274 + head0554c8dd）通过 1504/0/114，不能改写本地失败。
+
+`katex` 预期修正已提交 `9d03a1a`，focused runtime-contract 10、runtime-boundary 17、matrix 25、policy 118 均通过。稳定 HEAD 的 frontend 补测又暴露 `stageControl.test.ts` 跨进程测试标记竞态：worker 用 `writeFileSync(..., {flag: wx})` 创建后写入 JSON，父进程只等待 exists，可能解析到空内容。主审仅允许该测试把两个 JSON 标记的等待条件改为完整可解析记录，保留原 3 秒/5ms 边界及 inode/owner/stack 断言，不改生产 stageControl、worker、超时、跳过数或重试策略。按 selector 补 focused publication 测试及 replay:all 等联集；真实发布代码未修改，不新增生产资格声明。修正须先独立证明测试竞态、提交并冻结，再继续完整 frontend。所有失败证据保留，不以重跑改写历史。
+
+#### 本地兼容修复最终验证
+
+最终冻结提交 `9a567e9a70aa548af0a1f15be14e7c0233f4febb`，相对 `28b33646` 五文件 +131/-15；其中只有工具解析器属于产品逻辑，另有对应测试、精确 Linux skip 声明及上述两个测试修正。[产品 #1209](https://github.com/zilliztech/zdoc/pull/1209) 仍依赖 #1208/#1206，尚未合并。
+
+- [最终 CI 42812752912](https://github.com/zilliztech/zdoc/actions/runs/42812752912) 成功：Linux / Node 22.23.4，shared-docs 1504 passed / 0 failed / 114 个精确声明的平台 skips，最终 gate 成功。实际测试 merge `5dc6412112f47292e7427028fd184ca92c2a3308` 的 parent 是 master `47a7274` 和最终 head `9a567e9a`。
+- macOS / Node 26.7.0 / pnpm 10.33.0 的 `pnpm test:frontend` 成功：2950 passed / 0 failed / 6 declared skips，五阶段完整结束、before/after HEAD 与 tracked diff 相同；terminal v2 记录 884560.986 ms，低于原 900000 ms 上限。证据 `/Users/liyun/.cache/zdoc-vitest/run-VwmhvU`；主审核验终态与报告哈希，180 个发现文件完整包含 shared-docs 的全部 91 个文件。
+- focused publication 四文件 167、runtime-contract 10、runtime-boundary 17、matrix 25、policy 118、vitest-groups 64 与 typecheck/diff-check 通过。早先 shared-docs 终态失败及两次 frontend 失败保留，不改写为通过；最终 CI 的 shared-docs 与稳定 macOS 全量提供新的验证证据。
+- `replay:all` 的 PR 子套件通过；Translation 16 项中五项曾因本地 partial clone 缺失历史 Git 对象失败。主审按当前 HEAD 与两个固定 retained commit 的可达集合补齐 18,126 个对象，复核 53,229 个对象无缺失；未改变 refs、HEAD、源代码或持久 Git 配置。补齐前置数据后，仅补跑 `pnpm test:replay:translation`：最终 head 上 16/16 通过、exit 0、352665.894 ms；其他已通过子套件不重复。没有改变回放代码或向真实 dev 写入。
+
+该验证仅关闭本地路径兼容代码的检查范围；root-owned 0600 配置的受控准备、真实 hosted capture/worker/凭据隔离与 B4.2 容量仍未验收。下次外部运行需冻结具体配置包后单次授权，不能沿用已消费的只读诊断授权。
 
 #### 后续切片与准入条件
 
