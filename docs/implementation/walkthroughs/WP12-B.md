@@ -62,7 +62,7 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 最终 HEAD 的 macOS / Node 26.7.0 全量 **1513 passed / 0 failed / 6 既有 skipped**，四阶段与 committed terminal 校验通过，862.015 秒仍在 900 秒内；证据 `/Users/liyun/.cache/g-e0r1hgz8/run-tztCpZ`。
 
-[CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。主审接受本片限定离线范围，#1201 待合并，B4 未开始。之前混合源码运行的 132 passed / 1 failed 和夹具失败保留，不能称为本 HEAD 通过。
+[CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。当时主审接受本片限定离线范围，#1201 尚未合并，B4 未开始；后续合并状态见本卡当前状态。之前混合源码运行的 132 passed / 1 failed 和夹具失败保留，不能称为本 HEAD 通过。
 
 **合并后门禁修复与当前整合（2026-11-10）**：第三片的 [master push 42765032875](https://github.com/zilliztech/zdoc/actions/runs/42765032875) 曾在 900 秒总时限处停止，尽管它与合并前绿色运行的代码树相同。修复 [#1202](https://github.com/zilliztech/zdoc/pull/1202) 对独立祖先检查做有界并发，并协调同一 store 的同路径 blob 写入；检查仍每次重做，失败不重试，已完成结果不作为信任缓存。首轮本地全量暴露的半写文件竞态失败仍保留。
 
@@ -70,7 +70,7 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 第四片首次整合 HEAD `780ea96c0` 的 [CI 42778266615](https://github.com/zilliztech/zdoc/actions/runs/42778266615) donor-history 用例及本地 created-journal 恢复用例分别达到 30 秒单例上限，完整结果均不成立。保留 trace 显示恢复在 28.6 秒完成 validated、29.4 秒进入最后一次 collection；原时限下单独运行五个相关用例均通过。跟进只将这四个恢复变体和一个 donor 场景调为 60 秒，保持全部断言、平台 skips、普通单例预算及 900 秒总门槛。
 
-当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 已通过五项聚焦用例、typecheck、matrix、policy、完整 selector 和 diff-check。macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 和独立 committed terminal 校验通过；运行前后 HEAD/源码/harness 一致，789.643 秒小于 900 秒，证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过，约 816 秒；实际测试 merge `1e27edf63c42408c773c3674802ea1e3fe4393b1` 将当前 HEAD 合入 `ec64fd277`。主审接受本次组合，#1201 待合并；合并后继续核对 master push 检查。新结果不改写前述两次单例超时，B4 未开始。
+当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 已通过五项聚焦用例、typecheck、matrix、policy、完整 selector 和 diff-check。macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 和独立 committed terminal 校验通过；运行前后 HEAD/源码/harness 一致，789.643 秒小于 900 秒，证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过，约 816 秒；实际测试 merge `1e27edf63c42408c773c3674802ea1e3fe4393b1` 将当前 HEAD 合入 `ec64fd277`。主审据此接受合并前组合，#1201 现已合并为 `f932331a9`；合并后 master push 检查仍在跟踪。新结果不改写前述两次单例超时；B4 进入规划，产品实现未开始。
 
 生产写入仍禁用。恢复仅作只读重建并报告 raw/exact receipt 缺口；新准备目录与持久尝试记录分离，不授予重发权。真实平台、Linux capture、producer/validator、CAS/dispatch、跨运行去重与 ready/close 策略的资格仍待 B4；本片不是工作流激活。
 
@@ -139,7 +139,7 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202，组合复验通过，#1201 待合并。先合并 #1201 与设计记录并核对合并后 master 检查，再进入 B4 精确接线与资格计划；生产写入尚未启用。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202 并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`），设计 #86 已合并。合并后 master CI 与工具同步正在跟踪；B4 资格优先计划已写入任务卡，产品接线未实施，生产写入尚未启用。
 
 前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
 
