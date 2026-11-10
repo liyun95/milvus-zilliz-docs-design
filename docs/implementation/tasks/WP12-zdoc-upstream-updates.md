@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已合并 #1197；第三片离线事务已合并 #1199（`90441eff566a67f33823555ac7524e2fe2211394`），设计记录 #85 已合并。第四片桥接与只读编排已通过限定离线范围主审、本地全量及 CI，#1201 待合并；生产资格缺口保留，B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已合并 #1197；第三片离线事务已合并 #1199（`90441eff566a67f33823555ac7524e2fe2211394`），设计记录 #85 已合并。第四片桥接与只读编排已带入已合并的 #1202 门禁修复，组合复验通过，#1201 待合并；生产资格缺口保留，B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正已合并 #1197，第 3 片离线事务已通过主审与双平台完整测试，#1199 已合并；第 4 片已通过主审与双平台全量，#1201 待合并 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正已合并 #1197，第 3 片离线事务已通过主审与双平台完整测试，#1199 已合并；第 4 片已带入 #1202，组合复验通过，#1201 待合并 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -316,7 +316,7 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-tra
 
 #### 切片 4 — B2/远端历史桥接与默认只读编排
 
-**实施记录（2026-11-10，限定离线范围验收，待合并）**：[上游 #1201](https://github.com/zilliztech/zdoc/pull/1201)，实现提交 `dee8c76f621a58920914fa5ca4a64b64a3b41bd4`；新增测试单例时限修正后的 HEAD 为 `83443879b96292c6e9c99aea07aa9c5633fab448`，基线为第三片 merge `90441eff566a67f33823555ac7524e2fe2211394`。仅下列九个允许路径；未改 workflow、CLI 注册、依赖、权限或 dev-owned 内容。Fork Draft #22 保留本会话主审结论。
+**初次实施记录（2026-11-10，限定离线范围验收，待合并）**：[上游 #1201](https://github.com/zilliztech/zdoc/pull/1201)，实现提交 `dee8c76f621a58920914fa5ca4a64b64a3b41bd4`；新增测试单例时限修正后的 HEAD 为 `83443879b96292c6e9c99aea07aa9c5633fab448`，基线为第三片 merge `90441eff566a67f33823555ac7524e2fe2211394`。仅下列九个允许路径；未改 workflow、CLI 注册、依赖、权限或 dev-owned 内容。Fork Draft #22 保留本会话主审结论。
 
 主审关闭了新计划与既有不同 unit 的部分 subject 重叠、既有 target/donor ref 的 all-state PR 歧义，以及仅测试 bridge 而未走完整 observe 的覆盖缺口。历史 capability 绑定 exact reads/policy/当前 M/H/donors；新证据目录复制旧 raw object batches 和原始 proof/member bytes，并在生成候选前重新读取。历史 API observation refs 保留原来源语义，不能当成新目录中的 owned journal。
 
@@ -325,6 +325,10 @@ pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/remote-tra
 冻结源码专项：整链 1 passed（73.25 秒，其余 49 项因选择器未运行）；完整 remote-runner/transactions 20 passed；capability binding 1 passed（其余 62 项因选择器未运行）。主审 typecheck、完整 diff selector、matrix 25/25、policy 118/118、diff-check 通过。首次固定 HEAD 完整 gate 在新增 runner 用例默认 5 秒时限处停止，raw counts 不完整；证据 `/Users/liyun/.cache/g-j147qbzn/run-lKHbuu`。修正仅给八个新增 Git/IO 用例设 30 秒单例时限，断言、产品、既有 skips 和全局 15 分钟门槛不变；最终 HEAD 的完整 affected file 9/9、typecheck、selector、diff-check 通过。最终 HEAD 的 macOS / Node 26.7.0 完整 gate 为 **1513 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 与独立 committed terminal 校验通过，862.015 秒小于 900 秒门槛；证据 `/Users/liyun/.cache/g-e0r1hgz8/run-tztCpZ`，前后 HEAD/干净状态/harness hash 一致。6 项为 images 4、可选 collector 1、case-sensitive update-command 1，无新增跳过。开发中一次四文件运行混用了旧缓存模块与新测试，132 passed / 1 failed，不能作为固定 HEAD 的验证；夹具失败、该日志与最终专项日志均保留于 zdoc 本地 `.claude/preparation/wp12-b3-preflight/`。
 
 [CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。主审接受本片限定离线范围，#1201 待合并，B4 未开始。
+
+**当前整合复验（2026-11-10，已通过，待合并）**：门禁修复 [#1202](https://github.com/zilliztech/zdoc/pull/1202) 已合并为 `ec64fd2779f676cbfbdd7186b9906e5305ca62d1`；[合并后 master CI 42777811717](https://github.com/zilliztech/zdoc/actions/runs/42777811717) 四阶段通过，**1419 passed / 0 failed / 96 既有平台 skipped**。第四片普通合并该修复后，整合提交 `780ea96c0` 的 Linux donor 历史用例及本地 created-journal 恢复用例分别触发原有 30 秒单例时限，两个不完整结果保留，不能沿用前述旧 HEAD 的通过结论。
+
+主审核对有限阶段进展并测得五个完整聚焦用例在原时限下通过后，仅将四个 interruption/resume 变体及一个 donor-history 用例改为 60 秒。生产逻辑、断言、跳过规则及 900 秒总门禁不变；五个聚焦用例复测通过。此项额外允许 `testing/updates/remote-transaction.test.ts` 的单例预算修改；原九个功能路径不扩展。当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 的 macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 与独立 committed terminal 校验通过，789.643 秒小于 900 秒；证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段及最终 site gate 通过，约 816 秒。主审接受当前组合，#1201 待合并；合并后仍须核对 master push 检查，B4 未开始。详见 [B 走读](../walkthroughs/WP12-B.md)。
 
 `apply` 仍无条件 `WRITER_DISABLED`；`reconcile` 只重读事实并保留 raw/exact receipt holds，不认证生产完成状态。准备目录与持久 transaction-attempt store 分离，换准备目录不能清除 dispatch veto。生产 raw/capture/writer 安装、精确 producer/validator、真实 CAS/dispatch 与跨运行资格仍属于下文 B4 条件。合并后进入 B4 精确接线与资格计划，不直接开启生产写入；需求 pending 保留。
 
