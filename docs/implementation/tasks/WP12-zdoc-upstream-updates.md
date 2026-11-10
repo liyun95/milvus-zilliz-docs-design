@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片正在准备有界 API 预检，第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行两次有界 API 预检，尚未通过（身份规则与实际提交角色不一致），第三/四片产品实现与 B4 尚未开始，整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -29,7 +29,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | A：变化分析与报告 | 固定输入、原文/依赖与 Cloud 输出、锚点关系、采用单元、报告 | 已合并 #1027 |
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
-| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片准备 API 预检，第 3–4 片产品代码未实施，第 3 片须先通过有界 API 预检 |
+| B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片 API 预检未通过，身份规则待裁决；第 3–4 片产品代码未实施，第 3 片须先通过有界 API 预检 |
 | B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 未开始；既有 Fetch schedule 不等于新的上游更新 workflow |
 
 ### A 的允许路径
@@ -109,13 +109,20 @@ B3/B4 不能直接沿用下面的总体范围开工。下线证据缺失不能�
 
 #### 第 3 片入口：有界 API 可行性预检
 
-**执行准备（2026-11-10）**：第一/二片已合并，产品基线为 `38a721e3e720fee4a43d401a69b53663bdf423b4`，第二片收尾文档由设计 PR #79 合并（`6e7e93426656b0b3beedc45a7860b697cc541721`）。先准备并主审本地预检包，再申请具体隔离仓库/单次执行授权；第三片产品代码尚未开工。
+**执行记录（2026-11-10）**：第一/二片已合并，产品基线为 `38a721e3e720fee4a43d401a69b53663bdf423b4`；准备范围已由设计 PR #80 合并。用户分别授权了创建私有 `liyun95/zdoc-writer-preflight`、安装已审阅工具及首次 dispatch，和修正提交 `cafeb711e15938a8a472581ec9e3be36a055bf61` 后的一次新 dispatch。两次均已执行完毕，没有自动重跑、清理或生产仓库写入；第三片产品代码尚未开工。
 
-拟用新建私有仓库 `liyun95/zdoc-writer-preflight`，仅安装手动触发的预检 workflow 和无依赖脚本，使用该仓库自身 `GITHUB_TOKEN`。初始化 `main` 只承载经审阅的预检工具；实际 API 实验只操作一条由 run/attempt 派生的 staging ref。顺序固定为：上传精确 fixture objects → absent→K → 空文件变化 seal S → 错误旧值 CAS 被拒绝且仍为 S → 正确 CAS 到 S 的后继 F。成功响应丢弃后只读回验证，不自动重试；不自动删除分支或仓库。仓库创建、工具安装和一次 dispatch 均等待明确授权，生产 zdoc/milvus 仓库不在授权范围内。
+- [首次运行 42742884628](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42742884628) 在 REST commit-message JSON 省略末尾 LF 时停止。独立只读 Git fetch/cat-file 证明原始 217 字节与 OID 完全一致；修正仅允许 JSON 展示少一个末尾 LF，原始对象及 OID 检查未放宽。
+- [第二次运行 42743539633](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42743539633) 在 Node 22.23.4 上 14 项本地测试通过，7 个 fixture 对象上传/读回校验通过，absent→K CAS 和空文件变化 seal S 已执行并读回。随后因预检 GraphQL 查询少一个结束括号而失败；这是预检代码遗漏，不是 API 能力结论。错误旧值/正确旧值快进 CAS 尚未执行，不算通过。
+- 第二次的独立只读补证（操作员凭据，不冒称原 job-token 查询）确认 S 为 `402eadbae470ffbf48e8a9cbbceb1f295282586e`，唯一父为 K、内容树不变，REST/GraphQL 签名 payload 一致且 API 报告有效 GitHub 签名。原始 Git 对象取回并重算 OID 一致；预检重建函数漏了 `gpgsig` 尾部续行空行，需修正并按真实字节回归，不能用签名有效标志代替原始字节认证。
+- **设计阻塞**：真实 author 为 `github-actions[bot]`（41898282），REST committer 和 signer 为 `web-flow`（19864447），GraphQL `committer.user` 为 null。第二片冻结的 `writerAttribution.role=committer` 与此不相容；修正查询和字节编码也不能使该身份条件成立。不能把 `web-flow` 当成专属写入机器人，也不能在测试中静默切换到 author。
+
+保留私有仓库 ID 1452115569、两次 run/attempt、实际 token 权限和 artifact。第二次 artifact ID 13730331305，ZIP SHA-256 `b3acb03e1d5d658015e54d488b51c1994574e55deeacf3d1d9a8a63bb235e2cb` 已与下载内容核对；测试 staging ref 保留在 S。测试不触碰 zdoc/Milvus 的发布分支、Fetch 或 Translation。
+
+**下一步裁决**：先设计并审阅作者、平台 committer/signer、受信 producer/run 证据的联合认证规则，明确它与第二片 schema/adapter/历史认证的兼容性及拒绝矩阵；仅换一个作者字段或 bot ID 不构成修复。该规则尚未批准或实现。预检脚本自身的语法/编码遗漏单独修正，身份规则收敛后才准备下一次有界预检；本记录不授权额外 dispatch，第 3 片仍不进入大规模实现。
 
 预检使用 reviewed checkout（不保存凭据）及专用 probe 步骤；fixture Git objects 始终作为数据。签名者、作者、committer 和执行 App/actor 分别记录，不能因为观察到某个 ID 就改写第二片的固定身份判定。测试只能证明 API 可行性，生产进程隔离和平台资格仍属 B4。
 
-这是 B4 资格工作的前置小项，用来及早验证事务架构依赖的 GitHub 行为；不等于完整 runner 资格或生产激活。本计划不执行任何外部写。第 1/2 片可以先完成；如果还没有获准的隔离测试仓库及写入授权，第 3 片保持草案，不大规模实现，第 4 片也不绕过此前置。
+这是 B4 资格工作的前置小项，用来及早验证事务架构依赖的 GitHub 行为；不等于完整 runner 资格或生产激活。本计划本身不授予外部写入权限；上述两次执行各有单独授权。第 1/2 片可以先完成；如果还没有获准的隔离测试仓库及写入授权，第 3 片保持草案，不大规模实现，第 4 片也不绕过此前置。
 
 - 在获准的隔离测试仓库使用该仓库真实 `GITHUB_TOKEN`，记录仓库 ID、token 所属 App/actor 与执行 run/attempt；不用 PAT 冒充。授权范围先固定：一组小型 Git objects（含普通双亲 merge 和确定性 K）、一个 `shared-update-staging/<transactionId>` ref、无 PR/生产分支/生产 workflow 写入；清理仅限该 ref，并另按已授予的清理范围执行。
 - 验证 REST 上传返回的每个 blob/tree/commit OID 与本地完全一致；验证零文件修改 seal S 的 `parent=[K]`、`tree(S)=tree(K)`、有效签名及实际 API actor。任何规范化、签名缺失或身份不符都停止，不用同树或作者字符串替代。
