@@ -531,6 +531,10 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 第一次恢复运行在读取保留日志时停止。修正下载方式后，提交 `a0442ee` 的只读预演取得 `ready-to-create`。同一提交的创建运行通过，`github-actions[bot]` 在既有分支上创建了私有 Draft PR #1。主审下载并核对传输与建草稿两份回执，从私有仓重新抓取基线和候选后通过 `git fsck --strict`，确认只有目标锁文件的一行 `next` 改动，原始 Git 差异摘要与托管 proof 一致。私有仓的 Actions 建 PR 开关已恢复关闭。下一片是 B4.3 的精确提交验证与只读报告，生产定时建 PR 仍待激活。[只读预演](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989591287) · [创建运行与回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989841898) · [私有 Draft PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1)
 
+**B4.3 私有草稿的手动只读报告（2026-11-11）。** 工具提交 `535cc94f06` 根据已认证的源 proof、单父提交、完整 Git 差异和修改前后文件字节生成单页报告。私有验证工作流从自身提交 `ce735010` 运行，把 PR 内容作为数据读取。它核对了准备、传输和建草稿三个运行的固定 attempt、job 与保留产物，并在出报告前重读 PR 和两端分支。注入错误 head/base、额外父提交或文件、伪造回执、替换 workflow 及重跑 attempt 都有拒绝用例。
+
+[托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276) 的 report job 仅获得读取权限，17 秒完成。主审下载[归档](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276/artifacts/13841333329)，核对 ZIP 摘要、两份报告与三份生产者回执。[私有 PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1) 的基线为 `13ccf9de`、head 为 `b7d3b11b`；唯一修改为 `json-field-overview/lock.yaml` 的 `next` 从 `3a9694ac` 更新到 `3abf7928`。报告对应这个固定 head 和准备时的 D；它不会随 PR 推送更新。B4.3 剩余工作是将生产 seal S、目标 check 与真实 producer/validator 回执关联，验证过期输入的处理。本次工具提交仅作为 validator；严格 Fetch producer 登记仍对应上一棵已审树。后续若使用新树运行 Fetch，须先核对该树并登记摘要。生产定时激活仍待后续验收。
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |

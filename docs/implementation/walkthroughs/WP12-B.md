@@ -157,7 +157,9 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 [#1213](https://github.com/zilliztech/zdoc/pull/1213) 验证了本地 worker 的生成与退出。在随后的单页实测中，[工具草稿 #27](https://github.com/liyun95/zdoc/pull/27) 从同一次 Fetch 的源记录和英文发布结果确认了 `json-field-overview` 的资格。`update-prepare` 最终生成本地提交 `518c1982`，只更新一行 `next`。第一次托管运行在准备阶段遇到 GitHub 匿名读取限额。改由可信协调进程代读元数据后，macOS runner 成功安装候选 `c72c2aba`。下载的补丁与本地逐字节相同，proof 绑定了相同的修改前后内容。[托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854) · [任务卡](../tasks/WP12-zdoc-upstream-updates.md)
 
-主审从接收端的基线和 7 个 Git 对象还原了托管候选。私有测试仓使用独立基线，提交 ID 因而不同，锁文件补丁与原 proof 一致。GitHub Actions 在先前已推送的候选分支上创建了草稿。主审从 GitHub 读回草稿作者、父提交和唯一改动，并核对了保留的回执。下一片验证目标 PR 的精确提交并生成只读报告。[私有 Draft PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1) · [创建运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989841898)
+主审从接收端的基线和 7 个 Git 对象还原了托管候选。私有测试仓使用独立基线，提交 ID 因而不同，锁文件补丁与原 proof 一致。GitHub Actions 在先前已推送的候选分支上创建了草稿。主审从 GitHub 读回草稿作者、父提交和唯一改动，并核对了保留的回执。[私有 Draft PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1) · [创建运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989841898)
+
+同一草稿的只读验证在 17 秒内完成。打开运行摘要即可看到对应的 head 和 `current`、`next` 值。下载的 `report.json` 还包含基线、补丁摘要和来源回执。主审核对归档后，确认报告指向 `b7d3b11b`，PR 仍为草稿。若后来有人推送新提交，需要验证新的 head。生产 seal 与 PR 上的目标 check 仍待验证。[运行摘要](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276) · [JSON 和 Markdown 报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276/artifacts/13841333329)
 
 ## 收尾与下一步
 
