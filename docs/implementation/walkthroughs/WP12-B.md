@@ -153,6 +153,10 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 对应的本地路径兼容修复已进入 [#1209](https://github.com/zilliztech/zdoc/pull/1209)，只支持严格识别的 Git/Python developer 路径，并把词法入口交给原访问检查。身份配置读取和原生闭包规则保持不变。最终 `9a567e9a` 的 CI shared-docs 1504/0/114、稳定 macOS frontend 五阶段 2950/0/6、补齐本地历史对象后的 Translation 回放 16/16 均通过，主审完成。此前中途提交导致的终态拒绝、两处旧测试问题及回放对象缺失记录保留；修复的是两个测试声明/等待条件，没有改变生产发布锁。修复、受控环境配置与 hosted 资格是三个不同的状态。
 
+三个运行环境 PR 已合并。随后在托管 runner 上，普通用户读到的身份配置与工具集测量值一致；初次捕获和访问证据复核均已完成。180 秒上限先于诊断终态报告生效，worker 的退出与生成结果仍待验证。[私有运行和产物](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42945518064)
+
+[#1213](https://github.com/zilliztech/zdoc/pull/1213) 的本地诊断已取得 worker 正常退出和生成结果。现有 Fetch 归档不足以确认页面的最新资格。下一项以 `json-field-overview` 的真实源变更和双侧输出作验收样本，详见[任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。

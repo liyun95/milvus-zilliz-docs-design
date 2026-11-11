@@ -496,14 +496,26 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 #### 本地兼容修复最终验证
 
-最终冻结提交 `9a567e9a70aa548af0a1f15be14e7c0233f4febb`，相对 `28b33646` 五文件 +131/-15；其中只有工具解析器属于产品逻辑，另有对应测试、精确 Linux skip 声明及上述两个测试修正。[产品 #1209](https://github.com/zilliztech/zdoc/pull/1209) 仍依赖 #1208/#1206，尚未合并。
+最终冻结提交 `9a567e9a70aa548af0a1f15be14e7c0233f4febb`，相对 `28b33646` 五文件 +131/-15；其中只有工具解析器属于产品逻辑，另有对应测试、精确 Linux skip 声明及上述两个测试修正。[#1206](https://github.com/zilliztech/zdoc/pull/1206)、[#1208](https://github.com/zilliztech/zdoc/pull/1208) 与 [#1209](https://github.com/zilliztech/zdoc/pull/1209) 已于 2026-11-11 依次合并。[最终 master 检查通过](https://github.com/zilliztech/zdoc/actions/runs/42943277881)。
 
 - [最终 CI 42812752912](https://github.com/zilliztech/zdoc/actions/runs/42812752912) 成功：Linux / Node 22.23.4，shared-docs 1504 passed / 0 failed / 114 个精确声明的平台 skips，最终 gate 成功。实际测试 merge `5dc6412112f47292e7427028fd184ca92c2a3308` 的 parent 是 master `47a7274` 和最终 head `9a567e9a`。
 - macOS / Node 26.7.0 / pnpm 10.33.0 的 `pnpm test:frontend` 成功：2950 passed / 0 failed / 6 declared skips，五阶段完整结束、before/after HEAD 与 tracked diff 相同；terminal v2 记录 884560.986 ms，低于原 900000 ms 上限。证据 `/Users/liyun/.cache/zdoc-vitest/run-VwmhvU`；主审核验终态与报告哈希，180 个发现文件完整包含 shared-docs 的全部 91 个文件。
 - focused publication 四文件 167、runtime-contract 10、runtime-boundary 17、matrix 25、policy 118、vitest-groups 64 与 typecheck/diff-check 通过。早先 shared-docs 终态失败及两次 frontend 失败保留，不改写为通过；最终 CI 的 shared-docs 与稳定 macOS 全量提供新的验证证据。
 - `replay:all` 的 PR 子套件通过；Translation 16 项中五项曾因本地 partial clone 缺失历史 Git 对象失败。主审按当前 HEAD 与两个固定 retained commit 的可达集合补齐 18,126 个对象，复核 53,229 个对象无缺失；未改变 refs、HEAD、源代码或持久 Git 配置。补齐前置数据后，仅补跑 `pnpm test:replay:translation`：最终 head 上 16/16 通过、exit 0、352665.894 ms；其他已通过子套件不重复。没有改变回放代码或向真实 dev 写入。
 
-该验证仅关闭本地路径兼容代码的检查范围；root-owned 0600 配置的受控准备、真实 hosted capture/worker/凭据隔离与 B4.2 容量仍未验收。下次外部运行需冻结具体配置包后单次授权，不能沿用已消费的只读诊断授权。
+#### 托管 runner 的配置与耗时（2026-11-11）
+
+[私有运行 42945518064](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42945518064) 使用合并提交 `d7ef94d3` 与诊断包 `e76b5f29`。普通用户在运行前后读到同一份 561 字节的 Search.plist，摘要与工具集记录一致。初次捕获记录了 87,857 个条目。完整复核后保留了 89,772 条路径访问记录。前后两段各约 72 秒（按产物写入时间估算）。
+
+180 秒时启动器发出 SIGTERM。父进程组已退出，终态报告和 Guides worker 的退出凭据缺失，本次资格仍为 held。下一片针对诊断本身的计时、紧邻的重复复核与中断后的阶段记录；worker 启动前的实际校验继续执行。待验证项为托管 worker 生成及退出、凭据隔离，以及 B4.2 的对象传输容量。
+
+[诊断计时修复 #1213](https://github.com/zilliztech/zdoc/pull/1213) 在本地实测中省去一次耗时 31.8 秒的紧邻复核，并在各主要阶段开始前保留计时。固定提交 `a6b58dfc` 的 macOS 实跑耗时 135.8 秒：capture 通过，Guides worker 完成生成及结果校验，以 0 退出，进程组已清空。测试页没有对应的 Fetch 生命周期记录，计划按 `AUTHORITY_UNKNOWN` 暂停，没有产生候选。生产前仍要取得真实页面的有效记录和托管 worker 回执。
+
+**下一项：用一篇已接入页面验证更新资格。** 选 `json-field-overview` 为固定回归样本。Milvus `3a9694ac` → `872f0262` 在 Guides/BYOC 均可渲染，源和输出确有变化。B1 已算出拟议的 `next`，唯一的页面级阻塞是 `LIFECYCLE_UNKNOWN`。
+
+- **确认发布位置。** [Fetch 42872835003](https://github.com/zilliztech/zdoc/actions/runs/42872835003) 的源归档中，90 个共享记录均无输出路径；同次发布结果的 `source/guides-en` 提交 `6eb9e21d` 中，90 个记录均有输出路径。实现时认证 run/attempt、发布结果与提交，按同一记录和表核对 Guides/BYOC 路径，并核实提交与指定 dev 的祖先关系。
+- **确认记录的来源与时效。** 增量记录可能沿用旧值。为选定记录提供可核验的本次读取和集合完整性证据，定义如何确认最新适用观察，并在提交前重验。读取凭据留在收集证据的一侧，worker 只接收已认证的输入。缺失、过期、冲突或读取不完整时继续 hold。
+- **验收。** 先在本地用实际 worker 取得一条准确的 `lock.next` 改动、保留不变的 `current`，并验证陈旧和缺失输入时仍暂停。正例成立后再用相同输入验证托管运行。真实对象规模、凭据隔离及启用写入仍按后续切片验收。
 
 #### 后续切片与准入条件
 
