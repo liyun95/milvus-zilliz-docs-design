@@ -21,7 +21,7 @@ track: v3.0.x          # 跟踪分支
 
 - **跟踪分支**是 milvus-docs 的默认分支，目前为 `v3.0.x`。接入与上游更新取的“最新提交”都来自它；它只用于发现新提交，正式生成始终使用每页 `lock.yaml` 中锁定的 commit（见下文）。
 - Milvus 发布新的大版本分支时，用一个显式的 PR 切换跟踪分支。
-- 只写在 `preview` 分支中的内容，合入 `v3.0.x` 后 Cloud 才能读到。Cloud 先于 Milvus 上线的功能，写在 Cloud 内容文件中，用 `<NextChannel>` 包住。
+- 只写在 `preview` 分支中的内容，合入 `v3.0.x` 后 Cloud 才能读到。Cloud 先于 Milvus 上线的功能，写在 Cloud 内容文件中，用 `<NextChannel>` 包住。上游 PR 尚未合并、但 Cloud 要同步发布的原文修改，还可以采纳为 variant 覆盖文件，在不改 `lock.yaml` 的前提下提前进入通道（见 [06b](./06b-variant-adoption.md)）。
 
 ### 每页一份 `lock.yaml`
 
@@ -96,6 +96,8 @@ Phase 1 沿用飞书表格的 `Release Channel`，与其他页面相同，`lock.
 | 提升 | 文档工程师手动运行“提升”工作流 | 把 `current` 的 commit 值改成 `next` 的 commit 值 | Phase 1b |
 | 删除页面目录 | 下线完成后，文档工程师开普通 PR | 删除整个页面目录，`lock.yaml` 随之删除 | Phase 1b，按需 |
 
+这三种之外，**采纳 PR**（见 [06b](./06b-variant-adoption.md)）也由工具发起，但不写 `lock.yaml`：它在页面目录中写入 variant 覆盖文件及其来源记录，让人手不改的规则与 `lock.yaml` 相同。上游合并后的对账 PR 属于上游更新的一种：既改 `lock.yaml`（re-pin 到 merge commit），也删除 variant 文件。
+
 #### 接入一页
 
 1. 文档工程师在 zdoc 中开 PR，新增 `shared-docs/guides/pages/<页面标识>/` 下的 `page.yaml`，需要时加 Cloud 内容文件，不写 `lock.yaml`。
@@ -120,6 +122,7 @@ milvus-docs 有新提交时，工具每天自动开 PR，把受影响页面的 `
 - 清理页面配置中只对一个通道生效的规则：删除 `channel: current` 的规则，去掉 `channel: next` 的标记（见 [02](../prd.md#场景-6让内容先只在-uat-显示)）；
 - PR 说明中列出飞书表格中 `Release Channel` 仍为 `NEXT` 的页面，提示“这些页面如果也在这次上线，请在同一次发布中把表格改为 `CURRENT`”；
 - PR 说明中列出这些页面的 Cloud 内容文件里还剩的手写 `<NextChannel>`，提示“对应的功能也在这次上线时，请在本 PR 中一并去掉”。工具不自动去掉：这些包裹对应的是某个 Cloud 功能的上线时间，与这一页的提升不一定同时发生。
+- 提升只搬 `lock.yaml` 的 commit 值，不处理 variant 覆盖文件：处于采纳期的页面，发布走 [06b](./06b-variant-adoption.md) 的 promote，上游合并后在对账中清理 variant。
 
 提升在功能上线时进行，也就是现在修改 `Release Channel` 的时机；合并后到达 Prod 的路径与时延见 [05](./05-publish-handoff.md#触发时机)。提升合并后，这一页还开着的上游更新 PR 由下一次运行重建（见 [06](./06-upstream-changes.md#每页一个滚动更新的-pr)）。
 
@@ -166,6 +169,8 @@ Milvus 原文中的错误已在上游修好，Cloud 要让 Prod 马上改正、�
 | 两者都有值时，`current` 不是 `next` 的祖先（Prod 比 UAT 新，或两者不在同一条历史上） | 该页生成失败 |
 | `current` 或 `next` 写了 `none`（Phase 1 不启用） | 该页生成失败，按格式错误处理 |
 | Cloud 规则只在 `next` 上失效 | 失败并指出是 `next`；`current` 与 Prod 不受影响 |
+| `variant-current.md` 存在但没有 `variant-next.md` | 该页生成失败，见 [06b](./06b-variant-adoption.md#出错时) |
+| variant 的 provenance 缺失或字段不合法（如 `head_sha` 不是完整的 40 位） | 该页生成失败，见 [06b](./06b-variant-adoption.md#出错时) |
 
 发起改 `lock.yaml` 的 PR 时：
 
@@ -227,6 +232,8 @@ next:    b2…    # 两边相同，成对的标记消失
 **为什么 `lock.yaml` 不记摘要。** 它只表达决定；实际用到的输入与摘要属于构建结果，记在记录文件中。旧版本内容可以随时按 commit 从 Git 重新读取，比较变化不需要事先存摘要。
 
 **为什么不跟踪 `preview`。** milvus-docs 的 `preview` 分支放未发布功能，相对 `v3.0.x` 多 265 个、少 1424 个提交，已大幅分叉；两边一比较就会产生大面积差异。
+
+**采纳单个 PR 与跟踪 `preview` 不是一回事。** variant 采纳（见 [06b](./06b-variant-adoption.md)）只针对一个明确的 PR：head 在采纳那一刻抓取一次、内容经人工 PR 评审、上游合并后即清理；不引入分支级别的持续分叉，也不放松本篇的任何 lock 校验。
 
 **为什么锚点跟随标题。** 这与 zdoc 现在修改飞书标题时的行为一致，标题改名本身是正常的修改。milvus-docs 一年内有 17% 的候选页改过或删过标题，所以不能只给提示，要在提升时处理链接。milvus-docs 的链接检查目前不校验锚点；直接加校验要先修历史断链，Phase 1 不做，列在[待确认事项](../phase-1.md#61-待确认的接口)中。
 

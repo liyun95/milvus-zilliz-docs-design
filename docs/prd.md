@@ -79,25 +79,29 @@ Milvus 与 Zilliz Cloud 的功能文档有大量相同的内容，但现在各�
 | 链接映射表 `links.yaml` | zdoc，Guides 组一份 | 工具生成初始内容，文档工程师审核；之后由文档工程师补 | 工具报错提示时补一行 |
 | 产品名检查规则 `product-names.yaml` | zdoc，Guides 组一份 | 文档工程师 | 检查误报、需要放行时补一行 |
 | 版本记录 `lock.yaml` | zdoc，每页一份 | 只由工具写入 | 每个改变版本的 PR；样例见[第 4 节](#4-一页的生命周期) |
+| variant 覆盖文件 `variant-<channel>.md` 与来源记录 | zdoc，与版本记录同一目录，按需 | 只由采纳工作流写入 | 采纳期；见[技术设计 06b](./design/06b-variant-adoption.md) |
 | 代码 Tabs 规则、共享来源配置 | zdoc，Guides 组一份 | zdoc 维护者 | 很少 |
 
-zdoc 中的文件都放在 master 分支根目录的 `shared-docs/` 下，所有修改都向 master 开 PR：
+zdoc 中的文件都放在 master 分支根目录的 `shared-docs/` 下，按组分子目录（Phase 1 只有 `guides` 一组），所有修改都向 master 开 PR：
 
 ```
 shared-docs/
-  source.yaml                        # 共享来源配置：读哪个仓库、跟踪哪个分支（工程维护）
-  Variables.json                     # Cloud 变量
-  links.yaml                         # 链接映射表
-  product-names.yaml                 # 产品名检查规则
-  presentation/cloud-sdk-tabs.yaml   # 代码 Tabs 规则（工程维护）
-  pages/
-    delete-entities/                 # 目录名就是页面标识，等于这一页现有的 slug
-      page.yaml                      # 页面配置
-      lock.yaml                      # 工具写入
-    openai/
-      page.yaml
-      lock.yaml
-      before-you-start.md            # Cloud 内容文件
+  guides/                            # 组名，等于 Fetch 的发布组
+    source.yaml                      # 共享来源配置：读哪个仓库、跟踪哪个分支（工程维护）
+    Variables.json                   # Cloud 变量
+    links.yaml                       # 链接映射表
+    product-names.yaml               # 产品名检查规则
+    presentation/cloud-sdk-tabs.yaml # 代码 Tabs 规则（工程维护）
+    pages/
+      delete-entities/               # 目录名就是页面标识，等于这一页现有的 slug
+        page.yaml                    # 页面配置
+        lock.yaml                    # 工具写入
+      openai/
+        page.yaml
+        lock.yaml
+        before-you-start.md          # Cloud 内容文件
+        variant-next.md              # variant 覆盖文件，采纳时工具写入，按需
+        variant-next.provenance.json # 采纳来源记录，工具写入
 ```
 
 **生成的页面不能手改。** 发现问题，回到上表中对应的源文件修改。
@@ -128,6 +132,7 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版
 |---|---|---|---|
 | 接入 | 文档工程师开 PR，工具补上 `lock.yaml` | 无；Phase 1 要激活后才上网站 | [3](#场景-3接入一页) |
 | 上游更新 | 工具每天自动开 PR，文档工程师审核 | UAT 显示新版本，Prod 不变 | [7](#场景-7审核上游更新) |
+| 提前采用（按需） | 采纳工作流发起，文档工程师评审采纳 PR；上游合并后对账 | UAT 显示采纳内容；promote 后 Prod 跟上 | [7](#场景-7审核上游更新)、[技术设计 06b](./design/06b-variant-adoption.md) |
 | 提升 | 功能上线时，文档工程师发起 | Prod 跟上 UAT | [8](#场景-8功能上线时提升) |
 | 删除页面目录 | 下线完成后，文档工程师开普通 PR | 无；页面已在下线时从网站移除 | [10](#场景-10下线一页) |
 
@@ -995,7 +1000,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 提升只把 `lock.yaml` 中的 `current` 改成 `next`，管不到页面配置。所以 Cloud 自己写的内容和规则，合并后会在 Prod 下一次部署时一起出现；还不能在 Prod 显示的，要用下表的写法。PR 校验只生成候选结果，不发布到任何站点。
 
-**四种情况，四种做法**
+**五种情况，五种做法**
 
 | 想先只在 UAT 显示的内容 | 怎样做 |
 |---|---|
@@ -1003,6 +1008,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 | Cloud 新写的一段 | 在 Cloud 内容文件中用 `<NextChannel action="include">` 包住，沿用 zdoc 现有写法；功能上线时去掉包裹 |
 | 用 Cloud 内容替换或删除原文的某一段，但下次发布时才生效 | 给这条变换加 `channel: next` |
 | 整个新页面 | 在飞书表格中把这一页的 `Release Channel` 设为 `NEXT`（新记录的默认值），与其他页面相同；功能上线时改为 `CURRENT`（[场景 8](#场景-8功能上线时提升)） |
+| 上游 PR 未合并、但 Cloud 要同步发布的原文变化 | 采纳为这一页的 variant 覆盖文件：UAT 先显示，Cloud 发布时 promote（见[技术设计 06b](./design/06b-variant-adoption.md)） |
 
 **原文的版本差异怎样体现**
 
@@ -1163,6 +1169,7 @@ transforms:
 | Cloud 也需要，只是写法只适合 Milvus，例如新增一句 “In Milvus, you can …” | 回 milvus-docs 把 “Milvus” 改成变量；修正合并后，这个 PR 会自动带上 |
 | 只属于 Milvus，例如新增一段 `milvus.yaml` 配置说明 | 回 milvus-docs 把这段标成命名块，在这个 PR 中加一条 `remove`，一起合并 |
 | 暂时判断不了 | 先不合并。之后的上游修改会继续累积到这个 PR 中，所以要尽快决定 |
+| 修改还在未合并的上游 PR 中 | 不走这个上游更新 PR：请有工作流权限的同事触发“采纳”，把上游 PR 的原文采纳为这一页的 variant 覆盖文件；上游合并后再对账（见[技术设计 06b](./design/06b-variant-adoption.md)） |
 | 校验失败 | 按报告的建议，在同一个 PR 中修改页面配置或 Cloud 内容文件，校验通过后合并 |
 
 **PR 中有什么**
@@ -1194,6 +1201,7 @@ transforms:
 | 命名块的类型或语言变了，例如少了一种语言 | 按新原文重新检查 Cloud 的规则，不再成立时校验失败 |
 | 只新增了命名块标记，正文没变 | Cloud 页面不变，不触发重新翻译 |
 | 命名块被改名或删除；Cloud 定位的代码行被改了；原文被改名或删除 | 校验失败，见“出错时” |
+| 合并的提交包含曾被这一页采纳为 variant 的内容 | 巡检提示对账；对账时比较 variant 与合并结果，Cloud 的差异转 transform 或回馈上游（见[技术设计 06b](./design/06b-variant-adoption.md#上游先合并对账)） |
 
 **系统行为**
 

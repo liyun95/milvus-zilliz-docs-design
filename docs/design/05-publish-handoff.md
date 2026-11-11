@@ -44,7 +44,7 @@ zdoc 现状（文档负责人 2026-10-20 介绍，Fetch 耗时为 2026-10-21 从
 
 #### PR 校验
 
-zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更新、下线、提升）都经过同一套校验，通过后才能合并。校验是**候选运行**：完整生成一遍，但不写 dev、不上传图片、不需要 Cloud 凭据。
+zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更新、采纳、下线、提升）都经过同一套校验，通过后才能合并。校验是**候选运行**：完整生成一遍，但不写 dev、不上传图片、不需要 Cloud 凭据。
 
 | 检查 | 出错规则 |
 |---|---|
@@ -54,7 +54,7 @@ zdoc 中修改 `shared-docs/` 的 PR（作者修改配置、接入、上游更�
 | 链接与图片都能解析 | [02b](./02b-links-and-images.md#出错时) |
 | 生成的 MDX 通过 zdoc 现有的站点校验 | zdoc 现有规则 |
 
-- 人开的 PR 自动触发校验；工具用 `GITHUB_TOKEN` 开的 PR 或提交到 PR 的改动，由工具显式触发校验，因为用它推送的提交不会自动触发其他工作流。
+- 人开的 PR 自动触发校验；工具用 `GITHUB_TOKEN` 开的 PR 或提交到 PR 的改动，由工具显式触发校验，因为用它推送的提交不会自动触发其他工作流。采纳工作流的 PR 用专用 PAT 开出，会自动触发校验，这次全量生成即采纳的证据（见 [06b](./06b-variant-adoption.md#采纳)）。
 - 上游更新 PR 另附影响报告（见 [06](./06-upstream-changes.md#pr-的内容)）。
 
 ### 交给发布的三样东西
@@ -130,6 +130,10 @@ generated/en/manifests/shared-pages/
         { "path": "shared-docs/guides/Variables.json", "sha256": "…" }
       ]
     },
+    "variants": [
+      { "channel": "next", "path": "shared-docs/guides/pages/filtered-search/variant-next.md", "sha256": "…",
+        "pull": 4242, "head_sha": "d4…", "adopted_at": "2026-11-11T08:00:00Z", "adopted_via": "adopt-variant" }
+    ],
     "dev": {
       "commit": "<这次运行的 dev 基线 commit>",
       "files": [
@@ -161,6 +165,7 @@ generated/en/manifests/shared-pages/
 | `inputs.milvus_docs.files[]` | 用到的每个原文与片段：`path` 相对于仓库根目录，`current`、`next` 是它在两个版本中的摘要 | 判断输入是否变化 |
 | `inputs.zdoc.repository`、`commit` | zdoc 仓库，以及 `shared-docs/` 所在的 master commit | 重新生成 |
 | `inputs.zdoc.files[]` | 用到的页面配置、Cloud 内容文件、变量文件、链接映射表，各自的路径与摘要 | 判断输入是否变化 |
+| `inputs.variants[]` | 只在采纳期存在：每个通道的 variant 覆盖文件及其摘要与来源（上游 PR 号、head、采纳时间，见 [06b](./06b-variant-adoption.md)）。上例中 next 通道读 `variant-next.md`（上游 PR #4242 的 head），current 仍读 pin 的原文 | 判断输入是否变化、对账时核对 |
 | `inputs.dev.commit`、`files[]` | 这次运行的 dev 基线 commit，以及生成时读到的 dev 文件（Cloud 页面清单、表格快照等）的路径与摘要 | 重新生成 |
 | `inputs.fetch` | 这次 Fetch 读到的导航信息（标签、排序、通道）的摘要或内容地址，以及图片基地址；不含任何凭据 | 重新生成 |
 | `inputs.fetch.render_targets` | 交给生成的每个发布目标：手册、路径、扩展名、导航标签、排序位置、通道，带版本号。只记生成用到的值，不含凭据；没有这一项的旧记录文件仍然有效，用它重放只作升级对照，不拦发布（WP9b 加入） | 逐字节重新生成 |
@@ -197,7 +202,7 @@ generated/en/manifests/shared-pages/
 | 源 PR | 作者只改 Milvus 原文或 `shared-docs/`；预览提供跳转到源文件的编辑入口 | 实现 |
 | 分支权限 | 普通作者不能直接推送、强推正式生成分支，也不能绕过检查 | 实现 |
 | 候选任务 | 可以生成和预览，没有生产分支、部署或图片存储的写权限；社区 PR 不需要 Cloud 凭据 | 实现 |
-| 采用批准 | 以 zdoc 中各类 PR（配置修改、接入、上游更新、下线、提升）的审核合并为准；配置中自称已批准不构成授权 | 实现，沿用 GitHub PR |
+| 采用批准 | 以 zdoc 中各类 PR（配置修改、接入、上游更新、采纳、下线、提升）的审核合并为准；配置中自称已批准不构成授权 | 实现，沿用 GitHub PR |
 | 重新生成比对 | 两个时机：Fetch 写 dev 之前，按记录文件中的输入在干净目录重新生成，与 `outputs` 的摘要比对；有 PR 修改 dev 中共享页的生成结果时（包括手动修改），检查失败。都指出应改的源文件 | 实现；具体接法待核实（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)） |
 | 产物绑定 | 校验结果绑定实际发布产物的摘要，校验后替换产物时部署拒绝 | 后续按实际风险评估 |
 | 核心保护 | 工作流和校验器的改动需工程审核，内容 PR 不能关闭保护 | 实现 |
@@ -218,7 +223,7 @@ generated/en/manifests/shared-pages/
 | 恢复目标 | 做法 |
 |---|---|
 | 回到 dev 的某个历史状态 | 沿用 zdoc 现有的恢复流程；`generated/en/manifests/shared-pages/` 加进恢复脚本的固定清单，正文、导航、生效配置与记录文件一起恢复 |
-| 从输入重新生成 | 读记录文件：按 `inputs.milvus_docs` 的两个 commit 取原文，按 `inputs.zdoc.commit` 取 `shared-docs/`，用 `inputs.tools` 中的版本生成；结果摘要必须与 `outputs` 一致 |
+| 从输入重新生成 | 读记录文件：按 `inputs.milvus_docs` 的两个 commit 取原文，按 `inputs.zdoc.commit` 取 `shared-docs/`（variant 覆盖文件也在其中，按记录的摘要复核；与记录不一致时失败），用 `inputs.tools` 中的版本生成；结果摘要必须与 `outputs` 一致 |
 | 图片 | 按 `inputs.images` 中的摘要检查图片存储中的对象是否存在、内容是否一致 |
 | 已发布站点回滚 | 沿用既有的成功发布记录与镜像回滚，不交回飞书 |
 
@@ -227,7 +232,7 @@ generated/en/manifests/shared-pages/
 ### 缓存与运行
 
 - 同一仓库的同一 commit 只检出一次；每个源文件只解析一次，只展开实际用到的部分。
-- 缓存身份包含记录文件中的全部输入与生效配置，冷、热构建的结果一致；飞书侧的“内容未变”不能跳过 Git 输入的变化。zdoc 现在判断能否复用上一次组装结果的 `scripts/docs-workflow/guides-assembly-identity.js` 只看飞书快照、导航与工具文件，要把 `shared-docs/<组>/` 的内容与各页 lock 中锁定的上游 commit 一起算进去；增量抓取计划也要据此把共享页所在的表标为要重新渲染。
+- 缓存身份包含记录文件中的全部输入（含 variant 覆盖文件及其摘要）与生效配置，冷、热构建的结果一致；飞书侧的“内容未变”不能跳过 Git 输入的变化。zdoc 现在判断能否复用上一次组装结果的 `scripts/docs-workflow/guides-assembly-identity.js` 只看飞书快照、导航与工具文件，要把 `shared-docs/<组>/` 的内容与各页 lock 中锁定的上游 commit 一起算进去；增量抓取计划也要据此把共享页所在的表标为要重新渲染。
 - 展开深度、体积、下载并发和超时都设上限，沿用原发布队列。
 
 ## 出错时

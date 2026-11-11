@@ -34,7 +34,7 @@ Phase 1 分两步：
 |---|---|---|
 | [milvus-docs](https://github.com/milvus-io/milvus-docs) | Delete Entities 内容对齐，加变量；固定 CI 中的工具版本；PR 检查中加入命名块校验 | Filtered Search、OpenAI 内容对齐（OpenAI 先对齐历史漂移）；加命名块；更新贡献说明；撤销旧飞书导入任务对已迁移页的覆盖能力 |
 | [md2md](https://github.com/zilliztech/md2md) | 只做预处理的入口：受控读取、依赖报告、错误检查；命名块的解析、校验与清理；一次发版；旧入口保持兼容 | 无新增 |
-| [zdoc](https://github.com/zilliztech/zdoc) 生成（`packages/docs-tooling`） | 获取固定源、定位命名块、生成命名块清单、调用 md2md、生成 Tabs 与 MDX、产品名检查；接入 PR 写入 lock 与 PR 校验；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；双版本通道比较；依赖索引、影响报告、上游更新 PR，提升工作流 |
+| [zdoc](https://github.com/zilliztech/zdoc) 生成（`packages/docs-tooling`） | 获取固定源、定位命名块、生成命名块清单、调用 md2md、生成 Tabs 与 MDX、产品名检查；接入 PR 写入 lock 与 PR 校验；接入 stage 与预览 | 命名块、语言示例和代码行三级的 add / replace / remove；产品过滤器接入 Git 输入；双版本通道比较；依赖索引、影响报告、上游更新 PR，提升工作流；未合并上游 PR 的采纳与对账（[06b](./design/06b-variant-adoption.md)） |
 | [zdoc](https://github.com/zilliztech/zdoc) 发布 | Git 来源接入设计：交接格式、生效配置与来源记录 | 页级混源；按 `Docs` 链接分流与比较；按表格生成 `active.json` 并与内容同批写入；指向已激活页面的飞书链接保持有效；下线完成；旧飞书任务隔离；生成结果比对；过滤、通道、翻译与恢复接入 |
 | [web-content](https://github.com/milvus-io/web-content)、[milvus.io](https://github.com/milvus-io/milvus.io) | Milvus 发布回归 | Milvus 发布回归；Phase 1 不新增共享消费能力 |
 
@@ -75,7 +75,7 @@ Phase 1 分两步：
 
 1. **内容**：Filtered Search 与 OpenAI 两端对齐（OpenAI 先补齐语言与步骤；飞书上已有的 Rust 等语言示例同步到 milvus-docs），加命名块。
 2. **zdoc 生成**：add / replace / remove，目标包括命名块、语言示例和代码中连续的几行；产品过滤器接入 Git 输入（用于 Cloud 内容文件）；lock 记录 current / next 两个 commit，两版各生成一遍，按块比较并成对输出 `<NextChannel>`。
-3. **zdoc 生成**：依赖索引、影响报告、上游更新 PR，提升工作流；按[产品需求场景 7](./prd.md#场景-7审核上游更新)处理各类上游变化，实现见[技术设计 06](./design/06-upstream-changes.md)。
+3. **zdoc 生成**：依赖索引、影响报告、上游更新 PR，提升工作流；按[产品需求场景 7](./prd.md#场景-7审核上游更新)处理各类上游变化，实现见[技术设计 06](./design/06-upstream-changes.md)。未合并上游 PR 的采纳、promote 与对账按[技术设计 06b](./design/06b-variant-adoption.md)，随首个同步发布窗口需要落地。
 4. **zdoc 发布**：页级混源；按 `Docs` 链接分流、比较运行，按表格生成 `active.json` 并与内容同批写入；指向已激活页面的飞书链接保持有效；下线完成；旧飞书任务隔离；重新生成比对；过滤、通道、翻译与恢复接入。
 5. **切换**：核对最新飞书修订，文档负责人审核后切换试点页，更新编辑入口；记录验证结果与后续迁移条件。
 
@@ -89,6 +89,7 @@ Phase 1 分两步：
 - 【T10】恢复：临时 artifact 不可用时，能从 Git 恢复或从固定输入重建；来源记录一致；缺源或缺资源时停止；镜像回滚不恢复飞书写权。
 - 【T12】完整旅程：源 PR → 预览 → 审核 → 发布 → 采用或拒绝上游更新 → 恢复；手改生成文件，或连同来源记录一起改，都被拒绝。
 - 【T13】过滤与通道：适用的正文与代码保留，不适用的被排除；Next 内容在 UAT 显示，在 Prod 和静态产物中不出现；共享页的两个通道各自显示对应版本的生成结果，Cloud 规则在两个版本上都校验，提升后不留通道标记；`<NextChannel>` 包住列表、提示框和代码 Tabs 时渲染正确；Git 页面的整页通道在各语言译文中生效；未迁移飞书页的行为不变。
+- 【T15】变体采用：采纳未合并的上游 PR 后，UAT 块级显示、Prod 不变；promote 后两通道输出逐字相同、无通道标记；重复采纳同字节报 Unchanged；生成期 lock 校验不受 variant 影响，pin 失效时 variant 不救；上游合并后对账删 variant 并 re-pin 到 merge commit；巡检报告漂移、待对账与不健康三态，卡片只在有不健康项或运行出错时红。
 - **发布保护**：实际的 Git 服务端拒绝普通作者直接推送或强推正式生成分支；内容 PR 不能关闭核心检查。隔离环境的回放不能代替真实分支与凭据的权限核验。
 
 T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换前完成。
@@ -107,6 +108,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 | [04](./design/04-channels-and-lock.md) | 通道与 commit 记录 | `current` / `next` 的字段；接入与提升怎样发起；整页通道沿用飞书表格；记录粒度、跟踪的 Milvus 分支，以及怎样进入既有的发布和恢复数据 | 记录格式在 1a 获取原文前确定；提升方式与跟踪分支在 1b 开发前；恢复接线在切换前 | 已定义，待确认 |
 | [05](./design/05-publish-handoff.md)、[05b](./design/05b-cutover-and-ownership.md) | 生成结果交给发布（含页面切换与归属） | 生成结果、资源、来源与依赖记录的格式；Git 来源怎样进入现有来源模型；生效配置的存储与同批提交；下线页面怎样从网站移除 | 1a 发布接入设计时 | 已定义，待确认；有待核实事项，见下表 |
 | [06](./design/06-upstream-changes.md) | 上游变化的发现与影响报告 | 触发方式、执行身份（社区 PR 不提供 Cloud 凭据）、重复事件合并、失败重试与手动重跑、上游更新 PR 与影响报告的内容 | 1b 上游更新 PR 开发前 | 已定义，待确认 |
+| [06b](./design/06b-variant-adoption.md) | 未合并上游 PR 的采纳 | variant 覆盖文件与来源记录的格式；采纳工作流与人工评审闸；promote 与对账；每日巡检的内容与告警级别 | 1b 后期，首个同步发布窗口前 | 已定义，待确认；zdoc 实现进行中（PR #1219、#1221、#1223） |
 
 其他待确认事项：
 
@@ -163,7 +165,7 @@ T05、T07、T08、T11、T12 是上线阻断项；其他检查同样要在切换�
 
 两篇样例都检查了不支持的 schema、缺失输入和手改生成结果等错误；都没有调用真实的 md2md、Docusaurus 或生产发布，也没有实现跨仓的上游更新、翻译和发布保护。
 
-两篇样例仍是接口定义之前的草案写法（如 `shared/modules.yaml`、每页的 `links` 与 `assets`），与[产品需求](./prd.md)、[技术设计](./design/README.md)不一致的地方以它们为准，待文档负责人确认接口后更新。样例的共享原文经过本地整理，尚未合入上游。样例的 `registry.json` 中 `based_on_commit` 记录整理前的 Milvus 基线，`source_commit: null` 表示拟议原文还没有对应的上游提交；注册规则中的 `source.track` 只表达跟踪分支，脚本实际读取本地文件。正式接入时由工具把审核采用的原文锁定到实际 commit。
+两篇样例仍是接口定义之前的草案写法（如 `shared/modules.yaml`、每页的 `links` 与 `assets`），与[产品需求](./prd.md)、[技术设计](./design/README.md)不一致的地方以它们为准，待文档负责人确认接口后更新。样例的共享原文经过本地整理，尚未合入上游。样例的 `registry.json` 中 `based_on_commit` 记录整理前的 Milvus 基线，`source_commit: null` 表示拟议原文还没有对应的上游提交；注册规则中的 `source.track` 只表达跟踪分支，脚本实际读取本地文件。正式接入时由工具把审核采用的原文锁定到实际 commit；上游 PR 未合并内容的正式通道见[技术设计 06b](./design/06b-variant-adoption.md)。
 
 运行原型需要 Python 3.10+，在 `examples/delete-entities/` 或 `examples/filtered-search/` 目录执行：
 

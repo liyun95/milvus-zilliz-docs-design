@@ -18,6 +18,7 @@
 | 链接映射表 | zdoc `shared-docs/guides/links.yaml` | 文档工程师 | [场景 5](./prd.md#场景-5链接与图片) |
 | 产品名检查规则 | zdoc `shared-docs/guides/product-names.yaml` | 文档工程师 | [场景 1](./prd.md#场景-1把产品名和连接值写成变量) |
 | 版本记录 | zdoc `shared-docs/guides/pages/<页面标识>/lock.yaml` | 只由工具写入 | [第 4 节](./prd.md#4-一页的生命周期) |
+| variant 覆盖文件 | zdoc `shared-docs/guides/pages/<页面标识>/variant-<channel>.md` 与来源记录，按需 | 只由采纳工作流写入 | [技术设计 06b](./design/06b-variant-adoption.md) |
 | 代码 Tabs 规则 | zdoc `shared-docs/guides/presentation/cloud-sdk-tabs.yaml` | zdoc 维护者 | — |
 | 共享来源配置 | zdoc `shared-docs/guides/source.yaml` | zdoc 维护者 | — |
 
@@ -124,6 +125,7 @@ allow:                                  # 确实要保留的写法
 | Cloud 新写的一段 | Cloud 内容文件中用 `<NextChannel action="include">` 包住 |
 | 替换或删除原文的一段，下次发布时才生效 | 变换加 `channel: next` |
 | 整个新页面 | 飞书表格中 `Release Channel` 设为 `NEXT`（新记录的默认值） |
+| 上游 PR 未合并、但 Cloud 要同步发布的原文变化 | 采纳为 variant 覆盖文件，UAT 先显示；Cloud 发布时 promote |
 
 规则见[场景 6](./prd.md#场景-6让内容先只在-uat-显示)。
 
@@ -132,6 +134,9 @@ allow:                                  # 确实要保留的写法
 | 操作 | 在哪里 | 谁 | 规则见 |
 |---|---|---|---|
 | 手动触发上游更新，可指定页面与提交 | zdoc GitHub Actions | 文档工程师 | [场景 7](./prd.md#场景-7审核上游更新) |
+| 采纳：把未合并的上游 PR 写成 variant 覆盖文件，可先空跑 | zdoc GitHub Actions，“采纳”工作流 | 有工作流权限的同事发起，文档工程师评审采纳 PR | [技术设计 06b](./design/06b-variant-adoption.md#采纳) |
+| promote：发布窗口到点、上游还没合并，让 Prod 也用采纳内容 | 同上，再次触发并选 promote | 同上 | [技术设计 06b](./design/06b-variant-adoption.md#zilliz-先发布promote) |
+| 对账：上游合并后删除 variant 文件，lock 钉到 merge commit | zdoc 普通 PR，按巡检提示发起 | 文档工程师 | [技术设计 06b](./design/06b-variant-adoption.md#上游先合并对账) |
 | 提升 | zdoc GitHub Actions，“提升”工作流 | 文档工程师 | [场景 8](./prd.md#场景-8功能上线时提升) |
 | 新页面上线：`Release Channel` 从 `NEXT` 改为 `CURRENT` | 飞书表格 | 文档工程师 | [场景 6](./prd.md#场景-6让内容先只在-uat-显示) |
 | 比较 | zdoc GitHub Actions | 文档负责人 | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |
@@ -152,5 +157,6 @@ allow:                                  # 确实要保留的写法
 | 变换的目标、冲突、代码行、内容文件 | zdoc 的 PR 校验 | [场景 4](./prd.md#场景-4写-cloud-的差异) |
 | 链接、锚点、图片 | zdoc 的 PR 校验 | [场景 5](./prd.md#场景-5链接与图片) |
 | `channel`，规则只在一个版本上失效 | zdoc 的 PR 校验 | [场景 6](./prd.md#场景-6让内容先只在-uat-显示) |
+| variant 覆盖文件：缺伴随、provenance 不合法、依赖不在 pin 中 | zdoc 的 PR 校验 | [技术设计 06b](./design/06b-variant-adoption.md#出错时) |
 | 上游改名、删除了 Cloud 引用的内容 | 上游更新 PR 的校验 | [场景 7](./prd.md#场景-7审核上游更新) |
 | 激活前的检查 | 比较运行；激活后的每次 Fetch | [场景 9](./prd.md#场景-9从飞书切换到-git激活) |
