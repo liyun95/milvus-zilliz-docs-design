@@ -165,6 +165,8 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 打开[私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)，可见 `Shared Guides / formal exact validation` 在 `203a16e40` 上成功。[验证任务](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805)保留 `receipt.json` 和 `output.json`，其中目标 Check ID 为 `130542967356`。[过期样例](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) 的 `freshness.json` 给出计划与实际的 Milvus SHA 以及 `STALE_SOURCE`。该次运行跳过写入，私有仓的分支、草稿及原有 Check 均保留原状态。
 
+[生产接入 PR #1225](https://github.com/zilliztech/zdoc/pull/1225) 把同一试点页接入独立定时任务。部署后从 Actions 打开 `Shared Guides upstream update`，在 `master` 上保留手动输入 `create_draft=false` 先检查候选与影响报告。建草稿运行需核对草稿的签名 head、唯一修改的 `lock.next` 和对应 producer 归档。再运行一次发现，应能看到已有 PR 的编号和跳过的准备、写入任务。以上生产结果待实测。
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。

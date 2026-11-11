@@ -549,6 +549,10 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 只读验证任务从私有基线 `59ed5bf81` 运行，将签名提交 `203a16e40`、草稿编号、目标 Check 和 suite 与输出的 SHA-256 写入正式回执。独立任务重读上游、草稿及远端回执，完成同一个 Check。主审下载产物重放得到 `accepted`，并从 PR 最新提交的 GitHub Checks 核实编号 `130542967356` 和结论 success。生产定时发现与 writer 激活仍待实施。[验证回执及输出报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805/artifacts/13858835048) · [最终验收](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026841920) · [私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)
 
+**生产单页试点进入评审（2026-11-11）。** [zdoc #1225](https://github.com/zilliztech/zdoc/pull/1225) 将此前在 fork #27 审阅的工具接入生产仓。候选时段是每天北京时间 14:37。发现和准备只读；writer 每次请求前重读生产输入、PR 和 refs。机器人只为 `json-field-overview` 创建一个指向 `master` 的 Draft PR，正文链接页面影响报告。已有更新 PR、输入过期、或上次写入结果不能确认时停止。
+
+主审只读观察到 Milvus `ccc847315` 与原锁 `3a9694ac8` 的页面内容有一行修改，涉及 JSON flat indexing 的弃用说明。生产试点的验收还需要默认分支上的新工作流、通过审核的 Fetch 生产者树、一次实际建草稿和一次已有草稿的停止回执。私有仓 #2 的 Check、离线重放和工具 PR 的 CI 各自保留原有范围。
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |
