@@ -525,7 +525,11 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 同一 Fetch、同一 Milvus 目标及同一 `dev` 在私有 macOS 15 arm64 / Node 22.23.4 runner 上完成 `update-plan`（511 秒）和 `update-prepare`（1,329 秒）。七类元数据端点均接受临时 job token。runner 校验了 scratch 仓库的本地引用、候选父提交、候选树和已安装的 journal。候选 `c72c2aba7def9c38dbe68aa189d78725b3b384c8` 只修改该页 `lock.yaml` 的 `next`。下载的补丁与本地 `518c1982` 样本逐字节相同，proof 中的 `nextEdits` 及原始 Git 补丁摘要一致。两份 proof 各自记录实际使用的工具和候选。托管 proof 的 SHA-256 为 `648c783dfdfdbb67e77923835880260cffe3e2f122a7176c8a9b84ba35b161ef`。[托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854) · [补丁与 proof 归档](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854/artifacts/13838124787)
 
-下一片验证真实候选对象的有界传输，随后验证隔离仓库的 Draft PR 和提交校验。生产端的定时发现和自动建 PR 仍待接入。
+**单页候选 Git 对象传输（2026-11-11）。** 当接收端的基线已认证且历史连通时，`0ad643580a` 沿锁文件路径比对每层 Git 树的原始字节。只有对应条目的对象 ID 可以改变。接收端从原始字节核对文件、树、提交、父提交和 proof 中的差异摘要。主审在独立裸仓复现了本地候选 `518c1982` 和托管候选 `c72c2aba`。后者的增量为 1 个 blob、5 个 tree、1 个 commit，共 7,098 字节，打成 Git 包后为 5,231 字节。改写或截断的包被拒绝。最终提交上的 shared-docs 全量为 1,638 通过、0 失败、6 跳过，typecheck、矩阵和差异检查通过。[工具复审](https://github.com/liyun95/zdoc/pull/27#pullrequestreview-5855976179)
+
+[私有传输测试](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42987893488) 在完整基线上还原了 `c72c2aba`。私有仓是独立仓库，因此在只含原始锁文件的专用基线 `13ccf9de` 上再次传输相同改动。沙盒候选 `b7d3b11b` 的原始补丁摘要与托管 proof 一致。首次推送成功，紧接着的 ref 查询返回 404，writer 在创建 PR 前停止。主审随后从私有仓重新抓取两个分支，验证了父提交、Git 连通性和唯一差异。
+
+第一次恢复运行在读取保留日志时停止。修正下载方式后，提交 `a0442ee` 的只读预演取得 `ready-to-create`。同一提交的创建运行通过，`github-actions[bot]` 在既有分支上创建了私有 Draft PR #1。主审下载并核对传输与建草稿两份回执，从私有仓重新抓取基线和候选后通过 `git fsck --strict`，确认只有目标锁文件的一行 `next` 改动，原始 Git 差异摘要与托管 proof 一致。私有仓的 Actions 建 PR 开关已恢复关闭。下一片是 B4.3 的精确提交验证与只读报告，生产定时建 PR 仍待激活。[只读预演](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989591287) · [创建运行与回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989841898) · [私有 Draft PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1)
 
 #### 后续切片与准入条件
 
