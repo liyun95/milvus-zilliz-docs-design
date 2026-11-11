@@ -535,6 +535,12 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 [托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276) 的 report job 仅获得读取权限，17 秒完成。主审下载[归档](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276/artifacts/13841333329)，核对 ZIP 摘要、两份报告与三份生产者回执。[私有 PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1) 的基线为 `13ccf9de`、head 为 `b7d3b11b`；唯一修改为 `json-field-overview/lock.yaml` 的 `next` 从 `3a9694ac` 更新到 `3abf7928`。报告对应这个固定 head 和准备时的 D；它不会随 PR 推送更新。B4.3 剩余工作是将生产 seal S、目标 check 与真实 producer/validator 回执关联，验证过期输入的处理。本次工具提交仅作为 validator；严格 Fetch producer 登记仍对应上一棵已审树。后续若使用新树运行 Fetch，须先核对该树并登记摘要。生产定时激活仍待后续验收。
 
+**B4.3 私有签名提交与 PR Checks（2026-11-11）。** 在私有 PR #1 上，受审工具 `afa622409f` 检查 GitHub 的签名、身份观察与原始 Git 对象。工作流在暂存分支以预期旧值 `b7d3b11b` 创建空内容提交，验明签名、唯一父提交与同一文件树后，再以相同旧值将 PR head 前进到 `3ed7da0e`。主审独立重建签名字节及 Git OID，确认作者为 `github-actions[bot]`、平台签名者为 `web-flow`，与基线相比仍只有原锁文件的一行变化。[签名提交](https://github.com/liyun95/zdoc-writer-preflight/commit/3ed7da0eabdc589131191fcbab2a5c66e79d1c14) · [封签运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42994982540)
+
+首次验证预留了 Check `130437521876`，随后因 GitHub 返回该 Check 自己的详情 URL 而停止。恢复工作流从已完成任务的记录认证原 Check ID、suite ID 和预留结果，依照该 ID 核对 GitHub 详情页地址。成功完成的只读运行保留验证结果与摘要。后续独立 job 重新读取 PR head 和验证回执，仅将同一个 Check 更新为 success。主审从 PR 最新提交的 check rollup、REST API、Git 对象以及签名、验证和发布回执交叉核对同一 S、Check、suite 和验证摘要。[首次验证](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42995182627) · [只读验证](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42995872682) · [回执发布](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42996013424) · [PR Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/1/checks)
+
+此实测采用单页、固定私有基线和专用签名消息。生产接入仍需使用正式的 `Shared-Update-Seal` 和 exact-validation receipt 契约，核对当前 M/D、生产者身份和过期输入，并在分支保护中决定是否将 Check 设为合并条件。
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |

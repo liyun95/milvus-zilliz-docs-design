@@ -161,6 +161,8 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 同一草稿的只读验证在 17 秒内完成。打开运行摘要即可看到对应的 head 和 `current`、`next` 值。下载的 `report.json` 还包含基线、补丁摘要和来源回执。主审核对归档后，确认报告指向 `b7d3b11b`，PR 仍为草稿。若后来有人推送新提交，需要验证新的 head。生产 seal 与 PR 上的目标 check 仍待验证。[运行摘要](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276) · [JSON 和 Markdown 报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276/artifacts/13841333329)
 
+在 [PR #1 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/1/checks) 中，`Shared Guides / exact signed update` 对应签名提交 `3ed7da0e`。它只有一个父提交 `b7d3b11b`，两者的 Git 文件树相同。点开 [Check](https://github.com/liyun95/zdoc-writer-preflight/runs/130437521876)，可以从摘要进入只读验证运行，并用其中的 SHA-256 核对回执。第一次验证发现 GitHub 为 Check 生成了详情页地址，恢复验证使用原来的 Check ID。PR 维持 Draft。[验证回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42995872682/artifacts/13843313451)
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
