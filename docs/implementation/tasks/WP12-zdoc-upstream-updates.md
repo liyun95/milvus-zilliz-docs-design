@@ -521,7 +521,11 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 [私有 macOS 运行 42972495959](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42972495959) 使用 Node 22.23.4、上述工具版本、`dev` `6ef5943f` 及原 Milvus 目标 `3abf7928`。计划耗时 464 秒，选中同一页的一条锁修改。准备阶段耗时 1,192 秒后返回 `held / PLAN_CHANGED`。worker 再次读取 GitHub 元数据时收到 HTTP 403，公开读取额度为 0；最终候选为 `null`。协调进程的临时 job token 已能读取该上游 run、jobs 和归档元数据。
 
-**下一项是解决 worker 多次复核对匿名读取额度的依赖。** 审阅由可信协调进程代读固定 GitHub GET 的方案，将每次响应绑定到当前 worker 和请求，保留最新 Fetch、`dev` 和写前复核。验证凭据隔离、过期/重放响应拒绝、并发分支变化仍会暂停，再复跑真实单页。托管提交、远端上传、精确校验和生产写入仍待验证。
+**托管单页准备验证通过（2026-11-11）。** 工具提交 `95400cc094` 让可信协调进程代读 GitHub。每次采集都按当前 run、attempt 和分页结果重新读取两个 Guides 工作流的历史及 `dev`。单页 worker 通过专属管道验证响应，环境和输入中均无 token。首个实现曾使协调进程提前加载文档编译器，全量回归发现后取消了那次私有运行。修正依赖后，最终提交的 shared-docs 全量结果为 1,636 通过、0 失败、6 跳过，测试矩阵及 Fetch、Translation、恢复回放均通过。[主审记录](https://github.com/liyun95/zdoc/pull/27#pullrequestreview-5855313800)
+
+同一 Fetch、同一 Milvus 目标及同一 `dev` 在私有 macOS 15 arm64 / Node 22.23.4 runner 上完成 `update-plan`（511 秒）和 `update-prepare`（1,329 秒）。七类元数据端点均接受临时 job token。runner 校验了 scratch 仓库的本地引用、候选父提交、候选树和已安装的 journal。候选 `c72c2aba7def9c38dbe68aa189d78725b3b384c8` 只修改该页 `lock.yaml` 的 `next`。下载的补丁与本地 `518c1982` 样本逐字节相同，proof 中的 `nextEdits` 及原始 Git 补丁摘要一致。两份 proof 各自记录实际使用的工具和候选。托管 proof 的 SHA-256 为 `648c783dfdfdbb67e77923835880260cffe3e2f122a7176c8a9b84ba35b161ef`。[托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854) · [补丁与 proof 归档](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854/artifacts/13838124787)
+
+下一片验证真实候选对象的有界传输，随后验证隔离仓库的 Draft PR 和提交校验。生产端的定时发现和自动建 PR 仍待接入。
 
 #### 后续切片与准入条件
 

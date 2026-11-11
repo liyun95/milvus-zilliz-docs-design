@@ -155,7 +155,7 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 三个运行环境 PR 已合并。随后在托管 runner 上，普通用户读到的身份配置与工具集测量值一致；初次捕获和访问证据复核均已完成。180 秒上限先于诊断终态报告生效，worker 的退出与生成结果仍待验证。[私有运行和产物](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42945518064)
 
-[#1213](https://github.com/zilliztech/zdoc/pull/1213) 验证了本地 worker 的生成与退出。在随后的单页实测中，[工具草稿 #27](https://github.com/liyun95/zdoc/pull/27) 从同一次 Fetch 的源记录和英文发布结果确认了 `json-field-overview` 的资格。`update-prepare` 最终生成本地提交 `518c1982`，只更新一行 `next`。第一次托管运行生成了相同的计划，准备阶段遇到 GitHub 匿名读取限额并暂停。运行证据和后续修复见[任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+[#1213](https://github.com/zilliztech/zdoc/pull/1213) 验证了本地 worker 的生成与退出。在随后的单页实测中，[工具草稿 #27](https://github.com/liyun95/zdoc/pull/27) 从同一次 Fetch 的源记录和英文发布结果确认了 `json-field-overview` 的资格。`update-prepare` 最终生成本地提交 `518c1982`，只更新一行 `next`。第一次托管运行在准备阶段遇到 GitHub 匿名读取限额。改由可信协调进程代读元数据后，macOS runner 成功安装候选 `c72c2aba`。下载的补丁与本地逐字节相同，proof 绑定了相同的修改前后内容。下一步验证候选对象传输。[托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854) · [任务卡](../tasks/WP12-zdoc-upstream-updates.md)
 
 ## 收尾与下一步
 
