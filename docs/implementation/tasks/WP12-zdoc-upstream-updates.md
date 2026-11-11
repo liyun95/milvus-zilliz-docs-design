@@ -511,11 +511,11 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 [诊断计时修复 #1213](https://github.com/zilliztech/zdoc/pull/1213) 在本地实测中省去一次耗时 31.8 秒的紧邻复核，并在各主要阶段开始前保留计时。固定提交 `a6b58dfc` 的 macOS 实跑耗时 135.8 秒：capture 通过，Guides worker 完成生成及结果校验，以 0 退出，进程组已清空。测试页没有对应的 Fetch 生命周期记录，计划按 `AUTHORITY_UNKNOWN` 暂停，没有产生候选。生产前仍要取得真实页面的有效记录和托管 worker 回执。
 
-**下一项：用一篇已接入页面验证更新资格。** 选 `json-field-overview` 为固定回归样本。Milvus `3a9694ac` → `872f0262` 在 Guides/BYOC 均可渲染，源和输出确有变化。B1 已算出拟议的 `next`，唯一的页面级阻塞是 `LIFECYCLE_UNKNOWN`。
+**首条真实本地候选已验证（2026-11-11）。** 在合并 #1213 后，[工具草稿 PR #27](https://github.com/liyun95/zdoc/pull/27) 的 `613ddb07` 用 `json-field-overview` 跑通了 `update-plan` 和 `update-prepare`。
 
-- **确认发布位置。** [Fetch 42872835003](https://github.com/zilliztech/zdoc/actions/runs/42872835003) 的源归档中，90 个共享记录均无输出路径；同次发布结果的 `source/guides-en` 提交 `6eb9e21d` 中，90 个记录均有输出路径。实现时认证 run/attempt、发布结果与提交，按同一记录和表核对 Guides/BYOC 路径，并核实提交与指定 dev 的祖先关系。
-- **确认记录的来源与时效。** 增量记录可能沿用旧值。为选定记录提供可核验的本次读取和集合完整性证据，定义如何确认最新适用观察，并在提交前重验。读取凭据留在收集证据的一侧，worker 只接收已认证的输入。缺失、过期、冲突或读取不完整时继续 hold。
-- **验收。** 先在本地用实际 worker 取得一条准确的 `lock.next` 改动、保留不变的 `current`，并验证陈旧和缺失输入时仍暂停。正例成立后再用相同输入验证托管运行。真实对象规模、凭据隔离及启用写入仍按后续切片验收。
+- **页面资格。** 核对[定时 Fetch 42944655729](https://github.com/zilliztech/zdoc/actions/runs/42944655729) 第一次运行的源归档、英文 Guides 发布提交 `d8116329` 与固定的 `dev` 提交 `f04cd5c3`。独立读取的 9 张 Base 表共 497 条记录，逐表记录集合与归档相符。选中页面的 SaaS 和 BYOC 发布路径及内容均匹配。
+- **实际改动。** 计划得出一个候选。准备结果为 `prepared`，候选提交为 `518c1982b0fc10c042795caffc1e703faf28a1d7`。对比 Git 父子提交，唯一差异是该页锁的 `next` 从 `3a9694ac` 更新到 Milvus `3abf7928`，`current` 保持原值。两侧渲染均更新了 JSON flat index 的兼容性说明。已核对提交树、修改前后文件摘要、安装的本地引用和 proof 摘要；补丁通过 `git apply --check`。
+- **运行条件与下一步。** 前两次准备分别遇到工具同步和 Translation 推进 `dev`，均在写入前暂停。另一次计划因 GitHub 匿名读取额度用尽而暂停。最终验证使用发布完成后的固定输入。下一步审阅工具草稿，并在托管 runner 上复验该单页；生产 Draft PR 仍待对象传输、精确校验和写入验证。
 
 #### 后续切片与准入条件
 

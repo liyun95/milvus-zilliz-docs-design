@@ -155,7 +155,7 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 三个运行环境 PR 已合并。随后在托管 runner 上，普通用户读到的身份配置与工具集测量值一致；初次捕获和访问证据复核均已完成。180 秒上限先于诊断终态报告生效，worker 的退出与生成结果仍待验证。[私有运行和产物](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42945518064)
 
-[#1213](https://github.com/zilliztech/zdoc/pull/1213) 的本地诊断已取得 worker 正常退出和生成结果。现有 Fetch 归档不足以确认页面的最新资格。下一项以 `json-field-overview` 的真实源变更和双侧输出作验收样本，详见[任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+[#1213](https://github.com/zilliztech/zdoc/pull/1213) 验证了本地 worker 的生成与退出。在随后的单页实测中，[工具草稿 #27](https://github.com/liyun95/zdoc/pull/27) 从同一次 Fetch 的源记录和英文发布结果确认了 `json-field-overview` 的资格。`update-prepare` 最终生成本地提交 `518c1982`，只更新一行 `next`。复核输入、提前暂停的原因及托管复验见[任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
 ## 收尾与下一步
 
