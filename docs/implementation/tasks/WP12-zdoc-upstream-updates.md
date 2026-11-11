@@ -515,7 +515,13 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 - **页面资格。** 核对[定时 Fetch 42944655729](https://github.com/zilliztech/zdoc/actions/runs/42944655729) 第一次运行的源归档、英文 Guides 发布提交 `d8116329` 与固定的 `dev` 提交 `f04cd5c3`。独立读取的 9 张 Base 表共 497 条记录，逐表记录集合与归档相符。选中页面的 SaaS 和 BYOC 发布路径及内容均匹配。
 - **实际改动。** 计划得出一个候选。准备结果为 `prepared`，候选提交为 `518c1982b0fc10c042795caffc1e703faf28a1d7`。对比 Git 父子提交，唯一差异是该页锁的 `next` 从 `3a9694ac` 更新到 Milvus `3abf7928`，`current` 保持原值。两侧渲染均更新了 JSON flat index 的兼容性说明。已核对提交树、修改前后文件摘要、安装的本地引用和 proof 摘要；补丁通过 `git apply --check`。
-- **运行条件与下一步。** 前两次准备分别遇到工具同步和 Translation 推进 `dev`，均在写入前暂停。另一次计划因 GitHub 匿名读取额度用尽而暂停。最终验证使用发布完成后的固定输入。下一步审阅工具草稿，并在托管 runner 上复验该单页；生产 Draft PR 仍待对象传输、精确校验和写入验证。
+- **运行条件与下一步。** 前两次准备分别遇到工具同步和 Translation 推进 `dev`，均在写入前暂停。另一次计划因 GitHub 匿名读取额度用尽而暂停。最终验证使用发布完成后的固定输入。工具草稿和托管复验结论见下。
+
+**首次托管单页验证（2026-11-11）。** [工具 PR #27 复审](https://github.com/liyun95/zdoc/pull/27#pullrequestreview-5854727200) 在 `45226775bb` 关闭三个问题：协调进程的下载凭据只发给固定 GitHub API；完整 Git 树和审核策略文件参与生产者身份核验；英文共享 Guides 全表采集验证每一页的总量、游标和记录身份。上述历史样本另需匹配其固定归档与独立核对的 497 条记录。
+
+[私有 macOS 运行 42972495959](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42972495959) 使用 Node 22.23.4、上述工具版本、`dev` `6ef5943f` 及原 Milvus 目标 `3abf7928`。计划耗时 464 秒，选中同一页的一条锁修改。准备阶段耗时 1,192 秒后返回 `held / PLAN_CHANGED`。worker 再次读取 GitHub 元数据时收到 HTTP 403，公开读取额度为 0；最终候选为 `null`。协调进程的临时 job token 已能读取该上游 run、jobs 和归档元数据。
+
+**下一项是解决 worker 多次复核对匿名读取额度的依赖。** 审阅由可信协调进程代读固定 GitHub GET 的方案，将每次响应绑定到当前 worker 和请求，保留最新 Fetch、`dev` 和写前复核。验证凭据隔离、过期/重放响应拒绝、并发分支变化仍会暂停，再复跑真实单页。托管提交、远端上传、精确校验和生产写入仍待验证。
 
 #### 后续切片与准入条件
 
