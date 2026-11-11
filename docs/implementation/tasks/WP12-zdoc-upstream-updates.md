@@ -547,6 +547,8 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 同一私有基线 `59ed5bf8` 的两次托管运行使用了这份新 proof。历史输入 `a4cb2921` 与实时 `ccc84731` 不符，返回 `STALE_SOURCE`；写入和建草稿任务均跳过，运行前后的私有分支、PR 与已有 Check 一致。正常输入生成正式 `Shared-Update-Seal: v1` 签名提交 `203a16e4`。主审重建 Git OID、单父提交 `e690d1db` 与签名者身份，并比对生产者回执及补丁。[过期输入](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) · [正常输入与生产者回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023777355)
 
+只读验证任务从私有基线 `59ed5bf81` 运行，将签名提交 `203a16e40`、草稿编号、目标 Check 和 suite 与输出的 SHA-256 写入正式回执。独立任务重读上游、草稿及远端回执，完成同一个 Check。主审下载产物重放得到 `accepted`，并从 PR 最新提交的 GitHub Checks 核实编号 `130542967356` 和结论 success。生产定时发现与 writer 激活仍待实施。[验证回执及输出报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805/artifacts/13858835048) · [最终验收](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026841920) · [私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |

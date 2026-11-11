@@ -163,6 +163,8 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 在 [PR #1 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/1/checks) 中，`Shared Guides / exact signed update` 对应签名提交 `3ed7da0e`。它只有一个父提交 `b7d3b11b`，两者的 Git 文件树相同。点开 [Check](https://github.com/liyun95/zdoc-writer-preflight/runs/130437521876)，可以从摘要进入只读验证运行，并用其中的 SHA-256 核对回执。第一次验证发现 GitHub 为 Check 生成了详情页地址，恢复验证使用原来的 Check ID。PR 维持 Draft。[验证回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42995872682/artifacts/13843313451)
 
+打开[私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)，可见 `Shared Guides / formal exact validation` 在 `203a16e40` 上成功。[验证任务](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805)保留 `receipt.json` 和 `output.json`，其中目标 Check ID 为 `130542967356`。[过期样例](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) 的 `freshness.json` 给出计划与实际的 Milvus SHA 以及 `STALE_SOURCE`。该次运行跳过写入，私有仓的分支、草稿及原有 Check 均保留原状态。
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
