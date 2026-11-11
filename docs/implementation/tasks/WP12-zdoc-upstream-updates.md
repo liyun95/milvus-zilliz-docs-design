@@ -541,6 +541,12 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 此实测采用单页、固定私有基线和专用签名消息。生产接入仍需使用正式的 `Shared-Update-Seal` 和 exact-validation receipt 契约，核对当前 M/D、生产者身份和过期输入，并在分支保护中决定是否将 Check 设为合并条件。
 
+**B4.3 正式签名与过期输入（2026-11-11）。** [生产 Fetch](https://github.com/zilliztech/zdoc/actions/runs/43001579966) 已发布中英文 Guides。源归档中的 498 个唯一记录与 9 张 Lark 表逐项吻合，`json-field-overview` 对应唯一记录。生产翻译发布后，私有 macOS runner 以 `dev=f4660d0a`、Milvus `v3.0.x=ccc84731` 重新执行 `update-plan` 和 `update-prepare`。主审下载九项产物，从原始 Git 对象重建候选 `360eae4e`，核实唯一的改动是锁文件的 `next` 从 `3a9694ac` 更新到 `3abf7928`。本次原始 proof SHA-256 为 `fe626e3639b82b983b4fcbdabdf1b1350e646736d327e6fd601f565b481619d0`。[准备运行与归档](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43019047083/artifacts/13856765177)
+
+工具 `f84ca7480e` 在验明原始 Git 对象、签名和平台签名者后，支持 GitHub 省去消息最后一个 LF 的传输形式。本地编码仍有该 LF。先前的[试签](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43000891923) 暴露了这个逐字节差异。最终隔离全量为 1689 通过、6 跳过。此前一次全量中 local-runner 用例在 15 秒超时，最终重跑保持原时限。
+
+同一私有基线 `59ed5bf8` 的两次托管运行使用了这份新 proof。历史输入 `a4cb2921` 与实时 `ccc84731` 不符，返回 `STALE_SOURCE`；写入和建草稿任务均跳过，运行前后的私有分支、PR 与已有 Check 一致。正常输入生成正式 `Shared-Update-Seal: v1` 签名提交 `203a16e4`。主审重建 Git OID、单父提交 `e690d1db` 与签名者身份，并比对生产者回执及补丁。[过期输入](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) · [正常输入与生产者回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023777355)
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |
