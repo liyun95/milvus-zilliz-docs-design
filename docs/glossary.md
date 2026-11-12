@@ -11,6 +11,7 @@
 - **共享来源配置**：每组一份，Guides 组为 `shared-docs/guides/source.yaml`，记录这一组读哪个仓库、跟踪哪个分支。**跟踪分支**目前是 milvus-docs 的 `v3.0.x`，只用于发现新提交（见 [04](./design/04-channels-and-lock.md#共享来源配置与跟踪分支)）。
 - **链接映射表**：`shared-docs/guides/links.yaml`，登记 Milvus 页面到 Cloud 页面的对应关系（见 [02b](./design/02b-links-and-images.md)）。
 - **产品名检查规则**：`shared-docs/guides/product-names.yaml`，列出生成后的 Cloud 页面中不能出现的 Milvus 产品名与连接值，以及放行的短语（见 [07](./design/07-site-adaptation.md#产品名检查)）。
+- **variant 覆盖文件**：页面目录中的 `variant-next.md`、`variant-current.md`，把对应通道读到的原文替换为某个未合并上游 PR 的内容，字节与 PR 中的源文件逐字相同；旁边一份 `variant-<channel>.provenance.json` 记录来源（PR 号、head、采纳时间）。由采纳工作流写入，人不手改（见 [06b](./design/06b-variant-adoption.md#文件布局与规则)）。与“产品代码变体”（zdoc 现有的 milvus / zilliz 代码行过滤）无关。
 
 ## 原文
 
@@ -25,6 +26,8 @@
 - **lock（`lock.yaml`）**：每个共享页一份，放在页面目录中（`shared-docs/guides/pages/<页面标识>/lock.yaml`），记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升三类 PR 写入，人不手改（见 [04](./design/04-channels-and-lock.md#lockyaml-怎样变化)）。
 - **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，Phase 1 由飞书表格的 `Release Channel` 决定，作者不在 zdoc 中写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
 - **接入**：文档工程师开 PR 新增页面目录（`page.yaml`，需要时加 Cloud 内容文件），工具在同一个 PR 中写入 `lock.yaml`。接入后只生成候选结果，不改变网站（见 [04](./design/04-channels-and-lock.md#接入一页)）。
+- **采纳（adopt）**：上游 PR 未合并时，把它的原文写成本页的 variant 覆盖文件，以 Zilliz 自有内容的身份先进 UAT（需要时经 promote 进生产）；经人工评审的采纳 PR 是采用批准（见 [06b](./design/06b-variant-adoption.md#采纳)）。与“采用上游更新”（06，针对已合并提交）相区分。
+- **对账（reconciliation）**：被采纳的上游 PR 合并后，人工开 PR 删除 variant 覆盖文件、把 lock 重新钉到 merge commit，内容身份转回共享（见 [06b](./design/06b-variant-adoption.md#上游先合并对账)）。
 - **飞书表格（DocsList）**：zdoc 现有的飞书多维表格，Guides 的每一页一条记录，决定导航、发布目标与整页通道。Phase 1 共享页仍在其中保留记录。
 - **placement type**：飞书表格中每条记录的字段，说明这一行在导航中是什么，现有 `canonical`、`section`、`link`、`ref`。共享页的记录仍是 `canonical`。
 - **`Docs` 链接**：飞书表格中页面记录的一列，说明这一页的内容在哪里：飞书文档链接，或共享页在 zdoc master 上的页面目录地址。Fetch 按它决定这一页由飞书还是 Git 生成（见 [05b](./design/05b-cutover-and-ownership.md#开关docs-链接)）。
@@ -37,6 +40,7 @@
 ## 发布
 
 - **Fetch**：zdoc 现有的发布工作流，每天定时运行 3 次，也可以手动触发，一次约 70 分钟；抓取飞书内容、生成共享页，校验后写入 dev（见 [05](./design/05-publish-handoff.md#交接发生在哪里)）。
+- **巡检（watchdog）**：zdoc 中的只读巡检工作流，每天定时逐页报告 pin 漂移、pin 健康（pin 是否还在跟踪分支历史上）与已采纳 variant 的上游 PR 实况（见 [06b](./design/06b-variant-adoption.md#每日巡检watchdog)）。**pin 漂移**指跟踪分支上这一页的原文在 lock 的 `next` 之后又有新提交，与“历史漂移”（两边内容多年积累的分歧）无关。
 - **docs-tooling**：zdoc 中的 `packages/docs-tooling`，是 Fetch 等工作流调用的工具包，入口是 `pnpm docs-tooling`。共享页的生成代码放在其中的 `src/shared-docs/`（见[技术设计 README](./design/README.md#代码位置)）。
 - **候选结果（候选运行）**：不写 dev、不上传图片、不需要 Cloud 凭据的生成，用于 PR 校验与激活前的比较运行（见 [05](./design/05-publish-handoff.md#pr-校验)）。
 - **dev**：zdoc 存放生成结果的分支，由 Fetch 写入；网站从它构建，Prod 与 UAT 用同一个 dev 提交，部署时才区分。人编写的文件在 master，不在 dev。

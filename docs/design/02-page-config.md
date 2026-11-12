@@ -30,6 +30,8 @@ shared-docs/
         page.yaml
         lock.yaml
         before-you-start.md          # Cloud 内容文件，按需提供
+        variant-next.md              # variant 覆盖文件，采纳工作流写入（见 06b），按需
+        variant-next.provenance.json # 采纳来源记录，工具写入
 ```
 
 **页面标识**就是 `pages/` 下的目录名，在组内唯一，必须等于这一页现有的 slug（如 `delete-entities` 对应 `/delete-entities`）。目录名只能用小写字母、数字和连字符。它怎样替代飞书 `token`、供翻译清单与路由插件使用，见 [05](./05-publish-handoff.md#页面身份token)。

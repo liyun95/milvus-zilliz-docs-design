@@ -14,7 +14,7 @@
 | md2md | [md2md](https://github.com/zilliztech/md2md) | 新增命名块的解析与清除、只做预处理的入口；一次发版 | [03](./03-md2md-interfaces.md) |
 | zdoc 生成 | [zdoc](https://github.com/zilliztech/zdoc) | 按 lock 获取原文、定位命名块、执行变换、调用预处理、站点适配、两版合并、产品名检查；代码在 `packages/docs-tooling`（见下文“代码位置”） | [01](./01-named-blocks.md)–[04](./04-channels-and-lock.md)、[07](./07-site-adaptation.md) |
 | zdoc 发布（Fetch） | zdoc | 接入生成结果；混源与激活；归属检查；翻译与恢复接入 | [05](./05-publish-handoff.md)、[05b](./05b-cutover-and-ownership.md) |
-| zdoc 新增工作流 | zdoc | 接入时写 lock、PR 校验、上游更新、提升、激活前的比较 | [04](./04-channels-and-lock.md)、[06](./06-upstream-changes.md)、[08](./08-workflows-and-permissions.md) |
+| zdoc 新增工作流 | zdoc | 接入时写 lock、PR 校验、上游更新、提升、激活前的比较；未合并上游 PR 的采纳、对账与每日巡检 | [04](./04-channels-and-lock.md)、[06](./06-upstream-changes.md)、[06b](./06b-variant-adoption.md)、[08](./08-workflows-and-permissions.md) |
 
 各仓库的分阶段改动见[Phase 1 实施计划第 3 节](../phase-1.md#3-各仓库改动)。
 
@@ -54,6 +54,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | PR 校验，以及生成结果进入 zdoc 发布 | [05 生成结果交给发布](./05-publish-handoff.md) |
 | 页面从飞书切换到 Git，或从 Git 下线 | [05b 页面切换与归属](./05b-cutover-and-ownership.md) |
 | milvus-docs 有新提交时，触发整条流程 | [06 上游变化的发现与影响报告](./06-upstream-changes.md) |
+| 上游 PR 未合并、内容要提前进入 Cloud 时 | [06b 未合并上游 PR 的采纳](./06b-variant-adoption.md) |
 
 两条横跨多篇的规则：
 
@@ -73,6 +74,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/guides/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
 | 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/guides/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
 | 版本记录 `lock.yaml` | zdoc master `shared-docs/guides/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
+| variant 覆盖文件 `variant-<channel>.md` 与来源记录 | zdoc master `shared-docs/guides/pages/<页面标识>/`，按需 | 采纳工作流 | [06b](./06b-variant-adoption.md#文件布局与规则) |
 | 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/<组>/` | Fetch，按飞书表格生成 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
 | `Docs` 链接、`Release Channel` | 飞书表格（DocsList）中每页的记录 | 文档负责人、文档工程师 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
 | 记录文件 `<页面标识>.json` | zdoc dev `generated/en/manifests/shared-pages/<组>/` | Fetch | [05](./05-publish-handoff.md#记录文件) |
@@ -91,6 +93,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | 05 | [生成结果交给发布](./05-publish-handoff.md) | 交接物、记录文件、发布保护、翻译与恢复 | 第 6 节 | Phase 1a 设计，Phase 1b 接入 |
 | 05b | [页面切换与归属](./05b-cutover-and-ownership.md) | `active.json`、激活与归属规则 | 场景 9、10 | Phase 1b |
 | 06 | [上游变化的发现与影响报告](./06-upstream-changes.md) | 上游更新工作流、PR 与报告 | 场景 7 | Phase 1b |
+| 06b | [未合并上游 PR 的采纳](./06b-variant-adoption.md) | variant 覆盖文件与来源记录、采纳与对账、每日巡检 | 场景 7 的延伸（上游 PR 未合并时） | Phase 1b 后期，按同步发布需要 |
 | 07 | [站点适配](./07-site-adaptation.md) | Milvus Markdown 怎样变成 Cloud MDX；Tabs 规则文件的格式 | 场景 3、4 | Phase 1a |
 | 08 | [工作流与权限](./08-workflows-and-permissions.md) | 各工作流的触发、身份、权限与失败通知 | 场景 3、7、8、9、10 | Phase 1a 起 |
 | 09 | [错误目录](./09-error-catalog.md) | 统一的错误码、提示与应改的文件 | 各场景的“出错时” | Phase 1a 起 |

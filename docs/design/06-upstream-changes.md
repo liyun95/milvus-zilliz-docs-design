@@ -6,7 +6,7 @@ milvus-docs 合并新提交后，Cloud 要自动得知，并自己决定是否�
 
 **参与方**：milvus-docs（新提交）、zdoc 中的“上游更新”工作流（发现、生成、发起 PR）、文档工程师（审核）。
 
-**状态**：由原接口设计迁入，待工程维护者完善。接入与提升这两种由文档工程师发起的 PR 见 [04](./04-channels-and-lock.md#lockyaml-怎样变化)。
+**状态**：由原接口设计迁入，待工程维护者完善。接入与提升这两种由文档工程师发起的 PR 见 [04](./04-channels-and-lock.md#lockyaml-怎样变化)；上游 PR 尚未合并时的采纳与对账见 [06b](./06b-variant-adoption.md)。
 
 ## 约定
 
@@ -27,6 +27,7 @@ zdoc 新增“上游更新”工作流：
 - **手动触发时可以指定页面与目标提交。** 同样的输入得到同样的结果；结果没有变化时，不产生新的提交。
 - **执行身份是 zdoc 仓库自带的 `GITHUB_TOKEN`**，与现有的 master→dev 同步工作流相同：用它推送分支、开 PR，开好后显式触发校验工作流（用 `GITHUB_TOKEN` 开的 PR 不会自动触发其他工作流）。
 - 读取 milvus-docs 不需要凭据。生成是候选运行（见 [05](./05-publish-handoff.md#pr-校验)），不上传图片，不需要任何 Cloud 凭据。milvus-docs 中的社区 PR 不会运行 zdoc 的任何代码。
+- 除跟踪分支的新提交外，每日巡检还检查已采纳 variant 对应的上游 PR 实况（合并、关闭、head 漂移）与 pin 健康，见 [06b](./06b-variant-adoption.md#每日巡检watchdog)。
 
 ### PR 的内容
 
@@ -61,6 +62,7 @@ zdoc 新增“上游更新”工作流：
 | 几页在同一批提交中互相依赖（例如一页改了标题，另一页改了指向它的链接） | 合进同一个 PR，一起采用 |
 | 这一页的 `lock.yaml` 在 PR 开出后被改过（提升 PR 已合并） | 下一次运行按新的 `lock.yaml` 重建这个 PR；其中 `current` 与 `next` 是相邻的两行，不重建会产生 Git 冲突 |
 | 这一页在表格中已改为 `RETIRE-IN-NEXT` 或记录已删除，上游更新 PR 还开着 | 下一次运行关闭这个 PR，并写明“页面已下线” |
+| 这一页采纳的 variant 对应的上游 PR 已合并 | 巡检提示对账；人工开对账 PR：删除 variant 文件，把 `lock.yaml` 的 `current`、`next` 重新钉到 merge commit（见 [06b](./06b-variant-adoption.md#上游先合并对账)） |
 
 审核人暂缓某一页时，这一页的 PR 保持打开，之后的上游修改继续累积到这个 PR 中，不影响其他页面。
 
@@ -97,7 +99,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 每页一个滚动更新的 PR、失败也开 PR 的理由见[产品需求场景 7](../prd.md#场景-7审核上游更新)。
 
-**为什么定时检查，而不是事件触发。** milvus-docs 与 zdoc 属于不同的 GitHub 组织。事件触发要在 Milvus 的公开仓库中放一个能操作 zdoc 的跨组织凭据，管理与安全成本都高。milvus-docs 是公开仓库，zdoc 不需要凭据就能读取；上游修改本来就要等 Cloud 审核，晚几个小时发现没有影响。`v3.0.x` 近 30 天有 33 个提交，集中在 11 天内，单日最多 9 个，按天处理比每个提交开一个 PR 合理。
+**为什么定时检查，而不是事件触发。** milvus-docs 与 zdoc 属于不同的 GitHub 组织。事件触发要在 Milvus 的公开仓库中放一个能操作 zdoc 的跨组织凭据，管理与安全成本都高。milvus-docs 是公开仓库，zdoc 不需要凭据就能读取；上游修改本来就要等 Cloud 审核，晚几个小时发现没有影响。`v3.0.x` 近 30 天有 33 个提交，集中在 11 天内，单日最多 9 个，按天处理比每个提交开一个 PR 合理。06b 的每日巡检同样定时运行，理由相同。
 
 **为什么用 `GITHUB_TOKEN`。** zdoc 现有的 master→dev 同步工作流已用它开 PR 并显式触发校验，有现成的做法可以照搬，不必新增机器人账号或 GitHub App。zdoc 是公开仓库，来自外部 fork 的 PR 拿不到仓库的 secrets；上游更新工作流在 zdoc 内部定时运行，也不需要 Cloud 凭据。PR 中的影响报告是公开的，其内容来自公开的 milvus-docs 与 zdoc master，不会多暴露信息。
 
