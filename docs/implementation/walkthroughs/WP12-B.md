@@ -173,6 +173,8 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 在该提交的[页面回执](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/generated/en/manifests/shared-pages/guides/json-field-overview.json)里查看 `inputs.milvus_docs` 和 `outputs`。两条输出分别是英文 Cloud 和 BYOC，每条都给出文件路径和 SHA-256。主审核对了两份实际发布的 Markdown。CURRENT 保留旧警告，NEXT 说明 JSON flat indexing 的兼容请求只保留逻辑索引定义、不构建物理索引。在文中搜索 `only the logical index definition` 可以定位新段落。[Cloud 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/guides/tutorials/development/schema/json-fields/json-field-overview.md) · [BYOC 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/byoc/tutorials/development/schema/json-fields/json-field-overview.md)
 
+对照两次发现可以区分“已有更新 PR”与“没有新版本”。草稿打开时，发现会报告 PR 编号；合并并清理两个 writer 分支后，Milvus 跟踪分支等于已合入的 `lock.next`，复核结果为 `unchanged`。两次运行均跳过准备和写入。[草稿打开时](https://github.com/zilliztech/zdoc/actions/runs/43175958932) · [清理后](https://github.com/zilliztech/zdoc/actions/runs/43192148102)
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。

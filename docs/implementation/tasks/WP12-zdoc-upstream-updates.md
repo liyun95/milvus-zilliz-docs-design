@@ -561,7 +561,9 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 `json-field-overview` 的源生成结果为 `success`。发布提交 `c0ef7884` 的回执记录了 `current=3a9694ac` 和 `next=ccc84731`。主审在该提交和随后读到的 `dev@9bf4e244` 上分别取回 Cloud、BYOC 正文，两份文件均与各自的源产物逐字节一致，SHA-256 与回执一致。至此，这一页已验证从定时发现、创建草稿、已有草稿时停止，到人工合并并发布至 `dev` 的完整流程。[源产物](https://github.com/zilliztech/zdoc/actions/runs/43180947754/artifacts/13928753086) · [页面回执](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/generated/en/manifests/shared-pages/guides/json-field-overview.json)
 
-**下次发现前的分支核对。** 主审已将 writer 回执与两个远端 ref 对照。暂存分支 `shared-update-staging/e4e81b…` 与目标分支 `shared-update/71913d…` 均指向已合入 `master` 的签名提交 `deedf2cb`，没有开放 PR 以其中任一分支为 head 或 base。删除预演只列出这两个 ref。两者保留期间，发现器会返回 `EXISTING_UPDATE_BRANCH`。清理后以 `create_draft=false` 验证发现结果；若 Milvus 跟踪分支仍等于 `lock.next`，预期为 `unchanged`，准备与写入均跳过。[writer 回执](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13923418377)
+**合并后的分支清理与只读发现（2026-11-12）。** 主审将 writer 回执与远端 ref 对照，确认暂存分支 `shared-update-staging/e4e81b…` 和目标分支 `shared-update/71913d…` 均指向已合入 `master` 的签名提交 `deedf2cb`，没有开放 PR 引用。经授权，以该 SHA 为两个分支的删除条件，一次性删除并读回确认两者均已移除。[writer 回执](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13923418377)
+
+随后从 `master@f9d5f90f` 以 `create_draft=false` 运行发现。发现和历史核对成功，准备、写入均跳过。主审用运行期间的 GitHub 历史清单及实际分支、PR 重放同版发现代码，得到 `unchanged`，停止原因列表为空。Milvus 跟踪分支和该页 `lock.next` 均为 `ccc84731`。[清理后的只读运行](https://github.com/zilliztech/zdoc/actions/runs/43192148102)
 
 #### 后续切片与准入条件
 
