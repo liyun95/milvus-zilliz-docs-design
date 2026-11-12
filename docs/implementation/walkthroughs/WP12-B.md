@@ -62,7 +62,7 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 最终 HEAD 的 macOS / Node 26.7.0 全量 **1513 passed / 0 failed / 6 既有 skipped**，四阶段与 committed terminal 校验通过，862.015 秒仍在 900 秒内；证据 `/Users/liyun/.cache/g-e0r1hgz8/run-tztCpZ`。
 
-[CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。主审接受本片限定离线范围，#1201 待合并，B4 未开始。之前混合源码运行的 132 passed / 1 failed 和夹具失败保留，不能称为本 HEAD 通过。
+[CI 42768596620](https://github.com/zilliztech/zdoc/actions/runs/42768596620) 在 Linux / Node 22.23.4 上为 **1423 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过；实际测试 merge 为 `db206ddd7a5d787a25124c76d334395d4111172f`（最终 HEAD 合入 `90441eff5`）。96 项对应既有声明（images 4、collector 1、toolset 89、update-command 2），改动测试均运行；这不解除 Linux capture 拒绝。当时主审接受本片限定离线范围，#1201 尚未合并，B4 未开始；后续合并状态见本卡当前状态。之前混合源码运行的 132 passed / 1 failed 和夹具失败保留，不能称为本 HEAD 通过。
 
 **合并后门禁修复与当前整合（2026-11-10）**：第三片的 [master push 42765032875](https://github.com/zilliztech/zdoc/actions/runs/42765032875) 曾在 900 秒总时限处停止，尽管它与合并前绿色运行的代码树相同。修复 [#1202](https://github.com/zilliztech/zdoc/pull/1202) 对独立祖先检查做有界并发，并协调同一 store 的同路径 blob 写入；检查仍每次重做，失败不重试，已完成结果不作为信任缓存。首轮本地全量暴露的半写文件竞态失败仍保留。
 
@@ -70,7 +70,7 @@ Linux 的可信工具集捕获当前明确 fail-closed；SDK subject 当前返�
 
 第四片首次整合 HEAD `780ea96c0` 的 [CI 42778266615](https://github.com/zilliztech/zdoc/actions/runs/42778266615) donor-history 用例及本地 created-journal 恢复用例分别达到 30 秒单例上限，完整结果均不成立。保留 trace 显示恢复在 28.6 秒完成 validated、29.4 秒进入最后一次 collection；原时限下单独运行五个相关用例均通过。跟进只将这四个恢复变体和一个 donor 场景调为 60 秒，保持全部断言、平台 skips、普通单例预算及 900 秒总门槛。
 
-当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 已通过五项聚焦用例、typecheck、matrix、policy、完整 selector 和 diff-check。macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 和独立 committed terminal 校验通过；运行前后 HEAD/源码/harness 一致，789.643 秒小于 900 秒，证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过，约 816 秒；实际测试 merge `1e27edf63c42408c773c3674802ea1e3fe4393b1` 将当前 HEAD 合入 `ec64fd277`。主审接受本次组合，#1201 待合并；合并后继续核对 master push 检查。新结果不改写前述两次单例超时，B4 未开始。
+当前 HEAD `e89df444acf6d5a4b7b6da6c47a20ae0f0eb7465` 已通过五项聚焦用例、typecheck、matrix、policy、完整 selector 和 diff-check。macOS / Node 26.7.0 完整门禁 **1522 passed / 0 failed / 6 既有 skipped**，四阶段、exit 0 和独立 committed terminal 校验通过；运行前后 HEAD/源码/harness 一致，789.643 秒小于 900 秒，证据 `/Users/liyun/.cache/gfix-d37868e3/run-GtfXAT`。[Linux / Node 22.23.4 CI 42780414392](https://github.com/zilliztech/zdoc/actions/runs/42780414392) 为 **1432 passed / 0 failed / 96 既有平台 skipped**，四阶段与全部 PR 检查通过，约 816 秒；实际测试 merge `1e27edf63c42408c773c3674802ea1e3fe4393b1` 将当前 HEAD 合入 `ec64fd277`。主审据此接受合并前组合，#1201 现已合并为 `f932331a9`；合并后 master push 检查已通过。新结果不改写前述两次单例超时；B4.1 诊断包进入实现，生产接线未开始。
 
 生产写入仍禁用。恢复仅作只读重建并报告 raw/exact receipt 缺口；新准备目录与持久尝试记录分离，不授予重发权。真实平台、Linux capture、producer/validator、CAS/dispatch、跨运行去重与 ready/close 策略的资格仍待 B4；本片不是工作流激活。
 
@@ -135,11 +135,51 @@ pnpm test:workflow-matrix
 
 card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以及部分 alias 证据提示。它们作为独立内容/证据维护项保留，未在本次归因或修复；整体 run 成功不等于所有内容告警清零。
 
+## 第四片合并后验证（2026-11-10）
+
+#1201 合并为 `f932331a92d0a0ed6bc552282bbb08245e1041f3`。[master CI 42784180256](https://github.com/zilliztech/zdoc/actions/runs/42784180256) 的四阶段与最终 gate 均成功，1432 passed / 0 failed / 96 既有平台 skipped。[工具同步 42784180446](https://github.com/zilliztech/zdoc/actions/runs/42784180446) 的独立候选校验 [42784287828](https://github.com/zilliztech/zdoc/actions/runs/42784287828) 同样通过四阶段，1432 / 0 / 96；原有 workflow 合并同步 PR #1204。主审读取实际 tooling 日志分别核实，两者不混作一个 run，亦不宣称网站已部署或 B4 已激活。后续按任务卡先实现 B4.1 环境与容量诊断。
+
+## B4.1 诊断包进展（2026-11-10）
+
+[产品 Draft #1206](https://github.com/zilliztech/zdoc/pull/1206) 新增 `testing/updates/runner-qualification.ts` 与测试，用于分别观察工具捕获、真实 worker、对象规模和证据完整性。没有生产调用入口，任何报告都不授予 writer 权限。完整实测与验证结果见 [任务卡 B4.1](../tasks/WP12-zdoc-upstream-updates.md)。
+
+当前真实 smoke 只取得 capture 阶段成功；worker 在生成前停止、无 settlement，对象规模也已超过既有 64 MiB 预算。初次 CI 还发现新测试依赖完整 checkout，而默认 CI 使用浅克隆；已改用独立完整 fixture 并通过 55 个聚焦测试；最终 CI 四阶段 1487/0/96 和 gate 均通过，浅克隆拒绝策略保持。此前 c689 的 macOS 全量 1576/0/6 已通过并独立核实，不能冒充最终 HEAD 的本地全量。获准的私有运行 [42794595610](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42794595610) 已执行一次：Actions 成功，实际 capture=held（未分类拒绝），worker=not-run，对象下界 82,898,876 bytes 超预算；产物摘要已核验。setup 的版本化 Xcode Git 路径与现有规则不兼容，但首个拒绝原因尚未被准确证实。下一步先处理拒绝诊断与供应路径兼容性，B4.1 环境资格和 B4 整体均未完成。
+
+## 首版目标调整（2026-11-10）
+
+用户选择优先交付 Guides 单页的上游自动发现、`lock.next` 更新和 Draft PR 创建；已有未合并更新 PR 时暂停并报告，滚动更新和复杂恢复后续再启用。已有 B3 能力保留；去重、精确提交验证与未知远端结果停止仍是首版门槛。当前 [#1208](https://github.com/zilliztech/zdoc/pull/1208) 已实现 B4.1 同环境前置观察与安全错误分类，72 个聚焦测试通过，完整 CI 四阶段 1504/0/96 和 gate 均通过；本地 preflight-only 取得 13 项观察，未启动 capture/worker，避免把 setup 环境的观察当成实际 capture 失败原因。具体四个交付包、粗略预算与本片允许路径见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+
+随后获准的一次 [hosted 诊断 42806608231](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42806608231) 已完成，artifact 摘要与 GitHub 元数据一致。实际 capture 仍 held，但本次准确归因为 `git-provisioning-unsupported`：同环境选择版本化 `Xcode_16.4.app`，当前策略不支持。worker 未运行；另观察到 root-owned `0600` 身份配置，后续读取/身份兼容性尚需验证。对象下界 82,915,524 bytes 仍超 64 MiB。诊断代码验证通过不等于 hosted 环境资格通过；下一片合并评估 Git/Python 供应布局及身份配置可读性，保持安全检查，再处理容量与生产接线。
+
+对应的本地路径兼容修复已进入 [#1209](https://github.com/zilliztech/zdoc/pull/1209)，只支持严格识别的 Git/Python developer 路径，并把词法入口交给原访问检查。身份配置读取和原生闭包规则保持不变。最终 `9a567e9a` 的 CI shared-docs 1504/0/114、稳定 macOS frontend 五阶段 2950/0/6、补齐本地历史对象后的 Translation 回放 16/16 均通过，主审完成。此前中途提交导致的终态拒绝、两处旧测试问题及回放对象缺失记录保留；修复的是两个测试声明/等待条件，没有改变生产发布锁。修复、受控环境配置与 hosted 资格是三个不同的状态。
+
+三个运行环境 PR 已合并。随后在托管 runner 上，普通用户读到的身份配置与工具集测量值一致；初次捕获和访问证据复核均已完成。180 秒上限先于诊断终态报告生效，worker 的退出与生成结果仍待验证。[私有运行和产物](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42945518064)
+
+[#1213](https://github.com/zilliztech/zdoc/pull/1213) 验证了本地 worker 的生成与退出。在随后的单页实测中，[工具草稿 #27](https://github.com/liyun95/zdoc/pull/27) 从同一次 Fetch 的源记录和英文发布结果确认了 `json-field-overview` 的资格。`update-prepare` 最终生成本地提交 `518c1982`，只更新一行 `next`。第一次托管运行在准备阶段遇到 GitHub 匿名读取限额。改由可信协调进程代读元数据后，macOS runner 成功安装候选 `c72c2aba`。下载的补丁与本地逐字节相同，proof 绑定了相同的修改前后内容。[托管运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42980199854) · [任务卡](../tasks/WP12-zdoc-upstream-updates.md)
+
+主审从接收端的基线和 7 个 Git 对象还原了托管候选。私有测试仓使用独立基线，提交 ID 因而不同，锁文件补丁与原 proof 一致。GitHub Actions 在先前已推送的候选分支上创建了草稿。主审从 GitHub 读回草稿作者、父提交和唯一改动，并核对了保留的回执。[私有 Draft PR #1](https://github.com/liyun95/zdoc-writer-preflight/pull/1) · [创建运行](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42989841898)
+
+同一草稿的只读验证在 17 秒内完成。打开运行摘要即可看到对应的 head 和 `current`、`next` 值。下载的 `report.json` 还包含基线、补丁摘要和来源回执。主审核对归档后，确认报告指向 `b7d3b11b`，PR 仍为草稿。若后来有人推送新提交，需要验证新的 head。生产 seal 与 PR 上的目标 check 仍待验证。[运行摘要](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276) · [JSON 和 Markdown 报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42991540276/artifacts/13841333329)
+
+在 [PR #1 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/1/checks) 中，`Shared Guides / exact signed update` 对应签名提交 `3ed7da0e`。它只有一个父提交 `b7d3b11b`，两者的 Git 文件树相同。点开 [Check](https://github.com/liyun95/zdoc-writer-preflight/runs/130437521876)，可以从摘要进入只读验证运行，并用其中的 SHA-256 核对回执。第一次验证发现 GitHub 为 Check 生成了详情页地址，恢复验证使用原来的 Check ID。PR 维持 Draft。[验证回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/42995872682/artifacts/13843313451)
+
+打开[私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)，可见 `Shared Guides / formal exact validation` 在 `203a16e40` 上成功。[验证任务](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805)保留 `receipt.json` 和 `output.json`，其中目标 Check ID 为 `130542967356`。[过期样例](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) 的 `freshness.json` 给出计划与实际的 Milvus SHA 以及 `STALE_SOURCE`。该次运行跳过写入，私有仓的分支、草稿及原有 Check 均保留原状态。
+
+打开生产 [#1236 的 Files changed](https://github.com/zilliztech/zdoc/pull/1236/files)，唯一一行改动是 `json-field-overview/lock.yaml` 的 `next`。PR 正文给出两组比较，原文和渲染结果均有变化，内容校验均为 `valid`。[页面影响报告](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13924396033)
+
+从[定时运行](https://github.com/zilliztech/zdoc/actions/runs/43170134677) 下载候选归档可查看 `lock.next.patch`、`before.lock`、`after.lock` 和 `proof.json`。锁文件和补丁与[只读预演](https://github.com/zilliztech/zdoc/actions/runs/43158241017) 一致。writer 日志里的草稿编号和签名提交可与 PR 的 head `deedf2cb1` 对照。打开[已有草稿时的运行](https://github.com/zilliztech/zdoc/actions/runs/43175958932)，可见发现成功，准备和写入都已跳过。
+
+合并 #1236 后，打开[生产 Fetch](https://github.com/zilliztech/zdoc/actions/runs/43180947754)。在[发布结果](https://github.com/zilliztech/zdoc/actions/runs/43180947754/artifacts/13930781281)的 `publication-results.json` 中找到 `source/guides-en`，其 `status` 为 `published`，`resultSha` 为 `c0ef788405235ec85b85abdb0f44035a22a99ec9`。本次从 `master` 手动触发，发布目标是 `dev`。运行中的 `prepare_translation_handoff` 和 `dispatch_translations` 都已跳过。
+
+在该提交的[页面回执](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/generated/en/manifests/shared-pages/guides/json-field-overview.json)里查看 `inputs.milvus_docs` 和 `outputs`。两条输出分别是英文 Cloud 和 BYOC，每条都给出文件路径和 SHA-256。主审核对了两份实际发布的 Markdown。CURRENT 保留旧警告，NEXT 说明 JSON flat indexing 的兼容请求只保留逻辑索引定义、不构建物理索引。在文中搜索 `only the logical index definition` 可以定位新段落。[Cloud 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/guides/tutorials/development/schema/json-fields/json-field-overview.md) · [BYOC 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/byoc/tutorials/development/schema/json-fields/json-field-overview.md)
+
+对照两次发现可以区分“已有更新 PR”与“没有新版本”。草稿打开时，发现会报告 PR 编号；合并并清理两个 writer 分支后，Milvus 跟踪分支等于已合入的 `lock.next`，复核结果为 `unchanged`。两次运行均跳过准备和写入。[草稿打开时](https://github.com/zilliztech/zdoc/actions/runs/43175958932) · [清理后](https://github.com/zilliztech/zdoc/actions/runs/43192148102)
+
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202，组合复验通过，#1201 待合并。先合并 #1201 与设计记录并核对合并后 master 检查，再进入 B4 精确接线与资格计划；生产写入尚未启用。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202 并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`），设计 #86 已合并。合并后 master CI 与工具同步均通过；B4 资格优先计划已写入任务卡，B4.1 诊断包已获准实现，该阶段尚未启用生产写入。
 
 前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
 
