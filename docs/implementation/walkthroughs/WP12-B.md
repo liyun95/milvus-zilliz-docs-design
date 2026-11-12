@@ -165,9 +165,13 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 打开[私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)，可见 `Shared Guides / formal exact validation` 在 `203a16e40` 上成功。[验证任务](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805)保留 `receipt.json` 和 `output.json`，其中目标 Check ID 为 `130542967356`。[过期样例](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) 的 `freshness.json` 给出计划与实际的 Milvus SHA 以及 `STALE_SOURCE`。该次运行跳过写入，私有仓的分支、草稿及原有 Check 均保留原状态。
 
-打开生产 [Draft #1236 的 Files changed](https://github.com/zilliztech/zdoc/pull/1236/files)，唯一一行改动是 `json-field-overview/lock.yaml` 的 `next`。PR 正文给出两组比较，原文和渲染结果均有变化，内容校验均为 `valid`。[页面影响报告](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13924396033)
+打开生产 [#1236 的 Files changed](https://github.com/zilliztech/zdoc/pull/1236/files)，唯一一行改动是 `json-field-overview/lock.yaml` 的 `next`。PR 正文给出两组比较，原文和渲染结果均有变化，内容校验均为 `valid`。[页面影响报告](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13924396033)
 
 从[定时运行](https://github.com/zilliztech/zdoc/actions/runs/43170134677) 下载候选归档可查看 `lock.next.patch`、`before.lock`、`after.lock` 和 `proof.json`。锁文件和补丁与[只读预演](https://github.com/zilliztech/zdoc/actions/runs/43158241017) 一致。writer 日志里的草稿编号和签名提交可与 PR 的 head `deedf2cb1` 对照。打开[已有草稿时的运行](https://github.com/zilliztech/zdoc/actions/runs/43175958932)，可见发现成功，准备和写入都已跳过。
+
+合并 #1236 后，打开[生产 Fetch](https://github.com/zilliztech/zdoc/actions/runs/43180947754)。在[发布结果](https://github.com/zilliztech/zdoc/actions/runs/43180947754/artifacts/13930781281)的 `publication-results.json` 中找到 `source/guides-en`，其 `status` 为 `published`，`resultSha` 为 `c0ef788405235ec85b85abdb0f44035a22a99ec9`。本次从 `master` 手动触发，发布目标是 `dev`。运行中的 `prepare_translation_handoff` 和 `dispatch_translations` 都已跳过。
+
+在该提交的[页面回执](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/generated/en/manifests/shared-pages/guides/json-field-overview.json)里查看 `inputs.milvus_docs` 和 `outputs`。两条输出分别是英文 Cloud 和 BYOC，每条都给出文件路径和 SHA-256。主审核对了两份实际发布的 Markdown。CURRENT 保留旧警告，NEXT 说明 JSON flat indexing 的兼容请求只保留逻辑索引定义、不构建物理索引。在文中搜索 `only the logical index definition` 可以定位新段落。[Cloud 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/guides/tutorials/development/schema/json-fields/json-field-overview.md) · [BYOC 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/byoc/tutorials/development/schema/json-fields/json-field-overview.md)
 
 ## 收尾与下一步
 

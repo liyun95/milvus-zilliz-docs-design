@@ -557,6 +557,12 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 [重复发现](https://github.com/zilliztech/zdoc/actions/runs/43175958932) 采用手动只读入口。发现和历史检查完成，准备、写入均跳过。用运行中的 GitHub 历史清单和实际 PR、分支重放发现逻辑，得到 `OPEN_UPDATE_PR_1236` 和 `EXISTING_UPDATE_BRANCH`。同一更新分支仅有 #1236，head 未变。本次验收覆盖单页新建草稿和重复停止。后续新 Fetch 仍需通过生产者树认证，生产 PR 的精确签名 Check、扩页及已有 PR 的滚动更新另行跟踪。
 
+**合并后发布到 dev（2026-11-12）。** [#1236](https://github.com/zilliztech/zdoc/pull/1236) 合入 `master` 后，16:11（北京时间）从合并提交 `f9d5f90f` 手动发起生产 Fetch。参数为 `group=all`、`publish=true`、`target_branch=dev`、`force_full_fetch=false`、`run_translations=false`。17:25 工作流成功结束，英文 Guides 单元为 `published`，Translation 交接与触发 job 均为 `skipped`。[生产运行](https://github.com/zilliztech/zdoc/actions/runs/43180947754) · [发布结果](https://github.com/zilliztech/zdoc/actions/runs/43180947754/artifacts/13930781281)
+
+`json-field-overview` 的源生成结果为 `success`。发布提交 `c0ef7884` 的回执记录了 `current=3a9694ac` 和 `next=ccc84731`。主审在该提交和随后读到的 `dev@9bf4e244` 上分别取回 Cloud、BYOC 正文，两份文件均与各自的源产物逐字节一致，SHA-256 与回执一致。至此，这一页已验证从定时发现、创建草稿、已有草稿时停止，到人工合并并发布至 `dev` 的完整流程。[源产物](https://github.com/zilliztech/zdoc/actions/runs/43180947754/artifacts/13928753086) · [页面回执](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/generated/en/manifests/shared-pages/guides/json-field-overview.json)
+
+**下次发现前的分支核对。** 主审已将 writer 回执与两个远端 ref 对照。暂存分支 `shared-update-staging/e4e81b…` 与目标分支 `shared-update/71913d…` 均指向已合入 `master` 的签名提交 `deedf2cb`，没有开放 PR 以其中任一分支为 head 或 base。删除预演只列出这两个 ref。两者保留期间，发现器会返回 `EXISTING_UPDATE_BRANCH`。清理后以 `create_draft=false` 验证发现结果；若 Milvus 跟踪分支仍等于 `lock.next`，预期为 `unchanged`，准备与写入均跳过。[writer 回执](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13923418377)
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |
