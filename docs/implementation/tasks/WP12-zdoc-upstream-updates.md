@@ -547,11 +547,15 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 同一私有基线 `59ed5bf8` 的两次托管运行使用了这份新 proof。历史输入 `a4cb2921` 与实时 `ccc84731` 不符，返回 `STALE_SOURCE`；写入和建草稿任务均跳过，运行前后的私有分支、PR 与已有 Check 一致。正常输入生成正式 `Shared-Update-Seal: v1` 签名提交 `203a16e4`。主审重建 Git OID、单父提交 `e690d1db` 与签名者身份，并比对生产者回执及补丁。[过期输入](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) · [正常输入与生产者回执](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023777355)
 
-只读验证任务从私有基线 `59ed5bf81` 运行，将签名提交 `203a16e40`、草稿编号、目标 Check 和 suite 与输出的 SHA-256 写入正式回执。独立任务重读上游、草稿及远端回执，完成同一个 Check。主审下载产物重放得到 `accepted`，并从 PR 最新提交的 GitHub Checks 核实编号 `130542967356` 和结论 success。生产定时发现与 writer 激活仍待实施。[验证回执及输出报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805/artifacts/13858835048) · [最终验收](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026841920) · [私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)
+只读验证任务从私有基线 `59ed5bf81` 运行，将签名提交 `203a16e40`、草稿编号、目标 Check 和 suite 与输出的 SHA-256 写入正式回执。独立任务重读上游、草稿及远端回执，完成同一个 Check。主审下载产物重放得到 `accepted`，并从 PR 最新提交的 GitHub Checks 核实编号 `130542967356` 和结论 success。当时生产定时发现与 writer 激活仍待实施。[验证回执及输出报告](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805/artifacts/13858835048) · [最终验收](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026841920) · [私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)
 
 **生产单页试点进入评审（2026-11-11）。** [zdoc #1225](https://github.com/zilliztech/zdoc/pull/1225) 将此前在 fork #27 审阅的工具接入生产仓。候选时段是每天北京时间 14:37。发现和准备只读；writer 每次请求前重读生产输入、PR 和 refs。机器人只为 `json-field-overview` 创建一个指向 `master` 的 Draft PR，正文链接页面影响报告。已有更新 PR、输入过期、或上次写入结果不能确认时停止。
 
-主审只读观察到 Milvus `ccc847315` 与原锁 `3a9694ac8` 的页面内容有一行修改，涉及 JSON flat indexing 的弃用说明。生产试点的验收还需要默认分支上的新工作流、通过审核的 Fetch 生产者树、一次实际建草稿和一次已有草稿的停止回执。私有仓 #2 的 Check、离线重放和工具 PR 的 CI 各自保留原有范围。
+**生产单页试点通过（2026-11-12）。** #1225 合并后，[zdoc #1232](https://github.com/zilliztech/zdoc/pull/1232) 为这次已审查的 [scheduled Fetch](https://github.com/zilliztech/zdoc/actions/runs/43140162447) 登记来源。两次只读准备在生产分支变动期间以 `PLAN_CHANGED` 停止，均跳过写入。输入稳定后，[只读预演](https://github.com/zilliztech/zdoc/actions/runs/43158241017) 生成候选、补丁和 proof。
+
+北京时间 14:43 触发的[定时运行](https://github.com/zilliztech/zdoc/actions/runs/43170134677) 重新准备候选，由 GitHub Actions 创建 [Draft #1236](https://github.com/zilliztech/zdoc/pull/1236)。主审下载归档并核对签名 head `deedf2cb17b380bc9dad850c23191099140594db` 的父提交和文件树。PR 的唯一修改将该页 `next` 从 `3a9694ac8` 更新至 `ccc847315`，补丁与预演逐字节一致。上游修改说明 JSON flat indexing 兼容请求只保留逻辑索引定义。[影响报告](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13924396033)
+
+[重复发现](https://github.com/zilliztech/zdoc/actions/runs/43175958932) 采用手动只读入口。发现和历史检查完成，准备、写入均跳过。用运行中的 GitHub 历史清单和实际 PR、分支重放发现逻辑，得到 `OPEN_UPDATE_PR_1236` 和 `EXISTING_UPDATE_BRANCH`。同一更新分支仅有 #1236，head 未变。本次验收覆盖单页新建草稿和重复停止。后续新 Fetch 仍需通过生产者树认证，生产 PR 的精确签名 Check、扩页及已有 PR 的滚动更新另行跟踪。
 
 #### 后续切片与准入条件
 

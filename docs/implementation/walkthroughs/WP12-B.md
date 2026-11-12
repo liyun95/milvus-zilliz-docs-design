@@ -165,13 +165,15 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 
 打开[私有 PR #2 的 Checks](https://github.com/liyun95/zdoc-writer-preflight/pull/2/checks)，可见 `Shared Guides / formal exact validation` 在 `203a16e40` 上成功。[验证任务](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43026583805)保留 `receipt.json` 和 `output.json`，其中目标 Check ID 为 `130542967356`。[过期样例](https://github.com/liyun95/zdoc-writer-preflight/actions/runs/43023670323) 的 `freshness.json` 给出计划与实际的 Milvus SHA 以及 `STALE_SOURCE`。该次运行跳过写入，私有仓的分支、草稿及原有 Check 均保留原状态。
 
-[生产接入 PR #1225](https://github.com/zilliztech/zdoc/pull/1225) 把同一试点页接入独立定时任务。部署后从 Actions 打开 `Shared Guides upstream update`，在 `master` 上保留手动输入 `create_draft=false` 先检查候选与影响报告。建草稿运行需核对草稿的签名 head、唯一修改的 `lock.next` 和对应 producer 归档。再运行一次发现，应能看到已有 PR 的编号和跳过的准备、写入任务。以上生产结果待实测。
+打开生产 [Draft #1236 的 Files changed](https://github.com/zilliztech/zdoc/pull/1236/files)，唯一一行改动是 `json-field-overview/lock.yaml` 的 `next`。PR 正文给出两组比较，原文和渲染结果均有变化，内容校验均为 `valid`。[页面影响报告](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13924396033)
+
+从[定时运行](https://github.com/zilliztech/zdoc/actions/runs/43170134677) 下载候选归档可查看 `lock.next.patch`、`before.lock`、`after.lock` 和 `proof.json`。锁文件和补丁与[只读预演](https://github.com/zilliztech/zdoc/actions/runs/43158241017) 一致。writer 日志里的草稿编号和签名提交可与 PR 的 head `deedf2cb1` 对照。打开[已有草稿时的运行](https://github.com/zilliztech/zdoc/actions/runs/43175958932)，可见发现成功，准备和写入都已跳过。
 
 ## 收尾与下一步
 
 **B2 可以按本地 Guides 阶段标记完成。** 新增 scheduled Fetch 证据补充了合并后发布兼容性观察，不替代此前安全与本地事务验收。Linux 可信捕获、真实 SDK provider、远端滚动 PR、B4 schedule/rollout、完整退役处理和 WP13 提升不在这一完成声明里；WP12 的 pending 编号不变。
 
-B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202 并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`），设计 #86 已合并。合并后 master CI 与工具同步均通过；B4 资格优先计划已写入任务卡，B4.1 诊断包已获准实现，生产接线与写入仍未启用。
+B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二片只读事实与远端历史认证已通过主审、本地验证和上游 CI，合并 #1193。第三片入口已进行四次逐次获准的隔离 API 预检，严格全项验收仍未通过；身份兼容修正已合并 #1197，第三片离线事务已完成主审与完整测试，#1199 已合并；第四片已带入 #1202 并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`），设计 #86 已合并。合并后 master CI 与工具同步均通过；B4 资格优先计划已写入任务卡，B4.1 诊断包已获准实现，该阶段尚未启用生产写入。
 
 前两次暴露了预检查询/字节重建遗漏，以及真实 author 为机器人、committer/signer 为 GitHub 平台身份与原 committer 规则的冲突。查询/字节重建已修正，设计 PR #82 已合并 `github-app-author-v1`：联合检查作者关联、平台签名和成功 producer 的精确来源证据。第三次已通过测试身份方案和签名字节检查，但错误旧值请求原因未知，尚未执行正确值对照。
 
