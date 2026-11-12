@@ -565,6 +565,30 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 随后从 `master@f9d5f90f` 以 `create_draft=false` 运行发现。发现和历史核对成功，准备、写入均跳过。主审用运行期间的 GitHub 历史清单及实际分支、PR 重放同版发现代码，得到 `unchanged`，停止原因列表为空。Milvus 跟踪分支和该页 `lock.next` 均为 `ccc84731`。[清理后的只读运行](https://github.com/zilliztech/zdoc/actions/runs/43192148102)
 
+#### B4.3 生产签名提交的离线验证
+
+**本片交付。** 让正式验证器使用生产 writer 的原始单页计划和对应影响报告，在离线测试中走通 `receipt`、`prepublish` 和 `accept`。下一片再把验证器接到 GitHub Check。#1236 已合并，可用来核对已有证据，不能为该 PR 补写一个当时未生成的成功 Check。
+
+**接口现状。** 产品基线为 `zilliztech/zdoc@f9d5f90f146aeaf54a7b814ff41e3774ab29605f`。三个操作共用的 `checkInputs` 要求计划含 `scope=private-single-page-projection` 和顶层 `pins`。生产归档的 `plan.json` 是 `kind=shared-update-unit`；它通过 `reports[]` 引用一个含 `pins` 的报告。这个报告是 producer 输出。validator 自己的输出和回执仍需单独校验。[正式验证入口](https://github.com/zilliztech/zdoc/blob/f9d5f90f146aeaf54a7b814ff41e3774ab29605f/packages/docs-tooling/src/shared-docs/adapters/updates/formal-validation.ts) · [生产归档写法](https://github.com/zilliztech/zdoc/blob/f9d5f90f146aeaf54a7b814ff41e3774ab29605f/scripts/docs-workflow/shared-guides-update/write.mjs#L178)
+
+**设计约束**
+
+- 保留私有格式的现有行为。生产路径限定仓库 ID `660446555`、Guides 单页 `json-field-overview` 和唯一的 `lock.next` 编辑。根据已绑定的仓库、受信调用上下文和证据确定适用规则。生产身份配上私有格式须拒绝，任意请求字段不能选择更宽松的验证路径。
+- 对归档的原始计划核对 canonical bytes 与 `digest('plan', unit)`。按计划中的路径、字节数和 SHA-256 认证原始报告，复用 `validateUnitReports` 等现有校验。主仓和 dev 锚点来自报告的 `pins.master/dev`，与 seal/producer/回执对齐；上游新鲜度比对 `pins.source.observedTrackHead`，且本试点要求 `source.target`、跟踪 head 和唯一编辑的 `target` 一致。实测时观察到的 SHA 需由可信调用方独立提供。
+- 原有签名、producer 身份和归档认证、验证者输出摘要、预留 Check、Check 所属 App 和目标提交约束继续生效。常规 `shared-docs-validate`、其他 workflow 的绿色 Check、或请求自带的 pins 均不能代替这些事实。
+
+**主审验收**
+
+| 场景 | 可核验结果 |
+|---|---|
+| 真实格式、固定历史输入 | 用 #1236 的原始计划和报告重放生产输入绑定。再以明确标注的测试用 validator/Check facts 覆盖三个正式操作的成功路径。保留私有格式正例。 |
+| 内容或身份被替换 | 篡改报告字节/大小、错页/错 lock、混入私有格式、替换签名 head 或引用别的 Check，均无法得到有效成功回执或验收结论。 |
+| 输入已移动 | 分别改变 master、dev、Milvus 跟踪 head，得到对应的 stale/hold 结果。按今天的生产状态回看已合并的 #1236，应按新鲜度规则停止。 |
+
+真实 producer 来自 run `43170134677` attempt 1，artifact `13923258931`，归档 SHA-256 为 `b0dbe10600152602cb6104f448bd095f1250c4eea528f489402ea90afb2ea1c9`。在本地只读重放并保留命令、输入摘要、结果；常规 CI 使用有界 fixture，不依赖归档的保留期限。[生产运行](https://github.com/zilliztech/zdoc/actions/runs/43170134677) · [六成员 producer 归档](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13923258931)
+
+**分工和交回。** 实施范围以 `formal-validation.ts` 及对应的 focused tests 为主。复用现有生产验签和历史证据读取逻辑，冻结的 v1 envelope、生产 workflow、分支保护和多页发现均在本片之外。执行 Agent 按本卡的 fork Draft PR 流程先提交短计划，列出输入来源、调用路径、允许文件和测试断言。主会话审计划后，执行 Agent 在同一 PR 实现。交回精确 base/head、完整 diff 的 selector 输出、测试结果及真实归档重放证据，区分历史实据与 fixture。主会话负责代码复审和上游提审决定。
+
 #### 后续切片与准入条件
 
 | 切片 | 要交付的行为 | 实施前必须解决的问题 | 验收与停止点 |
