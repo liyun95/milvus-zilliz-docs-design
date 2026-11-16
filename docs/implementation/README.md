@@ -217,7 +217,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | 生成命令 | 把各步接成一条命令，按页面与手册输出 MDX | WP8a | 已合并到上游（`zilliztech/zdoc` `d3d1cbe`） | [WP8](./walkthroughs/WP8.md) |
 | 上游变化分析 | 比较源与 Cloud 输出、锚点和采用依赖，生成报告 | WP12-A | 已合并 #1027 | [WP12-A](./walkthroughs/WP12-A.md) |
 | 本地更新准备 | 只读发现、固定输入规划、隔离候选与 proof/journal | WP12-B1/B2 | 已合并 #1055 / #1155；B2 限定范围收尾，Linux 捕获与 SDK provider 未交付 | [WP12-B](./walkthroughs/WP12-B.md) |
-| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12-B、WP13 | WP8b 与 WP12-B3 内核已合并。Guides 单页定时发现、Draft PR 及已有 PR 时停止已实测 #1236；#1250/#1265 的离线验证/只读报告和 #1297 的两次手动 Check 接线已合并。手动身份已登记 #1299；来源复用资格修复 #1305 已合并且本地真实观察通过；首轮托管预演停在 discover 传输读取，尚未完成；真实正常 Check 验收待完成；完整资格与生命周期尚未结项，WP13 待实施 | [WP8](./walkthroughs/WP8.md)、[WP12-B](./walkthroughs/WP12-B.md) |
+| 工作流 | 接入写 lock、PR 校验、上游更新、提升 | WP8b、WP12-B、WP13 | WP8b 与 WP12-B3 内核已合并。Guides 单页定时发现、Draft PR 及已有 PR 时停止已实测 #1236；#1250/#1265 的离线验证/只读报告和 #1297 的两次手动 Check 接线已合并。手动身份已登记 #1299；来源复用资格修复 #1305 已合并且本地真实观察通过；托管重试实际 held/AUTHORITY_UNKNOWN，正在补内层诊断，资格验收尚未完成；真实正常 Check 验收待完成；完整资格与生命周期尚未结项，WP13 待实施 | [WP8](./walkthroughs/WP8.md)、[WP12-B](./walkthroughs/WP12-B.md) |
 | 目录结构 | `shared-docs/` 按组分子目录 | WP8c | 已合并到上游（`zilliztech/zdoc` `e9ab23f`） | [WP8c](./walkthroughs/WP8c.md) |
 | 发布与切换 | 接入 Fetch 与激活；比较、归属与下线；翻译与恢复 | WP9、WP14、WP15 | WP9a 已合并到上游（`zilliztech/zdoc#863`，`8289d74`）；WP9b-1（[#950](https://github.com/zilliztech/zdoc/pull/950)）、WP9b-2（[#960](https://github.com/zilliztech/zdoc/pull/960)）已合并，工具链已同步 dev；走读已补，正式 Fetch/部署后验收待完成；WP14、WP15 未开始 | [WP9a](./walkthroughs/WP9.md)、[WP9b](./walkthroughs/WP9b.md) |
 | 试点页接入 | 原文对齐与页面配置，分批接入 | 内容（不属于工作包） | 试点 Delete Entities 与第一、二批共 12 篇已激活并上 Prod（`zilliztech/zdoc#861`、`#872`、`#903`）；第三批 3 篇已激活（`#916`，2026-10-29），等发版上 Prod | — |
@@ -244,7 +244,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
-| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2 和 B3 内核已合并；单页生产 Draft #1236 已实测。#1250/#1265 完成离线验证和只读报告，#1297 完成两次手动 Check 接线；手动身份已登记 #1299；复用 Fetch 证据兼容 #1305 已合并，本地真实资格通过；首轮托管预演停在 discover 传输读取，下一步完成托管只读验证、真实样例验证及可持续准入，再接自动验证。Linux 可信捕获、SDK 与完整生命周期需求继续 pending；详见任务卡和走读） |
+| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2 和 B3 内核已合并；单页生产 Draft #1236 已实测。#1250/#1265 完成离线验证和只读报告，#1297 完成两次手动 Check 接线；手动身份已登记 #1299；复用 Fetch 证据兼容 #1305 已合并，本地真实资格通过；托管重试实际 held/AUTHORITY_UNKNOWN，下一步补内层诊断并完成托管只读验证、真实样例验证及可持续准入，再接自动验证。Linux 可信捕获、SDK 与完整生命周期需求继续 pending；详见任务卡和走读） |
 
 其余的在对应工作包开始前写，写完由推动者确认。任务分发与审阅按下文协作规则执行；WP12/WP13 的公共接口见 [WP12 任务卡](./tasks/WP12-zdoc-upstream-updates.md#接口)。阶段验收不等于整个工作包需求结项。
 
