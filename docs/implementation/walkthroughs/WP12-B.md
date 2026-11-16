@@ -1,6 +1,6 @@
-# WP12-B 走读：本地更新准备已完成，远端自动化待实现
+# WP12-B 走读：本地准备、单页 Draft PR 与只读验证
 
-截至 2026-11-10，B1 的只读报告、B2 的本地规划/准备与 B3 前三片的纯远端校验契约、只读事实和历史认证、离线事务内核已合并；整个 B 尚未完成。阶段与下一步计划入口统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)，不另设 coordination 或 review 状态入口。
+截至 2026-11-16，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线生产输入验证、定时 producer 认证和手动只读报告已合并；下一片是签名提交的目标 Check 接入。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
 ## 已交付的部分
 
@@ -174,6 +174,18 @@ card-report 仍列出英文 25 条、中文 22 条 canonical-link 问题，以�
 在该提交的[页面回执](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/generated/en/manifests/shared-pages/guides/json-field-overview.json)里查看 `inputs.milvus_docs` 和 `outputs`。两条输出分别是英文 Cloud 和 BYOC，每条都给出文件路径和 SHA-256。主审核对了两份实际发布的 Markdown。CURRENT 保留旧警告，NEXT 说明 JSON flat indexing 的兼容请求只保留逻辑索引定义、不构建物理索引。在文中搜索 `only the logical index definition` 可以定位新段落。[Cloud 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/guides/tutorials/development/schema/json-fields/json-field-overview.md) · [BYOC 发布文件](https://github.com/zilliztech/zdoc/blob/c0ef788405235ec85b85abdb0f44035a22a99ec9/content/en/byoc/tutorials/development/schema/json-fields/json-field-overview.md)
 
 对照两次发现可以区分“已有更新 PR”与“没有新版本”。草稿打开时，发现会报告 PR 编号；合并并清理两个 writer 分支后，Milvus 跟踪分支等于已合入的 `lock.next`，复核结果为 `unchanged`。两次运行均跳过准备和写入。[草稿打开时](https://github.com/zilliztech/zdoc/actions/runs/43175958932) · [清理后](https://github.com/zilliztech/zdoc/actions/runs/43192148102)
+
+## B4.3 离线验证与手动只读报告（2026-11-16）
+
+[#1250](https://github.com/zilliztech/zdoc/pull/1250) 的 merge 为 `22887cc7258e3db5528b4c4744a13c5f1724cff0`，认证真实 unit plan 与影响报告原始字节，绑定 unitKey、生产仓身份和独立观察。旧私有调用接口继续有效，生产声明在缺少受信上下文时被拒绝。
+
+[#1265](https://github.com/zilliztech/zdoc/pull/1265) 的 merge 为 `bf29522ee9f957d0a46519ca43cabb9ed592453a`，实现受信 schedule producer 和手动报告。`node scripts/docs-workflow/shared-guides-update/report.mjs` 用只读凭据读取已登记 run/attempt、归档、zdoc master/dev、Milvus v3.0.x 和目标 Check。显式 `--replay <zip> <master> <dev> <milvus>` 使用固定历史归档；结果带 replay 标记。两种命令均把 JSON 写到终端 stdout，可重定向到本地文件。
+
+本片以 producer run `43170134677` attempt 1、artifact `13923258931` 为已审样本，ZIP SHA-256 为 `b0dbe10600152602cb6104f448bd095f1250c4eea528f489402ea90afb2ea1c9`。主审最后一次现场报告读取 master `f5a4d82813b56dc576109a4511f92f8a8cdf7821`、dev `9570e2c8499d015ae1fa2cd9aafe9b848969be0a`、Milvus `5479f04fcf7c379ede9548be1d917795eb4646b3`，正确输出三项 stale，seal `deedf2cb` 的专用 Check 确认不存在；历史 pinned 重放输出 FRESH，Check 为 unobserved。这里保留的是当次观察值，后续重跑以实测为准。[主审记录](https://github.com/liyun95/zdoc/pull/29#pullrequestreview-5889251135)
+
+主审在最终实现 `96830b3a` 运行 127 项 focused、28 项 Node 和 8 项 Python Guides 更新测试，以及 typecheck、matrix 25、workflow-policy 118。全量终态记录 1745 passed / 0 failed / 6 skipped，运行于父提交 `65479069` 加工作区 patch；该 patch 的摘要已核对与最终提交一致。假 token 的代理回归中，旧读取器接受伪造 SHA，新读取器对代理连接为零。上游 PR 的 11 项检查成功、8 项按条件跳过，另一次 shared-docs 校验也成功。[site validation 43407329007](https://github.com/zilliztech/zdoc/actions/runs/43407329007)
+
+本片完成手动只读观察。目标 Check 的真实预留、跨运行回执和最终发布/验收由下一片交付。该片的时序、权限、真实样本和停止条件见 [任务卡](../tasks/WP12-zdoc-upstream-updates.md#b43-已合并结果与目标-check-接入2026-11-16)。
 
 ## 收尾与下一步
 

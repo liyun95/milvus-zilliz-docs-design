@@ -2,7 +2,7 @@
 
 **仓库**：[zdoc](https://github.com/zilliztech/zdoc)　**阶段**：Phase 1b　**依赖**：[WP11 #921](https://github.com/zilliztech/zdoc/pull/921)、[WP9b #960](https://github.com/zilliztech/zdoc/pull/960) 已合并。
 
-**状态（2026-11-10）**：A（[#1027](https://github.com/zilliztech/zdoc/pull/1027)）、B1（[#1055](https://github.com/zilliztech/zdoc/pull/1055)）与 B2（[#1155](https://github.com/zilliztech/zdoc/pull/1155)）均已合并。B2 按“Guides 本地规划与准备”的限定范围收尾；B3 第一片已合并（[#1189](https://github.com/zilliztech/zdoc/pull/1189)），B3 第二片也已合并（[#1193](https://github.com/zilliztech/zdoc/pull/1193)，`38a721e3e720fee4a43d401a69b53663bdf423b4`）；第三片已进行四次有界 API 预检，严格全项验收仍未通过（错误旧值请求的拒绝原因未确认）；设计 PR #83 已合并限定本地实现的入口修订；身份兼容修正已合并 #1197；第三片离线事务已合并 #1199（`90441eff566a67f33823555ac7524e2fe2211394`），设计记录 #85 已合并。第四片桥接与只读编排已带入 #1202，组合复验通过并合并 #1201（`f932331a92d0a0ed6bc552282bbb08245e1041f3`）；设计 #86 已合并。合并后 master CI 与工具同步均通过；生产资格缺口保留，B4.1 诊断代码通过 #1206 审阅；首次 hosted capture held，#1208 正补同环境前置观察，首版限定新建 Draft PR、已有 PR 时暂停；整个 WP12-B / WP12 均未完成，需求 pending 编号保留。实现和验证分别见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
+**状态（2026-11-16）**：A、B1、B2 和 B3 四片已合并。Guides 单页 `json-field-overview` 的定时发现、`lock.next` 候选与 Draft PR 已取得生产证据（#1236）；已有更新 PR 时暂停。B4.3 离线生产输入验证已合并 [#1250](https://github.com/zilliztech/zdoc/pull/1250)，定时 producer 认证与手动只读报告已合并 [#1265](https://github.com/zilliztech/zdoc/pull/1265)。下一片按本卡“B4.3 目标 Check 接入”先提交短计划，由主会话审定后实施。真实目标 Check 的预留、跨运行回执和最终验收待交付；整个 WP12-B / WP12 的需求 pending 编号继续保留。历史实现和证据见 [A 走读](../walkthroughs/WP12-A.md)与 [B 阶段走读](../walkthroughs/WP12-B.md)。
 
 ## 目标
 
@@ -30,7 +30,7 @@ Guides 的上游原文或依赖变化时，形成可审核的更新 PR 和影响
 | B1：只读发现与生命周期证据 | 固定输入、认证观察、只读 CLI 和报告 | 已合并 #1055，不写远端 |
 | B2：本地规划与准备 | `update-plan` / `update-prepare`、可信工具集、隔离候选、proof/journal 与恢复 | 已合并 #1155；按受限范围收尾，不代表远端事务或 Linux 支持完成 |
 | B3：GitHub 事务与恢复 | 远端身份、保留人工改动、滚动 PR、精确 head 校验、响应丢失与并发恢复 | 第一片已合并 #1189；第二片已合并 #1193，第 3 片诊断证据已主审，负例原因缺口保留；仅允许下文限定本地实现；身份兼容修正已合并 #1197，第 3 片离线事务已通过主审与双平台完整测试，#1199 已合并；第 4 片已带入 #1202 并合并 #1201；合并后 master CI 与工具同步均通过 |
-| B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 本卡新增分阶段计划；产品接线未实施，既有 Fetch schedule 不等于新的上游更新 workflow |
+| B4：工作流与 rollout | 定时/手动 report-only、权限隔离、真实外部 smoke 与需求验收 | 单页 Draft PR 已有 #1236 生产证据；#1250 / #1265 完成离线验证和手动只读报告。目标 Check、滚动更新、恢复及完整资格仍按下文逐片验收 |
 
 ### A 的允许路径
 
@@ -588,6 +588,22 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 真实 producer 来自 run `43170134677` attempt 1，artifact `13923258931`，归档 SHA-256 为 `b0dbe10600152602cb6104f448bd095f1250c4eea528f489402ea90afb2ea1c9`。在本地只读重放并保留命令、输入摘要、结果；常规 CI 使用有界 fixture，不依赖归档的保留期限。[生产运行](https://github.com/zilliztech/zdoc/actions/runs/43170134677) · [六成员 producer 归档](https://github.com/zilliztech/zdoc/actions/runs/43170134677/artifacts/13923258931)
 
 **分工和交回。** 实施范围以 `formal-validation.ts` 及对应的 focused tests 为主。复用现有生产验签和历史证据读取逻辑，冻结的 v1 envelope、生产 workflow、分支保护和多页发现均在本片之外。执行 Agent 按本卡的 fork Draft PR 流程先提交短计划，列出输入来源、调用路径、允许文件和测试断言。主会话审计划后，执行 Agent 在同一 PR 实现。交回精确 base/head、完整 diff 的 selector 输出、测试结果及真实归档重放证据，区分历史实据与 fixture。主会话负责代码复审和上游提审决定。
+
+#### B4.3 已合并结果与目标 Check 接入（2026-11-16）
+
+**已交付。** [#1250](https://github.com/zilliztech/zdoc/pull/1250) 合并为 `22887cc7258e3db5528b4c4744a13c5f1724cff0`，正式验证器认证生产计划及影响报告，绑定仓库身份、unitKey 和独立观察。 [#1265](https://github.com/zilliztech/zdoc/pull/1265) 合并为 `bf29522ee9f957d0a46519ca43cabb9ed592453a`，producer 支持受信登记的 schedule/dispatch，validator 继续限定 dispatch。手动报告分别提供现场观察和显式历史重放，输出到 stdout，可保存为本地 JSON。命令、证据与测试来源见 [B 走读](../walkthroughs/WP12-B.md#b43-离线验证与手动只读报告2026-11-16)。
+
+**下一片交付。** 为新的 `json-field-overview` 内容 Draft PR，在它的签名提交 S 上显示专用验证 Check，并保留可认证的 output/receipt。实施 Agent 先从包含 #1265 的最新上游 master 开 fork Draft PR，提交短计划；主会话审计划和最终代码。初始产品基线为 `bf29522e`，开工时重新记录真实 base/head。计划需给出准确文件、命令、权限、producer/validator 注册来源、API 调用顺序和可执行测试，不另写一套 B3 总计划。
+
+**计划必须解决的接口**
+
+- **工具与数据。** 从受信 M 构建并执行工具，将候选 K、seal S、归档及 PR 内容当数据读取。绑定固定 D、上游跟踪 head、唯一 `lock.next` 编辑和 producer 的工具版本。说明现有契约要求 producer、validator 和 intent 的 M 一致时如何准备新候选；master 已推进时应输出 stale。#1236 是历史反例材料。
+- **先预留，再验收。** 完成输入及 seal 检查后预留 S 上的 Check，读回真实 check/suite/App ID。validator 使用这些 ID 编码 output/receipt，归档并成功结束。独立 finalizer 认证该次完成的 run/attempt、原始归档、PR 当前 head、新鲜度及已预留 Check，调用 `prepublish`；得到 ready 后更新该条 Check，再读回实际完成状态，调用 `accept`。`prepublish` 需要真实 in_progress Check 和成功完成的 validator；`accept` 需要已完成成功的 Check。M 上 workflow suite 与 S 上目标 suite 分别绑定。
+- **注册与权限。** 使用真实 workflow ID、定义摘要、actor、Check App/name；#1265 样本策略中 validator 的占位 ID/摘要仅用于只读报告。计划说明新 workflow 的登记和摘要如何按受信 master 固定。读取凭据覆盖 contents/actions/pull-requests/checks 的所需 read 权限；仅预留和完成 Check 的受信步骤取得 checks:write，明确实际 App 身份。先核对已有凭据与运行方式。
+- **新鲜度、并发与失败。** master/dev/source 任一改变、PR 换 head、错误 attempt、同 App 异 workflow/Check、缺失或篡改归档均停止成功发布。完成前重读 PR 与关键 refs。未知 mutation 结果先只读核对，不凭相同参数重发。多条匹配 Check、重跑与部分执行的处理必须有明确测试，保留原始失败和关联证据。
+- **接线和激活。** 本片计划限定单页、手动入口，说明 job 之间和跨 run 的回执传递及取消后的终态。新增 workflow、矩阵和 operator 文档按实际实现同行更新。隔离仓库先验正常结果和 stale 停止，再由主会话决定生产单次验证；执行 Agent 交回代码和测试后停在主审。生产手动运行与后续定时启用各自作为具体操作裁决。
+
+**主审验收。** 常规 CI 使用有界 fixture 验证 Check 预留→成功 validator→finalizer→读回的完整顺序；覆盖候选脚本注入、伪造回执、错误签名或目标提交、错 App/name/suite、producer/validator 重跑、Check 查询失败、过期 M/D/source、PR 并发换 head、丢响应及重复执行。新增运行器/工作流路径执行完整 diff selector，按涉及的边界增加回放与 workflow-policy。真实验证需能在新 Draft PR 的 S 上看到对应 Check，并由独立读回证明回执与最终状态一致。
 
 #### 后续切片与准入条件
 
