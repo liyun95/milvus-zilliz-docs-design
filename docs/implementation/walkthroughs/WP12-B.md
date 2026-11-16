@@ -222,10 +222,10 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 随后 [CI 42750713023](https://github.com/zilliztech/zdoc/actions/runs/42750713023) 在 Linux / Node 22.23.4 的测试 merge `0c0d7255b5ec834c37028a865b1cfd3d7e6bac02` 上完成四阶段，1376 passed / 0 failed / 96 skipped；跳过项符合既有精确声明，三个改动测试文件均未列入。主审接受这一完整 CI 证据与 macOS focused 结果作为本次身份兼容修改的门槛，#1197 转为 ready for review。当次 macOS 全量失败记录保留，不能改写为通过；第三片最终 HEAD 的新全量结果见上文。当时仅身份兼容先决项完成，后续事务、生产 producer、真实 CAS 负例原因及 B4 资格均未因此完成。
 
 
-### 复用 Fetch 证据资格修复（2026-11-16，待合并）
+### 复用 Fetch 证据资格修复（2026-11-16，已合并）
 
-[#1305](https://github.com/zilliztech/zdoc/pull/1305) 最终提交 `45befaabf` 已完成主审、独立复审与完整上游 CI。新分支保留继承 receipt 的原始工具和 dev 身份，要求现代 regeneration proof、精确回执描述 SHA 与 channel，并将源归档中的 receipt / Cloud / BYOC 字节绑定到固定 dev baseline、本次发布结果和当前 dev；fresh success 原有身份检查保持。来源登记仍只覆盖 `json-field-overview` 的 Fetch `43847158549` / attempt 1，不信任任意新树。
+[#1305](https://github.com/zilliztech/zdoc/pull/1305) 最终提交 `45befaabf` 已完成主审、独立复审与完整上游 CI，合并为 `1ef6768e5cc4b8934c7c68fb519761ef128a10d1`；实际合并树与审阅树一致。新分支保留继承 receipt 的原始工具和 dev 身份，要求现代 regeneration proof、精确回执描述 SHA 与 channel，并将源归档中的 receipt / Cloud / BYOC 字节绑定到固定 dev baseline、本次发布结果和当前 dev；fresh success 原有身份检查保持。来源登记仍只覆盖 `json-field-overview` 的 Fetch `43847158549` / attempt 1，不信任任意新树。
 
 主会话在同一生产 reader / registry 字节上重放真实归档与现场只读 GitHub / Git 观察，结果 `reasons: []`。最终 Node 22 聚焦测试在无全局 Git 身份和受干扰配置下通过，hosted light / isolated 与最终 Site gate 成功。最初 CI 的测试 Git 作者缺失由纯测试提交修复。历史 macOS aggregate 因测试运行中 HEAD 改变而失效，虽所有断言通过也未计为完整通过；具体处置保留在任务卡。此次没有生产候选或 Check 写入，也未跑额外发布型 Fetch / Translation。
 
-下一步是合并后以 `create_draft=false` 在托管 runner 做只读预演；该页没有相关源变化时应 no-op，不强制修改 lock.next。真实新鲜候选的 Check 正例、可持续 Fetch 准入、自动验证接线仍未验收。变更虽不改 Fetch 触发和发布逻辑，但属于渲染引擎指纹，可使后续 Fetch 重新生成。精确边界和后续优先级见[当前任务](../tasks/WP12-zdoc-upstream-updates.md#当前生产登记与验证任务2026-11-16)。
+合并后已以 `create_draft=false` 发起[首轮托管预演 43890812515](https://github.com/zilliztech/zdoc/actions/runs/43890812515)。discover 约 9 秒后报 `fetch failed`，没有给出底层 cause，prepare / writer 均跳过。该结果没有验证到页面资格，不算正常 no-op 验收；待授权以同一提交和参数新建一次 attempt 1 的预演。该页没有相关源变化时应 no-op，不强制修改 lock.next。真实新鲜候选的 Check 正例、可持续 Fetch 准入、自动验证接线仍未验收。变更虽不改 Fetch 触发和发布逻辑，但属于渲染引擎指纹，可使后续 Fetch 重新生成。精确边界和后续优先级见[当前任务](../tasks/WP12-zdoc-upstream-updates.md#当前生产登记与验证任务2026-11-16)。
