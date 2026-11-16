@@ -229,3 +229,10 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 主会话在同一生产 reader / registry 字节上重放真实归档与现场只读 GitHub / Git 观察，结果 `reasons: []`。最终 Node 22 聚焦测试在无全局 Git 身份和受干扰配置下通过，hosted light / isolated 与最终 Site gate 成功。最初 CI 的测试 Git 作者缺失由纯测试提交修复。历史 macOS aggregate 因测试运行中 HEAD 改变而失效，虽所有断言通过也未计为完整通过；具体处置保留在任务卡。此次没有生产候选或 Check 写入，也未跑额外发布型 Fetch / Translation。
 
 合并后已以 `create_draft=false` 发起[首轮托管预演 43890812515](https://github.com/zilliztech/zdoc/actions/runs/43890812515)。discover 约 9 秒后报 `fetch failed`，没有给出底层 cause，prepare / writer 均跳过。该结果没有验证到页面资格，不算正常 no-op 验收。用户授权后，同提交和参数的[新运行 43902041033](https://github.com/zilliztech/zdoc/actions/runs/43902041033) 已完成：GitHub 为 success，实际 preparation 归档却是 held / AUTHORITY_UNKNOWN，candidate 为 null、writer skipped，因此仍未完成托管资格验收。内层原因在现有 early Hold 路径中没有保留；正在补有界诊断，不改裁决策略，也不继续盲跑。该页没有相关源变化时应 no-op，不强制修改 lock.next。真实新鲜候选的 Check 正例、可持续 Fetch 准入、自动验证接线仍未验收。变更虽不改 Fetch 触发和发布逻辑，但属于渲染引擎指纹，可使后续 Fetch 重新生成。精确边界和后续优先级见[当前任务](../tasks/WP12-zdoc-upstream-updates.md#当前生产登记与验证任务2026-11-16)。
+
+
+### 托管 held 原因保留（2026-11-17，待验收）
+
+[诊断补丁 #1307](https://github.com/zilliztech/zdoc/pull/1307) 在既有 `preparation.json` 的 reasons 中保留可信采集固定码和认证后的内层原因。协调进程代码独立于原始 worker 结果及 settlement；缺失、损坏、越界或非预期页面的诊断只得到固定 unavailable 码，原 Hold 与零操作保持。它不改变资格、网络重试、Fetch 发布或调度，也不说明此前托管根因已经解决。
+
+固定修复提交 `4db15929b` 已通过独立任务审查与最终增量复审：协调进程采集码的命名空间只能由父进程供应，子进程同名 hold 转为普通 unavailable 且仍暂停；held-only pins/ref/version 类型和 fallback 脱敏均有反例。针对性测试及 [最终 HEAD 的 hosted CI](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 通过：light 1,599 / 0 failed / 114 既有 skipped，isolated 68 / 0 / 0；测试合并树与审阅树一致。Ready 后的独立只读校验也成功，PR 保持未合并。取消的本地较大范围测试不记为通过；原有单例 15 秒超时已在精确基线上复现，未放宽时限。尚未发起新的生产运行，待补丁最终主审和 CI 完成后，再裁决一次有界只读验证。
