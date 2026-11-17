@@ -896,7 +896,7 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 
 #### 多页资格与采集第二片 Implementation Plan（2026-11-17）
 
-**状态。** 用户已授权在验收 #1331/#95 后继续本片，由 subagent 实现、主会话主审。#1331 的精确候选 `2f5a6777` 经 [44097730636](https://github.com/zilliztech/zdoc/actions/runs/44097730636) 的中英文构建、shared-docs light/isolated 与最终 gate 通过后，由串行同步工作流合并为 `ca7af792`；主会话已独立确认候选归属、dev 内容保持及合并树一致。设计 #95 合并为 `a996e1e5`。本片基线为 master `3839abb3`，先在 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32) 实施；Task1–2 已完成并通过修复后独立复审；Task3 已交 subagent 实施，Task4 尚未交付。
+**状态。** 用户已授权在验收 #1331/#95 后继续本片，由 subagent 实现、主会话主审。#1331 的精确候选 `2f5a6777` 经 [44097730636](https://github.com/zilliztech/zdoc/actions/runs/44097730636) 的中英文构建、shared-docs light/isolated 与最终 gate 通过后，由串行同步工作流合并为 `ca7af792`；主会话已独立确认候选归属、dev 内容保持及合并树一致。设计 #95 合并为 `a996e1e5`。本片基线为 master `3839abb3`，先在 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32) 实施；Task1–3 已完成并通过主审、独立复审与对应证据门；Task4 已交新的 subagent 实施。
 
 主会话与独立设计审查已确认以下完整契约。源代码核查发现单页 issuer 与大结果不能直接循环复用，采用“逐页内容采集 → 真实依赖闭包 → 单次集中资格 → 独立 Python 校验 → 只读索引”的两阶段路径；保留既有 FD3 framing、v1 pilot 与全部组件限额。此为实施计划通过，不是运行、12 页容量或生产资格通过。新工具与旧 Fetch 可能不相容；正向生产 v2 资格仍需后续同版本正常 Fetch。旧 writer 明确拒绝 v2/mixed，正向 v2 writer 留给原子候选片。
 
@@ -904,8 +904,8 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 |---|---|---|
 | 1. profile-v2 与有界 Git 读取 | M 配置推导锁集合、93 锁实际命令/字节计数、v1 正反例保持 | 已验收；两项阻塞已修复并复审通过 |
 | 2. 逐页内容与完整闭包 | 原始变化/孤立片段/变换嵌套依赖全覆盖、真实收据与 effective namespace | 已验收；组外已发布引用漏检已修复并复审通过 |
-| 3. 集中资格与 Python | 一次 M/F 认证、真实 per-run 字节、私有执行承诺与独立校验根 | subagent 实施中 |
-| 4. 只读入口与实测 | 完整三页正反例、真实历史采集/容量分项证据、最终 selector 全部门禁 | 待实施 |
+| 3. 集中资格与 Python | 一次 M/F 认证、真实 per-run 字节、私有执行承诺与独立校验根 | 已验收；实际五进程重放、错误 current 与证据替换反例通过 |
+| 4. 只读入口与实测 | 完整三页正反例、真实历史采集/容量分项证据、最终 selector 全部门禁 | subagent 实施中；组合源码与最终门禁仍待验证 |
 
 
 > For agentic workers: use subagent-driven-development task-by-task; main conversation owns design and review.
@@ -1013,6 +1013,12 @@ The closed `guides-batch-material-v1` record above is the retained material head
 
 ##### Task 3: Qualify the final group once in measured code; bind Python consumption
 
+**Task3 验收（2026-11-18）。** 最终代码 `41f39f9509` 的源码及执行证据已通过独立验收。真实 replay 在含固定实现的隔离 checkout 执行，M=F=工具提交 `82676b65`；三个内容子进程、一个资格子进程及一个捕获的 Python 进程全部正常退出、无遗留进程组或清理错误。资格 Q 为 7,338 bytes（SHA-256 `b9da8c50…`），只读 I 为 7,889 bytes（`6d9da560…`），三页为 advance/advance/noop，outcomes 为 success/reused/reused，operations=[]、writeEligible=false。主会话重算保留 Q/I 的物理摘要与大小，确认输入前后不变。此正例为三页双目标、六份输出；Cloud-only/双目标混合仍是 Task4 的实际入口验收项。
+
+实际错误 current 反例在 M/F 规范化 profile 相等、源树字节相同的条件下，三页材料完整，资格进程以 `PUBLISHED_CURRENT_OWNER_MISMATCH` 失败并完成清理，未生成 Q/I、未启动 Python。另外五类保留 Python 证据替换反例全部拒绝，未发出成功回执；这些不是新的现场资格授权。全过程保持 replay，不称生产通过。较早原始快照的小数兼容、末尾重放错误传播、固定 ref 接线、手册排序与发现层原始快照解析问题均在普通提交和增量复审中关闭；只对原始 producer JSON 保留合法小数，新增规范记录继续严格校验。主审窄扩展 `adapters/updates/batch-discovery.ts` 仅修原始 D snapshot 解析，测试仍在已允许的 collection 文件。
+
+针对性材料 22 项、资格相关 116 项（另一个既有 skip）、Python 29 项、writer 9 项与类型检查等分开留证；初始完整 toolset 117/118 失败及修正后单例通过未改写为全量通过，最终完整 selector 联合仍由 Task4 执行。实际重放耗时约 266 s、错误 current 约 226 s；RSS 约 2 GiB、磁盘约 1.4 GiB 均为采样下界。由于全树磁盘扫描，100 ms 采样目标未达成、间隔均超过 200 ms；Task4 必须补集成采样、容量/截止时间、最后新鲜度复查和指针发布，本次验收没有关闭这些项目。
+
 Allowed paths: `adapters/updates/{trusted-fetch-producer,guides-provider,guides-lifecycle-transport,guides-metadata-broker,guides-run-metadata,lifecycle,selected-lifecycle,runner,toolset,batch-collection,batch-collection-contract}.ts`, `testing/updates/{trusted-fetch-producer,toolset,guides-metadata-broker,guides-provider,runner-qualification,lifecycle-publication,batch-collection}.test.ts`; `testing/updates/fixtures/batch-qualification.ts`, `scripts/docs-workflow/shared-guides-update/{prepare.py,test_prepare.py,write.test.mjs}`. Use a separate group-only ordinary-call issuer from the fixed measured bootstrap, never a JSON property usable by an operator. Keep v1 authenticate(F) and its exactly-once semantics. The new entry validates expected runtime root HEAD=M=trustedTools, config snapshot M, per-page observed material keys, actual M registry, complete privately derived group and selected evidence run. One WeakSet/closure-branded, operation-local issuer; cache only a single **in-flight or settled** F/profile transaction including terminal failure. Decide and freeze membership and run before issuer construction. Lifecycle row validation cannot call it on arbitrary identities.
 
 ```ts
@@ -1062,6 +1068,8 @@ In `testing/updates/fixtures/batch-qualification.ts` build actual immutable Git 
 Separate raw replay data plane: the parent replay-only broker binds a closed manifest `(sequence,expected fixed endpoint) → exact raw metadata bytes`, validates request order, path digest, framing, pagination and body caps; feed those bytes through the **same measured worker FD4/5 client and validators**. The fixed observed launcher constructs its own real HTTPS GET reader, no dependency override. Replay archive staging executes actual hash/size and full `validateGuidesStageArtifact` logic. Use real repository-controlled image bytes in the small fixture; the immutable #3848 replay may also need HTTPS-origin images. Bind normalized exact observed URL to pre-retained immutable image bytes (SHA-256 + byte length, path/manifest guarded under owned root), with no network credentials or live fallback; provide a separate fixed replay-only child image reader, chosen by replay launcher origin, not an observed worker request. An absent URL/changed digest implies held and a partial measurement. No callback crosses worker wire; the immutable manifest refs/known replay root identify data only. Exercise wrong URL/metadata order/sequence/missing image and truncated actual stage. Do not claim post-validation fixture facts as real collector evidence.
 
 ##### Task 4: Expose read-only entry, run end-to-end and measure
+
+**Task4 起点。** Task3 验收后同步了上游 [#1332](https://github.com/zilliztech/zdoc/pull/1332) 的 manual 双通道/记录改动（master `732dd9ab`），本地正常合并为 `93a00621`。无冲突，原功能补丁相对新旧基线的二进制 diff 摘要完全一致；这不是组合源码已验证的声明。Fork Draft #32 的专用 review-base 已正常前进至该 master。新的执行 subagent 从 `93a00621` 实现本任务，主会话主审。除下述路径外，窄允许 `testing/updates/toolset.test.ts` 用于私有两阶段 verifier/settlement 边界回归及必要依赖 fixture 复制；不放宽守卫、skip、超时或独立 oracle。
 
 Allowed paths: `adapters/updates/{batch-collection,batch-collection-contract,batch-discovery,batch-github,batch-source,guides-provider,toolset,evidence}.ts`, `testing/updates/{batch-collection,batch-discovery,evidence}.test.ts`, `testing/updates/fixtures/batch-qualification.ts`; `scripts/docs-workflow/shared-guides-update/{batch-collect.mjs,batch-collect.test.mjs,prepare.py,test_prepare.py}`. Add bounded fixed executable only as needed (reuse `scripts/docs-tooling.js` loader/fixtures). Do not add workflow options, schedule, persistent queue, activation, edits or remote writer entry.
 
