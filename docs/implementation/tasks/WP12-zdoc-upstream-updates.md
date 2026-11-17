@@ -631,7 +631,7 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 | P1 | 自动衔接内容 Draft PR、validator 和独立 finalizer | 先取得手动生产证据，再审定完成态触发、schedule 身份、跨 run 回执与去重；不把同 run 内 job 当作 completed validator，不自动 ready/merge 内容 PR |
 | P2 | 扩页与完整生命周期 | 滚动更新已有 PR、保留人工修改、恢复、依赖组、提升后重算、退役，以及 SDK/平台资格按既有需求分片；保留 `7-1`—`7-10` / T05 pending，不能因单页成功宣布整个 WP12 完成 |
 
-#### 可持续 Fetch 认证设计（2026-11-17，方案评审稿）
+#### 可持续 Fetch 认证设计（2026-11-17，已确认实施）
 
 **目标与当前证据。** 删除“每个新 run 都要人工补登记”的依赖，继续限定 `json-field-overview`。新 Fetch [43926761586/1](https://github.com/zilliztech/zdoc/actions/runs/43926761586) 使用 `1ef6768e`，整体成功，英文 Guides 发布回执为 `published`；但实际 `reviewedProducerInventory` 返回未认证，原因是旧单次登记仍固定 `43847158549/1` 与 `3389cc4`，完整树指纹也不同。新源归档只核查了 API 身份/摘要元数据，尚未完成完整页面资格；不能把 Fetch 成功写成 WP12 验收。设计 PR #91 与诊断 #1307 均已合并。
 
@@ -684,7 +684,7 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 | B1→Python 方法协议 | 通过真实 `authority` 消费者的 tagged 正例，保留正确 method/M/F/digest；null/未知/部分/mixed 方法和错误 M/F/digest 全部停止，不能回退 legacy；legacy/census 原边界回归保持 |
 | 主审与最终门禁 | subagent 按定稿任务卡实现，先任务审查再全分支主审；运行实际 diff selector 的全部必要门禁，保留取消/失败历史，不新增 skips / 放宽时限来取得绿色。工具 PR 先保持 Draft；生产合并和运行另行裁决 |
 
-**明确不做。** 不改 Fetch / Translation 的调度、发布、permissions、队列、worker 凭据隔离、source gate、远端 writer/Check、真实 source/lock 内容或付费操作；不扩大到别的页面，也不因这一层认证完成就宣布 WP12 完成。上述方案已通过独立架构审查和修订复审（四项 Important 均关闭），当前提交用户书面审阅；确认后由 subagent 实现，主会话主审。此时产品代码尚未实施。
+**明确不做。** 不改 Fetch / Translation 的调度、发布、permissions、队列、worker 凭据隔离、source gate、远端 writer/Check、真实 source/lock 内容或付费操作；不扩大到别的页面，也不因这一层认证完成就宣布 WP12 完成。上述方案已通过独立架构审查和修订复审（四项 Important 均关闭），用户已书面确认本稿，进入 subagent 实施，主会话主审；本确认不授权产品 PR 的生产合并或生产运行。
 
 #### 后续切片与准入条件
 

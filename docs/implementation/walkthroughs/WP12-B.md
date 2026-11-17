@@ -242,4 +242,4 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 
 设计 #91 与诊断 #1307 已合并。原先获准的只读预演限定旧 Fetch `43847158549/1`，执行前最新成功 Fetch 已变为 [43926761586/1](https://github.com/zilliztech/zdoc/actions/runs/43926761586)，因此未启动预演。新发布回执已认证英文 Guides published，实际 producer 准入仍拒绝；原 hosted held 根因没有因此获得验证。
 
-下一项改为按受信执行工具 M 的保守仓库配置指纹认证后续 Fetch：默认纳入全部已提交文件，只对严格三行格式的 pilot lock 内容规范化；README、workflow、依赖、loader、build config、MDX/sidebar 与未知新文件均保留身份。新方法只由已测量的 worker 提供，B1 与 Python 准备记录通过带版本的 method 对象绑定 M/F/profile；standalone B1 保持历史路径。还必须证明 F→M 祖先、核验真实 run 身份，再完整验证每次归档、receipt、发布和新鲜度。同版本新 run 无需逐次登记；代码变化后可等待下一次正常 Fetch。实际边界、迁移、反例与实施入口见[任务卡](../tasks/WP12-zdoc-upstream-updates.md#可持续-fetch-认证设计2026-11-17方案评审稿)。设计尚在评审，产品代码未实施、没有新增生产运行。
+下一项改为按受信执行工具 M 的保守仓库配置指纹认证后续 Fetch：默认纳入全部已提交文件，只对严格三行格式的 pilot lock 内容规范化；README、workflow、依赖、loader、build config、MDX/sidebar 与未知新文件均保留身份。新方法只由已测量的 worker 提供，B1 与 Python 准备记录通过带版本的 method 对象绑定 M/F/profile；standalone B1 保持历史路径。还必须证明 F→M 祖先、核验真实 run 身份，再完整验证每次归档、receipt、发布和新鲜度。同版本新 run 无需逐次登记；代码变化后可等待下一次正常 Fetch。实际边界、迁移、反例与实施入口见[任务卡](../tasks/WP12-zdoc-upstream-updates.md#可持续-fetch-认证设计2026-11-17已确认实施)。设计已通过独立审查并获用户书面确认，进入 subagent 实施与主会话主审；没有新增生产运行。
