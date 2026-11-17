@@ -896,15 +896,15 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 
 #### 多页资格与采集第二片 Implementation Plan（2026-11-17）
 
-**状态。** 用户已授权在验收 #1331/#95 后继续本片，由 subagent 实现、主会话主审。#1331 的精确候选 `2f5a6777` 经 [44097730636](https://github.com/zilliztech/zdoc/actions/runs/44097730636) 的中英文构建、shared-docs light/isolated 与最终 gate 通过后，由串行同步工作流合并为 `ca7af792`；主会话已独立确认候选归属、dev 内容保持及合并树一致。设计 #95 合并为 `a996e1e5`。本片基线为 master `3839abb3`，先在 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32) 实施；Task1 已完成并通过修复后独立复审；Task2 已启动，Task3–4 尚未交付。
+**状态。** 用户已授权在验收 #1331/#95 后继续本片，由 subagent 实现、主会话主审。#1331 的精确候选 `2f5a6777` 经 [44097730636](https://github.com/zilliztech/zdoc/actions/runs/44097730636) 的中英文构建、shared-docs light/isolated 与最终 gate 通过后，由串行同步工作流合并为 `ca7af792`；主会话已独立确认候选归属、dev 内容保持及合并树一致。设计 #95 合并为 `a996e1e5`。本片基线为 master `3839abb3`，先在 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32) 实施；Task1–2 已完成并通过修复后独立复审；Task3 已交 subagent 实施，Task4 尚未交付。
 
 主会话与独立设计审查已确认以下完整契约。源代码核查发现单页 issuer 与大结果不能直接循环复用，采用“逐页内容采集 → 真实依赖闭包 → 单次集中资格 → 独立 Python 校验 → 只读索引”的两阶段路径；保留既有 FD3 framing、v1 pilot 与全部组件限额。此为实施计划通过，不是运行、12 页容量或生产资格通过。新工具与旧 Fetch 可能不相容；正向生产 v2 资格仍需后续同版本正常 Fetch。旧 writer 明确拒绝 v2/mixed，正向 v2 writer 留给原子候选片。
 
 | 任务 | 验收结果 | 当前状态 |
 |---|---|---|
 | 1. profile-v2 与有界 Git 读取 | M 配置推导锁集合、93 锁实际命令/字节计数、v1 正反例保持 | 已验收；两项阻塞已修复并复审通过 |
-| 2. 逐页内容与完整闭包 | 原始变化/孤立片段/变换嵌套依赖全覆盖、真实收据与 effective namespace | subagent 实施中 |
-| 3. 集中资格与 Python | 一次 M/F 认证、真实 per-run 字节、私有执行承诺与独立校验根 | 待实施 |
+| 2. 逐页内容与完整闭包 | 原始变化/孤立片段/变换嵌套依赖全覆盖、真实收据与 effective namespace | 已验收；组外已发布引用漏检已修复并复审通过 |
+| 3. 集中资格与 Python | 一次 M/F 认证、真实 per-run 字节、私有执行承诺与独立校验根 | subagent 实施中 |
 | 4. 只读入口与实测 | 完整三页正反例、真实历史采集/容量分项证据、最终 selector 全部门禁 | 待实施 |
 
 
@@ -958,6 +958,12 @@ Explicit call budget, including transaction HEAD checks: 1 HEAD + 2 history guar
 Fixture: actual temp Git history with 93 validated configs and canonical locks including repeated OIDs, M/F lock-only change, both legal noncanonical spellings identical/different, absent/bad/oversize blobs, invalid source/page, wrong mode, unrelated lock/code/README/config added/deleted/changed, disconnected/shallow/replaced history. Count actual Git invocations and aggregate bytes including HEAD probes. Inject framing/truncation, overflow and expired clock in existing test seams. Preserve v1 pilot oracle.
 
 ##### Task 2: Trace the real semantic closure one page at a time
+
+**Task2 验收（2026-11-18）。** fork 代码 `fd197eec0a` 实现逐页实际内容测量、原始变化义务与闭包；主审和独立审查发现组外已发布页面指向本组旧锚点的引用可能漏检，修复 `e1b3962c0c` 只检查实际 D 中同手册、指向本组的有效链接，保留引用源的输出证据，失败暂停整组，不伪造 adoption 边。真实渲染的重命名、删除、仅 BYOC 移除三项反例先失败，修复后含保留锚点正例的完整材料测试 18/18、typecheck/diff-check 通过；增量复审确认唯一 P1 关闭。
+
+完整源码测量在 `fd197eec0a` 上以 replay 运行，两次真实单页子进程正常退出、进程组清空，FD3 分别为 42,450 / 37,985 bytes，得到一页必要成员和一页 collateral 的 material-complete。初次捕获因既有空缓存目录失败，随后仅临时移开该目录并在 finally 恢复，inode/目录树与 Git refs/status/object 数均核对未变；没有放宽捕获守卫。该 smoke 的配置 M 与工具 M 不同，只证明材料采集的支持环境重放，不是整组资格；最终语义修复没有重标为新的源码 smoke。此前 8 文件组合曾为 295 passed / 2 failed / 1 skip，保留失败；冻结代码后的完整 oracle 10/10、材料 14/14 和后续修复材料 18/18 分别记录，不宣称组合测试全绿。下一步在实际 M=工具代码的三页 fixture 上实现集中资格/Python，最终完整 selector 联合留至 Task4。
+
+**跨任务承诺澄清。** Task2 只封存 pre-qualification 的真实材料/闭包，不接收 run setter；Task3 独立取得固定 run lease 后一次消费并绑定完整 scope。`scope.pages[].materialSha256` 指 `H(material, header)` domain digest，与 `RetainedPage.materialDigest`/qualifier row 一致；物理 canonical header 摘要另在 `materialRef.sha256`，不得互换。
 
 Allowed paths: `adapters/updates/{guides-provider,runner,toolset,batch-collection,batch-collection-contract,batch-discovery,batch-source,candidate}.ts`, `core/updates/{impact,units}.ts`, `testing/updates/{batch-collection,batch-discovery,batch-source,guides-provider,guides-provider-equivalence,toolset,units,impact}.test.ts`, `testing/updates/fixtures/batch-qualification.ts` under shared-docs. New files only where named. Retain existing fixed v1 child, standalone B1 and oracle. Add separately measured **content-only** child entry choice under fixed verified launcher code, not a worker JSON authority flag. Keep current worker framing/launch/settlement. No GH_TOKEN for content. Example internal boundary:
 
