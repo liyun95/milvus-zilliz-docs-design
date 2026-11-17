@@ -629,7 +629,8 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 | P0 | 新鲜真实候选的生产 Check 正例及停止样例 | producer 成功结束后才 validate；validator 整次成功结束后才 finalize；S 上的 id/suite/App/name/head 与原始回执、独立读回一致。无有效源变化时不伪造正例，stale/未知输入不写 |
 | P0（产品已合并，等待同版本 Fetch 资格） | 可持续的 Fetch producer 版本准入（产品 #1311） | 按下节设计，以执行工具的受信 M 为认证锚，比较保守仓库配置指纹，绑定 F→M 祖先关系；同版本的后续合格 run 无需逐次登记。代码或未获准的数据变化仍暂停，等待对应版本的正常 Fetch，不自动信任任意新树；代码审阅通过不替代生产资格验收 |
 | P1 | 自动衔接内容 Draft PR、validator 和独立 finalizer | 先取得手动生产证据，再审定完成态触发、schedule 身份、跨 run 回执与去重；不把同 run 内 job 当作 completed validator，不自动 ready/merge 内容 PR |
-| P2 | 扩页与完整生命周期 | 滚动更新已有 PR、保留人工修改、恢复、依赖组、提升后重算、退役，以及 SDK/平台资格按既有需求分片；保留 `7-1`—`7-10` / T05 pending，不能因单页成功宣布整个 WP12 完成 |
+| P1（设计中） | 已激活 Guides 按上游变更批次自动准备 Draft PR | 用户已确认批次分组方向，完整设计见下节；同批多页一起准备，跨 PR 有依赖时合组，已有更新 PR 时暂停新建。先只读证明完整覆盖与容量，再接多 lock 候选，不沿用逐页 PR 或任意页数配额 |
+| P2 | 完整生命周期 | 滚动更新已有 PR、保留人工修改、恢复、提升后重算、退役，以及 SDK/平台资格按既有需求分片；保留 `7-1`—`7-10` / T05 pending，不能因单页或批次成功宣布整个 WP12 完成 |
 
 #### 可持续 Fetch 认证设计（2026-11-17，已确认实施）
 
@@ -695,6 +696,80 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 - **最终产物及未发布证据。** 小型 selection、results、中英文 reports、最终 card report 归档均核对 API size/SHA-256，再有界读取 ZIP；独立重跑现有 `validatePublicationSelection` / `validatePublicationResults` 成功。results artifact `14298880960` 为 674 bytes、SHA-256 `1d1f8c6ecfdd409b1c9053450ee48b996c161de53e4d2751132ff6b6e418055f`，明确 `mode: artifact_only`、`overallStatus: success`；英文/中文单元均 ready、`attempts: 0`、`commitShas: []`。初始/最终 target 与事后独立读取 dev 均为 `62f2ba122d0e0b26f3a7138a57b6dd5980eef96d`。aggregate 成功、card report success，reconcile / source publication barrier / Translation handoff / dispatch / publish 后 verify 均按配置跳过。构建启用现有 skipLinkChecks；中文 2 个链接和 2 个锚点、英文构建的 1 个日文 BYOC 锚点告警，均能在较早正常 Fetch `44001782552` 的对应 assembly 日志中找到，没有将其写成“链接全部无告警”。本轮只运行一次，没有重跑、合并、发布或翻译。
 - **产品合并（2026-11-17，后续明确授权）。** 用户已明确授权合并产品 #1311 与设计 #93。产品在转 Ready 后新增 [校验 44017440027](https://github.com/zilliztech/zdoc/actions/runs/44017440027) 成功，最终检查无失败或未完成项，再以固定 HEAD `40461004f` 合并为 `4492793f78d6761d042dbef8099007e27c08ddd7`。API 复核双亲为 `136ff45b5` 与已审 HEAD，合并树 `a4b80b40664a151a73aad68068835844d227cd1f` 与审阅/测试树相同。自动触发的 master CI 和 tooling 同步另行收束，不将“已合并”写成“合并后检查已通过”。本次授权未扩展为额外 Fetch、发布、Translation 或生产预演。
 - **部署后仍待验收。** 上述手动 Fetch 通过证明兼容性，不是新 producer 准入的正例。手动 `workflow_dispatch` 且 run head 与 effective tooling 不同，不满足新路径的 schedule/master 绑定；不得登记它来绕过认证。产品已合并，接下来等待正常 Fetch 使用同版本工具，再认证新的来源与发布证据；额外发起有界只读预演仍须另行授权，不为最新 run 再补单次例外。无相关源变化应为合格 noop，不制造 lock.next 更新。真实新鲜候选的 Check 正例与自动验证仍未结项。
+- **部署与 dev 同步收束（2026-11-17）。** master [CI 44017495874](https://github.com/zilliztech/zdoc/actions/runs/44017495874) 已 success。自动同步首轮候选校验的原有单例 5 秒超时保留为失败；同候选只读重试通过（isolated 68/0/0，最终 Site gate 成功），未改代码、时限或 skips。用户随后单独授权合并 [dev 同步 #1313](https://github.com/zilliztech/zdoc/pull/1313)，固定候选 `4a992ab7`、原 dev `c587dddb` 与 master `4492793f` 经核对后合并为 `4134345635b58beea05e4eb6f17b361ac14e803f`，合并树与候选相同；[dev CI 44020199701](https://github.com/zilliztech/zdoc/actions/runs/44020199701) 已 success。这些是部署门禁，不是新来源资格正例；本轮没有额外 Fetch、Translation 或 Check。
+
+#### 已激活 Guides 的批次更新设计（2026-11-17，完整稿待审）
+
+**裁决与范围。** 用户已确认按已合并的上游变更批次组织 PR：同一上游 PR 关联的共享页进入同一条 Zdoc Draft；跨 PR 影响重叠或存在采用依赖时合并成一组。首版沿用“已有自动更新 PR 就暂停新建”，不更新已有 PR，不自动 Ready/merge。此前讨论的逐页 PR、每日一页及最多三条开放 PR 均未采用。本节是待审完整设计，分组方向确认不等于产品实现、生产合并或运行授权。
+
+**基线与实测范围。**
+
+- 产品工具 M 为 master `4492793f78d6761d042dbef8099007e27c08ddd7`，已审实现 `40461004f` 与其树相同；dev D 为 `4134345635b58beea05e4eb6f17b361ac14e803f`。这是一份固定库存观察，运行时必须重新取得并绑定 M/D/F/T；F 为实际 Fetch 工具提交，T 为本轮独立观测的 Milvus 跟踪分支 head。
+- 在该 M/D 上，配置、active 与 published snapshot 可按 page/record ID 完整对应：93 个 Guides 页面，均为 current channel；93 份 lock 都是严格三行规范格式，51 页有 transforms，没有 adopted variants。此盘点通过现有 active/snapshot 结构校验及 Git blob 字节核对，尚未逐页完成最新 Fetch、receipt 和发布输出的完整资格认证。93 是扫描库存，不是默认允许写入 93 页的凭据。
+- 目标手册以每页配置为准，库存同时存在 Cloud/BYOC 双侧和仅 Cloud 页面。只要求已配置的目标；不能为仅 Cloud 页面强加 BYOC，也不能因其中一侧缺失而把双侧页面降为单侧通过。
+- 当前生产仍只有 `json-field-overview` 自动入口。discover、prepare、write、formal validator、measured provider、Fetch profile 与对象传输都有限定单页的代码；请求 schema 有 pages 数组和 core 支持多 subject，不能证明生产多页链路已经实现。
+
+**方案选择。**
+
+| 方案 | 审阅与一致性 | 本次选择 |
+|---|---|---|
+| 上游变更批次 → 一条多页 Draft | 保留上游改动意图，跨 PR 依赖合组；需要完整提交范围和依赖证明 | 用户已确认 |
+| 每次扫描所有受影响页 → 一条 Draft | 简单保守，但容易混入互不相关的上游任务 | 不作为默认；确有依赖时多个批次自然合组 |
+| 每页独立 Draft + 数量限制 | 单页容易审阅，但批量改动会被拆碎，链接与公共片段可能不一致 | 不采用 |
+
+**1. 批次识别与完整覆盖。**
+
+- 从固定受信 M 的配置枚举已激活 Guides 候选；逐页绑定 D 的 current ownership、record、channel 和实际配置目标。未激活、归属冲突、配置或证据不全的页只报告，不自动激活。若它是拟写批次所需的依赖，整批暂停，不能静默删除该成员。
+- 固定一次 T；每页以自己的旧 next 为起点检查原始 Git 变更、祖先关系和候选预处理依赖，包括根源文件未变但引用片段变化的情况。PR changed-files 清单仅帮助分组与解释，不能替代真实 Git 区间或 collector 的片段/锚点/图片证据。源门禁仍按原定义，不因图片、工具或配置变化而自行放行。
+- 把相关的已合并上游 PR 作为批次种子。关联须由固定仓库、目标分支、受信 GitHub 读取与 T 的 Git 历史相互核对；标题、标签、正文和请求传入的页清单不授予身份。无 PR 的已证明直接提交按提交形成种子并明确展示；查询失败、不完整分页或关联歧义不能被写成“没有 PR”，歧义不能随意选择其中一条。
+- 以“受影响页 ↔ 其旧 next 到 T 之间的上游变更种子”建组；同一 PR 的页保持同组，再合并共享页面、真实采用依赖及无法证明可独立更新的边界。仅有公共预处理文件不自动伪称已有 adoption edge，但必须分析其实际影响。PR 分组是审阅层，不伪造 `localJournalUnits` 或已认证历史。
+- 所有拟写成员满足 `source.target === source.observedTrackHead === T`。若某页更新到 T 会同时带入其他 PR 的有效变化，必须把相应种子纳入并重新合组，不能把候选声称为“只同步某一 PR”。每页报告明确 current / oldNext / T 与完整区间；直接映射清单不能当作最终闭包。缺少范围、关联或依赖证据的批次 held，不截取前 N 页提交。
+- 独立批次按已证明的上游历史顺序稳定选择，使用不可变 SHA 作并列排序；首版每次只处理一个完整批次，其他批次报告为等待。下一轮从新 M/D/T 重新计算，不能以旧游标或排队状态授予认证。已有任意本工具更新 PR 或无法解释的 owned 分支时保留全局暂停；首版不跨过未知 mutation、遗留分支或人工改动继续新建。
+
+**2. 同批计划、候选与报告。**
+
+- 同批共享固定 M、D、工具/配置/toolset 身份、源仓库/track 和 T。每页独立认证最新合格 Fetch 的 run/attempt、source bundle、success/reused receipt、baseline、本次发布与当前 D 字节、新鲜度；profile 相同只说明代码/配置身份相容。任一必要成员过期、unknown、渲染失败或 namespace/锚点关系不明，则整个批次不生成可写候选。
+- 复用 core 的多 subject `planUpdateUnit` 和逐页 material context，真实采用单元不可拆开；较大的审阅批次可以合并完整采用单元，但不省略成员报告。补齐 core 当前公共 pins 检查未强制的共同 T 约束。无有效相关源变化的成员保留必要的报告，但不为了“所有页齐步走”强改 next；整组无有效编辑则为已认证 noop。
+- 一个批次生成一份 plan/proof、一个隔离候选 K、一个签名 seal S、一条 Draft。候选只允许计划明确列出的 lock.next 改动；current、schema、其他锁字节、transforms、源正文、导航、active ownership 和 generated 内容保持原字节。计划 edits 是实际需要修改的页子集，不能以 `subjects.length === edits.length` 误拒必要的 noop 成员。
+- prepare/Python、formal validator、原始 Git delta、候选对象传输、签名、writer 与后续 Check 消费端都验证同一份完整 plan 和精确 edits 集合。缺失/多余 lock、漏报告、跨批 proof、部分上传或伪造方法标记在远端 mutation 前拒绝；不以多个单页成功拼成未验证的整批成功。保留丢响应后停止、读回核对、去重和人工合并边界。
+- 完整批次成员与分组所用的区间/上游关联证据必须由可信协调进程固定，并与计划的 subjects/reports 逐项绑定；不能靠 PR 正文、调用方页数组或后续消费者取第一个 report 来恢复批次范围。沿用已有冻结 v1 的字段语义；若现有外层证据不足以表达该绑定，须明确新增有版本且参与摘要的外层格式与严格消费者，不能向冻结对象悄悄加未知字段。
+- 只读报告供扫描结果归档，Draft 正文提供审阅摘要和 artifact 链接：上游 PR/直接提交、完整 T、各页旧 next→T、实际编辑/必要 noop、配置目标、依赖与未接管文件、held 原因及证据摘要。报告与 PR 正文是说明，plan/proof 和认证字节才是验收依据；只读扫描本身不创建 PR、不写 Check。
+
+**3. 持续 Fetch 认证与有界采集。**
+
+- 为扩大严格锁数据例外引入独立的 `fetch-producer-profile-v2`，保留 v1 的 pilot-only 语义及历史重放。规范化集合只能来自受信 M 已验证的 Guides 配置，覆盖这些配置声明的现有规范锁；不能来自请求页数组、候选、F 的配置或 operator 白名单。目录/模式/类型仍绑定；只有严格规范三行锁数据可归一化，其他合法拼写仍比较 raw OID，非法、缺失或超限拒绝。
+- 所有配置、代码、workflow、policy、README、MDX/sidebar 及未知文件继续 raw 绑定；新增/删除页面配置仍改变版本，不以“扩页”信任任意新树。仍证明 F→M 祖先、固定仓库/event/attempt 与完整 per-run 发布资格，不增加 manual Fetch 准入。新版工具合并后可能等待下一次相容版本的正常 Fetch，不能靠逐 run 例外跳过。
+- raw Git reader 在现有每事务最多 16 次 Git 调用、64 MiB 总 stdout、60 秒、单清单 32 MiB/20,000 项及单锁 64 KiB 内，用严格有界、去重、逐 OID/类型/长度认证的 batch body 读取规范锁，不能按 93 个锁逐个 spawn。整个 profile 认证的预算不因逐页采集重置；解析、framing、超时和截断仍 fail-closed。
+- measured bootstrap 固定一次 M/F 和受信配置集合，以私有闭包将认证能力绑定每个实际选中页面与 evidence run；扩展单次使用生命周期时必须覆盖全部真实调用，不复用失效授权。不能把身份能力序列化到 worker JSON、冻结 v1 envelope 或普通请求。B1→Python→writer 保留带版本的完整 method/M/F/digest，并拒绝混用 v1、v2、legacy 或缺字段降级；standalone B1 不因此取得生产权限。
+- 按页有界采集并及时落内容寻址证据，避免把每页原始大结果拼成一个内存 JSON；每页 worker 仍接受现有边界约束，整体资源也须实测。现有 128 MiB result、32 MiB request、prepare 75 分钟、writer 20 分钟和 producer archive 的 16 MiB/64 成员等限额不自动提高。约 93 MiB 的既有单页结果不能外推为 12 页可通过；若现有 wire 不能安全支撑，先独立审定有版本且有界的传输方案。容量不足报告整组 held，不拆散关联页或只提交部分。
+
+**4. #3848 验收样例与停止条件。**
+
+固定设计样本为 [milvus-docs #3848](https://github.com/milvus-io/milvus-docs/pull/3848)：base `5479f04fcf7c379ede9548be1d917795eb4646b3`、head `0115d5854c81f35e43d869955a00371501aa8e19`，22 个文件（4 个新增公共片段、1 个导航文件、15 个修改的 Markdown、2 个删除的 Markdown）。观察时仍为 OPEN/Draft；只可作固定历史/假设合并的设计测试，不能将未合并 head 授权为生产 T。
+
+按 M 的实际源路径直接映射到 12 页：`basic-filtering-operators`、`bitmap-index-type`、`index-struct-array`、`inverted-index-type`、`json-field-overview`、`json-indexing`、`manage-collections-sdks`、`ngram-index-type`、`pattern-match`、`rtree-index-type`、`slt-sort-index-type`、`use-array-fields`。这是实际配置 ID（包括 `slt-sort` 拼写），不是最终受影响闭包。新增片段跨多个索引页面引用，必须采集真实预处理结果并核查跨页锚点。
+
+两份删除文档，以及 scalar_index/trie/load_balance 等未直接映射的改动须列入报告；未映射不代表没有链接影响。工具不因上游删除而删除 Cloud 文档/配置/ownership，不自动复制 Milvus 导航，不宣称该 PR 的全部内容已在 Zdoc 接管。若未接管内容导致共享输出链接或锚点不成立，应整组 held 并给出人工修复范围。
+
+| 验收项 | 必须保留的结果 |
+|---|---|
+| 93 页库存与边界 | 配置/active/published 对应，Cloud-only 与双侧正反例；未激活、其他组/仓库、variants、冲突归属不因枚举而自动获准。出现尚不支持的 variants 时明确 held |
+| 批次识别 | #3848 的 12 页直接清单、片段间接影响及未映射/删除分别展示；同 PR 不拆页，跨 PR 重叠/依赖合组，独立 PR 可区分；无 PR 的已证直接提交、关联未知、分页截断、不同旧 next、T 移动均有断言 |
+| 全组计划与语义 | 真实 collector 的片段/锚点/图片证据；依赖组某页失败全组零候选；必要 noop 不强改 next；完整组 noop 认证成功且零写入；禁止用无依赖 fixture 代替 #3848 的闭包证明 |
+| 新版来源身份 | 93 锁 batch 读取在原预算内；只改规范锁的 v2 相容正例，改代码/配置或未知文件不相容；无私有上下文、伪造 JSON、错 M/F/页/run、v1 越界、降级/mixed 方法、对象缺失/超限全部停止 |
+| 原子候选与远端安全 | 多 lock raw Git 差异和对象传输，所有 current/非允许字节保持；漏页/漏报告/额外路径/错误 proof 零写；重复运行、有开放 PR、owned 残留、并发改 head/refs、未知写结果均停止，不再创建第二条 PR |
+| 容量与回归 | 完整 12 页实测时间/内存/每页 wire/最终归档大小和成员数，保持现有预算；运行实际 diff selector 全部门禁；不新增 skip/放宽时限来取得绿色。库级 fixture、真实本地 collector、隔离 hosted 与生产证据分开记录 |
+
+**5. 实施顺序与交回标准。**
+
+| 切片 | 交付范围 | 进入下一片的证据 |
+|---|---|---|
+| 批次发现与只读影响报告 | 枚举已激活配置、固定区间/上游关联和 #3848 分组样例；先报告，不接 writer | 直接映射与已知依赖完整覆盖、歧义停止；尚未经过多页 collector 的组明确为待验证，不能发出可写计划或宣称最终闭包 |
+| 多页资格与采集 | profile-v2、batch Git reader、measured provider、B1/Python 方法；必要时先审有界传输 | 实际入口与消费者正反例、真实闭包及容量测量通过；多页在现有限额内完成，单页旧路径保持。若真实样本仍未合并，只能交离线证据，不能称生产通过 |
+| 多 lock 原子候选与 Draft | prepare、proof、传输、writer、formal validator 同步支持完整组，保留全局开放 PR 暂停 | 本地/隔离仓库真实多页整组成功与失败零操作，最终代码主审及 CI；不自动取得生产写入授权 |
+| 生产准入 | 固定最终代码，先只读，再另行批准一次批次 Draft 与重复运行停止验证 | 单页持续来源资格仍需补齐；生产合并/运行由用户对具体操作授权，不将 nightly Fetch 成功等同于此验收 |
+
+主会话维护设计和主审，执行 Agent 按已确认完整稿在 fork Draft PR 先交短实施计划，再实现并回到主审。代码 PR 按上述依赖切片交付，避免一次混入所有功能或把未接线库函数写成产品完成。此轮不包括 SDK、WP13 current 提升、滚动修改已有 PR、自动内容合并、自动 Check 激活、手动 Fetch 认证、Fetch/Translation 调度与发布策略；已有单页持续资格及 Check 正例继续独立 pending。
 
 #### 后续切片与准入条件
 
