@@ -896,7 +896,7 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 
 #### 多页资格与采集第二片 Implementation Plan（2026-11-17）
 
-**状态。** 用户已授权在验收 #1331/#95 后继续本片，由 subagent 实现、主会话主审。#1331 的精确候选 `2f5a6777` 经 [44097730636](https://github.com/zilliztech/zdoc/actions/runs/44097730636) 的中英文构建、shared-docs light/isolated 与最终 gate 通过后，由串行同步工作流合并为 `ca7af792`；主会话已独立确认候选归属、dev 内容保持及合并树一致。设计 #95 合并为 `a996e1e5`。本片基线为 master `3839abb3`，先在 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32) 实施；Task1–3 已完成并通过主审、独立复审与对应证据门；Task4 已交新的 subagent 实施。
+**状态。** 用户已授权在验收 #1331/#95 后继续本片，由 subagent 实现、主会话主审。#1331 的精确候选 `2f5a6777` 经 [44097730636](https://github.com/zilliztech/zdoc/actions/runs/44097730636) 的中英文构建、shared-docs light/isolated 与最终 gate 通过后，由串行同步工作流合并为 `ca7af792`；主会话已独立确认候选归属、dev 内容保持及合并树一致。设计 #95 合并为 `a996e1e5`。本片基线为 master `3839abb3`，先在 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32) 实施；Task1–3 已完成并通过主审、独立复审与对应证据门；Task4 实现及整分支主审已通过，运行实现 `ebda18aa98` 的三条完整重放及 `efcb2093` 的本地完整门禁已通过；最终测试收尾 `d131a0a8` 的 TCB 实跑与上游 [#1335](https://github.com/zilliztech/zdoc/pull/1335) 的 13 项检查成功、8 项条件跳过，主审完成本片只读范围验收。工具和设计记录仍为 Draft，尚未合并；历史容量、生产 v2 资格与原子候选不在本次完成声明内。
 
 主会话与独立设计审查已确认以下完整契约。源代码核查发现单页 issuer 与大结果不能直接循环复用，采用“逐页内容采集 → 真实依赖闭包 → 单次集中资格 → 独立 Python 校验 → 只读索引”的两阶段路径；保留既有 FD3 framing、v1 pilot 与全部组件限额。此为实施计划通过，不是运行、12 页容量或生产资格通过。新工具与旧 Fetch 可能不相容；正向生产 v2 资格仍需后续同版本正常 Fetch。旧 writer 明确拒绝 v2/mixed，正向 v2 writer 留给原子候选片。
 
@@ -905,7 +905,7 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 | 1. profile-v2 与有界 Git 读取 | M 配置推导锁集合、93 锁实际命令/字节计数、v1 正反例保持 | 已验收；两项阻塞已修复并复审通过 |
 | 2. 逐页内容与完整闭包 | 原始变化/孤立片段/变换嵌套依赖全覆盖、真实收据与 effective namespace | 已验收；组外已发布引用漏检已修复并复审通过 |
 | 3. 集中资格与 Python | 一次 M/F 认证、真实 per-run 字节、私有执行承诺与独立校验根 | 已验收；实际五进程重放、错误 current 与证据替换反例通过 |
-| 4. 只读入口与实测 | 完整三页正反例、真实历史采集/容量分项证据、最终 selector 全部门禁 | subagent 实施中；组合源码与最终门禁仍待验证 |
+| 4. 只读入口与实测 | 完整三页正反例、真实历史采集/容量分项证据、最终 selector 全部门禁 | 已验收本片只读范围：三条 replay、本地门禁、最终 TCB 实跑和原生 CI 通过；历史 12 页容量及生产资格继续 pending |
 
 
 > For agentic workers: use subagent-driven-development task-by-task; main conversation owns design and review.
@@ -1119,6 +1119,30 @@ pnpm test:for-change -- --base origin/master --head HEAD
 Query actual enumerated paths before editing and re-run on complete diff at handoff, including untracked/new files before commit. Representative selector union on this base: `pnpm test:shared-docs`, `pnpm test:shared-guides-update`, `pnpm typecheck`, `pnpm test:workflow-matrix`, `git diff --check`, `pnpm test:workflow-policy`. Run any additional commands returned for actual paths. Report library/transport fixtures, real collector execution, immutable replay, isolated hosted and observed production evidence separately; mark measurements and all suites not executed in this planning task as pending.
 
 Task-specific focused validation: Task 1 runs raw reader/profile + discovery registry tests. Task 2 runs batch-discovery/source/collection render and impact/units/equivalence tests. Task 3 runs trusted launcher/broker/stage/qualifier + Python and writer pilot rejection tests. Task 4 runs the real measured batch-collect entry, raw replay/E2E and targeted safety/capacity regressions. Full selector union only once at final committed SHA.
+
+**Task4 实施与主审（2026-11-18）。** 运行实现 `ebda18aa98398278361a36423f8580ea95d51955` 增加只接受 source/out 的本地 `batch-collect.mjs`，连接实际发现、逐页内容、完整闭包、一次整组资格、独立 C/Python 校验、最终新鲜度和独占只读指针。源码、分项审查及新的整分支审查均已通过。审查发现并修正源片段快照和隐含解包目录的预算遗漏、发布及收尾期间的有效期缺口，最后补齐中间提交/父提交的真实渲染峰值；同一次有界 source 事务认证完整集合，预算取端点并存快照与逐次中间快照的最大值，不提高原限额。批次专用解包在写树前约束全部文件/隐含目录不超过 20,000，旧 v1 路径保持原义。窄扩展只涉及实际需要的 lifecycle、操作取消及安全 Git 读取，未改工作流、调度、真实锁、生成内容或 writer 激活。
+
+本地完整门禁提交 `efcb2093dbada7cfd5af218d0bd820d0ab9922f4` 仅把小数快照用例的 fixture 调用换成同文件已有的简单 Markdown fixture；全部 provider/1.5/原始字节/discovery 断言及 5 s 时限不变，定向复审通过。首次完整门禁在 `ebda18aa` 上因该用例 5 s 超时退出，240.725 s 后 fail-fast，原始计数不完整，后续隔离阶段未运行；此失败原样保留。旧/新单例约 3.42/3.27 s，均仍出现 18 次 MDX repair，不能称已经证明超时根因。该提交完整重跑中该用例为 4.63 s，仍接近原时限；全套在原 900 s 上限内通过。主会话逐项比较所有 tracked blob/mode，确认只有该测试行变化、运行代码及 raw-capture fixture 字节完全一致；旧三条实跑保留 `ebda` 标签并按未变运行路径接受，不重标为新 SHA。测试本身进入 TCB 指纹，并未被排除；`efcb` 身份的额外成功实跑已完成，随后最终 `d131` 身份亦重新完成一次真实正例，不能把旧 SHA 的记录重标为新 SHA。
+
+首次上游 [CI 44176648265](https://github.com/zilliztech/zdoc/actions/runs/44176648265) 在三个新增原生测试直接请求 Linux capture 时失败，产品按设计拒绝是正确行为，测试遗漏了平台契约。最终 `d131a0a8526e8c4a1dd37b4909f1fb6c46258a07` 只改 `toolset.test.ts`：Linux 分支在建立 fixture 前真实断言拒绝发行能力，受支持平台保留全部原测量/票据/broker/收尾断言及超时；纯 JSON 票据拒绝用例在所有平台运行。另把两个新 Git 边界用例移出旧 Linux skip 块，改用同一真实拒绝断言，静态注册计数恢复 103+4=107，未提高跳过上限或修改生产守卫。Mac 完整受影响文件 122/122 属于移位前的保留 blob；最终两个移位用例 2/2 和反向字节重建/无 group hook 丢失证明另行留证，不假称最终 HEAD 全文件重跑。typecheck、matrix 27 和 diff-check 通过，定向复审确认唯一改动文件及其余 8,330 个 tracked 项的 mode/object 不变。
+
+Python 与协调进程使用同一现场控制根和两阶段私有回执；发布有效期采用保守的单调往返耗时，并在子进程、目录 FD、采样及日志全部收尾后再次同步检查。可捕获的 link/fsync/有效期失败仅撤回本次安装的 inode；不可捕获的主机丢失可能保留未确认的数据描述文件，结果必须 held，不能恢复或当作完成授权。磁盘描述文件不宣称进程已完成，`collected` 仅由当次活协调过程给出。未知结局不重试、不恢复过去目录。
+
+| `ebda18aa98` 支持环境重放（保留原 SHA） | 结果与独立核验 |
+|---|---|
+| 混合目标三页 | fixture M=F `80b7b80b`；advance/advance/noop，目标数 2/1/2，success/reused/reused。五个进程 close=0、group absent、无清理错误；输入前后未变。实际 ZIP 8 成员、11,328 compressed / 28,887 expanded bytes；成员/CRC/摘要已读取校验 |
+| 非空上游改后还原区间 | fixture M=F `da7e6e97`；三页均为必要 noop、operations=[]。五进程正常收尾，实际 ZIP 8 成员、11,875 compressed / 30,927 expanded bytes；输入未变 |
+| 最终 D 变化 | 独立 final-pass 原始 GET 在最后报告另一 D；整组 held/BATCH_PIN_CHANGED、index:null、零操作、无 `index.json`。四个 Node 子进程正常结束，等待提交的同一 Python 实际 SIGTERM，进程组清空且无清理错误 |
+| 独立根篡改 | 捕获的独立 Python 20 次探测：一个原始正例发匹配 ACK，19 个替换/省略/重复/会话/模式/方法等反例 exit 1 且无 ACK；原先正例的指针逐字节未变。这些是保留证据的验证器探测，不是恢复现场能力，也不宣称目录原先没有指针 |
+| 最终提交完整门禁 | `efcb2093` 的 38 路径 selector 联合六条命令全部 exit 0；shared-docs 四阶段/109 文件为 2,039 passed / 0 failed / 6 既有 skips，终态 838,298 ms < 900,000 ms；Guides 为 Node 76 / Python 37（内部 26 场景不重复计数），matrix 27、policy 118、typecheck/diff 通过。这些是 `efcb` 上的原记录，按运行代码未变保留，不改称最终 `d131` 本地全套重跑 |
+| 最终 TCB 身份 | `d131a0a8` 真实 replay 正例通过，fixture M=F `de627701`，新工具集 `2f190f7c…`；五进程正常收尾、输入未变、8 个实际 ZIP 成员为 11,355 compressed / 28,887 expanded bytes，独立成员/CRC/摘要验证通过 |
+| 上游 CI | [#1335](https://github.com/zilliztech/zdoc/pull/1335) 当前 `d131a0a8` 的 13 项检查成功、8 项条件跳过；[site validation 44180348094](https://github.com/zilliztech/zdoc/actions/runs/44180348094) 在 Ubuntu 24.04 / Node 22.23.4 成功。light 为 1,864/0/114，isolated 为 68/0/0。实际测试合并 `08bd5528` 的树 `75f35ab0` 与已审 HEAD 完全一致 |
+
+以上均为动态链接 Node 26.7.0 / macOS 本地重放。三条重放耗时约 208–210 s，采样间隔目标 100 ms，最大 RSS/disk 间隔分别为 171/122、114/118、143/118 ms，sampleErrors=0；峰值采样 RSS 约 2 GiB，磁盘采样约 58 MB。它们不是 OS 全生命周期精确峰值，也不包含 fixture 配置/初始 replay capture 的耗时。主会话另外重算最终 Q/I 的物理及域摘要、实际 ZIP 各成员和输入前后记录。真实 600 s 超时在较早 `6108318` 上完成，601,718 ms、实际 SIGTERM、无遗留组；仅对最终代码摘要完全相同的 timeout/terminal-settlement 尾段保留有效，不能改称最终源码实跑或 ACK 协议验证。32/128 MiB、CAS、ZIP、根替换、晚过期及收尾失败分别按实际流、本地文件或明确标注的故障/时钟注入留证，Node 实验性告警和 fixture 诊断原样保存。
+
+最终 `d131` 身份实跑耗时 206,417 ms，RSS/disk 各 2,043 次采样，最大间隔 111/114 ms、0 错误；这些仍是本地采样而非 OS 精确峰值。最终原生 Linux 门禁在已审树上无 `-t` 筛选运行完整文件，结合无 skip 的真实拒绝断言和 qualified gate 成功确认拒绝路径；现有 workflow 仅在失败时上传逐例 raw JSON，成功轮没有该 artifact，未声称直接读取成功轮逐例 JSON。英文/中文整站构建及 discover/history/prepare/write 按条件跳过，本次 CI 不等于生产 Fetch 或批量 PR 验证。
+
+**未完成项仍保留。** #3848 提供的不可变源对象存在，但缺少独立固定的完整 D/lifecycle/归档/图片前置证据，依计划在采集前暂停：0/12 material launches，不能宣称 12 页容量通过。Linux 正向捕获仍拒绝，原生 Ubuntu/Node 22 的拒绝路径按上述完整 CI 验证；未伪造平台或新增 skip。当前结果全部为 replay，不是生产 v2 资格；未来有签名 producer 的容量、多 lock 原子候选/Draft、真实同版本 Fetch 和生产 Check 仍未验收。原有源码开 FD 的部分失败清理与可读性整理为非阻塞维护项；全 noop 最早组不能饿死后续组的策略留给原子候选设计。本片不修改 WP12 的 pending 需求编号。
 
 #### 后续切片与准入条件
 
