@@ -1,6 +1,6 @@
 # WP12-B 走读：本地准备、单页 Draft PR 与只读验证
 
-截至 2026-11-16，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线生产输入验证、定时 producer 认证和手动只读报告已合并；下一片是签名提交的目标 Check 接入。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+截至 2026-11-17，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线验证、定时 producer 认证、只读报告和两次手动目标 Check 接线已合并；可持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并且部署 CI 成功，来源资格与真实正常 Check 仍待验收。扩页的批次设计 #94 已确认，第一片只读发现进入执行交接，生产入口仍限单页。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
 ## 已交付的部分
 
@@ -249,3 +249,30 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 用户随后授权一次合并前 Fetch 兼容性验证，[44009318863 / attempt 1](https://github.com/zilliztech/zdoc/actions/runs/44009318863) 已 success。现有 master workflow 通过 `tooling_ref` 实际执行 `40461004f`，只选 Guides，关闭发布/翻译并跳过媒体上传。英文 8 个、中文 2 个 Cloud/BYOC 渲染任务及两次整体 assembly/构建成功，实际均 regenerated；`json-field-overview` 的英文 effective snapshot 包含两侧输出。已独立核验结果归档的 API size/digest 与 publication contract：最终 artifact_only/success，两个单元发布 attempts 均为 0、提交均为空，dev SHA 保持 `62f2ba12`，Translation/发布后校验按条件跳过。构建存在较早正常 Fetch 中同样出现的非阻断链接/锚点告警，本次不宣称链接检查全覆盖。产品 PR 仍 Draft、未合并；手动运行不是 schedule-only 自动认证正例，合并后同版本正常 Fetch 的资格与新鲜候选 Check 仍待验收。
 
 后续用户明确授权两份 PR 合并。产品 #1311 转 Ready 后的新增校验通过，已以固定审阅 HEAD 合并为 `4492793f78d6761d042dbef8099007e27c08ddd7`；合并树与已通过 CI / Fetch 的工具树一致。前述 Draft/未合并表述保留为当时验证记录；当前状态为产品已合并、等待同版本定时 Fetch 的来源资格。合并后自动 CI/同步与来源资格分别记账，没有额外发起 Fetch 或生产预演。
+
+随后 master [CI 44017495874](https://github.com/zilliztech/zdoc/actions/runs/44017495874) 成功。自动 dev 同步的候选校验首次出现原有单例 5 秒超时，同候选只读重试通过；没有改时限、代码或 skips，原失败保留。用户另行授权合并 [#1313](https://github.com/zilliztech/zdoc/pull/1313)，dev 成为 `4134345635b58beea05e4eb6f17b361ac14e803f`，合并树与已验证候选一致；[dev CI 44020199701](https://github.com/zilliztech/zdoc/actions/runs/44020199701) 成功。这不替代新的 per-run 来源资格与 Check 验收。
+
+### 已激活 Guides 批次更新：设计盘点（2026-11-17）
+
+在上述 M/D 固定版本上，93 份 Guides 页面配置、93 个 active 条目与 93 份 published shared-page 记录可按 page/record ID 对应，均为 current channel。93 份锁都是严格三行格式，51 页有 transforms，没有 adopted variants；同时存在 Cloud/BYOC 双侧与仅 Cloud 的配置。盘点验证了结构与原始 Git blob，不是逐页最新 Fetch/receipt/发布输出的资格证明。当前自动入口仍硬编码 `json-field-overview`，所以这些已激活页面尚不会全部自动修改 next。
+
+用户以 [Milvus #3848](https://github.com/milvus-io/milvus-docs/pull/3848) 的批量更新纠正逐页 PR 的初步建议，并确认按上游变更批次合 PR。固定样本 head `0115d5854c81f35e43d869955a00371501aa8e19` 涉及 22 个文件、直接映射 12 个共享页，另有跨页公共片段、导航和未接管的删除/修改；这不是最终依赖闭包。观察时上游仍 OPEN/Draft，只作为设计测试，不授权生产 pin。逐页拆分及任意每日/开放 PR 数量默认值已撤下。
+
+本轮只更新设计：同批多页一份原子候选/签名/Draft，跨 PR 重叠或依赖合组；固定共同源 head，完整分析每页旧 next→目标区间；只改实际需要的 lock.next。首版已有更新 PR/未知 owned 分支则暂停新建，必要成员失败或整组超限则 held，不裁剪前 N 页；current 提升、正文/导航迁移、滚动更新已有 PR、自动 Check 激活不在此片。实际接线须覆盖 profile-v2、measured 采集、Python、完整 plan/proof、多 lock 传输与 formal validator，不能只移除一处页名常量。先做只读分组，再证明真实闭包/容量，随后才接 writer；[完整设计与验收卡](../tasks/WP12-zdoc-upstream-updates.md#已激活-guides-的批次更新设计2026-11-17完整稿已确认) 已获用户书面确认，第一片只读发现的精确实施卡已附在任务卡中，交执行 Agent 实现并回主会话主审。没有改产品代码或启动生产操作。
+
+
+### Guides 批次发现第一片：只读实现与现场报告（2026-11-17）
+
+用户确认完整批次设计后，由主会话分发 subagent 完成 core 分组、原始 Git/GitHub 独立观察、实际 CLI 和完整集成，分别审查后进入整分支主审。[Fork Draft #31](https://github.com/liyun95/zdoc/pull/31) 的最终本地工具提交为 `e75c6333362ff27a2831d27d8cb3c63286489641`，基线为 `bcbe89e5`。14 文件净差异不修改生产 workflow、锁或现有 writer；独立入口只在本地写出 `batch-report.json` / `batch-report.md`，所有组都是 pending-collector，所有报告 writeEligible:false。临时实施计划已经普通提交移除；任务、审阅和结果统一记录在现有[精确实施卡](../tasks/WP12-zdoc-upstream-updates.md#批次发现第一片-implementation-plan2026-11-17)。
+
+最终代码上的完整 shared-docs 为 1,926 passed / 0 failed / 6 个既有 skips；Node Guides 更新 70、Python 24、matrix 27、policy 118 通过，typecheck/diff-check 通过。108 个 Vitest 文件被完整运行，3 个新增文件各发现一次。保留测试终态、原始计数、失败记录和报告哈希。fork 专用 base 没有 hosted Checks，本地通过不冒称上游 CI。
+
+固定 #3848 重放保留历史未合并、生命周期未知和部分源区间，形成 12 页的一组并 held。真实现场在补齐当前固定 Git 对象后，读回 93 页配置/激活/发布库存、169 条变化路径和 3 个待验证组（22/1/1 页），当前 Milvus #3848 已作为已合并种子出现；不能将现场状态反写进冻结历史样本。工具与 M/D/T 分开绑定，现场仍因公共片段、未映射变化和部分 PR 关联未证实而 held，没有任何候选或远端写入。旧 `c9117df41` 最初因 M/D/T 对象缺失而未生成报告；最终 `e75c63333` 首轮仅缺新的 T，生成了完整 held 诊断。两者都与各自补齐对象后的完整报告分开保留。
+
+这证明只读发现可实际运行，不证明多页更新资格或最终依赖闭包。生产依旧单页，Fetch/Translation 调度未变；下一片验证多页认证、真实 collector 和容量，再实现原子多锁候选。最终整分支主审的七项重要问题已集中修复并通过增量复审；没有遗留阻塞项，尚有不影响分组与 held 的 fragment-only 原因码精度问题。最终提交全部门禁与现场报告重放已完成；产品已提交 [上游 Draft #1327](https://github.com/zilliztech/zdoc/pull/1327)，仍未合并或运行生产 workflow。
+
+最终现场工具为 `e75c63333`、M `3a604dfc`、D `c8c9839e`、源 T `916cbd00`，#3707 仅保留 11 条导入主干的 held 依赖线索，不再作为任何页面的直接 seed。完整本地终态为 grouped run `45633ea9-2efd-4b1b-991c-4844951381a6`，现场 JSON SHA-256 `712c2e99362734434cf4f2b766393bc1167a2c5e5173a7682e8a8a5f16165642`。最终工具首轮因源 T 已前进而缺对象的 held 诊断，以及 CLI 外补齐固定对象后的完整报告分别保留。
+
+输出失败时允许保留私有目录和最多两份不完整文件，避免路径被替换后清理外来内容；只有完整对被核验后才算报告生成完成。新增发现模块在现有 engine inventory 目录内，因此合并可能使 Fetch 缓存失效、共享页重新生成；未修改触发、发布或调度，没有额外启动生产 workflow。多页 collector/资格、原子候选和生产准入继续按已确认设计分片推进。
+
+随后按用户授权提交上游 Draft #1327。GitHub 测试合并 `6dfe4377` 的树与本地预演完全一致，相对新 master `3a604dfc` 的 14 文件补丁没有变化；自动 CI 已全部结束：13 success、8 个条件 skips，三份 workflow 均 success、最终 Site gate 成功。Node 22.23.4 / Linux 的 shared-docs light 1,750 / 0 failed / 114 既有 skips、isolated 68 / 0 / 0，Guides 更新 Node 70、Python 24 通过；实际 checkout 与上述测试合并 SHA 一致。内容构建的跳过和 Linux capture 的既有资格缺口保持，不冒称真实 Fetch 端到端验证。生产写入步骤按条件跳过，没有启动 Fetch/Translation 或合并产品。
