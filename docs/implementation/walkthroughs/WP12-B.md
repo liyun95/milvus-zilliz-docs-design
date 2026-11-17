@@ -1,6 +1,6 @@
 # WP12-B 走读：本地准备、单页 Draft PR 与只读验证
 
-截至 2026-11-17，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线验证、定时 producer 认证、只读报告和两次手动目标 Check 接线已合并；可持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并且部署 CI 成功，来源资格与真实正常 Check 仍待验收。扩页进入按上游变更批次组织多页 Draft 的设计审阅，生产入口仍限单页。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+截至 2026-11-17，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线验证、定时 producer 认证、只读报告和两次手动目标 Check 接线已合并；可持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并且部署 CI 成功，来源资格与真实正常 Check 仍待验收。扩页的批次设计 #94 已确认，第一片只读发现进入执行交接，生产入口仍限单页。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
 ## 已交付的部分
 
@@ -258,4 +258,4 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 
 用户以 [Milvus #3848](https://github.com/milvus-io/milvus-docs/pull/3848) 的批量更新纠正逐页 PR 的初步建议，并确认按上游变更批次合 PR。固定样本 head `0115d5854c81f35e43d869955a00371501aa8e19` 涉及 22 个文件、直接映射 12 个共享页，另有跨页公共片段、导航和未接管的删除/修改；这不是最终依赖闭包。观察时上游仍 OPEN/Draft，只作为设计测试，不授权生产 pin。逐页拆分及任意每日/开放 PR 数量默认值已撤下。
 
-本轮只更新设计：同批多页一份原子候选/签名/Draft，跨 PR 重叠或依赖合组；固定共同源 head，完整分析每页旧 next→目标区间；只改实际需要的 lock.next。首版已有更新 PR/未知 owned 分支则暂停新建，必要成员失败或整组超限则 held，不裁剪前 N 页；current 提升、正文/导航迁移、滚动更新已有 PR、自动 Check 激活不在此片。实际接线须覆盖 profile-v2、measured 采集、Python、完整 plan/proof、多 lock 传输与 formal validator，不能只移除一处页名常量。先做只读分组，再证明真实闭包/容量，随后才接 writer；[完整设计与验收卡](../tasks/WP12-zdoc-upstream-updates.md#已激活-guides-的批次更新设计2026-11-17完整稿待审) 仍待书面审阅。没有改产品代码或启动生产操作。
+本轮只更新设计：同批多页一份原子候选/签名/Draft，跨 PR 重叠或依赖合组；固定共同源 head，完整分析每页旧 next→目标区间；只改实际需要的 lock.next。首版已有更新 PR/未知 owned 分支则暂停新建，必要成员失败或整组超限则 held，不裁剪前 N 页；current 提升、正文/导航迁移、滚动更新已有 PR、自动 Check 激活不在此片。实际接线须覆盖 profile-v2、measured 采集、Python、完整 plan/proof、多 lock 传输与 formal validator，不能只移除一处页名常量。先做只读分组，再证明真实闭包/容量，随后才接 writer；[完整设计与验收卡](../tasks/WP12-zdoc-upstream-updates.md#已激活-guides-的批次更新设计2026-11-17完整稿已确认) 已获用户书面确认，第一片只读发现的精确实施卡已附在任务卡中，交执行 Agent 实现并回主会话主审。没有改产品代码或启动生产操作。
