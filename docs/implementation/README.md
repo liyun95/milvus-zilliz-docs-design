@@ -244,7 +244,7 @@ L1、L2 必须全绿才能提审；L3 的差异要么是上游的正常修改，
 | WP9b | [Fetch 收尾：写 dev 前的保护与真实运行的遗留问题](./tasks/WP9b-zdoc-fetch-followups.md) |
 | WP10 | [变换：命名块、语言、代码行三级](./tasks/WP10-zdoc-transforms.md) |
 | WP11 | [两版合并与 `channel`](./tasks/WP11-zdoc-two-version-merge.md) |
-| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2 和 B3 内核已合并；单页生产 Draft #1236 已实测；离线验证、只读报告及手动 Check 接线已合并。诊断 #1307、持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并，部署 CI 成功；持续来源资格与真实正常 Check 仍待验收。用户确认扩页按上游变更批次合一条多页 Draft，跨 PR 依赖合组、已有更新 PR 暂停新建；[完整设计已确认](./tasks/WP12-zdoc-upstream-updates.md#已激活-guides-的批次更新设计2026-11-17完整稿已确认)，[批次发现第一片](./tasks/WP12-zdoc-upstream-updates.md#批次发现第一片-implementation-plan2026-11-17) 已在 fork Draft #31 实现，七项重要问题修复并复审通过，最终提交全部本地门禁通过；现场只读实跑完成，报告仍 held；多页资格/真实采集及原子候选仍待实现，当前生产仍限单页。Linux、SDK、已有 PR 滚动更新和完整生命周期继续 pending） |
+| WP12 | [上游更新：A/B 分阶段交付](./tasks/WP12-zdoc-upstream-updates.md)（A、B1/B2 和 B3 内核已合并；单页生产 Draft #1236 已实测；离线验证、只读报告及手动 Check 接线已合并。诊断 #1307、持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并，部署 CI 成功；持续来源资格与真实正常 Check 仍待验收。用户确认扩页按上游变更批次合一条多页 Draft，跨 PR 依赖合组、已有更新 PR 暂停新建；[完整设计已确认](./tasks/WP12-zdoc-upstream-updates.md#已激活-guides-的批次更新设计2026-11-17完整稿已确认)，[批次发现第一片](./tasks/WP12-zdoc-upstream-updates.md#批次发现第一片-implementation-plan2026-11-17) 已在 fork Draft #31 实现并提交上游 Draft #1327，七项重要问题修复并复审通过，最终提交全部本地门禁通过、上游 CI 13 项成功、8 项按条件跳过（Draft 未合并）；现场只读实跑完成，报告仍 held；多页资格/真实采集及原子候选仍待实现，当前生产仍限单页。Linux、SDK、已有 PR 滚动更新和完整生命周期继续 pending） |
 
 其余的在对应工作包开始前写，写完由推动者确认。任务分发与审阅按下文协作规则执行；WP12/WP13 的公共接口见 [WP12 任务卡](./tasks/WP12-zdoc-upstream-updates.md#接口)。阶段验收不等于整个工作包需求结项。
 

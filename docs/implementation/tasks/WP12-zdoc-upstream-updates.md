@@ -863,7 +863,7 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 - [x] 停在主会话主审，不自动转 Ready、提上游、合并、建内容 PR、写 Check 或手动发起/重跑 workflow（包括 Fetch/Translation）；正常 PR CI 沿用仓库触发。主会话先审设计符合性和行为，再决定上游工具 PR；第二片 profile/collector 另按已确认总体设计补精确实施卡。
 
 
-**第一片实现与验证记录（2026-11-17）。** 用户改为由本主会话分发 subagent 实施并主审。实现进入 [Fork Draft #31](https://github.com/liyun95/zdoc/pull/31)，最终本地工具提交 `e75c6333362ff27a2831d27d8cb3c63286489641`，审阅基线 `bcbe89e5e54ca6706ca44cbe99a29ecb8c56ba16`；上游已合并的 SDK/超时等改动以普通 merge 纳入，但不计作本片实现。最终净差异 14 个文件，临时计划以普通提交删除；增加私有 `batch-publish.mjs` 负责绑定输出目录、排他写入及同 fd 读回两份完整报告，不移动或递归清理外来目录。生产 workflow、真实 lock、profile、collector/Python、现有 discover/prepare/write 和 formal validator 均未改。本轮仍保持 Draft，尚未提交上游或合并。
+**第一片实现与验证记录（2026-11-17）。** 用户改为由本主会话分发 subagent 实施并主审。实现进入 [Fork Draft #31](https://github.com/liyun95/zdoc/pull/31)，最终本地工具提交 `e75c6333362ff27a2831d27d8cb3c63286489641`，审阅基线 `bcbe89e5e54ca6706ca44cbe99a29ecb8c56ba16`；上游已合并的 SDK/超时等改动以普通 merge 纳入，但不计作本片实现。最终净差异 14 个文件，临时计划以普通提交删除；增加私有 `batch-publish.mjs` 负责绑定输出目录、排他写入及同 fd 读回两份完整报告，不移动或递归清理外来目录。生产 workflow、真实 lock、profile、collector/Python、现有 discover/prepare/write 和 formal validator 均未改。本轮先在 fork 完成主审，随后按用户授权提交 [上游 Draft #1327](https://github.com/zilliztech/zdoc/pull/1327)，仍未合并。
 
 | 最终提交验证 | 结果 |
 |---|---|
@@ -881,6 +881,8 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 **主审修复与 Fetch 影响。** 修复覆盖第二父分支锁到目标的实际变化、topic 分支导入主干的路径归因、关联查询失败后同提交页面保持合组、输出路径重复 ownership、变化区间缺少提交证据、执行工具字节与 tools SHA 绑定，以及发布失败时不再按可替换路径清理。失败时允许保留私有目录和最多两份不完整文件，诊断非空且绝不返回部分成功报告。旧提交 `c9117df41` 的 1,920 项完整结果独立保留，不作为最终提交通过依据。新增模块不接生产 Fetch，但其路径处于既有 engine inventory 覆盖范围；合并会改变指纹，可能使共享页重新生成，不能声称 Fetch 零影响。触发、调度、发布策略未修改，未执行额外生产 Fetch。
 
 最终代码终态保留 grouped run `45633ea9-2efd-4b1b-991c-4844951381a6`，四阶段 834,531 ms / 原 900,000 ms 上限；aggregate 为 895,407 bytes，SHA-256 `8f89fe19cc4d04ae6634d20b910f04e422f8952e74e505a95cb453da305df0e3`。最终 replay JSON 为 81,958 bytes / `8965252a14decf67affdf0dab59f026e44d5d51f5a450bb8a3006c31b085a71f`；现场 JSON 为 295,211 bytes / `712c2e99362734434cf4f2b766393bc1167a2c5e5173a7682e8a8a5f16165642`，两份报告均有独立 Markdown。主会话复核了最终提交、原始终态/计数及报告摘要，所有所选测试合计 2,165 次通过，6 个既有 skips，不将 focused 或 Python 内部 fixture 次数重复累加。
+
+**上游提审（2026-11-17）。** 产品 [#1327](https://github.com/zilliztech/zdoc/pull/1327) 的 head 仍为同一 `e75c63333`，base 为当前 master `3a604dfc`。本地无冲突合并树为 `5093b2869891e772fd37a7ca7c4e87684e245770`；GitHub 测试合并提交 `6dfe43774ebc78994975ab0da279596130ae9034` 的树完全相同，且相对新 master 的 14 文件补丁与原审阅补丁逐字节一致。正常 PR CI 已自动启动：[site validation](https://github.com/zilliztech/zdoc/actions/runs/44054722491)、[Guides 更新测试](https://github.com/zilliztech/zdoc/actions/runs/44054721768)、[shared docs validate](https://github.com/zilliztech/zdoc/actions/runs/44054721836)；三份运行最终均为 success，13 项检查成功、8 项按条件跳过，包括最终 Site validation gate。日志确认实际 checkout 为上述测试合并提交、Node 22.23.4；Linux shared-docs light 为 1,750 passed / 0 failed / 114 个既有平台或 opt-in skips，isolated 三阶段 68 passed / 0 failed / 0 skipped；Guides 更新测试 Node 70、Python 24 通过。平台/opt-in 跳过不等于 Linux 可信捕获已获资格。CI 的内容构建按工具 PR 条件跳过，不将其当作真实 Fetch 端到端验证。生产 discover/history_checkpoint/prepare/write 按条件跳过，没有手动发起工作流。保持 Draft，不在此操作中合并或启动生产 Fetch。
 
 **仍待交付。** 本片只发现批次并产出只读证据；当前生产自动更新仍限 `json-field-overview`。下一片先完成多页 profile-v2、认证读取/真实 collector 闭包及容量测量，再进入多 lock 原子候选/Draft；不把本片完成写成全部共享页已自动更新，也未授权生产运行或合并。
 
