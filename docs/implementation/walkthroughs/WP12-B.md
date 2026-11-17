@@ -284,3 +284,9 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 第二轮 [44062001527](https://github.com/zilliztech/zdoc/actions/runs/44062001527) 的英文渲染与 assembly 通过，中文 SaaS 开发指南因整页 NEXT 与两段 NextChannel 标记冲突失败。精确保留归档和离线复现证明根因；渲染守卫与 dev 基线相同，不放宽校验。用户授权最小源修正后，写前核查发现文档已至 revision 46，两个标记已移除、正文和 NEXT 保持，本会话没有重复修改。外部 master Fetch 44081444371 的认证 source bundle 确认了这份输入，其整轮已成功，中英文构建、10 个单元发布与发布后验证通过；此结果独立于分支准入。
 
 #1327 已同步并主审最新 master 的接口影响，head `ab3257ce` 的 CI 13 项成功、8 项条件跳过；与最新 master 的预期合并树、GitHub 测试合并 `bedc3d9e` 的树均为 `deb7b408`。最终 [44086502969](https://github.com/zilliztech/zdoc/actions/runs/44086502969) 已排队，固定该工具树、publish=false、run_translations=false、media_upload_mode=skip。该轮最终 success，英文 8 表、中文 14 表及两次整体 assembly/构建均成功。对 selection/results 归档做 API size/SHA 与现有 contract 校验后确认 artifact_only/success，两个单元 ready、发布 attempts=0、commitShas=[]，目标 SHA 保持 `03cab659`；Translation dispatch 与发布后 verify 按条件跳过。按原授权合并 #1327 为 `3839abb3`，实际合并树与已验证工具树相同；合并后 master site validation 44096795099 亦 success，自动 dev 同步已生成 #1331（待候选验收和合并），不自动合并同步 PR。多页资格、collector、原子候选与 Draft 继续待后续实现，不因一次 Fetch 通过自动结项。
+
+### 多页资格与采集第二片：实施准入（2026-11-17）
+
+用户授权验收并合并 #1331 和设计 #95。主会话复核同步只带入已审工具文件及必要 REST 派生清单，实际 dev 内容保持；精确候选的中英文构建及全部门禁通过，串行工作流合并 #1331，实际合并树与候选一致。设计 #95 亦已合并。随后从 master `3839abb3` 开启 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32)。
+
+本片采用逐页有界内容采集、完整依赖闭包、一次集中 per-run 资格与独立 Python 校验，再发布只读索引；保留 v1 与既有限额。孤立/嵌套/变换引入片段、真实执行收据、必要 noop 与手册实际锚点、真实离线 stage/broker/图片和资源边界已在设计审查中补齐；尚未取得代码或容量验收结果。Task1 已交 subagent，Task2–4 继续按[精确实施卡](../tasks/WP12-zdoc-upstream-updates.md#多页资格与采集第二片-implementation-plan2026-11-17) 推进，主会话负责分项及最终审查。生产入口仍限单页，本片不创建内容 Draft 或写 Check。
