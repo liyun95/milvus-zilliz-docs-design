@@ -9,7 +9,7 @@
 ## 目标与范围
 
 - **试点：** Rust SDK Reference。Cloud 上还没有 Rust 手册，不涉及从飞书迁移、切换与归属。以后其他 SDK 照同一条路迁过来，REST 最后。
-- **node 先行走了另一条路：** node SDK Reference 已于 2026-11 起迁移为 shared-docs 的第二个组，但采用的是 Guides 逐页模型（逐页 page.yaml / lock.yaml / receipt），不是本篇的手册级布局——上游 web-content 的 node 文档没有 `doc:block` 标记也没有 front matter，逐页 overlay 即可覆盖试点目标。方案与进展见 [node SDK 迁移试点计划](../node-sdk-shared-docs-migration.md)；本篇手册级方案仍以 Rust 为首个落地对象。
+- **node 是手册级布局的首个落地对象：** node SDK Reference 于 2026-11-16 先按 Guides 逐页模型启动迁移（引擎／生产链／CI 的多组泛化已落地为 zdoc PR，属呈现无关地基，继续合入），2026-11-17 拍板改为本篇的手册级布局——node 的存量手册（dev 页面、翻译、Base 元数据）正好把后续所有 SDK 都要走的“迁移型手册接入”先硬化；Rust 改为第二个落地对象（绿地变体，只剩 dev 初始内容、着陆页、生命周期 UI、current 搜索等绿地件）。工作量对比、决策点处置与终态两组态框架见 [node SDK 迁移试点计划](../node-sdk-shared-docs-migration.md) 的「2026-11-17 更新」一节。
 - **原文：** web-content 的 `API_Reference/milvus-sdk-rust/v3.0.x/`。它在 web-content 中手写维护（web-content 的 `AGENTS.md`：“hand-curated”），不是 md2md 的输出，没有变量。
 - **不改上游的发布：** 不改 milvus.io 的构建与 Milvus 的发布流程。web-content 在 Cloud 变换需要定位的地方加命名块（HTML 注释，milvus.io 不显示）。
 - **只做 v3.0.x、只做英文。** 中文由现有的机器翻译从 dev 生成，不做人工校对。

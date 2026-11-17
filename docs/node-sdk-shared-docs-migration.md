@@ -1,6 +1,105 @@
-> **仓库侧说明（2026-11-17）**：本文复制自 zdoc 仓库 `.claude/plans/2026-11-16-node-sdk-shared-docs-migration-plan.md`，正文逐字未改；文首“状态”行反映的是方案定稿时点。执行进展：引擎泛化（WP-1）= zdoc [#1298](https://github.com/zilliztech/zdoc/pull/1298)，生产链泛化（WP-2）= [#1304](https://github.com/zilliztech/zdoc/pull/1304)，PR CI 与 pin-drift watchdog 泛化（WP-3）= [#1309](https://github.com/zilliztech/zdoc/pull/1309)，均已开出待评审；本机测试环境修复 = [#1303](https://github.com/zilliztech/zdoc/pull/1303)。生产 lane 多段接线（`_fetch-content-group.yml`，原 WP-2b）递延为 WP-4.5，与 WP-4 内容种子同期落地。配套的 201 页逐页清单副本见 [`research/evidence/node-sdk-shared-migration-manifest.json`](../research/evidence/node-sdk-shared-migration-manifest.json)。
+> **仓库侧说明（2026-11-17）**：本文复制自 zdoc 仓库 `.claude/plans/2026-11-16-node-sdk-shared-docs-migration-plan.md`，正文逐字未改；文首“状态”行反映的是方案定稿时点。执行进展：引擎泛化（WP-1）= zdoc [#1298](https://github.com/zilliztech/zdoc/pull/1298)，生产链泛化（WP-2）= [#1304](https://github.com/zilliztech/zdoc/pull/1304)，PR CI 与 pin-drift watchdog 泛化（WP-3）= [#1309](https://github.com/zilliztech/zdoc/pull/1309)，均已开出待评审；本机测试环境修复 = [#1303](https://github.com/zilliztech/zdoc/pull/1303)。生产 lane 多段接线（`_fetch-content-group.yml`，原 WP-2b）原递延为 WP-4.5；2026-11-17 拍板转手册级试点后，逐页路线的 WP-4/4.5/5/6 作废（见下方「2026-11-17 更新」），lane 接线归入 R2-node。配套的 201 页逐页清单副本见 [`research/evidence/node-sdk-shared-migration-manifest.json`](../research/evidence/node-sdk-shared-migration-manifest.json)。
 >
-> 与[技术设计 10（SDK Reference）](./design/10-sdk-reference.md)的关系：本试点不走该篇为 Rust 定义的手册级布局（manual.yaml + 整本 lock + 手册级记录），而是把 Guides 逐页模型泛化为第二个组（`shared-docs/node/pages/**`，逐页 page.yaml / lock.yaml / receipt）。原因见正文 §1.3：上游 web-content 的 node 文档 0/192 含 `doc:block` 标记、无 front matter，transform 零挂载点，逐页 overlay（链接改写 + front matter + product-names）即可覆盖试点目标；Rust 仍按设计 10 的手册级方案实施。
+> 与[技术设计 10（SDK Reference）](./design/10-sdk-reference.md)的关系：本试点不走该篇为 Rust 定义的手册级布局（manual.yaml + 整本 lock + 手册级记录），而是把 Guides 逐页模型泛化为第二个组（`shared-docs/node/pages/**`，逐页 page.yaml / lock.yaml / receipt）。原因见正文 §1.3：上游 web-content 的 node 文档 0/192 含 `doc:block` 标记、无 front matter，transform 零挂载点，逐页 overlay（链接改写 + front matter + product-names）即可覆盖试点目标。**2026-11-17 拍板：改为该篇的手册级布局，node 成为手册级首个落地对象，Rust 退为第二个（绿地变体）**。评估、终态框架与新工作包见下方「2026-11-17 更新」一节；以下正文保留为逐页路线的历史方案，其中与手册级冲突的处置（C 桶留飞书、B 桶 Base 链接语义、逐页种子）以更新一节为准。
+
+## 2026-11-17 更新：拍板转手册级（manual）试点
+
+**决定**：node SDK Reference 试点改用[技术设计 10](./design/10-sdk-reference.md)的手册级布局（`manual.yaml` + 整本 `lock.yaml` + 手册级记录 + `cloud_pages`），成为该布局的首个落地对象；Rust 改为第二个（绿地变体）。逐页路线的 WP-4（139 页种子）、WP-4.5（逐页生产 lane）、WP-5（Base 行编辑）、WP-6（逐页试跑）作废；已开出的 WP-1/2/3（#1298/#1304/#1309，链接见文首）是呈现无关的多组引擎／生产链／CI 泛化，照常合入作地基。201 页清单继续有效——它转为 R2 内容迁移的数据源（A=默认发布清单、B=exclude 清单、C=cloud_pages 迁移清单、D=评审、E=exclude 判定）。
+
+### 为什么
+
+1. **终态收敛**：SDK Reference 只剩手册级一条路线（guides 维持逐页），go/python/java/cpp/cli 后续零引擎改动复用迁移 runbook；否则终态是三套并存模型，node 逐页成为孤例。
+2. **总工作量打平**：手册级管线（原 WP-R1）无论谁先做都要建。node 转手册级自身迁移约 +2 会话，rust 省 2 会话（R1 由 node 建成），到 rust 上线合计 8–9.5 vs 逐页路线 7–9 会话——不是更省，是更干净。
+3. **迁移最贵的两块消失**：139 行 Base 链接翻转（Base 不再驱动 en 路由）与 139×2 逐页种子文件。
+4. **手册级管线的首战就是迁移**：go/python/java/cpp/cli 全是带存量翻译的活手册迁移，rust 只证明绿地。用真值最全（Base Targets/metadata）、团队最熟的 node 先把迁移路径硬化，验证价值高于 rust 绿地先行。
+
+### 事实依据（2026-11-17 dev 侧核实）
+
+| 事实 | 对手册级接入的含义 |
+|---|---|
+| dev 布局 `content/en/reference/api/nodejs/nodejs/<Module>/<Module>-<Api>.md`（11 模块目录），slug `/node/node/<Module>-<Api>` | 与手册级路径规则同构，模板走 registry（`documentIdPrefix`/`prefix`）；路径、深链、翻译键全部稳定 |
+| front matter 为 Base 真值：`added_since`（如 v2.3.x）、`type: docx`、`token`（飞书 token）、`sidebar_position`（Base 序，非字母序）、逐页 keywords | 迁移型手册的 metadata 需按页回填（一次脚本 + 评审），不能按 Rust 绿地型“规则推导 + 4 字段”直接套 |
+| registry node 源含 fallback 链 english-v2.4→v2.5→v2.6→v3.0；手册级不支持 `source.previous` | 切换前断言 fallback 当前零贡献（dev 148 = Base 170 叶 − B 22，成立）后显式丢弃 |
+| B 桶 22 页判定来自 Base Targets 字段 | exclude 清单有数据源，比 Rust“照 Go 先例”更硬 |
+| 上游 0 标记、0 front matter | 两模型同样做不了页内 transform；node v1 整体递延 transforms 接线，随 Rust 接上游标记时一并验证 |
+
+### 工作量对比
+
+单位“会话”≈ 一个 PR 的实现 + 验证 + 评审修复（按 WP-1/2/3 实测节奏）。
+
+| | 路线 A：维持逐页 | 路线 B：转手册级（拍板） |
+|---|---|---|
+| 前置 | — | R0 合入三 PR 作地基 + 本设计更新（0.5） |
+| node 完成 | WP-4 种子(1) + WP-4.5 lane(1) + WP-5 Base 编辑(1) + WP-6 试跑(1) = 4 | R1a 手册呈现核心(1) + R1b 差异链(1) + R1c 通道与记录(1) + R2-node 接线(1) + R2-node 内容迁移(1) + 试跑发布(1) = 6 |
+| Rust 之后 | WP-R1(2–3) + WP-R2-rust(1–2) = 3–5 | 只剩 R2-rust 绿地件（dev 初始内容／着陆页／生命周期 UI／current 搜索）= 2–3 |
+| 到 Rust 上线合计 | 7–9 | 8–9.5 |
+| 终态模型数 | 三套 | 两套 |
+
+### 决策点处置
+
+| 处置 | 项 | 原因 |
+|---|---|---|
+| 消亡 | §5.1 Base 链接形态（milvus.io vs zdoc URL） | Base 不再驱动 en 路由，139 行链接翻转整体不存在 |
+| 消亡 | §5.3/§5.11 B 桶行链接语义；评审 P1-2 invalid 路由 | B 页 = `exclude` 条目 |
+| 消亡 | §5.8 云独有功能规则 | `cloud_pages` 给出终态答案：C 桶 9 页迁入 zdoc `content/`；未来 volume 类同理 |
+| 消亡 | P0 createImportJobs 重复行（阻塞项身份） | Base 编辑缩到 ~9 行 C 桶 retire；重复行仅剩数据卫生 |
+| 存活 | §5.2 transform 挂载点 | 两模型同样等上游标记；node v1 递延 |
+| 变形 | §5.4 D 桶 5 页 | 手册级“新增页默认发布”会带上，评审后决定收编或 exclude |
+| 落位 | §5.5 product-names 特配 | 手册级 `product-names.yaml`（含 severity 扩展） |
+| 新增 | — | token/type 逐页延续策略；sidebar_position 回填 vs 接受重排；fallback 零贡献断言；E 桶 26 页 exclude 判定 |
+
+### 终态框架（两组态、一引擎）
+
+```text
+shared-docs/<group>/source.yaml  {repository, track, source_dir, presentation: pages|manual}
+├─ pages 呈现（guides 专用，冻结）
+│    pages/<id>/{page.yaml, lock.yaml, receipt} · Base 行 classifySourceRoute 接管
+│    逐页更新（WP12 逐页 PR）· 逐页提升 · 快照基线
+├─ manual 呈现（全部 SDK Reference：node → rust → go/python/java/cpp/cli → REST 最后）
+│    manual.yaml{source.dir, publish.manual, exclude, milvus_values,
+│                metadata+（迁移型含 type/token/keywords/sidebar_position 回填）,
+│                cloud_pages, transforms} + 单 lock.yaml(current/next)
+│    + Variables.json + product-names.yaml(severity) + content/
+│    registry 来源切 shared · 无飞书 lane · 整本更新/提升
+│    手册级记录 generated/en/manifests/shared-manuals/<id>.json
+├─ 共享核心（呈现无关；WP-1/2/3 已落大半）
+│    变换 WP10 · 双版合并+NextChannel WP11 · 产品名 · 连接值
+│    链接换算 · customEditUrl · 组线程化(source-state/lark/aliases/publication/checkpoint)
+└─ CI/守卫层（双布局）
+     detect-groups 按形态 · lock/validate 逐组循环分叉 · push guard 双正则
+     watchdog 双模式：pages=pin 漂移 ／ manual=pin 漂移+transform 目标存在+cloud_pages 引用
+```
+
+**SDK 迁移 runbook（node 试点产出，后续 SDK 复用）**：registry 切换 → 能力桶映射（A=默认发、B=exclude、C=cloud_pages、D=评审定、E=exclude+着陆页）→ metadata/token 回填 → Base 行转档案 → fallback 零贡献断言 → 沙盒 artifact 对 artifact 对现 dev 零预期外 diff → 发布。rust = 绿地变体（dev 种子 + 着陆页 + 生命周期 UI + current 搜索）。
+
+### 新工作包
+
+| 包 | 内容 |
+|---|---|
+| R0 | 合入 #1298/#1304/#1309 作地基；zdoc 执行计划改写（WP-4/5/6 → R 包） |
+| R1a 手册呈现核心 | manual.yaml schema+校验、展开为虚拟页（桥接 WP-1 已泛化的 build-page）、手册级 lock、`shared-docs build/lock` 命令分叉、front matter 规则走 registry 模板 |
+| R1b 差异链 | 连接值（milvus_values+Variables.json）、product-names severity、exclude、链接清单（LINK_TARGET_EXCLUDED/LINK_UNKNOWN_FORM）、cloud_pages 与 content/ 路径安全 |
+| R1c 通道与记录 | current/next 双版生成与合并（复用 WP11）、手册级记录 schema/生成/纯校验、整本更新与提升工具（WP12/13 手册级） |
+| R2-node 接线 | registry drive→shared 切换、fetch 无飞书来源分支、watchdog/push-guard/detect-groups 双布局（含手册级 pin 漂移扫描） |
+| R2-node 内容迁移 | metadata/token/keywords/sidebar_position 回填脚本（Base 导出→manual.yaml）、C 桶 9 页飞书→content/ 转写、B/D/E 桶处置、Base 行 lifecycle |
+| 试跑与发布 | 沙盒 artifact 对 artifact 零预期外 diff、翻译/lark-revisions 连续性断言、发布 |
+
+### 对技术设计 10 的增补（迁移型手册接入）
+
+设计 10 现文按 Rust 绿地书写；node 试点需要补“迁移型手册接入”一节，差异：
+
+1. **metadata 字段扩展**：迁移型按页回填 `type/token/keywords/sidebar_position/last_modified/notebook/beta/added_since/deprecate_since`；绿地型维持现状（4 字段 + token/type 规则生成）。
+2. **token/type 延续**：沿用现 dev 页身份（`type: docx` + 飞书 token），避免翻译／修订身份重算；手册级记录按页记录身份。
+3. **fallback 断言**：切换前断言旧 fallback 源零贡献（node：v2.4/2.5/2.6 均零）。
+4. **C 桶迁移**：云独有页从飞书转写为 `content/` 完整页（H1+正文），Base 行 retire。
+5. **Base lifecycle**：A/B 行转档案（不再驱动 en；翻译分组与 lark-revisions 按手册键，不受影响）。
+6. **沙盒验收基线**：artifact 对 artifact 对现 dev，差异必须全部归因到已知 overlay（连接值／产品名／链接改写）。
+
+### Rust 的位置
+
+设计 10 的 WP-R1 范围被 R1a–R1c 覆盖大半；Rust 剩 R2-rust 绿地件（dev 初始内容、着陆页、生命周期 UI、current 搜索）。设计 10 与 README 的交叉引用已随本次更新同步修订。
+
+---
 
 # Node SDK 参考文档 shared-docs 迁移方案(pilot study)
 
