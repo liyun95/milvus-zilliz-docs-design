@@ -824,10 +824,10 @@ type BatchDiscoveryReport = {
 
 **Task 1：core 和固定样本。**
 
-- [ ] 先提交失败测试，涵盖同 PR 两页合组、共享一页的两个 PR 合组、独立 PR 可区分、显式依赖线索保守合组、输入顺序无关、共同 T 不一致拒绝、未知关联保留 held；任何正例仍为 `writeEligible: false` 和 `pending-collector`。
-- [ ] 实现 `discoverBatches(input)`（core 导出），以 page↔seed 的连通分量做确定性分组；未知闭包不能变成独立性证明，不能调用 `computeUpdateUnits` 造假 adoption edge。验证重复页/冲突 pin/重复或不存在 seed 等不一致输入，不静默丢行。
-- [ ] 样本冻结 base `5479f04fcf7c379ede9548be1d917795eb4646b3`、head `0115d5854c81f35e43d869955a00371501aa8e19`，保留完整 22 路径与 12 页实际配置映射；将四个公共片段和无映射改动列出，标签明确 `replay`/`upstream-unmerged`，不得为了正例将 merged 改成 true。
-- [ ] 运行 `pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/batch-discovery.test.ts`，先证明失败，再证明行为通过，提交 core/fixture。测试要实际比较 groups、变更 ID 和 held 原因，而不是只断言配置常量。
+- [x] 先提交失败测试，涵盖同 PR 两页合组、共享一页的两个 PR 合组、独立 PR 可区分、显式依赖线索保守合组、输入顺序无关、共同 T 不一致拒绝、未知关联保留 held；任何正例仍为 `writeEligible: false` 和 `pending-collector`。
+- [x] 实现 `discoverBatches(input)`（core 导出），以 page↔seed 的连通分量做确定性分组；未知闭包不能变成独立性证明，不能调用 `computeUpdateUnits` 造假 adoption edge。验证重复页/冲突 pin/重复或不存在 seed 等不一致输入，不静默丢行。
+- [x] 样本冻结 base `5479f04fcf7c379ede9548be1d917795eb4646b3`、head `0115d5854c81f35e43d869955a00371501aa8e19`，保留完整 22 路径与 12 页实际配置映射；将四个公共片段和无映射改动列出，标签明确 `replay`/`upstream-unmerged`，不得为了正例将 merged 改成 true。
+- [x] 运行 `pnpm vitest run packages/docs-tooling/src/shared-docs/testing/updates/batch-discovery.test.ts`，先证明失败，再证明行为通过，提交 core/fixture。测试要实际比较 groups、变更 ID 和 held 原因，而不是只断言配置常量。
 
 核心断言应具有以下可读形状（fixture helper 与函数在同一任务内实现，不依赖未交付类型）：
 
@@ -841,26 +841,48 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 
 **Task 2：独立观察与有界读取。**
 
-- [ ] 先建真实临时 Git 仓库测试，再实现 `collectBatchDiscovery`（adapter 导出）及 source reader：原始对象证明 oldNext→T，检测根文件与片段差异，完整绑定 before/after 路径和 blob OID；覆盖 merge DAG 与不同旧 next，不能仅沿第一父节点漏掉合入分支。metadata 伪造、对象缺失、浅历史/grafts/replace、目录/链接异常、非祖先和长历史停止。禁止以 GitHub compare 返回的有限 files 列表代替完整原始区间。
-- [ ] observed 的 M/D/T 来自固定 GitHub 仓库/ref 的独立读取；工具代码的提交另列 tools，配置/锁只读 committed M，active/snapshot 只读 committed D。源数据路径只是本地 Git 对象来源，不能覆盖 GitHub 仓库 ID、分支或观测 T；入口不接受 caller-supplied SHA 伪装 live。缺对象报告 held，不在 CLI 内补 fetch。
-- [ ] 使用 `createRemoteTransport`。只读身份为 zdoc ID `660446555`、Milvus ID `267273319`/track `v3.0.x`；新增精确 GET `/repos/milvus-io/milvus-docs/commits/<40hex>/pulls` 与 `/pulls/<positive>/files`（以及必要的固定仓库 identity/ref/PR GET）。拒绝任意 repo/URL/method/重定向/不允许参数。提交关联会包含非默认分支上的开放 PR，必须核对 merged、base 仓库/track 与已入 T 的原始历史；开放 #3848 不能作为 live 种子。参考 [GitHub commit association](https://docs.github.com/en/rest/commits/commits#list-pull-requests-associated-with-a-commit) 和 [PR files](https://docs.github.com/en/rest/pulls/pulls#list-pull-requests-files)。
-- [ ] API 复用 `REMOTE_IO_LIMITS`：jsonBytes 1 MiB、pageSize 100、pages 20、calls 512、request 30 秒、inspection 120 秒；本片 API 累计 body 另限 16 MiB（取现有 expandedBytes 值），原始 Git 累计 stdout 另限 64 MiB（取现有 objectBytes 值）。整次 source/metadata 观察同时计入截止，跨页不得重置。PR files 以 changed_files 与去重全量计数核对，超过当前 20 页容量即 held，不能宣称覆盖 API 的 3,000 文件上限。空关联只有完整成功查询才能记直接提交；失败/歧义/截断分别保留固定原因。Git 读取沿用现有单次字节/时间与 50,000 遍历边界，不扩通用 reader allowlist。
-- [ ] 观察后重读 M/D/T；变动则报告 held，旧数据可保留用于诊断，但不可被标为 fresh。只保留安全固定原因，不写 token、签名 URL、环境、原始异常或本机绝对路径。通过真实 Git 与 HTTP seam 的新增测试后提交 adapter/transport。
+- [x] 先建真实临时 Git 仓库测试，再实现 `collectBatchDiscovery`（adapter 导出）及 source reader：原始对象证明 oldNext→T，检测根文件与片段差异，完整绑定 before/after 路径和 blob OID；覆盖 merge DAG 与不同旧 next，不能仅沿第一父节点漏掉合入分支。metadata 伪造、对象缺失、浅历史/grafts/replace、目录/链接异常、非祖先和长历史停止。禁止以 GitHub compare 返回的有限 files 列表代替完整原始区间。
+- [x] observed 的 M/D/T 来自固定 GitHub 仓库/ref 的独立读取；工具代码的提交另列 tools，配置/锁只读 committed M，active/snapshot 只读 committed D。源数据路径只是本地 Git 对象来源，不能覆盖 GitHub 仓库 ID、分支或观测 T；入口不接受 caller-supplied SHA 伪装 live。缺对象报告 held，不在 CLI 内补 fetch。
+- [x] 使用 `createRemoteTransport`。只读身份为 zdoc ID `660446555`、Milvus ID `267273319`/track `v3.0.x`；新增精确 GET `/repos/milvus-io/milvus-docs/commits/<40hex>/pulls` 与 `/pulls/<positive>/files`（以及必要的固定仓库 identity/ref/PR GET）。拒绝任意 repo/URL/method/重定向/不允许参数。提交关联会包含非默认分支上的开放 PR，必须核对 merged、base 仓库/track 与已入 T 的原始历史；开放 #3848 不能作为 live 种子。参考 [GitHub commit association](https://docs.github.com/en/rest/commits/commits#list-pull-requests-associated-with-a-commit) 和 [PR files](https://docs.github.com/en/rest/pulls/pulls#list-pull-requests-files)。
+- [x] API 复用 `REMOTE_IO_LIMITS`：jsonBytes 1 MiB、pageSize 100、pages 20、calls 512、request 30 秒、inspection 120 秒；本片 API 累计 body 另限 16 MiB（取现有 expandedBytes 值），原始 Git 累计 stdout 另限 64 MiB（取现有 objectBytes 值）。整次 source/metadata 观察同时计入截止，跨页不得重置。PR files 以 changed_files 与去重全量计数核对，超过当前 20 页容量即 held，不能宣称覆盖 API 的 3,000 文件上限。空关联只有完整成功查询才能记直接提交；失败/歧义/截断分别保留固定原因。Git 读取沿用现有单次字节/时间与 50,000 遍历边界，不扩通用 reader allowlist。
+- [x] 观察后重读 M/D/T；变动则报告 held，旧数据可保留用于诊断，但不可被标为 fresh。只保留安全固定原因，不写 token、签名 URL、环境、原始异常或本机绝对路径。通过真实 Git 与 HTTP seam 的新增测试后提交 adapter/transport。
 
 **Task 3：可运行 CLI 和报告。**
 
-- [ ] observed 形状固定为 `node scripts/docs-workflow/shared-guides-update/batch-report.mjs --source-repo <existing-local-store> --out <empty-directory>`；replay 为 `node scripts/docs-workflow/shared-guides-update/batch-report.mjs --replay <fixture-json> --out <empty-directory>`。严格参数匹配，非法形状在 bundling/联网前 exit 2；GH_TOKEN/GITHUB_TOKEN 只用于 observed GET，不写报告。
-- [ ] module-relative 定位工具入口与本机 esbuild，生成最小只读 bundle；从外来 cwd 调用结果一致。out 必须 absent/empty 的安全目录，写入本地 `batch-report.json` 与 `batch-report.md`；拒绝覆盖既有内容及链接路径。replay 输入同 fd 有界普通文件读取，拒绝 FIFO/链接/超限，输入至多 1 MiB；输出各至多 16 MiB，超限不能输出截断的“成功”报告。
-- [ ] provisional（含完整 replay）exit 0；数据/观察不完整且能生成完整 held 报告时 exit 1；参数错误 exit 2；无法安全写输出或工具构建失败为非零 stderr 固定错误，不能伪造业务报告。JSON 必须一直显式 `writeEligible:false`，Markdown 顶部说明直接映射/待验证依赖、observed/replay 和限制，不能输出 ready/candidate/accepted 结论。
-- [ ] node:test 必须启动真实 CLI（包括 foreign cwd、错误参数、FIFO、超限和输出冲突）；临时 Git + HTTP fixture 驱动 adapter 生成一份 observed 模式测试报告，明确网络/仓库为 fixture。完成 #3848 replay，保留 JSON/Markdown 两份 artifact。通过 `node --test scripts/docs-workflow/shared-guides-update/batch-report.test.mjs` 后提交 CLI。
+- [x] observed 形状固定为 `node scripts/docs-workflow/shared-guides-update/batch-report.mjs --source-repo <existing-local-store> --out <empty-directory>`；replay 为 `node scripts/docs-workflow/shared-guides-update/batch-report.mjs --replay <fixture-json> --out <empty-directory>`。严格参数匹配，非法形状在 bundling/联网前 exit 2；GH_TOKEN/GITHUB_TOKEN 只用于 observed GET，不写报告。
+- [x] module-relative 定位工具入口与本机 esbuild，生成最小只读 bundle；从外来 cwd 调用结果一致。out 必须 absent/empty 的安全目录，写入本地 `batch-report.json` 与 `batch-report.md`；拒绝覆盖既有内容及链接路径。replay 输入同 fd 有界普通文件读取，拒绝 FIFO/链接/超限，输入至多 1 MiB；输出各至多 16 MiB，超限不能输出截断的“成功”报告。
+- [x] provisional（含完整 replay）exit 0；数据/观察不完整且能生成完整 held 报告时 exit 1；参数错误 exit 2；无法安全写输出或工具构建失败为非零 stderr 固定错误，不能伪造业务报告。JSON 必须一直显式 `writeEligible:false`，Markdown 顶部说明直接映射/待验证依赖、observed/replay 和限制，不能输出 ready/candidate/accepted 结论。
+- [x] node:test 必须启动真实 CLI（包括 foreign cwd、错误参数、FIFO、超限和输出冲突）；临时 Git + HTTP fixture 驱动 adapter 生成一份 observed 模式测试报告，明确网络/仓库为 fixture。完成 #3848 replay，保留 JSON/Markdown 两份 artifact。通过 `node --test scripts/docs-workflow/shared-guides-update/batch-report.test.mjs` 后提交 CLI。
 
 **Task 4：最终集成与交回。**
 
-- [ ] 用最终 base/head 运行 `pnpm test:for-change -- --base review-base/wp12-guides-batch-discovery --head HEAD`。所有新路径必须被发现；core/adapter 对应 `test:shared-docs`，脚本对应 `test:shared-guides-update`。检查分组 discovery.json 确实含新 Vitest 文件。
-- [ ] 运行 selector 的全部命令：至少 `pnpm test:shared-docs`、`pnpm test:shared-guides-update`、`pnpm typecheck`、`pnpm test:workflow-matrix`、`git diff --check`；若实时 selector 要求 policy 等一并完成。遵循既有 Linux capture 拒绝和环境资格，不用新增 skip/超时放宽取得绿色。失败/取消与最终通过分开留证。
-- [ ] 自查仅新增只读入口，无 `.github/workflows`、真实 lock、profile-v1/v2、生产 discover/prepare/write、formal-validation、凭据权限或调度改动；本片不能以“缺激活”为由隐藏未实现的 observed/CLI 读取路径。生产明晚 Fetch 不应调用本片入口，产品 CI 可以按既有规则执行新增测试。
-- [ ] 更新 fork Draft PR 正文，交回准确 base/head、最终文件清单、selector、测试及 artifacts。附 #3848 原始 22 路径与 12 页映射、每个组的种子与待采集依赖、所有未映射/删除项目；若有真实 observed 实跑，注明观察时间和 pins。网络/权限/缺对象使 observed held 时如实报告，不能只交 replay 却写 observed 已通过。
-- [ ] 停在主会话主审，不自动转 Ready、提上游、合并、建内容 PR、写 Check 或手动发起/重跑 workflow（包括 Fetch/Translation）；正常 PR CI 沿用仓库触发。主会话先审设计符合性和行为，再决定上游工具 PR；第二片 profile/collector 另按已确认总体设计补精确实施卡。
+- [x] 用最终 base/head 运行 `pnpm test:for-change -- --base review-base/wp12-guides-batch-discovery --head HEAD`。所有新路径必须被发现；core/adapter 对应 `test:shared-docs`，脚本对应 `test:shared-guides-update`。检查分组 discovery.json 确实含新 Vitest 文件。
+- [x] 运行 selector 的全部命令：至少 `pnpm test:shared-docs`、`pnpm test:shared-guides-update`、`pnpm typecheck`、`pnpm test:workflow-matrix`、`git diff --check`；若实时 selector 要求 policy 等一并完成。遵循既有 Linux capture 拒绝和环境资格，不用新增 skip/超时放宽取得绿色。失败/取消与最终通过分开留证。
+- [x] 自查仅新增只读入口，无 `.github/workflows`、真实 lock、profile-v1/v2、生产 discover/prepare/write、formal-validation、凭据权限或调度改动；本片不能以“缺激活”为由隐藏未实现的 observed/CLI 读取路径。生产明晚 Fetch 不应调用本片入口，产品 CI 可以按既有规则执行新增测试。
+- [x] 更新 fork Draft PR 正文，交回准确 base/head、最终文件清单、selector、测试及 artifacts。附 #3848 原始 22 路径与 12 页映射、每个组的种子与待采集依赖、所有未映射/删除项目；若有真实 observed 实跑，注明观察时间和 pins。网络/权限/缺对象使 observed held 时如实报告，不能只交 replay 却写 observed 已通过。
+- [x] 停在主会话主审，不自动转 Ready、提上游、合并、建内容 PR、写 Check 或手动发起/重跑 workflow（包括 Fetch/Translation）；正常 PR CI 沿用仓库触发。主会话先审设计符合性和行为，再决定上游工具 PR；第二片 profile/collector 另按已确认总体设计补精确实施卡。
+
+
+**第一片实现与验证记录（2026-11-17）。** 用户改为由本主会话分发 subagent 实施并主审。实现进入 [Fork Draft #31](https://github.com/liyun95/zdoc/pull/31)，最终本地工具提交 `e75c6333362ff27a2831d27d8cb3c63286489641`，审阅基线 `bcbe89e5e54ca6706ca44cbe99a29ecb8c56ba16`；上游已合并的 SDK/超时等改动以普通 merge 纳入，但不计作本片实现。最终净差异 14 个文件，临时计划以普通提交删除；增加私有 `batch-publish.mjs` 负责绑定输出目录、排他写入及同 fd 读回两份完整报告，不移动或递归清理外来目录。生产 workflow、真实 lock、profile、collector/Python、现有 discover/prepare/write 和 formal validator 均未改。本轮仍保持 Draft，尚未提交上游或合并。
+
+| 最终提交验证 | 结果 |
+|---|---|
+| 实时 selector / 测试发现 | 14 条路径均映射；108 个 Vitest 文件，3 个新增文件各出现一次；全部所选命令完成 |
+| shared-docs 完整分组 | 1,926 passed / 0 failed / 6 个既有 skips，四阶段通过；原 900 秒总预算内完成，未新增 skip 或放宽时限 |
+| shared-guides-update | Node 70 passed；Python unittest 24 passed；其内部另报 26 个普通用户 fixture 场景，不重复计入总数 |
+| 其余门禁 | typecheck、diff-check 通过；workflow matrix 27、policy 118 全部通过 |
+| 固定 #3848 replay | 完整 JSON/Markdown，保留 22 路径、12 页直接映射、4 个依赖线索及历史 OPEN 状态；held / exit 1，未伪造合并或生命周期 |
+| 现场 observed | 93 configured / 93 active / 93 published，未知计数为 0；169 个变化路径、12 个种子、20 个依赖线索，形成 22/1/1 页的 3 组；held / exit 1，全部 pending-collector 与 writeEligible:false |
+
+现场报告于 UTC 09:10:22–09:12:01 独立观察 M `3a604dfc45d755a5f55a0b81d7b58c759a2988cc`、D `c8c9839ea7dc3b81ae5aa62c40db369b927f65c1`、Milvus T `916cbd00c6a6e1259a68dead7175e90131a57bba`；工具提交与数据 M 分别记录。旧提交的最初运行因三个新提交尚不在本地对象库而报 `GIT_OBJECT_UNAVAILABLE`、未生成报告。最终提交首次实跑时 T 再次推进，保留了源对象不足的完整 held 诊断；两次均由主会话在 CLI 外补齐各自固定对象后仅复测一次，记录不混用。运行时没有 fetch/checkout。公共片段、未映射变化以及 11 页 PR 变化路径/关联未证实均保留暂停原因；#3707 导入主干的变化已从直接 page seed 移为 11 条带原始提交的 held 依赖线索，直接 seed 数为 0，保守合组关系保持。69 页无直接变化仅为信息，不是合格 noop。`published` 此处只证明 committed 库存、身份/ownership、目标路径及输出对象存在，不替代第二片 per-run Fetch/receipt/输出字节资格。
+
+本轮所有门禁是动态链接 Node 26.7.0 / macOS 的本地结果；fork 的专用 review-base 没有 hosted Checks，不能称上游 CI 已通过。第一次错误命令在参数解析阶段失败、首次 observed 缺对象及既有 Node 实验性告警均单独保留，没有改写成成功。完整 run/discovery/terminal、日志、报告及哈希保留在本片本地执行证据目录，PR 正文给出复跑命令；不把绝对本机路径提交成可移植产品依赖。分项任务审查均通过；整分支主审发现的七项重要问题已集中修复并通过增量复审，没有遗留阻塞项。fragment-only 依赖已证实但仍可能附加 UNKNOWN_COMMIT_ASSOCIATION 的原因码精度问题保留为非阻塞项，不影响分组、独立的片段 hold 或只读边界。最终提交全部门禁及现场报告重放已完成。
+
+**主审修复与 Fetch 影响。** 修复覆盖第二父分支锁到目标的实际变化、topic 分支导入主干的路径归因、关联查询失败后同提交页面保持合组、输出路径重复 ownership、变化区间缺少提交证据、执行工具字节与 tools SHA 绑定，以及发布失败时不再按可替换路径清理。失败时允许保留私有目录和最多两份不完整文件，诊断非空且绝不返回部分成功报告。旧提交 `c9117df41` 的 1,920 项完整结果独立保留，不作为最终提交通过依据。新增模块不接生产 Fetch，但其路径处于既有 engine inventory 覆盖范围；合并会改变指纹，可能使共享页重新生成，不能声称 Fetch 零影响。触发、调度、发布策略未修改，未执行额外生产 Fetch。
+
+最终代码终态保留 grouped run `45633ea9-2efd-4b1b-991c-4844951381a6`，四阶段 834,531 ms / 原 900,000 ms 上限；aggregate 为 895,407 bytes，SHA-256 `8f89fe19cc4d04ae6634d20b910f04e422f8952e74e505a95cb453da305df0e3`。最终 replay JSON 为 81,958 bytes / `8965252a14decf67affdf0dab59f026e44d5d51f5a450bb8a3006c31b085a71f`；现场 JSON 为 295,211 bytes / `712c2e99362734434cf4f2b766393bc1167a2c5e5173a7682e8a8a5f16165642`，两份报告均有独立 Markdown。主会话复核了最终提交、原始终态/计数及报告摘要，所有所选测试合计 2,165 次通过，6 个既有 skips，不将 focused 或 Python 内部 fixture 次数重复累加。
+
+**仍待交付。** 本片只发现批次并产出只读证据；当前生产自动更新仍限 `json-field-overview`。下一片先完成多页 profile-v2、认证读取/真实 collector 闭包及容量测量，再进入多 lock 原子候选/Draft；不把本片完成写成全部共享页已自动更新，也未授权生产运行或合并。
 
 #### 后续切片与准入条件
 
