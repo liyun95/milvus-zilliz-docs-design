@@ -1,6 +1,6 @@
 # WP12-B 走读：本地准备、单页 Draft PR 与只读验证
 
-截至 2026-11-17，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线验证、定时 producer 认证、只读报告和两次手动目标 Check 接线已合并；可持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并且部署 CI 成功，来源资格与真实正常 Check 仍待验收。扩页的批次设计 #94 已确认，第一片只读发现进入执行交接，生产入口仍限单页。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
+截至 2026-11-17，B1、B2、B3 四片及单页自动 Draft PR 已有合并和生产证据。B4.3 的离线验证、定时 producer 认证、只读报告和两次手动目标 Check 接线已合并；可持续 Fetch 认证 #1311 与 dev 同步 #1313 已合并且部署 CI 成功，来源资格与真实正常 Check 仍待验收。扩页的批次设计 #94 已合并，第一片只读发现产品 #1327 已经完整分支 Fetch 验证后合并；生产入口仍限单页。整个 B 尚未完成。阶段与下一步计划统一放在 [WP12 任务卡](../tasks/WP12-zdoc-upstream-updates.md)。
 
 ## 已交付的部分
 
@@ -276,3 +276,11 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 输出失败时允许保留私有目录和最多两份不完整文件，避免路径被替换后清理外来内容；只有完整对被核验后才算报告生成完成。新增发现模块在现有 engine inventory 目录内，因此合并可能使 Fetch 缓存失效、共享页重新生成；未修改触发、发布或调度，没有额外启动生产 workflow。多页 collector/资格、原子候选和生产准入继续按已确认设计分片推进。
 
 随后按用户授权提交上游 Draft #1327。GitHub 测试合并 `6dfe4377` 的树与本地预演完全一致，相对新 master `3a604dfc` 的 14 文件补丁没有变化；自动 CI 已全部结束：13 success、8 个条件 skips，三份 workflow 均 success、最终 Site gate 成功。Node 22.23.4 / Linux 的 shared-docs light 1,750 / 0 failed / 114 既有 skips、isolated 68 / 0 / 0，Guides 更新 Node 70、Python 24 通过；实际 checkout 与上述测试合并 SHA 一致。内容构建的跳过和 Linux capture 的既有资格缺口保持，不冒称真实 Fetch 端到端验证。生产写入步骤按条件跳过，没有启动 Fetch/Translation 或合并产品。
+
+### 批次发现合并前 Fetch：两项既有阻塞与重新验证（2026-11-17）
+
+设计 #94 已合并，产品 #1327 转 Ready 后按用户授权做 artifact-only 验证。首次 Fetch 在 prepare 命中过期测试：Node checkpoint 的既有追加行为使“revision inventory 必须最后”断言失效。独立审阅的测试修复 #1328 保留精确唯一性断言，实际 prepare 236/236、CI 10 项通过，Anthony 已合并为 `6ce8b6a8`。完整本地 replay 首次缺历史 Git 对象失败；固定对象闭包修复后原全量命令重跑通过，原失败记录保留。
+
+第二轮 [44062001527](https://github.com/zilliztech/zdoc/actions/runs/44062001527) 的英文渲染与 assembly 通过，中文 SaaS 开发指南因整页 NEXT 与两段 NextChannel 标记冲突失败。精确保留归档和离线复现证明根因；渲染守卫与 dev 基线相同，不放宽校验。用户授权最小源修正后，写前核查发现文档已至 revision 46，两个标记已移除、正文和 NEXT 保持，本会话没有重复修改。外部 master Fetch 44081444371 的认证 source bundle 确认了这份输入，其整轮已成功，中英文构建、10 个单元发布与发布后验证通过；此结果独立于分支准入。
+
+#1327 已同步并主审最新 master 的接口影响，head `ab3257ce` 的 CI 13 项成功、8 项条件跳过；与最新 master 的预期合并树、GitHub 测试合并 `bedc3d9e` 的树均为 `deb7b408`。最终 [44086502969](https://github.com/zilliztech/zdoc/actions/runs/44086502969) 已排队，固定该工具树、publish=false、run_translations=false、media_upload_mode=skip。该轮最终 success，英文 8 表、中文 14 表及两次整体 assembly/构建均成功。对 selection/results 归档做 API size/SHA 与现有 contract 校验后确认 artifact_only/success，两个单元 ready、发布 attempts=0、commitShas=[]，目标 SHA 保持 `03cab659`；Translation dispatch 与发布后 verify 按条件跳过。按原授权合并 #1327 为 `3839abb3`，实际合并树与已验证工具树相同；合并后 master site validation 44096795099 亦 success，自动 dev 同步已生成 #1331（待候选验收和合并），不自动合并同步 PR。多页资格、collector、原子候选与 Draft 继续待后续实现，不因一次 Fetch 通过自动结项。
