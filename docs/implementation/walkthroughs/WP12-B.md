@@ -235,4 +235,11 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 
 [诊断补丁 #1307](https://github.com/zilliztech/zdoc/pull/1307) 在既有 `preparation.json` 的 reasons 中保留可信采集固定码和认证后的内层原因。协调进程代码独立于原始 worker 结果及 settlement；缺失、损坏、越界或非预期页面的诊断只得到固定 unavailable 码，原 Hold 与零操作保持。它不改变资格、网络重试、Fetch 发布或调度，也不说明此前托管根因已经解决。
 
-固定修复提交 `4db15929b` 已通过独立任务审查与最终增量复审：协调进程采集码的命名空间只能由父进程供应，子进程同名 hold 转为普通 unavailable 且仍暂停；held-only pins/ref/version 类型和 fallback 脱敏均有反例。针对性测试及 [最终 HEAD 的 hosted CI](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 通过：light 1,599 / 0 failed / 114 既有 skipped，isolated 68 / 0 / 0；测试合并树与审阅树一致。Ready 后的独立只读校验也成功，PR 保持未合并。取消的本地较大范围测试不记为通过；原有单例 15 秒超时已在精确基线上复现，未放宽时限。尚未发起新的生产运行，待补丁最终主审和 CI 完成后，再裁决一次有界只读验证。
+固定修复提交 `4db15929b` 已通过独立任务审查与最终增量复审：协调进程采集码的命名空间只能由父进程供应，子进程同名 hold 转为普通 unavailable 且仍暂停；held-only pins/ref/version 类型和 fallback 脱敏均有反例。针对性测试及 [最终 HEAD 的 hosted CI](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 通过：light 1,599 / 0 failed / 114 既有 skipped，isolated 68 / 0 / 0；测试合并树与审阅树一致。Ready 后的独立只读校验也成功，PR #1307 随后合并为 `136ff45b5`，合并后 master CI 与自动 tooling 同步均成功。取消的本地较大范围测试不记为通过；原有单例 15 秒超时已在精确基线上复现，未放宽时限。尚未发起新的生产运行，待补丁最终主审和 CI 完成后，再裁决一次有界只读验证。
+
+
+### 可持续 Fetch 认证设计（2026-11-17）
+
+设计 #91 与诊断 #1307 已合并。原先获准的只读预演限定旧 Fetch `43847158549/1`，执行前最新成功 Fetch 已变为 [43926761586/1](https://github.com/zilliztech/zdoc/actions/runs/43926761586)，因此未启动预演。新发布回执已认证英文 Guides published，实际 producer 准入仍拒绝；原 hosted held 根因没有因此获得验证。
+
+下一项改为按受信执行工具 M 的保守仓库配置指纹认证后续 Fetch：默认纳入全部已提交文件，只对严格三行格式的 pilot lock 内容规范化；README、workflow、依赖、loader、build config、MDX/sidebar 与未知新文件均保留身份。新方法只由已测量的 worker 提供，B1 与 Python 准备记录通过带版本的 method 对象绑定 M/F/profile；standalone B1 保持历史路径。还必须证明 F→M 祖先、核验真实 run 身份，再完整验证每次归档、receipt、发布和新鲜度。同版本新 run 无需逐次登记；代码变化后可等待下一次正常 Fetch。实际边界、迁移、反例与实施入口见[任务卡](../tasks/WP12-zdoc-upstream-updates.md#可持续-fetch-认证设计2026-11-17方案评审稿)。设计尚在评审，产品代码未实施、没有新增生产运行。
