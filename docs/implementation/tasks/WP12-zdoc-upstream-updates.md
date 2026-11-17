@@ -902,7 +902,7 @@ expect(discoverBatches(reverseFixtureInput()).groups).toEqual(result.groups)
 
 | 任务 | 验收结果 | 当前状态 |
 |---|---|---|
-| 1. profile-v2 与有界 Git 读取 | M 配置推导锁集合、93 锁实际命令/字节计数、v1 正反例保持 | subagent 实施中 |
+| 1. profile-v2 与有界 Git 读取 | M 配置推导锁集合、93 锁实际命令/字节计数、v1 正反例保持 | 初版主审发现两项阻塞，修复中 |
 | 2. 逐页内容与完整闭包 | 原始变化/孤立片段/变换嵌套依赖全覆盖、真实收据与 effective namespace | 待实施 |
 | 3. 集中资格与 Python | 一次 M/F 认证、真实 per-run 字节、私有执行承诺与独立校验根 | 待实施 |
 | 4. 只读入口与实测 | 完整三页正反例、真实历史采集/容量分项证据、最终 selector 全部门禁 | 待实施 |
@@ -926,6 +926,8 @@ API code blocks are concrete contracts to implement, never placeholder stubs to 
 Only a local read-only adapter/entry and evidence root are in scope. Use one measured content worker per page followed by one measured transient qualifier for the fixed complete group. The coordinator owns selection, subprocess handles, fresh evidence store and the final index. Every specific contract below is mandatory for this proposal; component-specific stricter existing limits prevail. Preserve the exact v1 wire, profile domain, pilot lifecycle and candidate workflow. Review the two **new, private, versioned call/return contracts** before implementation. They use existing one-shot bounded stdin/FD3 framing; the proposed design requires no streaming protocol, disk rendezvous with authority, or shared credentials between workers.
 
 ##### Task 1: Authenticate the M registry and F profile in one raw Git transaction
+
+**主审范围澄清。** Task1 初版的合成 93 页测试通过，但真实 M 中有 187 个页面内变换片段，被过严文件白名单误拒；另一个 2.7 MB 合法配置在同步 YAML 定位遍历中超过 60 秒。两项均在 fork 中阻塞验收，尚未进入生产。保留真实页面内内容的 raw 身份；另允许 `core/config.ts`、`core/yaml.ts`、`testing/config.test.ts` 仅增加可选的协作式单调预算检查，贯穿 YAML listener/定位遍历和配置校验，保持默认语法、诊断、旧调用方与限额。补齐真实片段变化、单次解析内部超时和修复后真实 M=F 的自指纹实测；不以任意缩小配置字节白名单或提高时限规避。
 
 Allowed paths under `packages/docs-tooling/src/shared-docs`: `adapters/updates/{fetch-producer-profile,trusted-fetch-producer,batch-discovery}.ts`, new if needed `adapters/updates/guides-batch-registry.ts`, `testing/updates/{fetch-producer-profile,trusted-fetch-producer,batch-discovery}.test.ts`.
 
