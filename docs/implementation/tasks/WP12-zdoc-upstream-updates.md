@@ -618,7 +618,7 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 
 - **托管重试（2026-11-17）。** [43902041033](https://github.com/zilliztech/zdoc/actions/runs/43902041033) 使用相同 `1ef6768e` / attempt 1 / `create_draft=false`。discover、history checkpoint、prepare 的 GitHub job 均 success，但经过 API size/digest 核验的 [preparation 归档](https://github.com/zilliztech/zdoc/actions/runs/43902041033/artifacts/14244293037) 明确返回 `status: held`、`candidate: null`、`reasons: [B2_PLAN_HELD / AUTHORITY_UNKNOWN]`；writer skipped。Fetch、dev、上游 pins 与本地正例相同，不能把这次绿色运行认作合格 no-op。profile 回执为 verified，archive ZIP SHA-256 为 `16db586fcbe843b3c3abe9fd1f1ae21b40b08a1c0b1df816fb0eb6b08de3ee1c`。
 - **已确认的诊断缺口。** 实际 B2 先将页面 lifecycle 映射成 authority，再将 unknown 折叠成 `AUTHORITY_UNKNOWN`；`prepare.run_b2` 在保留内层 pins/report 前抛出 Hold。采集阶段也会把失败折叠成无归档。现场产物因此不足以区分资格拒绝、归档获取失败和元数据管道错误。本地已用固定 Node 22、真实私有 FD4/FD5 元数据管道与相同保留归档取得 active / reasons 空；另一次实际 HTTPS 读取曾见 jobs API HTTP 502，但不足以证明托管原因。当前只补可信协调进程的固定失败码和认证后报告的有界原因保留，不改 authority、来源/权限/凭据隔离、endpoint/redirect、重试策略、worker wire 或 v1 envelope；不会继续盲目发起生产运行。
-- **诊断补丁（2026-11-17，待合并）。** [#1307](https://github.com/zilliztech/zdoc/pull/1307) 固定 HEAD `4db15929b442ea093b3ad3830e1b367432fce9b8`，仅保留可信协调进程的固定采集失败码，并经 unit / report / pins / impact 的身份、路径、字节与摘要校验，将有界内层原因带入现有 `preparation.reasons`。协调进程诊断独立于原始 child 结果与 settlement；缺失或损坏诊断仍保留原 Hold。独立任务审查及最终主审通过；最终主审发现的诊断来源混淆、无效类型和 fallback 脱敏问题已在同一修复波关闭，独立增量复审没有新的 Critical/Important。Node 22 针对性 35 项及 Python 19 项（含 26 个 profile fixture）、provider 22 项、typecheck、matrix 27 项、policy 118 项、diff check 通过，最终 HEAD 的 [hosted CI 43916946919](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 已通过：light 为 1,599 passed / 0 failed / 114 既有条件与平台 skipped，isolated 为 68 / 0 / 0；实际测试 merge `609b1e7c` 的双亲为 `1ef6768e` 与 `4db15929b`，树与审阅 HEAD 相同。PR 已转 Ready，新增只读校验 [43918364385](https://github.com/zilliztech/zdoc/actions/runs/43918364385) 成功；最终 13 项检查成功、8 项按条件跳过，生产 discover / prepare / write 未执行。一次较大范围本地运行已取消，不算通过；隔离的原有 15 秒测试在本次代码和精确基线上均超时，未改时限或 skips。本片不证明托管根因已修复，不改资格规则、worker wire、重试或发布；尚未再次发起生产运行。
+- **诊断补丁（2026-11-17，已合并）。** [#1307](https://github.com/zilliztech/zdoc/pull/1307) 固定 HEAD `4db15929b442ea093b3ad3830e1b367432fce9b8`，仅保留可信协调进程的固定采集失败码，并经 unit / report / pins / impact 的身份、路径、字节与摘要校验，将有界内层原因带入现有 `preparation.reasons`。协调进程诊断独立于原始 child 结果与 settlement；缺失或损坏诊断仍保留原 Hold。独立任务审查及最终主审通过；最终主审发现的诊断来源混淆、无效类型和 fallback 脱敏问题已在同一修复波关闭，独立增量复审没有新的 Critical/Important。Node 22 针对性 35 项及 Python 19 项（含 26 个 profile fixture）、provider 22 项、typecheck、matrix 27 项、policy 118 项、diff check 通过，最终 HEAD 的 [hosted CI 43916946919](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 已通过：light 为 1,599 passed / 0 failed / 114 既有条件与平台 skipped，isolated 为 68 / 0 / 0；实际测试 merge `609b1e7c` 的双亲为 `1ef6768e` 与 `4db15929b`，树与审阅 HEAD 相同。PR 已转 Ready，新增只读校验 [43918364385](https://github.com/zilliztech/zdoc/actions/runs/43918364385) 成功；最终 13 项检查成功、8 项按条件跳过，生产 discover / prepare / write 未执行。一次较大范围本地运行已取消，不算通过；隔离的原有 15 秒测试在本次代码和精确基线上均超时，未改时限或 skips。本片已合并为 `136ff45b5b26b74e0726a3d58b55831b004fdcbc`，合并树与审阅树一致，合并后 master CI 和自动 tooling 同步均成功。它不证明托管根因已修复，不改资格规则、worker wire、重试或发布。原获准预演要求最新 Fetch 仍为 `43847158549/1`；执行前已出现新的成功 Fetch `43926761586/1`，因此按授权条件未启动预演。
 - **正常样例准入。** GitHub 对 `ccc84731` 与当前上游 `5479f04f` 的 `json-field-overview.md` 返回相同 blob `6162f57c5196b806e487eeaf87269f09a6200f9f`。是否有有效更新仍以实际 consumed source/dependencies 的认证计划为准。若原文与相关依赖未变，应保留 noop/report-only 并不建空 PR；真实正常 Check 样例继续等待相关上游变更，不绕过 source gate 或回退 lock。
 
 | 优先级 | 下一项可验收结果 | 验收与保留边界 |
@@ -627,9 +627,74 @@ master tree 下界 82,915,524 bytes（8153 entries / 7646 distinct blobs），�
 | P0 | 复用 Fetch 结果的严格资格兼容（#1305 已合并，本地真实资格通过；托管预演未完成） | 复用已有 bundle/publication/regeneration 验证器，绑定原始 baseline 字节和此次已发布输出；不以 reused 标记或旧 receipt 自报身份替代认证，不改变 Fetch 发布/调度 |
 | P0 | 托管 held 诊断与只读资格验收 | 保留原 Hold，认证报告/refs 后带出内层原因及可信采集固定码；不保留 token、原始响应/异常、签名 URL 或环境，不将诊断变成信任开关；源码与测试主审后再申请有界托管验证 |
 | P0 | 新鲜真实候选的生产 Check 正例及停止样例 | producer 成功结束后才 validate；validator 整次成功结束后才 finalize；S 上的 id/suite/App/name/head 与原始回执、独立读回一致。无有效源变化时不伪造正例，stale/未知输入不写 |
-| P1 | 可持续的 Fetch producer 版本准入 | 当前完整仓库指纹随 master 推进变化，单次登记仅覆盖一次 Fetch；需要在维持代码与来源认证的前提下，审定可持续更新机制，避免定时发现长期停在资格未知。不能自动信任任意新树或默许缺失证据 |
+| P0（产品已合并，等待同版本 Fetch 资格） | 可持续的 Fetch producer 版本准入（产品 #1311） | 按下节设计，以执行工具的受信 M 为认证锚，比较保守仓库配置指纹，绑定 F→M 祖先关系；同版本的后续合格 run 无需逐次登记。代码或未获准的数据变化仍暂停，等待对应版本的正常 Fetch，不自动信任任意新树；代码审阅通过不替代生产资格验收 |
 | P1 | 自动衔接内容 Draft PR、validator 和独立 finalizer | 先取得手动生产证据，再审定完成态触发、schedule 身份、跨 run 回执与去重；不把同 run 内 job 当作 completed validator，不自动 ready/merge 内容 PR |
 | P2 | 扩页与完整生命周期 | 滚动更新已有 PR、保留人工修改、恢复、依赖组、提升后重算、退役，以及 SDK/平台资格按既有需求分片；保留 `7-1`—`7-10` / T05 pending，不能因单页成功宣布整个 WP12 完成 |
+
+#### 可持续 Fetch 认证设计（2026-11-17，已确认实施）
+
+**目标与当前证据。** 删除“每个新 run 都要人工补登记”的依赖，继续限定 `json-field-overview`。新 Fetch [43926761586/1](https://github.com/zilliztech/zdoc/actions/runs/43926761586) 使用 `1ef6768e`，整体成功，英文 Guides 发布回执为 `published`；但实际 `reviewedProducerInventory` 返回未认证，原因是旧单次登记仍固定 `43847158549/1` 与 `3389cc4`，完整树指纹也不同。新源归档只核查了 API 身份/摘要元数据，尚未完成完整页面资格；不能把 Fetch 成功写成 WP12 验收。设计 PR #91 与诊断 #1307 均已合并。
+
+**方案取舍。**
+
+| 方案 | 行为与代价 | 裁决建议 |
+|---|---|---|
+| 继续逐 run / producer commit 登记 | 改动最少，但新编号或 master 普通推进仍需要登记 PR | 不采用为持续运行机制；已有精确历史登记保持原边界 |
+| 受信 M 的保守仓库配置指纹 + F→M 祖先证明 | 不把 run ID 当版本；默认覆盖整个已提交树，只有明确列出的非执行数据字节允许变化。同版本后续 run 自动认证；代码或其他受保护文件（包括 README）漂移时等待新版本 Fetch | 推荐首版，边界与测试见下 |
+| 另建签名发布清单 / 独立固定 producer release | 可以独立管理多个工具版本，但新增密钥、发布和 Fetch 接线，扩大本轮范围 | 后续确有多版本并行需求时再审，本轮不引入 |
+
+**1. 受信锚与调用链。**
+
+- M 是正在执行的固定工具 checkout 的提交，不能取自候选、source archive、`SelectedPage.producerRepo` 的 HEAD、请求中的 master/configSnapshot 或调用方声明的 expected digest。M 的源码字节仍由原有 toolset capture / launcher / loader 检查；本功能不替代或放宽这些检查。
+- 在 measured Guides worker 调用 B1 前，将执行目录的提交与现有 capture 绑定的 `trustedTools` 核对，固定一次 M。认证上下文是同进程的只读闭包/函数，由已测量的固定 worker bootstrap 通过普通调用提供，持有固定工具目录、M、可信 Git 读取和预期指纹；通过现有内部依赖 seam 传给 B1。调用方声明的 JSON 不能创建它。它不进入 operator JSON、worker 序列化 wire 或冻结 v1 envelope。已有 parent→launcher 的 commit 与 toolsetSha256 绑定必须在所有选中 worker 启动中执行，包括不带 token 的路径；不能继续仅放在 metadata-broker 条件分支中。M 固定后不因 HEAD 改变而重签发，发结果前重新核对，发现漂移则拒绝。
+- 独立 B1 命令首版只保留既有历史认证；没有 measured launcher 的代码/提交绑定，不创建新动态认证上下文。新路径无可信上下文、缺少对象、浅历史或工具 pin 不一致，均保留 unknown/held。其他页、无 evidence 的报告不初始化本功能、不增加昂贵检查；fixture 私有替身不能代替真实生产入口的正例。不提供新的公共 trust flag、任意仓库根或 expected-M 参数来授予身份。
+- F 来自 GitHub 实际 run 的 `head_sha`。新增路径要求生产仓及 head repository ID `660446555`，workflow ID `83360731`、路径 `.github/workflows/fetch-docs.yml`、branch `master`、event `schedule`、attempt 1、completed/success，并在固定受信工具仓中证明 F 是 M 的祖先或等于 M。M→F 反向、fork / 未纳入 M 的提交、失败或重跑均不因代码相同获准。
+
+**2. 仓库配置指纹 `fetch-producer-profile-v1`。**
+
+- 这是保守的仓库代码/配置等价检查，不宣称覆盖托管 OS、外部 Actions 或所有运行时输入的完整执行闭包。实际 Fetch 会构建 MDX，并执行 D 的 sidebar；继续沿用既有固定 D、原始 Git 字节、归档与发布证据的信任边界，不声称 MDX/sidebar 只是不会执行的数据。
+- 从固定受信工具 Git store 中，按 M、F 的不可变 OID 分别读取 raw buffered `ls-tree -r -t -z --full-tree`，不 checkout/执行 F 的脚本，不 fetch、不触发 lazy fetch、不用 Git replacement。新路径专用只读 reader 不能复用会解码/trim 的字符串接口：严格 UTF-8 与 NUL framing，沿用单次 32 MiB 输出上限，每份清单至多 20,000 项；整次认证最多 16 次 Git 调用、64 MiB 累计 stdout、60 秒总截止，超限/超时均拒绝，不扩大原有通用 reader 的限制。该预算覆盖一次不可重试的 profile 认证事务及其自身前后 HEAD 检查；不把 B1 的归档/渲染等待计入 60 秒。capture 前与长 B1 完成后的既有身份复核独立有界，不能重置/重试已失败的认证或重新签发 M。
+- 默认纳入所有 tracked 路径，不以“不是已知源码目录”跳过。workflow、CLI / TS loader、`.pnpmfile.cjs`、package manifests / lockfile / workspace / patches、所有 scripts / packages / apps / site config / build config / 测试代码、MDX、generated/sidebar 以及未来新增的未分类文件都包含路径、模式、类型与原始 Git blob OID。
+- 两份清单引用的 OID 按期望类型去重，使用有界 `cat-file --batch-check` 核验每个 commit/tree/blob 的存在性、实际类型与大小；逐项绑定请求/响应 OID、精确行数和 framing，拒绝 missing、额外/截断行及类型冲突。普通 blob 只需 metadata 存在性，不逐文件 spawn 或把所有内容读入内存。被规范化的 lock 先查 size，再按同一 OID 有界读取并复核实际字节。
+- M、F 的 ancestry 在 Git 工作树 metadata 与 common metadata 两处拒绝 shallow、grafts，并拒绝 refs/replace，即使 F=M 也先检查；固定 `--no-replace-objects` / `GIT_NO_LAZY_FETCH=1`，消除外部 Git 环境覆盖。拒绝重复或不安全路径、无效 OID/mode/type、缺失父目录、文件/目录碰撞以及不可用对象。
+- tree 项保留路径/模式/类型，将 tree OID 统一替换成固定 directory 标记；完整递归叶子和空目录成员关系仍参与指纹。否则某个允许的数据改动会沿父目录 OID 扩散，仍等价于整树锁死。固定 domain/version 与 UTF-8 字节排序进入 SHA-256，禁止跨旧算法复用摘要。
+- 首版只对 `shared-docs/guides/pages/json-field-overview/lock.yaml` 提供内容规范化。双方必须存在、为普通 `100644`、至多 64 KiB，严格解码并通过现有 lock schema。只有精确匹配 `schema_version: 1\ncurrent: <40位小写非零SHA>\nnext: <40位小写非零SHA>\n` 的三行规范拼写才替换 blob OID 为固定 lock-data 标记：用已验证 pins 按 `prepare.py.lock_bytes` 的固定格式重新生成，再与原始 bytes 逐字节相等比较，BOM、额外空白或末尾换行变化均不能误入该例外。其他合法 YAML 拼写/注释保留 raw OID 比较，非法/缺失/超限/改模式拒绝。目录成员、路径和模式仍参与指纹。README、其他 prose / Markdown / MDX / 配置均保留 raw OID；后续引入新的 lock 消费方式时必须复审这条数据边界。
+- 本轮不排除任何认证 policy / registration 文件，不保存一个需要更新自身的 expected digest；预期值由受信 M 动态计算，因此无自引用登记。未来扩大数据例外必须另审实际读取/执行路径及反例，不能让请求传路径白名单。
+- 默认拒绝 symlink / gitlink 等特殊模式。仅保留仓库已有的精确 `CLAUDE.md → AGENTS.md` 别名（blob OID `47dc3e3d863cfb5727b87d785d09abf9743c0a72`），要求目标是根 `AGENTS.md` 普通 tracked 文件；两者身份保留在指纹。此例外不允许跟随任意链接或外部目标。
+
+**3. 自动认证及迁移。**
+
+- 只有 F、M 的上述 profile 相同，且 run 身份与祖先证明通过，才通过“producer 代码/配置身份”这一关。不登记新 run ID，不自动修改 policy / registration，不读取 producer 自报的 profile 来决定信任。
+- 每个 run 仍独立认证最新观测、精确 attempt/jobs/source-step 时间窗、ZIP size/digest、完整 source bundle、Base census/record、成功或 reused receipt/regeneration、固定 baseline、本次 Cloud/BYOC 发布与当前 D 的字节及新鲜度。身份等价不能直接把 lifecycle 置 active，也不能跳过 source gate 或制造 lock.next 更新。
+- 已有 strict / legacy census / 单次历史登记按原有分支优先级保留。命中专属 legacy census producer SHA 后，其精确 run/attempt/artifact/digest/page 任一不匹配必须终止，不能回退到新路径；旧 strict 分支自身没有新增 attempt/page 限制，仍受既有调用方检查。只有非 census 且原 whole-tree strict / 单次登记路径未认证时，才尝试 pilot 的新路径；新路径自身固定 attempt 1 / schedule，不扩大历史例外。本轮不为 `43926761586` 再补单次例外，也不自动接受任意新 master / fork / artifact 声明。
+- 此功能自己的代码变化也会改变 profile。部署后，若最新 Fetch 还来自旧代码，明确输出 `FETCH_PROFILE_MISMATCH`（已比较且确定不等时），等待新的正常定时 Fetch 使用对应工具版本后自动取得资格；不通过逐 run 补丁跨过这一步。未来普通 run 编号变化不会要求登记；受保护代码/配置变化可能等待下一次正常 Fetch。
+- 新路径的 B1 `lifecycle.identity` 仅在完整 per-run 验证成功后增加精确四字段 `producerAuthentication: {kind: "fetch-producer-profile-v1", trustedTools: M, producer: F, profileSha256: <64位小写hex>}`，不同时写旧 `producerInventorySha256`。旧路径的字段语义保持，不把 census 人为补成带 digest 的候选资格。
+- Python `prepare.authority` 对这个 discriminant 明确分支：字段存在时（含 null / 未知 kind）只走新验证，要求精确 keys、有效 SHA/digest、`producer ===` 独立选出的实际 run head，`trustedTools ===` 已由 setup 的 GITHUB_SHA / 工具 checkout HEAD 核定的 M、B1 `tools.zdoc` 和 envelope `pins.trustedTools`；旧 digest 混入、部分/未知字段或任一不符都停止，不能降级历史路径。无新字段时按既有 whole-tree 证据要求处理，census 缺少旧 digest 仍不获 Python 候选资格。
+- 新准备记录将整个 `producerAuthentication` 对象原样保留，不能把 profile 裸摘要另写成旧 inventory。新增字段仅在 B1 detail / 现有准备证据中，不改冻结 unit/envelope/worker wire。writer 如读准备记录须保持此标记，不能丢失方法语义。
+- 新路径保留三种有界原因 `FETCH_PROFILE_CONTEXT_UNAVAILABLE`、`FETCH_PROFILE_MISMATCH`、`FETCH_PROFILE_ANCESTRY_UNPROVEN`；错误 repo/event/workflow 等仍用既有 `BASE_SCAN_PRODUCER_UNPROVEN`。同步更新现有 prepare 诊断闭表，只留固定码，不留异常/响应/路径。缺失上下文、profile 不同、对象/元数据/归档未知始终 held。
+
+**4. 实施与验收卡。**
+
+| 工作项 | 必须交付的验收结果 |
+|---|---|
+| profile 纯计算与固定上下文 | 同 M/F 的两个不同 run ID 在各自独立 latest 观测快照中均能进入既有证据校验（不要求旧 run 在同一最新快照中通过）；仅规范 pilot lock 值改变仍等价，其他合法锁拼写走 raw 比较；README、未知新代码、workflow / loader / installer /依赖 / build config / MDX / sidebar / policy 改动或删除均不等价 |
+| 实际 B1/B2 接线 | production worker 在 B1 前绑定真实固定工具 M / toolsetSHA，覆盖 token 和 tokenless；实际 measured bootstrap、上下文工厂、Git reader 和 prepare.authority 有组合正例。伪造 request/selected repo 的 M、digest、上下文或 policy 不能授予身份；无 capture 的 standalone 保留 legacy-only；前后 HEAD 变化、缺对象、浅历史/grafts/replace（含 F=M）暂停。fixture 替身须标识，不能代替真实上下文构建正例 |
+| 来源与证据负例 | 新路径中同 profile 的 fork/非祖先、错误仓库/workflow/event/branch、失败/运行中/attempt 2、归档替换、缺失/过期证据、错页/record/channel/输出、stale D/source 全部停止；覆盖 H 与实际 source stage tooling 不同（即使 profile 相同）、repo 与 head repo ID 分别错误、workflow ID/path 分别错误；保留 success/reused 证据链，并证明无有效 source delta 时仍 noop/no writer |
+| parser 与路径边界 | 畸形 NUL tree、无效 UTF-8 / OID、重复/遍历/别名路径、父目录缺失、symlink/gitlink、普通 blob 缺失/类型错误、batch 响应缺失/多余/截断、aggregate/命令数/时间预算超限、lock 超限/非法 schema、仅改变模式/路径/空目录成员关系均拒绝或不等价；精确 CLAUDE 别名正例与变体拒绝 |
+| B1→Python 方法协议 | 通过真实 `authority` 消费者的 tagged 正例，保留正确 method/M/F/digest；null/未知/部分/mixed 方法和错误 M/F/digest 全部停止，不能回退 legacy；legacy/census 原边界回归保持 |
+| 主审与最终门禁 | subagent 按定稿任务卡实现，先任务审查再全分支主审；运行实际 diff selector 的全部必要门禁，保留取消/失败历史，不新增 skips / 放宽时限来取得绿色。工具 PR 先保持 Draft；生产合并和运行另行裁决 |
+
+**明确不做。** 不改 Fetch / Translation 的调度、发布、permissions、队列、worker 凭据隔离、source gate、远端 writer/Check、真实 source/lock 内容或付费操作；不扩大到别的页面，也不因这一层认证完成就宣布 WP12 完成。上述方案已通过独立架构审查和修订复审（四项 Important 均关闭），用户已书面确认本稿，进入 subagent 实施，主会话主审；本确认不授权产品 PR 的生产合并或生产运行。
+
+**实施与主审记录（2026-11-17）。** subagent 已按本卡实现，[产品 Draft #1311](https://github.com/zilliztech/zdoc/pull/1311) 固定 HEAD `40461004f7959f0d0a87a9bbeca4ce50d57aacb3`，基线 `136ff45b5b26b74e0726a3d58b55831b004fdcbc`。13 个文件覆盖 profile/raw Git reader、measured bootstrap、provider→B1/B2 的私有上下文接线和 Python 方法协议；未修改 workflow、逐 run 登记、真实 lock 或发布权限。任务审查、最终安全主审与修复增量复审均已通过。
+
+- **已关闭的问题。** 首次 Linux light 测试误调用原本明确不支持 Linux 的真实 capture；后续测试在 Linux 上实际断言生产拒绝，macOS 保留 measured bootstrap 正例，没有新增 skip 或放宽时限。最终主审又发现过期 pilot 的保留 B1 pins 仍带成功 method，以及深路径父目录反复重建可超过 60 秒；同一修复波将 method 延至 pilot 最终 lifecycle 通过后保留，父目录改为逐项校验直接父节点，并在解析/计算后检查预算；Python direct-entry guard 也已移至所有测试类之后。增量复审确认两项 Important 和一项 Minor 均关闭。
+- **本地覆盖与边界。** 最终修复的 profile/reader 20 项（含约 31.9 MiB、9,605 项的深路径输入）、真实 provider 的正常/noop/Python 消费/过期 held 正反例、lifecycle 11 项、Python 直接选例与 discovery 24 项、typecheck 和 diff check 通过。此前完整针对性五文件 78 passed / 1 个既有 opt-in skip，bootstrap 独立覆盖通过；这些组合正例使用真实工厂与生产采集入口，但 metadata/source/publication 来自 fixture，不能说已经完成一次 measured 完整 collector→Python 或 hosted 生产资格验证。
+- **最终门禁。** 固定 `40461004f` 的 [site CI 44006746817](https://github.com/zilliztech/zdoc/actions/runs/44006746817)、[workflow harness 44006746862](https://github.com/zilliztech/zdoc/actions/runs/44006746862) 和 shared-docs validate 均成功。Linux / Node 22 的 light 为 1,622 passed / 0 failed / 114 既有条件与平台 skipped，isolated 为 68 / 0 / 0，合计 1,690 passed；最终 13 项检查成功、8 项按条件跳过，生产 discover / prepare / write 未执行。两组实际 checkout 测试合并提交 `e17391da8974ad672468c010dd8f85a3c37b40d4`，双亲为基线 `136ff45b5` 与最终 HEAD，树 `a4b80b40664a151a73aad68068835844d227cd1f` 与审阅树一致。主审独立重跑最终 HEAD 的 shared-guides 51 项 JS + 24 项 Python、typecheck、matrix 27 项、policy 118 项、selector 与 diff check 全部通过，工作区/HEAD 未漂移。旧 `6ef02b97c` 的 light 失败及后续 concurrency 取消保留，不记为通过；上一提交 `837736e3c` 的 CI 成功也不替代最终提交的结果。
+- **合并前 Fetch 兼容性验证（用户单次授权，2026-11-17）。** [44009318863 / attempt 1](https://github.com/zilliztech/zdoc/actions/runs/44009318863) 已完成且 success。从主仓 master 的 workflow 启动，实际工具固定 `40461004f`；`group=guides`、`publish=false`、`run_translations=false`、`media_upload_mode=skip`、`source_ref=dev`、`target_branch=dev`、`force_full_fetch=false`。prepare、两侧 source 与 assembly 日志及归档均确认实际工具 SHA，不能把 API run head `136ff45b5` 误认作本次工具代码。英文 8 个渲染任务（Cloud/BYOC 各 4）、中文 2 个（各 1）与两次 assembly/combined-output 构建全部成功；两份 assembly result 均为 `regenerated`。英文 effective snapshot 中 `json-field-overview` 为 current/shared-page，同时包含 Cloud 与 BYOC 两份输出路径，共享发布报告 failures 为空。
+- **最终产物及未发布证据。** 小型 selection、results、中英文 reports、最终 card report 归档均核对 API size/SHA-256，再有界读取 ZIP；独立重跑现有 `validatePublicationSelection` / `validatePublicationResults` 成功。results artifact `14298880960` 为 674 bytes、SHA-256 `1d1f8c6ecfdd409b1c9053450ee48b996c161de53e4d2751132ff6b6e418055f`，明确 `mode: artifact_only`、`overallStatus: success`；英文/中文单元均 ready、`attempts: 0`、`commitShas: []`。初始/最终 target 与事后独立读取 dev 均为 `62f2ba122d0e0b26f3a7138a57b6dd5980eef96d`。aggregate 成功、card report success，reconcile / source publication barrier / Translation handoff / dispatch / publish 后 verify 均按配置跳过。构建启用现有 skipLinkChecks；中文 2 个链接和 2 个锚点、英文构建的 1 个日文 BYOC 锚点告警，均能在较早正常 Fetch `44001782552` 的对应 assembly 日志中找到，没有将其写成“链接全部无告警”。本轮只运行一次，没有重跑、合并、发布或翻译。
+- **产品合并（2026-11-17，后续明确授权）。** 用户已明确授权合并产品 #1311 与设计 #93。产品在转 Ready 后新增 [校验 44017440027](https://github.com/zilliztech/zdoc/actions/runs/44017440027) 成功，最终检查无失败或未完成项，再以固定 HEAD `40461004f` 合并为 `4492793f78d6761d042dbef8099007e27c08ddd7`。API 复核双亲为 `136ff45b5` 与已审 HEAD，合并树 `a4b80b40664a151a73aad68068835844d227cd1f` 与审阅/测试树相同。自动触发的 master CI 和 tooling 同步另行收束，不将“已合并”写成“合并后检查已通过”。本次授权未扩展为额外 Fetch、发布、Translation 或生产预演。
+- **部署后仍待验收。** 上述手动 Fetch 通过证明兼容性，不是新 producer 准入的正例。手动 `workflow_dispatch` 且 run head 与 effective tooling 不同，不满足新路径的 schedule/master 绑定；不得登记它来绕过认证。产品已合并，接下来等待正常 Fetch 使用同版本工具，再认证新的来源与发布证据；额外发起有界只读预演仍须另行授权，不为最新 run 再补单次例外。无相关源变化应为合格 noop，不制造 lock.next 更新。真实新鲜候选的 Check 正例与自动验证仍未结项。
 
 #### 后续切片与准入条件
 

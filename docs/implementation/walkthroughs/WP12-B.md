@@ -235,4 +235,17 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 
 [诊断补丁 #1307](https://github.com/zilliztech/zdoc/pull/1307) 在既有 `preparation.json` 的 reasons 中保留可信采集固定码和认证后的内层原因。协调进程代码独立于原始 worker 结果及 settlement；缺失、损坏、越界或非预期页面的诊断只得到固定 unavailable 码，原 Hold 与零操作保持。它不改变资格、网络重试、Fetch 发布或调度，也不说明此前托管根因已经解决。
 
-固定修复提交 `4db15929b` 已通过独立任务审查与最终增量复审：协调进程采集码的命名空间只能由父进程供应，子进程同名 hold 转为普通 unavailable 且仍暂停；held-only pins/ref/version 类型和 fallback 脱敏均有反例。针对性测试及 [最终 HEAD 的 hosted CI](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 通过：light 1,599 / 0 failed / 114 既有 skipped，isolated 68 / 0 / 0；测试合并树与审阅树一致。Ready 后的独立只读校验也成功，PR 保持未合并。取消的本地较大范围测试不记为通过；原有单例 15 秒超时已在精确基线上复现，未放宽时限。尚未发起新的生产运行，待补丁最终主审和 CI 完成后，再裁决一次有界只读验证。
+固定修复提交 `4db15929b` 已通过独立任务审查与最终增量复审：协调进程采集码的命名空间只能由父进程供应，子进程同名 hold 转为普通 unavailable 且仍暂停；held-only pins/ref/version 类型和 fallback 脱敏均有反例。针对性测试及 [最终 HEAD 的 hosted CI](https://github.com/zilliztech/zdoc/actions/runs/43916946919) 通过：light 1,599 / 0 failed / 114 既有 skipped，isolated 68 / 0 / 0；测试合并树与审阅树一致。Ready 后的独立只读校验也成功，PR #1307 随后合并为 `136ff45b5`，合并后 master CI 与自动 tooling 同步均成功。取消的本地较大范围测试不记为通过；原有单例 15 秒超时已在精确基线上复现，未放宽时限。尚未发起新的生产运行，待补丁最终主审和 CI 完成后，再裁决一次有界只读验证。
+
+
+### 可持续 Fetch 认证设计（2026-11-17）
+
+设计 #91 与诊断 #1307 已合并。原先获准的只读预演限定旧 Fetch `43847158549/1`，执行前最新成功 Fetch 已变为 [43926761586/1](https://github.com/zilliztech/zdoc/actions/runs/43926761586)，因此未启动预演。新发布回执已认证英文 Guides published，实际 producer 准入仍拒绝；原 hosted held 根因没有因此获得验证。
+
+下一项改为按受信执行工具 M 的保守仓库配置指纹认证后续 Fetch：默认纳入全部已提交文件，只对严格三行格式的 pilot lock 内容规范化；README、workflow、依赖、loader、build config、MDX/sidebar 与未知新文件均保留身份。新方法只由已测量的 worker 提供，B1 与 Python 准备记录通过带版本的 method 对象绑定 M/F/profile；standalone B1 保持历史路径。还必须证明 F→M 祖先、核验真实 run 身份，再完整验证每次归档、receipt、发布和新鲜度。同版本新 run 无需逐次登记；代码变化后可等待下一次正常 Fetch。实际边界、迁移、反例与实施入口见[任务卡](../tasks/WP12-zdoc-upstream-updates.md#可持续-fetch-认证设计2026-11-17已确认实施)。设计已通过独立审查并获用户书面确认，进入 subagent 实施与主会话主审；没有新增生产运行。
+
+实现现已进入 [产品 Draft #1311](https://github.com/zilliztech/zdoc/pull/1311)，固定 `40461004f`，任务审查、最终安全主审与增量复审通过。首轮 Linux capture 测试问题已用明确拒绝断言修复；最终主审关闭过期页面仍保留成功 method、深路径解析超过认证预算，以及 Python 直接运行遗漏新增测试三项问题。真实 provider/B1/B2→Python 和 measured bootstrap 分别有组合正例，但不合称完整 measured collector 或生产资格验证。最终 [CI 44006746817](https://github.com/zilliztech/zdoc/actions/runs/44006746817) 已成功：light 1,622 passed / 0 failed / 114 既有 skips，isolated 68 / 0 / 0；实际合并测试树与审阅树一致，13 项检查成功、8 项按条件跳过。最终 HEAD 的本地 selector 门禁亦通过，产品与本设计尚未合并；后续合并与生产只读预演另行授权，等待同版本正常 Fetch，不添加逐 run 例外。详见上述任务卡的实施记录。
+
+用户随后授权一次合并前 Fetch 兼容性验证，[44009318863 / attempt 1](https://github.com/zilliztech/zdoc/actions/runs/44009318863) 已 success。现有 master workflow 通过 `tooling_ref` 实际执行 `40461004f`，只选 Guides，关闭发布/翻译并跳过媒体上传。英文 8 个、中文 2 个 Cloud/BYOC 渲染任务及两次整体 assembly/构建成功，实际均 regenerated；`json-field-overview` 的英文 effective snapshot 包含两侧输出。已独立核验结果归档的 API size/digest 与 publication contract：最终 artifact_only/success，两个单元发布 attempts 均为 0、提交均为空，dev SHA 保持 `62f2ba12`，Translation/发布后校验按条件跳过。构建存在较早正常 Fetch 中同样出现的非阻断链接/锚点告警，本次不宣称链接检查全覆盖。产品 PR 仍 Draft、未合并；手动运行不是 schedule-only 自动认证正例，合并后同版本正常 Fetch 的资格与新鲜候选 Check 仍待验收。
+
+后续用户明确授权两份 PR 合并。产品 #1311 转 Ready 后的新增校验通过，已以固定审阅 HEAD 合并为 `4492793f78d6761d042dbef8099007e27c08ddd7`；合并树与已通过 CI / Fetch 的工具树一致。前述 Draft/未合并表述保留为当时验证记录；当前状态为产品已合并、等待同版本定时 Fetch 的来源资格。合并后自动 CI/同步与来源资格分别记账，没有额外发起 Fetch 或生产预演。
