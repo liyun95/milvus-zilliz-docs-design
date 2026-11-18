@@ -148,4 +148,19 @@ pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$recor
 
 以 zdoc `master@b701ac59` 为基线，最终本地提交为 `281f5903d203f5415db10cb8ea72c0bc6a29c0a3`。主审复核了经修正的工作树和证据目录隔离、Git 历史检查、双目标内容比对及 replay 边界。CLI 样本产生单页 Cloud/BYOC 只读报告，覆盖缺失和重复构建、路径重叠、Git 历史标记、`next` 漂移及报告进入 replay prepare 时的拒绝。最终提交的 124 项定向回归、56 项部署合约检查、类型检查和 selector 其余门禁通过。分组测试按顺序执行，合计 2,112 项通过，6 项跳过。早期失败或中止的运行单独保留。
 
-产品分支保留在本地。真实 Jenkins 只读挂载、部署镜像标签、发版人对页面和目标的验收，以及开放更新 PR 的独立核对仍待补。挂载记录沿用现有发布校验器的 JSON 解析约定。
+产品 [Draft PR #1353](https://github.com/zilliztech/zdoc/pull/1353) 的合并候选 `93dfbaa9` 与本地提交同树。CI 13 项成功、8 项按条件跳过，最终站点门禁成功。真实 Jenkins 只读挂载、部署镜像标签、发版人对页面和目标的验收，以及开放更新 PR 的独立核对仍待补。挂载记录沿用现有发布校验器的 JSON 解析约定。
+
+### 直接读取 Jenkins 部署证据 · 方案待审
+
+**已核查。** 通过 Jenkins 界面和只读 API，能从固定发布任务读取已完成的构建、阶段结果和 `output.json`。一组历史英文 UAT 与 Prod 的最终部署 digest 一致，可以从归档追溯复用关系。最近核查的英文 UAT 构建可以作过期反例：当时筛出的 12 个待提升页面，其发布回执均已与复核时的 dev 不同。现有可见任务和仓库未能确认有证据挂载，也尚未独立读取实际镜像标签。内部构建链接、任务位置和镜像引用保留在内部验收记录。
+
+**首片交付。** 给 Guides 单页只读预览增加实时 Jenkins 记录来源，复用 [#1353](https://github.com/zilliztech/zdoc/pull/1353) 的固定 Git 读取、页面分类和 Cloud/BYOC 视图比对。Jenkins 直读证据带独立来源标记，输出只读预览。原挂载仍服务现有验证入口，既有 replay 继续显式标注。不将下载文件转换成挂载证据，也不授予 `prepare`、生产发布或回滚权限。
+
+| 步骤 | 契约和验收 |
+|---|---|
+| 1. 固定读取来源 | 受信运行环境固定 Jenkins HTTPS origin 和发布 job，操作者只提供具体构建号与页面 ID。读取该编号的构建元数据、阶段和唯一归档 `output.json`。使用有期限、有限大小的 GET，拒绝重定向及响应中的任意下载地址。自动执行身份只需该 job 的构建和归档读取权限；从预期环境确认连通和权限，不能依赖个人浏览器登录。 |
+| 2. 绑定实际英文 UAT | 构建须已完成且成功，`uat-en` 阶段唯一且成功。归档须绑定同一 job、构建号和实际 Jenkins build ID，并明确选中 `oversea` / `uat`，且英文镜像及其 UAT 部署均为 selected。校验完整 `zdoc_sha`、源镜像 revision 和 UAT 部署 digest；从 dev 源码构建的首片正例要求 revision 与 `zdoc_sha` 一致、源 digest 与实际 UAT 部署 digest 相同。仅凭 tag、总成功状态、阶段名称或 Prod 归档均不准入。保留原始 Jenkins 身份，使用明确的一对一绑定，不能仅凭编号替代挂载契约里的 `jenkinsBuildIdentity`。 |
+| 3. 复用预览并复核 | 用部署的完整 SHA 读取已提交的页面回执和生成产物，与固定的 master、dev 和上游版本比较。校验配置中的 Cloud/BYOC 目标，记录构建和阶段身份、归档原始字节 SHA-256、部署 SHA/digest、Git 基线和比较结果；结束前重读构建证据与 refs，任一变化则暂停。镜像标签、发版人对两个页面视图的验收、开放更新 PR 分别记录状态；没有独立观察就保留 pending/unobserved。 |
+| 4. 验收正常与暂停 | 先用已留存归档验证真实字段布局；用英文 Prod、中文 UAT、旧英文 UAT、错误 SHA/digest、歧义阶段、归档变化和访问失败验证停止原因。下一次正常英文 UAT 到来后，用一页仍有 current/next 差异、回执未变且两目标齐备的 Guides 跑真实预览。正式发版验收还需对不可变 digest 独立核对镜像的 revision 和 Jenkins build ID 标签，并记录发版人确认及同页开放更新 PR 的观察。 |
+
+**实现交接。** 在最新 master 核对 #1353 的状态与差异后定实现基线。将 Jenkins HTTP 边界和归档验证收在 shared-docs 的发布证据 adapter，`packages/docs-tooling/src/shared-docs/adapters/promotion.ts` 复用已有单页比对，`packages/docs-tooling/src/shared-docs/commands/promote-guides.ts` 明确区分 Jenkins 实时、挂载和 replay 的预览入口。定向测试放在 `packages/docs-tooling/src/shared-docs/testing/`，覆盖请求目标、身份绑定、读回漂移、过期停止和正式预览进入 `prepare` 的拒绝。以 `pnpm test:for-change -- --base <base> --head HEAD` 核对完整差异并执行命中的命令。先交短方案和只读运行身份的证据，主审通过后再实现。Actions、批量提升 Draft 和实际部署各自另行交付。
