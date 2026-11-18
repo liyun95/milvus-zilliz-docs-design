@@ -1,6 +1,6 @@
 # WP13 Guides 提升
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：首片设计草案
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：本地首片实施卡，真实 UAT 记录待核验
 
 ## 目标
 
@@ -66,9 +66,49 @@ WP12 推进页面的 `next`，WP13 推进页面的 `current`。已有已验收�
 | 空清单、重跑和缩减范围 | 无有效编辑只报告。相同请求复用 Draft；缩减范围后重校验并更新同一 Draft；Draft 有人工改动或并发更新则暂停并保留现场 |
 | 正式发布旅程 | 本地候选和实际 UAT／Prod 分开记录。实际生产上线另需核对合并提交、Fetch 产物及部署记录 |
 
-## 下轮讨论
+## 首片实施计划
 
-- 发版人实际用哪个 UAT 部署编号确认验收，以及哪个可核验记录能将它绑定到实际部署的生成产物。
-- 首批由人根据候选开 PR，还是第一轮就接 Actions 的 Draft 创建。无论选哪种，预览、一次选页和最终 PR 审阅的规则相同。
+**Goal:** 从固定的本地重放材料预览待提升 Guides 页面，并为一次选中的页面生成一份可审阅补丁。
 
-本卡是设计草案。需求 [8-1–8-4](../../prd.md#场景-8功能上线时提升) 保持待验收：首片验证本地候选与视图，工作流创建 PR、真实生产发布及既有更新 PR 自动重建分别结项。SDK 整本手册的完整提升旅程使用其独立契约。
+**Architecture:** 本地 CLI 分为预览和准备，两个阶段共用页面资格和证据读取。首片只消费样本记录并标记为重放，可以给真实记录核验留接口；实际 Jenkins 记录读取与认证、Actions 创建 Draft 各自验收。
+
+**Tech Stack:** zdoc TypeScript CLI、Git 固定提交读取、现有 SharedReceipt 和 WP11 生成、Vitest。
+
+在 [产品基线 57977f06](https://github.com/zilliztech/zdoc/commit/57977f06c7165a4eb0d9e945ce3c72c7fc10fc7e) 核对接口；开工时取最新 master，并报告任何影响本卡的漂移。负责人提供的部署脚本默认查 Jenkins `zdoc-release`。人可用「任务 + 构建号」定位记录，单个任务运行可能含 oversea、cn 或两者，实际站点分别核对。构建结果、描述和 image tag 只用于定位；真实验收记录还必须给出成功部署、精确 zdoc SHA 和镜像 digest。本地开发先构造同形状样本，保持测试与真实验收分开。首批先由人员根据已验证补丁开 PR，等只读记录入口跑通后再接自动 Draft。
+
+允许改动：
+
+| 文件（相对于 zdoc） | 职责 |
+|---|---|
+| `packages/docs-tooling/src/shared-docs/core/promotion.ts` | 纯分类、选页和整组决定 |
+| `packages/docs-tooling/src/shared-docs/adapters/promotion.ts` | 读取固定 Git 对象、核对记录和生成视图证据 |
+| `packages/docs-tooling/src/shared-docs/commands/promote-guides.ts` | 本地入口、重新核对输入、输出报告和补丁 |
+| `packages/docs-tooling/src/cli-main.ts` | 独立注册 `promote-guides`，保留整本手册命令 |
+| `packages/docs-tooling/src/shared-docs/testing/promotion.test.ts`、`packages/docs-tooling/src/cli-main.integration.test.ts` | 样本重放、失败回归和 CLI 契约 |
+
+### 1. 固定样本，生成预览
+
+- [ ] 用本地 Git fixture 构造三页。A 页的 UAT 已验收 B，当前锁为 A/B；B 页已同步；C 页在验收 B 后变成 C。以已部署样本记录的 `sourceSha` 查找该 zdoc 生成提交，读取 `generated/en/manifests/shared-pages/guides/active.json` 和相应的每页记录。复用 `validateActiveState` 和 `validateSharedReceipt`，按记录的输出路径核对 Git 对象原始内容摘要。关联不明、缺少目标产物或已验收版本不符，记录原因。不能用 Git 工作区当前文件替代受锁的 UAT 提交。
+- [ ] 实现 `preview` 严格参数解析。默认只报告三类页面。输出 `promotion-preview.json`，记录 `observation: replay`、实际输入的 UAT 记录摘要、Git 基线、确定排序的分类、页面目标、每页旧锁与相关输入摘要。fixture 用临时 Git 文件模拟真实内容，输出始终与正式验收区分。
+- [ ] 验收 A 页可提升、B 页无需提升、C 页需处理；换记录、失去 Cloud/BYOC 任一必要产物、结果摘要错误和无关未激活目录均不能增加可提升页。
+
+### 2. 一次选页，产出整批补丁
+
+- [ ] `prepare` 只接受上一步预览及明确的页面 ID 列表或 `all-eligible`。用同一组固定仓库与记录重算预览，逐项核对基线、选集和活动记录，勿从报告文字取得授权。用临时输出比对候选 Prod 与批准快照的 UAT 视图；复用 WP11 生成和观察接口。核对原 UAT 产物，使用语义一致的通道投影；无法证明某处差异等价就报告暂停。首个正例用无需改跨页链接、飞书整页通道或手写通道块的页面。
+- [ ] 只在所有选中页通过时输出一份 `promotion.patch` 和对应 `promotion-result.json`。检查补丁只改所选页 `lock.current` 与必要的同页通道规则。写入新的输出目录，不修改源检出。证据不完整、选中页失效或比对失败时输出暂停报告，目录里没有可采纳补丁。首片不创建 Git 提交、PR 或发布。
+- [ ] 增加两页可提升的正例，分别验证显式子集和 `all-eligible`。篡改预览选集、在两阶段间推进一页 next、改变视图依赖、未选页多出编辑、空选集、已存在输出目录分别验证。对正例执行 `git apply --check`，打到隔离检出后检查实际差异和视图。
+
+### 3. 从 CLI 重放并交主审
+
+拟定命令：
+
+```sh
+pnpm docs-tooling shared-docs promote-guides --mode preview --uat-record "$record"   --repo "$milvus_repo" --dev "$zdoc_repo" --out "$preview_out"
+pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$record"   --repo "$milvus_repo" --dev "$zdoc_repo" --preview "$preview_out/promotion-preview.json"   --pages all-eligible --out "$candidate_out"
+```
+
+- [ ] 从 zdoc master 的独立工作树跑一遍真实 CLI 加驱动测试。用 CLI 集成断言覆盖缺参数、产物目录限制、报告和退出语义。成功预览、空清单和成功准备正常退出；参数错误或明确暂停返回非零值，并按阶段记录可读原因。
+- [ ] 开工前按允许路径查 `pnpm test:for-change -- <paths...>`，提交后用实际完整 diff 重跑选择器。当前预计门禁包括 CLI/validation、shared-docs grouped、Fetch 合约与 replay、workflow policy、typecheck、matrix 和 diff-check。将实际执行命令、结果、Git SHA 及输出样本带回主会话；已通过的样本明确标为 replay。
+- [ ] 用得到的真实只读 UAT 记录做额外验收，首先核对记录来源、站点、成功状态、完整 SHA/digest 是否能与生成物串起来。缺记录不影响前两项本地交付，但需报告真实验收未完成。Actions 预览、自动 Draft、真实部署各自另行验收。
+
+本卡是首片实施计划。需求 [8-1–8-4](../../prd.md#场景-8功能上线时提升) 保持待验收：首片验证本地候选与视图，工作流创建 PR、真实生产发布及既有更新 PR 自动重建分别结项。SDK 整本手册的完整提升旅程使用其独立契约。
