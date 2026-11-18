@@ -1,6 +1,6 @@
 # WP13 Guides 提升
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：本地首片已实现并通过主审，真实 UAT 记录待核验
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：本地首片已合并并同步 dev，下一片接入真实 UAT 证据
 
 ## 目标
 
@@ -122,4 +122,22 @@ pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$recor
 
 最终提交的 115 项定向测试、8 项发布路由测试、类型检查、Fetch 合约/回放、workflow policy、matrix 和 diff 检查通过。默认并发的 shared-docs 全量两次在未修改的 WP12 小数快照用例达到 5 秒时限后提前终止，单例复跑约 3.5 秒通过。降低本地 light 并发至 4 workers 后，light 2,006 passed / 0 failed / 6 skipped；合跑触及 900 秒总时限。按 CI 划分单独运行 transactions、local-runner 和 update-prepare，68 passed / 0 failed / 0 skipped。所有分组覆盖同一个最终提交，合跑记录保留为未通过。Jenkins 真实 UAT 记录和 Actions 接入保持待验收。
 
-本卡是首片实施计划。需求 [8-1–8-4](../../prd.md#场景-8功能上线时提升) 保持待验收：首片验证本地候选与视图，工作流创建 PR、真实生产发布及既有更新 PR 自动重建分别结项。SDK 整本手册的完整提升旅程使用其独立契约。
+首片已验证本地候选与视图。需求 [8-1–8-4](../../prd.md#场景-8功能上线时提升) 保持待验收，工作流创建 PR、真实生产发布及既有更新 PR 自动重建分别结项。SDK 整本手册的完整提升旅程使用其独立契约。
+
+### 合并与定时 Fetch 验证（2026-11-18）
+
+- 产品 PR [#1342](https://github.com/zilliztech/zdoc/pull/1342) 已合入 `master@2778f169`。合并树与 CI、[仅产物 Fetch 44262771912](https://github.com/zilliztech/zdoc/actions/runs/44262771912) 验证的候选 `960f2ca9` 一致。[同步 PR #1348](https://github.com/zilliztech/zdoc/pull/1348) 已将工具交接到 `dev@2b2c1a40`。
+- 当晚[定时 Fetch 44283079178](https://github.com/zilliztech/zdoc/actions/runs/44283079178) 从包含 #1342 与 #1347 的 `master@c062875f` 运行。英文 Cloud 4 项、BYOC 4 项通过，组装后写入 `dev@09b32d97`。中文 Cloud 8 项、BYOC 6 项通过，组装后确认无变化，回执引用 `35fac446`。两种语言的 Cloud/BYOC 候选内容清单和侧栏均与各自回执提交中的字节一致。原先因权限受阻的英文《Configure Access Logs》成功读取。
+- `dev` 派生状态同步至 `aebeeacd` 并通过最终站点校验。全量 Fetch 的 Node.js 分组因发布基线摘要不一致而失败，整轮结论为 failure，Translation 跳过。此次验收覆盖 Guides 到 `dev` 的发布链路，实际 Jenkins UAT 内容验收仍待补。[发布结果](https://github.com/zilliztech/zdoc/actions/runs/44283079178/artifacts/14421436243) · [Node.js 日志](https://github.com/zilliztech/zdoc/actions/runs/44283079178/job/134729322531) · [站点校验](https://github.com/zilliztech/zdoc/actions/runs/44283079178/job/134755572359)
+
+## 下一片 · 真实 UAT 发布证据与只读预览
+
+发版负责人用明确的 Jenkins 任务和构建号定位已部署的英文站 UAT，再确认本次验收的页面和目标。先跑通一页的只读预览和隔离候选重放。发版人的页面验收与 Jenkins 的成功部署记录都进入报告。
+
+1. **确定证据入口。** 优先确认发布侧能否在现有受信环境提供 `evidence/uat-records.json` 的只读导出，沿用 zdoc 发布契约的信任边界。部署脚本显示的 image tag 用于定位。正式证据应包含英文 UAT 的成功部署状态、完整 `sourceSha`、实际部署镜像的不可变 digest 和 `jenkinsBuildIdentity`。核对部署镜像的 revision 和 Jenkins build 标签是否与记录一致。若证据交付位置或身份尚未确认，先用同形状 fixture 验证解析和暂停行为，报告标为重放。
+2. **接到固定 Git 读取。** 从唯一的受信成功记录解析出实际 UAT 提交。复用 `deploy/contracts/release.schema.json`、发布校验器及现有 `promote-guides` 的生成记录读取、通道投影和 Cloud/BYOC 比对。受信记录须由运行环境提供，命令行参数只选择构建身份。基于该固定提交读取 `active.json`、页面生成记录和输出对象。真实预览保留部署记录摘要、镜像 digest、已验收目标和选页依据。
+3. **验证正常与暂停路径。** 选一页在该次 UAT 中有 current/next 差异、Cloud/BYOC 证据齐全且无需锚点别名协调的英文 Guides。正常样例输出分类和语义比对。重复或缺失记录、错误站点、失败部署、SHA 或 digest 不一致、产物或目标缺失、验收后 next 前进都必须暂停。原 `observation: replay` 入口继续支持本地回归，样本不能冒充正式证据。Actions 接入、Draft 写入及生产发布留待这片的真实验收完成后再推进。
+
+### 执行 Agent 交接
+
+> 以最新 zdoc master 为基线，先读本卡「真实 UAT 发布证据与只读预览」及 zdoc `deploy/contracts/README.md`。给出短方案，标明现有 verifier 的可复用入口、由谁提供受信发布记录、预览如何绑定具体部署与 Git 对象，以及资料缺失时的暂停条件。主审通过后实现只读证据接入与上述回归，用最终 diff 查 selector、跑完命中的检查，交回确切 base/head、通过与暂停样本、真实 Jenkins 验收状态。保持现有 replay 入口，无 Jenkins 触发、工作流、远端写入或 Draft 操作。
