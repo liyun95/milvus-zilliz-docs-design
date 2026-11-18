@@ -138,6 +138,8 @@ pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$recor
 2. **接到固定 Git 读取。** 从唯一的受信成功记录解析出实际 UAT 提交。复用 `deploy/contracts/release.schema.json`、发布校验器及现有 `promote-guides` 的生成记录读取、通道投影和 Cloud/BYOC 比对。受信记录须由运行环境提供，命令行参数只选择构建身份。基于该固定提交读取 `active.json`、页面生成记录和输出对象。真实预览保留部署记录摘要、镜像 digest、已验收目标和选页依据。
 3. **验证正常与暂停路径。** 选一页在该次 UAT 中有 current/next 差异、Cloud/BYOC 证据齐全且无需锚点别名协调的英文 Guides。正常样例输出分类和语义比对。重复或缺失记录、错误站点、失败部署、SHA 或 digest 不一致、产物或目标缺失、验收后 next 前进都必须暂停。原 `observation: replay` 入口继续支持本地回归，样本不能冒充正式证据。Actions 接入、Draft 写入及生产发布留待这片的真实验收完成后再推进。
 
+主审通过的实施范围为单页英文只读预览。命令用完整 Jenkins 构建身份选择发布侧挂载的成功记录，沿用现有受信证据树及其检查。报告分别记录部署证据、固定 Git 输入与双目标视图比对，并保留镜像标签核验、人工验收和开放更新 PR 的观测状态。镜像标签尚未独立核验时，状态保持待核。新入口只输出报告，原 replay 的 `prepare` 拒绝这类报告，保持现有重放契约。
+
 ### 执行 Agent 交接
 
 > 以最新 zdoc master 为基线，先读本卡「真实 UAT 发布证据与只读预览」及 zdoc `deploy/contracts/README.md`。给出短方案，标明现有 verifier 的可复用入口、由谁提供受信发布记录、预览如何绑定具体部署与 Git 对象，以及资料缺失时的暂停条件。主审通过后实现只读证据接入与上述回归，用最终 diff 查 selector、跑完命中的检查，交回确切 base/head、通过与暂停样本、真实 Jenkins 验收状态。保持现有 replay 入口，无 Jenkins 触发、工作流、远端写入或 Draft 操作。
