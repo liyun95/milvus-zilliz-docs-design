@@ -1,6 +1,6 @@
 # WP13 Guides 提升
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：本地首片已合并并同步 dev，下一片接入真实 UAT 证据
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：首片已同步 dev，只读 UAT 预览已通过本地验证，真实部署验收待补
 
 ## 目标
 
@@ -143,3 +143,9 @@ pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$recor
 ### 执行 Agent 交接
 
 > 以最新 zdoc master 为基线，先读本卡「真实 UAT 发布证据与只读预览」及 zdoc `deploy/contracts/README.md`。给出短方案，标明现有 verifier 的可复用入口、由谁提供受信发布记录、预览如何绑定具体部署与 Git 对象，以及资料缺失时的暂停条件。主审通过后实现只读证据接入与上述回归，用最终 diff 查 selector、跑完命中的检查，交回确切 base/head、通过与暂停样本、真实 Jenkins 验收状态。保持现有 replay 入口，无 Jenkins 触发、工作流、远端写入或 Draft 操作。
+
+### 只读预览本地验证（2026-11-18）
+
+以 zdoc `master@b701ac59` 为基线，最终本地提交为 `281f5903d203f5415db10cb8ea72c0bc6a29c0a3`。主审复核了经修正的工作树和证据目录隔离、Git 历史检查、双目标内容比对及 replay 边界。CLI 样本产生单页 Cloud/BYOC 只读报告，覆盖缺失和重复构建、路径重叠、Git 历史标记、`next` 漂移及报告进入 replay prepare 时的拒绝。最终提交的 124 项定向回归、56 项部署合约检查、类型检查和 selector 其余门禁通过。分组测试按顺序执行，合计 2,112 项通过，6 项跳过。早期失败或中止的运行单独保留。
+
+产品分支保留在本地。真实 Jenkins 只读挂载、部署镜像标签、发版人对页面和目标的验收，以及开放更新 PR 的独立核对仍待补。挂载记录沿用现有发布校验器的 JSON 解析约定。
