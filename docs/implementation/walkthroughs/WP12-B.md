@@ -317,8 +317,12 @@ Task2 的材料与完整闭包代码 `fd197eec0a` 经主审发现组外 D 引用
 
 索引、资格和逐页 report/pins 同时进入有界本地 ZIP，正例均为 8 个成员。采样间隔目标 100 ms、实际最大间隔及误差保留在测量文件，约 2 GiB RSS 是采样高水位而非 OS 精确峰值。真实 600 s 超时的旧提交结果仅对最终未变的终止/清理尾段保留有效；更新后的 ACK、晚过期和最终收尾检查有各自的源码及针对性回归，不能混用证明。
 
-运行代码与 raw-capture fixture 字节经逐项 Git blob/mode 对比未变，以上 `ebda` 实跑按原 SHA 保留有效；测试文件仍改变 TCB 指纹，额外的 `efcb` 正例和最终 `d131` 正例均真实完成。最后一轮 fixture M=F `de627701`、工具集 `2f190f7c…`，五进程干净收尾，ZIP 8 成员 11,355/28,887 bytes，206,417 ms、各 2,043 次 RSS/disk 采样，最大间隔 111/114 ms、0 错误。主会话重算原始 Q/I/ZIP，独立最终复审关闭本片代码/本地/原生 CI 门槛。工具和设计 PR 仍保留 Draft，不在原 #1331/#95 合并授权中自动合并。历史 #3848 缺完整独立 D/lifecycle/图片前置证据，停在 0/12 material launches；真实 12 页容量、生产同版本 Fetch 资格、有签名 producer 的容量、多 lock 原子候选和批量 Draft 仍待后续实施/授权。未知退出或主机丢失可能保留只读数据描述文件，但不能得到 collected、导入或恢复能力；故障时保留诊断，不重试现场授权。
+运行代码与 raw-capture fixture 字节经逐项 Git blob/mode 对比未变，以上 `ebda` 实跑按原 SHA 保留有效；测试文件仍改变 TCB 指纹，额外的 `efcb` 正例和最终 `d131` 正例均真实完成。最后一轮 fixture M=F `de627701`、工具集 `2f190f7c…`，五进程干净收尾，ZIP 8 成员 11,355/28,887 bytes，206,417 ms、各 2,043 次 RSS/disk 采样，最大间隔 111/114 ms、0 错误。主会话重算原始 Q/I/ZIP，独立最终复审关闭本片代码/本地/原生 CI 门槛。历史 #3848 缺完整独立 D/lifecycle/图片前置证据，停在 0/12 material launches；真实 12 页容量、生产同版本 Fetch 资格、有签名 producer 的容量、多 lock 原子候选和批量 Draft 仍待后续实施/授权。未知退出或主机丢失可能保留只读数据描述文件，但不能得到 collected、导入或恢复能力；故障时保留诊断，不重试现场授权。
 
-最后 [site validation 44180348094](https://github.com/zilliztech/zdoc/actions/runs/44180348094) 的实际 checkout 为测试合并 `08bd5528`，树与已审 `d131a0a8` 一致；Ubuntu 24.04 / Node 22.23.4 的 light 1,864/0/114、isolated 68/0/0。成功轮按现有 if:failure() 策略不上传逐例 JSON，拒绝路径的证明来自完整 qualified gate 与未跳过的真实断言/源码树绑定；没有虚构单例 JSON，也不把 Linux 正向 capture 算作支持。首次失败和随后的修复记录均保留。整站中英文构建和生产更新步骤本轮条件跳过，不能据 CI 通过称生产 Fetch 或多页 Draft 已验证。
+首轮通过的 [site validation 44180348094](https://github.com/zilliztech/zdoc/actions/runs/44180348094) 的实际 checkout 为测试合并 `08bd5528`，树与已审 `d131a0a8` 一致；Ubuntu 24.04 / Node 22.23.4 的 light 1,864/0/114、isolated 68/0/0。成功轮按现有 if:failure() 策略不上传逐例 JSON，拒绝路径的证明来自完整 qualified gate 与未跳过的真实断言/源码树绑定；没有虚构单例 JSON，也不把 Linux 正向 capture 算作支持。首次失败和随后的修复记录均保留。整站中英文构建和生产更新步骤本轮条件跳过，不能据 CI 通过称生产 Fetch 或多页 Draft 已验证。
 
-后续先审定并合并本片工具/设计 PR，再补多 lock 原子候选的精确实施卡；保持完整批次、已有更新 PR 时暂停、全 noop 不饿死后续组、未知结果停止，以及归档/对象/权限预算。真实 12 页容量与兼容的正常 Fetch 是独立前置项；没有通过时只报告 held，不以缩小组或扩大限额绕过。
+合并前 [分支 Fetch 44209342636](https://github.com/zilliztech/zdoc/actions/runs/44209342636) 用 `d131a0a8` 生成 Guides 产物。英文、中文的 Cloud/BYOC 渲染共 22 项全部通过，两次 assembly 均重新生成侧栏，最终汇总为 `artifact_only / success`，中英文单元均为 `ready`。验证期间 `dev` 保持 `9faf4eaf`，Translation 未触发。
+
+同步 #1334 后，[最终 CI 44215917559](https://github.com/zilliztech/zdoc/actions/runs/44215917559) 在 `116a20d2` 对应的合并内容上通过。转 Ready 后共 14 项检查通过、8 项条件跳过；[产品 #1335](https://github.com/zilliztech/zdoc/pull/1335) 已合入 `57977f06`，合并树与最终 CI 一致。[dev 同步 #1338](https://github.com/zilliztech/zdoc/pull/1338) 和合并后的定时 Fetch 单独验收。
+
+后续补多 lock 原子候选的精确实施卡；保持完整批次、已有更新 PR 时暂停、全 noop 不饿死后续组、未知结果停止，以及归档/对象/权限预算。真实 12 页容量与兼容的正常 Fetch 是独立前置项；没有通过时只报告 held，不以缩小组或扩大限额绕过。
