@@ -1,6 +1,6 @@
 # WP13 Guides 提升
 
-**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：本地首片实施卡，真实 UAT 记录待核验
+**仓库**：[zdoc](https://github.com/zilliztech/zdoc)｜**阶段**：Phase 1b｜**依赖**：[WP11 双通道生成](https://github.com/zilliztech/zdoc/pull/921)｜**状态**：本地首片已实现并通过主审，真实 UAT 记录待核验
 
 ## 目标
 
@@ -100,15 +100,26 @@ WP12 推进页面的 `next`，WP13 推进页面的 `current`。已有已验收�
 
 ### 3. 从 CLI 重放并交主审
 
-拟定命令：
+本地重放命令。
+
+`--uat-record` 接收版本化重放输入，内含形如发布契约的 UAT 记录以及显式 `openUpdatePages` 清单（无冲突时填空数组）。当前证明范围为英文站的 Cloud/BYOC，读取固定 Git 对象，无法验证的通道或证据应暂停。
 
 ```sh
-pnpm docs-tooling shared-docs promote-guides --mode preview --uat-record "$record"   --repo "$milvus_repo" --dev "$zdoc_repo" --out "$preview_out"
-pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$record"   --repo "$milvus_repo" --dev "$zdoc_repo" --preview "$preview_out/promotion-preview.json"   --pages all-eligible --out "$candidate_out"
+pnpm docs-tooling shared-docs promote-guides --mode preview --uat-record "$record" \
+  --repo "$milvus_repo" --dev "$zdoc_repo" --out "$preview_out"
+pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$record" \
+  --repo "$milvus_repo" --dev "$zdoc_repo" --preview "$preview_out/promotion-preview.json" \
+  --pages all-eligible --out "$candidate_out"
 ```
 
 - [ ] 从 zdoc master 的独立工作树跑一遍真实 CLI 加驱动测试。用 CLI 集成断言覆盖缺参数、产物目录限制、报告和退出语义。成功预览、空清单和成功准备正常退出；参数错误或明确暂停返回非零值，并按阶段记录可读原因。
 - [ ] 开工前按允许路径查 `pnpm test:for-change -- <paths...>`，提交后用实际完整 diff 重跑选择器。当前预计门禁包括 CLI/validation、shared-docs grouped、Fetch 合约与 replay、workflow policy、typecheck、matrix 和 diff-check。将实际执行命令、结果、Git SHA 及输出样本带回主会话；已通过的样本明确标为 replay。
 - [ ] 用得到的真实只读 UAT 记录做额外验收，首先核对记录来源、站点、成功状态、完整 SHA/digest 是否能与生成物串起来。缺记录不影响前两项本地交付，但需报告真实验收未完成。Actions 预览、自动 Draft、真实部署各自另行验收。
+
+### 本地实施记录（2026-11-18）
+
+执行分支以 zdoc master `1bc57ff6` 为基线，本地实现提交 `cb48e26d`。首片真实 CLI 重放验证两页同批提升，补丁只修改两页的 `lock.current`，四个英文 Cloud/BYOC 视图与样本 UAT 一致。过期页、历史文件或导航证据不一致、不可用链接及发布补丁失败均有暂停用例。英文站同 token 通道由生产路由插件判定；本地重放只证明英文 Guides 及 BYOC 的范围，站点其他目的地和本地化视图仍需后续验收。
+
+最终提交的 115 项定向测试、8 项发布路由测试、类型检查、Fetch 合约/回放、workflow policy、matrix 和 diff 检查通过。默认并发的 shared-docs 全量两次在未修改的 WP12 小数快照用例达到 5 秒时限后提前终止，单例复跑约 3.5 秒通过。降低本地 light 并发至 4 workers 后，light 2,006 passed / 0 failed / 6 skipped；合跑触及 900 秒总时限。按 CI 划分单独运行 transactions、local-runner 和 update-prepare，68 passed / 0 failed / 0 skipped。所有分组覆盖同一个最终提交，合跑记录保留为未通过。Jenkins 真实 UAT 记录和 Actions 接入保持待验收。
 
 本卡是首片实施计划。需求 [8-1–8-4](../../prd.md#场景-8功能上线时提升) 保持待验收：首片验证本地候选与视图，工作流创建 PR、真实生产发布及既有更新 PR 自动重建分别结项。SDK 整本手册的完整提升旅程使用其独立契约。
