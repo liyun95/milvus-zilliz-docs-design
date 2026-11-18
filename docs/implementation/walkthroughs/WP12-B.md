@@ -284,3 +284,45 @@ B3 总计划已合并设计 PR #78，第一片已合并产品 PR #1189，第二�
 第二轮 [44062001527](https://github.com/zilliztech/zdoc/actions/runs/44062001527) 的英文渲染与 assembly 通过，中文 SaaS 开发指南因整页 NEXT 与两段 NextChannel 标记冲突失败。精确保留归档和离线复现证明根因；渲染守卫与 dev 基线相同，不放宽校验。用户授权最小源修正后，写前核查发现文档已至 revision 46，两个标记已移除、正文和 NEXT 保持，本会话没有重复修改。外部 master Fetch 44081444371 的认证 source bundle 确认了这份输入，其整轮已成功，中英文构建、10 个单元发布与发布后验证通过；此结果独立于分支准入。
 
 #1327 已同步并主审最新 master 的接口影响，head `ab3257ce` 的 CI 13 项成功、8 项条件跳过；与最新 master 的预期合并树、GitHub 测试合并 `bedc3d9e` 的树均为 `deb7b408`。最终 [44086502969](https://github.com/zilliztech/zdoc/actions/runs/44086502969) 已排队，固定该工具树、publish=false、run_translations=false、media_upload_mode=skip。该轮最终 success，英文 8 表、中文 14 表及两次整体 assembly/构建均成功。对 selection/results 归档做 API size/SHA 与现有 contract 校验后确认 artifact_only/success，两个单元 ready、发布 attempts=0、commitShas=[]，目标 SHA 保持 `03cab659`；Translation dispatch 与发布后 verify 按条件跳过。按原授权合并 #1327 为 `3839abb3`，实际合并树与已验证工具树相同；合并后 master site validation 44096795099 亦 success，自动 dev 同步已生成 #1331（待候选验收和合并），不自动合并同步 PR。多页资格、collector、原子候选与 Draft 继续待后续实现，不因一次 Fetch 通过自动结项。
+
+### 多页资格与采集第二片：实施准入（2026-11-17）
+
+用户授权验收并合并 #1331 和设计 #95。主会话复核同步只带入已审工具文件及必要 REST 派生清单，实际 dev 内容保持；精确候选的中英文构建及全部门禁通过，串行工作流合并 #1331，实际合并树与候选一致。设计 #95 亦已合并。随后从 master `3839abb3` 开启 [fork Draft #32](https://github.com/liyun95/zdoc/pull/32)。
+
+本片采用逐页有界内容采集、完整依赖闭包、一次集中 per-run 资格与独立 Python 校验，再发布只读索引；保留 v1 与既有限额。孤立/嵌套/变换引入片段、真实执行收据、必要 noop 与手册实际锚点、真实离线 stage/broker/图片和资源边界已在设计审查中补齐；尚未取得代码或容量验收结果。Task1 已交 subagent，Task2–4 继续按[精确实施卡](../tasks/WP12-zdoc-upstream-updates.md#多页资格与采集第二片-implementation-plan2026-11-17) 推进，主会话负责分项及最终审查。生产入口仍限单页，本片不创建内容 Draft 或写 Check。
+
+
+### 第二片 Task1–2 分项验收与资格交接（2026-11-18）
+
+Task1 的真实 M 文件白名单及同步 YAML 预算问题已修复，代码 `4b413427` 的独立复审通过；真实 93 页/185 目标自指纹使用 12 次 Git 读取、3,732,693 bytes、213 ms。这是配置/对象身份交易，未代替 Fetch 资格。
+
+Task2 的材料与完整闭包代码 `fd197eec0a` 经主审发现组外 D 引用旧锚点的遗漏，修复 `e1b3962c0c` 后通过独立增量复审；三个真实反例先失败，修复后完整材料 18/18、typecheck/diff-check 通过。原始 8 文件组合的 295/2/1 失败保留，冻结后完整 oracle 10/10 和材料 14/14 分别通过；没有将孤立通过改称组合通过。
+
+实际完整源码 smoke 在 `fd197eec0a` 上完成两个真实 replay 内容子进程，FD3 42,450/37,985 bytes，退出与清理正常，保留 canonical/CAS/流哈希。现有空缓存导致的首次失败与临时移开后恢复原 inode/目录树、Git 状态不变的证明同时留存。它只证明材料采集，配置 M 与工具 M 不同，不能说已完成集中资格或生产认证。Task2 的不透明材料闭包由下一步独立 run lease 一次消费；Task3 现交 subagent 实施真实整组资格与 Python 校验，主会话继续分项/最终审查，Task4 仍待实现。生产多页 writer/内容 Draft/Check 均未激活。
+
+
+### 第二片 Task3 实际资格验收与最后入口（2026-11-18）
+
+代码 `41f39f9509` 通过 Task3 最终独立源码和执行证据门。含实际工具代码的隔离 M=F=`82676b65` 上，三个内容、一个资格、一个捕获 Python 子进程均正常结算，资格 Q 7,338 bytes、索引 I 7,889 bytes，三页 advance/advance/noop、零操作且不可写。主会话独立重算 Q/I 物理摘要并核对原始输入不变。三页均为双目标；没有把它称为混合目标、历史 12 页容量或生产资格通过。
+
+错误 current 的真实反例证明：即便代码 profile 相等、原源树和输出字节相同，M.current 与实际发布收据身份不同仍在资格阶段停止，未发出 Q/I 或启动 Python。五类保留 Python 替换反例也被拒绝；不视为现场重获资格。原始快照的合法小数在共同事实、材料及发现层逐步修正并完整补测，新增规范 JSON 保持整数规则；末尾重放错误必须向父启动器传播。失败历史和初始 toolset 117/118 保留，最后完整门禁继续 pending。
+
+采样只有约 2 GiB RSS / 1.4 GiB 磁盘下界，实际间隔未达 100 ms，资源、最后新鲜度和安全成功指针仍属 Task4。验收后正常同步已合并上游 #1332，组合基线 `93a00621` 的功能补丁与原审阅补丁逐字节一致；共享 build、links 和 front matter 的组合行为尚需最终测试。Task4 已交新的 subagent 实现，主会话继续主审；生产工作流、writer 和内容 Draft 未激活。
+
+### 多页只读采集：最终实现与验证（2026-11-18）
+
+运行实现 `ebda18aa98` 及测试收尾 `d131a0a8` 已通过分项与新的整分支主审，主审缺口及窄范围修复统一记录在[任务卡](../tasks/WP12-zdoc-upstream-updates.md#多页资格与采集第二片-implementation-plan2026-11-17)。新入口从实际发现到完整成员资格、独立 Python、最后新鲜度与本地只读指针形成闭环；生产仍是单页 pilot，未接多页 writer。
+
+最终源码的支持环境 replay 已跑完混合目标正例、非空改后还原的三页 noop，以及最终 D 漂移整组停止。两份正例均为三个内容进程、一个资格进程、一个 Python 干净收尾；漂移时同一 Python 被终止并清空进程组，不安装指针。主会话独立重算 Q/I 域及物理摘要、ZIP 各成员/字节和输入前后记录；不把构造的 GitHub 元数据或模拟时钟当作生产观察。保留证据的独立根探测另为 1 正例和 19 个拒绝反例，原指针未变，没有恢复现场授权。最终测试专用提交 `efcb2093` 仅更换小数快照用例的已有 fixture，全部断言和 5 s 时限不变；定向复审及本地六命令门禁通过，shared-docs 为 2,039/0/6，原 900 s 内结束。首次 5 s 超时导致的不完整失败仍保留，后续单例通过没有代替完整重跑；超时根因未被充分证明。最终 `d131a0a8` 只修测试的平台契约：真实 Linux 断言 capture 拒绝、受支持平台保留完整测量，两个新边界用例移出旧 skip 块，上限仍为 107。Mac 122/122 的移位前记录与最终 2/2 补测/字节重建证明分开，不重标为最终全套；上游 [#1335](https://github.com/zilliztech/zdoc/pull/1335) 的 13 项检查成功、8 项条件跳过。
+
+索引、资格和逐页 report/pins 同时进入有界本地 ZIP，正例均为 8 个成员。采样间隔目标 100 ms、实际最大间隔及误差保留在测量文件，约 2 GiB RSS 是采样高水位而非 OS 精确峰值。真实 600 s 超时的旧提交结果仅对最终未变的终止/清理尾段保留有效；更新后的 ACK、晚过期和最终收尾检查有各自的源码及针对性回归，不能混用证明。
+
+运行代码与 raw-capture fixture 字节经逐项 Git blob/mode 对比未变，以上 `ebda` 实跑按原 SHA 保留有效；测试文件仍改变 TCB 指纹，额外的 `efcb` 正例和最终 `d131` 正例均真实完成。最后一轮 fixture M=F `de627701`、工具集 `2f190f7c…`，五进程干净收尾，ZIP 8 成员 11,355/28,887 bytes，206,417 ms、各 2,043 次 RSS/disk 采样，最大间隔 111/114 ms、0 错误。主会话重算原始 Q/I/ZIP，独立最终复审关闭本片代码/本地/原生 CI 门槛。历史 #3848 缺完整独立 D/lifecycle/图片前置证据，停在 0/12 material launches；真实 12 页容量、生产同版本 Fetch 资格、有签名 producer 的容量、多 lock 原子候选和批量 Draft 仍待后续实施/授权。未知退出或主机丢失可能保留只读数据描述文件，但不能得到 collected、导入或恢复能力；故障时保留诊断，不重试现场授权。
+
+首轮通过的 [site validation 44180348094](https://github.com/zilliztech/zdoc/actions/runs/44180348094) 的实际 checkout 为测试合并 `08bd5528`，树与已审 `d131a0a8` 一致；Ubuntu 24.04 / Node 22.23.4 的 light 1,864/0/114、isolated 68/0/0。成功轮按现有 if:failure() 策略不上传逐例 JSON，拒绝路径的证明来自完整 qualified gate 与未跳过的真实断言/源码树绑定；没有虚构单例 JSON，也不把 Linux 正向 capture 算作支持。首次失败和随后的修复记录均保留。整站中英文构建和生产更新步骤本轮条件跳过，不能据 CI 通过称生产 Fetch 或多页 Draft 已验证。
+
+合并前 [分支 Fetch 44209342636](https://github.com/zilliztech/zdoc/actions/runs/44209342636) 用 `d131a0a8` 生成 Guides 产物。英文、中文的 Cloud/BYOC 渲染共 22 项全部通过，两次 assembly 均重新生成侧栏，最终汇总为 `artifact_only / success`，中英文单元均为 `ready`。验证期间 `dev` 保持 `9faf4eaf`，Translation 未触发。
+
+同步 #1334 后，[最终 CI 44215917559](https://github.com/zilliztech/zdoc/actions/runs/44215917559) 在 `116a20d2` 对应的合并内容上通过。转 Ready 后共 14 项检查通过、8 项条件跳过；[产品 #1335](https://github.com/zilliztech/zdoc/pull/1335) 已合入 `57977f06`，合并树与最终 CI 一致。[dev 同步 #1338](https://github.com/zilliztech/zdoc/pull/1338) 和合并后的定时 Fetch 单独验收。
+
+后续补多 lock 原子候选的精确实施卡；保持完整批次、已有更新 PR 时暂停、全 noop 不饿死后续组、未知结果停止，以及归档/对象/权限预算。真实 12 页容量与兼容的正常 Fetch 是独立前置项；没有通过时只报告 held，不以缩小组或扩大限额绕过。
