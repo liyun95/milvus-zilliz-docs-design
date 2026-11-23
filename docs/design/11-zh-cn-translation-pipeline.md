@@ -30,7 +30,7 @@
 
 `translate-codex.yml` 与 `publish-translation.yml` 继续使用现有选集和写入路径。首期中文迁移选集排除 Guides 首页、`content/zh-CN/guides/tutorials/tools/` 和 Reference。必须以实际生产者、发布者及恢复路径的写入集合验证隔离，其中 `zh-CN-reference` 仍有 Guides tutorials 路径映射。中文入口可以复用内容保护与 MDX 解析，中文 Guides 的审批基线、来源凭据和校验独立于自动 Translation 的状态。
 
-[分支所有权契约](https://github.com/zilliztech/zdoc/blob/master/deploy/contracts/master-tooling-sync.json) · [英文发布交接设计](../design/05-publish-handoff.md)
+[分支所有权契约](https://github.com/zilliztech/zdoc/blob/master/deploy/contracts/master-tooling-sync.json) · [英文发布交接设计](./05-publish-handoff.md)
 
 ## 3. 英文基线与语义 3-way
 
@@ -69,11 +69,11 @@
 
 ### 4.2 Promote 的交接
 
-1. 提升候选从 `lock.yaml` 固定拟采用的英文 `next`，按 [04](../design/04-channels-and-lock.md#提升) 的规则重建目标手册和通道。对照已审中文 NEXT 对应的英文产物及投影摘要，确认是同一拟发布版本，并检查候选提升结果的差异。仅锁文件 SHA 相同不足以通过，Cloud 规则、片段或资源也可能变化。
+1. 提升候选从 `lock.yaml` 固定拟采用的英文 `next`，按 [04](./04-channels-and-lock.md#提升) 的规则重建目标手册和通道。对照已审中文 NEXT 对应的英文产物及投影摘要，确认是同一拟发布版本，并检查候选提升结果的差异。仅锁文件 SHA 相同不足以通过，Cloud 规则、片段或资源也可能变化。
 2. 同一次提升提交保留已审的中文 NEXT 正文，解包由生成器添加的 `include`，删除对应的旧 `exclude`。作者手写的通道块只随对应功能的显式发布决定移除。检查两个通道的锚点与入链。整页 NEXT 要上线时，由负责人在同一次发布中协调 Base 的 `Release Channel`，Fetch 核对实际值后才发布该中文提升。
 3. 英文 `next` 推进、无对应中文批准、Base 通道提前变化或候选验证失败时，保留上次已验证的中文产物和通道状态，并报告阻断原因。英文若可独立发布，记录中文暂缓。要求双语同时上线的页面由发布负责人等到两边证据齐全后再放行。Fetch 使用已固定的输入重验，通过后在同一个中文检查点提交中更新正文、导航、通道和来源凭据。
 
-[04 的双版本生成和提升规则](../design/04-channels-and-lock.md) · [zdoc 通道运行手册](https://github.com/zilliztech/zdoc/blob/master/runbook/release-channel-gating.md)
+[04 的双版本生成和提升规则](./04-channels-and-lock.md) · [zdoc 通道运行手册](https://github.com/zilliztech/zdoc/blob/master/runbook/release-channel-gating.md)
 
 ## 5. 滚动 PR 与日常审校
 
@@ -88,7 +88,7 @@
 
 仅当中文 PR 已通过第 1 节的必需检查并由文档负责人批准，才进入 master 的审校源。09:30 出稿及审校耗时作为试点指标，发布时延另计 Fetch 和部署。
 
-[06 的滚动 PR 和跨页依赖规则](../design/06-upstream-changes.md#每页一个滚动更新的-pr)
+[06 的滚动 PR 和跨页依赖规则](./06-upstream-changes.md#每页一个滚动更新的-pr)
 
 ## 6. 逐页切流与 Fetch 接线
 
@@ -103,7 +103,7 @@
 | 待激活 | 确认显式 `canonical`、可发布状态和原记录 ID，再把该中文 Base 记录的 `Docs` 改为 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/<page-id>`。该修改是激活请求。Fetch 用固定的 master、dev 和 Base 路由证据重新校验，部署继续使用最近已发布版本。 |
 | Git 已激活 | Fetch 只在原 dev 发布前提仍成立时提交。同一个 dev 提交写入中文正文、导航、旧链接与锚点映射、逐页来源凭据和中文 `active.json`，同时将正文写权交给 Git。验证 Git 提交与部署后，停用旧正文编辑。首期继续保留负责导航的 Base 记录。 |
 
-接线借鉴 [05b](../design/05b-cutover-and-ownership.md)，现有 shared-docs 路由和激活记录只服务英文。中文须增加站点限定的 Git 来源类型、独立激活记录和来源凭据。目录 URL 只用于选源，按 Fetch 固定的 master SHA 读取仓库内受控路径，禁止跨站、重复所有者、路径逃逸和符号链接。保持 Base 记录、页面 ID、发布目标与实际写入路径可核对。快照和缓存身份包含已审批中文及所需资源的摘要。飞书记录无变化而 Git 正文、配套资源或归属变化时，也要重新生成或核验。中文候选还要贯通媒体处理、表格渲染、组装、检查点、发布和恢复。凭据至少记录使用的 master/dev 提交、Base 记录与通道、正文、导航及媒体摘要和 Fetch 运行 ID。
+接线借鉴 [05b](./05b-cutover-and-ownership.md)，现有 shared-docs 路由和激活记录只服务英文。中文须增加站点限定的 Git 来源类型、独立激活记录和来源凭据。目录 URL 只用于选源，按 Fetch 固定的 master SHA 读取仓库内受控路径，禁止跨站、重复所有者、路径逃逸和符号链接。保持 Base 记录、页面 ID、发布目标与实际写入路径可核对。快照和缓存身份包含已审批中文及所需资源的摘要。飞书记录无变化而 Git 正文、配套资源或归属变化时，也要重新生成或核验。中文候选还要贯通媒体处理、表格渲染、组装、检查点、发布和恢复。凭据至少记录使用的 master/dev 提交、Base 记录与通道、正文、导航及媒体摘要和 Fetch 运行 ID。
 
 激活前的失败保留原 dev 产物及状态。若要撤回请求，先确认旧请求已结束且未写入，再由负责人恢复原链接和编辑权。结果未知时停下并核实远端。激活后的全量抓取、缓存恢复与删除流程均须遵守 Git 写权。误改链接、删记录、重命名或拟下线时按归属保护处理，修复记录或走受控下线路径。部署失败走现有重试或镜像回滚，编辑权仍归 Git。逐页验证可独立完成，任何新步骤都不得持有生产队列锁去等待另一个生产写入任务。
 

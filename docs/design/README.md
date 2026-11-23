@@ -95,6 +95,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | 08 | [工作流与权限](./08-workflows-and-permissions.md) | 各工作流的触发、身份、权限与失败通知 | 场景 3、7、8、9、10 | Phase 1a 起 |
 | 09 | [错误目录](./09-error-catalog.md) | 统一的错误码、提示与应改的文件 | 各场景的“出错时” | Phase 1a 起 |
 | 10 | [SDK Reference：从 web-content 生成（Rust 试点）](./10-sdk-reference.md) | 手册配置、整本手册的生成与 lock、Cloud 差异、接入 Fetch 与上线；草稿，待与文档负责人确认 | [SDK Reference 产品需求](../prd-sdk-reference.md)（草稿） | 待定 |
+| 11 | [中文 Guides 翻译与发布](./11-zh-cn-translation-pipeline.md) | 人审门禁、英文基线、增量翻译、通道提升与逐页切流 | 中文 Guides 迁移与维护 | 试点设计 |
 
 ## 每篇的结构
 
