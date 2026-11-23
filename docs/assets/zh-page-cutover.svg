@@ -11,12 +11,12 @@
 <path d="M127 214 v194" stroke="#64748b"/>
 <text x="70" y="307.0" class="head">发布与交接</text>
 <text x="70" y="334.0" class="sub">按页确认</text>
-<rect x="148" y="39" width="251" height="96" rx="10" fill="#fef3c7" stroke="#b45309"/>
-<text x="273.5" y="81.0" class="head">① 飞书仍可编辑</text>
-<text x="273.5" y="105.0" class="sub">记录导出时的正文修订</text>
+<rect x="148" y="39" width="251" height="96" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="273.5" y="81.0" class="head">① Fetch 读取飞书中文</text>
+<text x="273.5" y="105.0" class="sub">飞书仍可编辑</text>
 <rect x="435" y="39" width="317" height="96" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
-<text x="593.5" y="81.0" class="head">② 文档工程师审 Git 候选</text>
-<text x="593.5" y="105.0" class="sub">对齐英文，核对旧锚点和图片</text>
+<text x="593.5" y="81.0" class="head">② 文档工程师审导入 PR</text>
+<text x="593.5" y="105.0" class="sub">核对来源修订、英文和预览</text>
 <rect x="796" y="39" width="407" height="96" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
 <text x="999.5" y="81.0" class="head">③ 负责人暂停该页编辑</text>
 <text x="999.5" y="105.0" class="sub">复核最后修订，再把飞书 Docs 指向 Git</text>
