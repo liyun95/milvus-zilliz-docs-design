@@ -1,53 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="336" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
-<title id="title">语义 3-way 增量更新：以现有已润色中文为底稿，仅更新语义变动段落</title>
-<desc id="desc">基准英文与最新英文对比，大模型识别语义实质变更。现有中文作为不可侵犯的底稿，未变动段落原样保留，变动段落参考现有术语风格进行局部更新，Prod NextChannel 块原样保留。</desc>
-<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:18px;font-weight:600;text-anchor:middle;}.sub{font-size:15px;text-anchor:middle;fill:#64748b;}.band{font-size:16px;font-weight:600;text-anchor:middle;}.t{font-size:15px;fill:#475569;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
-<rect width="1280" height="560" fill="#ffffff"/>
-
-<rect x="60" y="30" width="340" height="110" rx="12" fill="#f1f5f9" stroke="#94a3b8"/>
-<text x="230" y="68" class="head">基准英文 (base_en)</text>
-<text x="230" y="98" class="sub">上次翻译审校合入时的英文快照</text>
-<text x="230" y="122" class="sub" style="font-family:monospace;font-size:13px">zdoc@a1b2c3d (.baseline.json)</text>
-
-<rect x="880" y="30" width="340" height="110" rx="12" fill="#a7f3d0" stroke="#047857"/>
-<text x="1050" y="68" class="head">最新英文 (new_en)</text>
-<text x="1050" y="98" class="sub">当前 master 最新的英文源文件</text>
-<text x="1050" y="122" class="sub" style="font-family:monospace;font-size:13px">shared-docs / cloud-docs</text>
-
-<rect x="470" y="35" width="340" height="100" rx="12" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="640" y="73" class="head">大模型语义比对</text>
-<text x="640" y="103" class="sub">识别功能实质变更，忽略标点空格</text>
-
-<path class="edge" d="M400 85 H463"/>
-<path class="edge" d="M880 85 H817"/>
-
-<path class="edge" d="M640 135 V193"/>
-
-<rect x="60" y="200" width="1160" height="120" rx="12" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
-<text x="640" y="238" class="head" style="fill:#92400e;font-size:20px">现有已审校中文 (cur_zh) · 核心底稿</text>
-<text x="640" y="268" class="sub" style="fill:#78350f">存储于 master/localized-docs/zh-CN/ · 包含文档工程师此前人工润色沉淀的专业术语与行文风格</text>
-<text x="640" y="294" class="sub" style="fill:#b45309;font-weight:600">原则：未变动段落一字不改，不得整篇重新机翻覆盖</text>
-
-<path class="edge" d="M230 320 V383"/>
-<path class="edge" d="M640 320 V383"/>
-<path class="edge" d="M1050 320 V383"/>
-
-<rect x="60" y="390" width="340" height="130" rx="12" fill="#ffffff" stroke="#64748b"/>
-<text x="230" y="426" class="head">未变动段落</text>
-<text x="230" y="458" class="sub" style="fill:#047857;font-weight:600">100% 逐字保留 cur_zh</text>
-<text x="230" y="484" class="sub">错别字修正、表达润色</text>
-<text x="230" y="504" class="sub">与定制翻译完全不受破坏</text>
-
-<rect x="470" y="390" width="340" height="130" rx="12" fill="#fff7ed" stroke="#c2410c"/>
-<text x="640" y="426" class="head">实质变动段落</text>
-<text x="640" y="458" class="sub" style="fill:#c2410c;font-weight:600">局部增量更新</text>
-<text x="640" y="484" class="sub">仅翻译英文 diff 对应部分</text>
-<text x="640" y="504" class="sub">严格继承 cur_zh 术语与句式</text>
-
-<rect x="880" y="390" width="340" height="130" rx="12" fill="#f0fdf4" stroke="#16a34a"/>
-<text x="1050" y="426" class="head">&lt;NextChannel&gt; 块</text>
-<text x="1050" y="458" class="sub" style="fill:#16a34a;font-weight:600">Prod 存量免翻译保护</text>
-<text x="1050" y="484" class="sub">exclude 块保持线上稳定</text>
-<text x="1050" y="504" class="sub">仅对 include 增量翻译并校验对称</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="476" viewBox="0 0 1100 476" role="img" aria-labelledby="title desc">
+  <title id="title">语义 3-way 的编辑边界</title>
+  <desc id="desc">基准英文与最新英文引用可复核的英文产物，现有中文固定在 master。程序划定可编辑的 MDX 块，模型建议局部变更，未编辑区间原样拼接。验证失败进入人工处理，基线随已审 PR 合入推进。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
+    <style>
+      text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1e293b; }
+      .title { font-size: 25px; font-weight: 650; }
+      .head { font-size: 22px; font-weight: 650; }
+      .body { font-size: 18px; fill: #42536a; }
+      .edge { fill: none; stroke: #61718a; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1100" height="476" fill="#ffffff"/>
+  <text class="title" x="24" y="42">语义 3-way 的编辑边界</text>
+  <rect x="24" y="72" width="326" height="107" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="42" y="105">base_en · 已审英文</text>
+  <text class="body" x="42" y="135">固定来源凭据及通道摘要</text>
+  <rect x="387" y="72" width="326" height="107" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="405" y="105">new_en · 候选英文</text>
+  <text class="body" x="405" y="135">核验同一目标的最新产物</text>
+  <rect x="750" y="72" width="326" height="107" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
+  <text class="head" x="768" y="105">cur_zh · 已审中文</text>
+  <text class="body" x="768" y="135">固定 master 提交与正文摘要</text>
+  <path class="edge" d="M187 179 V213"/>
+  <path class="edge" d="M550 179 V213"/>
+  <path class="edge" d="M913 179 V213"/>
+  <rect x="24" y="221" width="1052" height="91" rx="12" fill="#f5f0ff" stroke="#c4b4ed"/>
+  <text class="head" x="42" y="254">按 MDX 结构和通道对齐，划定允许编辑的块</text>
+  <text class="body" x="42" y="284">模型返回带块 ID 的编辑建议。程序按原文区间拼接，再验证技术字面量、链接、结构和两通道。</text>
+  <path class="edge" d="M187 312 V341"/>
+  <path class="edge" d="M550 312 V341"/>
+  <path class="edge" d="M913 312 V341"/>
+  <rect x="24" y="349" width="326" height="111" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="42" y="382">无变化</text>
+  <text class="body" x="42" y="412">保留未编辑区间原始字节</text>
+  <text class="body" x="42" y="437">无需模型改写</text>
+  <rect x="387" y="349" width="326" height="111" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="405" y="382">允许的局部变更</text>
+  <text class="body" x="405" y="412">PR 附差异和通道预览</text>
+  <text class="body" x="405" y="437">审批合入后推进基线</text>
+  <rect x="750" y="349" width="326" height="111" rx="12" fill="#fff2ef" stroke="#e3aa9e"/>
+  <text class="head" x="768" y="382">对齐不明或检查失败</text>
+  <text class="body" x="768" y="412">定位到页面、通道和块</text>
+  <text class="body" x="768" y="437">人工处理，保留已审基线</text>
 </svg>

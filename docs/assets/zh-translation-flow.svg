@@ -1,62 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="384" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
-<title id="title">中文文档翻译流水线：英文变更触发，大模型 3-way 增量，PR 审核后由 Fetch 发布</title>
-<desc id="desc">英文源发生变更后，每日工作流定时扫描（也可手动触发）。翻译工具提取基准英文、最新英文和现有已润色中文，调用大模型执行语义 3-way 增量更新，并通过 NextChannel 和 MDX 确定性门禁。校验通过后开出单页滚动 PR。文档工程师在 GitHub PR 中审核与微调，合并到 master 的 localized-docs 权威目录。Fetch 工作流按 active.json 汇总发布到 dev 分支的 content/zh-CN，最终上线。</desc>
-<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:18px;font-weight:600;text-anchor:middle;}.sub{font-size:15px;text-anchor:middle;fill:#64748b;}.lane{font-size:17px;font-weight:600;text-anchor:middle;}.warn{font-size:15px;fill:#b91c1c;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
-<rect width="1280" height="640" fill="#ffffff"/>
-
-<rect x="20" y="20" width="1240" height="120" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-<rect x="20" y="150" width="1240" height="180" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-<rect x="20" y="340" width="1240" height="180" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-<rect x="20" y="530" width="1240" height="90" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
-<path d="M170 20 V140 M170 150 V330 M170 340 V520 M170 530 V620" stroke="#cbd5e1"/>
-<text x="95" y="85" class="lane">英文输入</text>
-<text x="95" y="245" class="lane">翻译工具</text>
-<text x="95" y="425" class="lane">文档</text><text x="95" y="449" class="lane">工程师</text>
-<text x="95" y="581" class="lane">发布</text>
-
-<rect x="190" y="40" width="220" height="80" rx="10" fill="#a7f3d0" stroke="#047857"/>
-<text x="300" y="72" class="head">Shared Docs 英文生成</text><text x="300" y="98" class="sub">shared-docs/guides/pages/*</text>
-<rect x="440" y="40" width="220" height="80" rx="10" fill="#a7f3d0" stroke="#047857"/>
-<text x="550" y="72" class="head">Cloud 独有英文文档</text><text x="550" y="98" class="sub">统一组装完成的 MDX</text>
-<rect x="700" y="40" width="180" height="80" rx="10" fill="#fef3c7" stroke="#b45309"/>
-<text x="790" y="72" class="head">合并到 master</text><text x="790" y="98" class="sub">形成新的英文 commit</text>
-<path class="edge" d="M410 80 H433"/><path class="edge" d="M660 80 H693"/>
-
-<path class="edge" d="M790 120 V163"/>
-<rect x="520" y="170" width="170" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="605" y="198" class="head">发现英文变更</text><text x="605" y="222" class="sub">工作日定时 09:30</text><text x="605" y="242" class="sub">去抖聚合 · 支持手动</text>
-<rect x="715" y="170" width="190" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="810" y="198" class="head">语义 3-way 翻译</text><text x="810" y="222" class="sub">base_en + new_en</text><text x="810" y="242" class="sub">以 cur_zh 现有中文为底稿</text>
-<rect x="930" y="170" width="180" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="1020" y="198" class="head">发起单页滚动 PR</text><text x="1020" y="222" class="sub">改 localized-docs</text><text x="1020" y="242" class="sub">附差异与审阅说明</text>
-<path class="edge" d="M690 210 H708"/><path class="edge" d="M905 210 H923"/>
-
-<path d="M810 250 V266" stroke="#b91c1c" stroke-width="2" stroke-dasharray="4 4"/>
-<rect x="520" y="266" width="385" height="56" rx="8" fill="#fef2f2" stroke="#b91c1c" stroke-dasharray="6 4"/>
-<text x="536" y="290" class="warn">确定性门禁拦截：NextChannel 对称性错误或</text>
-<text x="536" y="313" class="warn">MDX 标签损坏时 CI 阻断报错，不开出坏 PR</text>
-
-<path class="edge" d="M1020 250 V393"/>
-<rect x="910" y="400" width="220" height="80" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
-<text x="1020" y="432" class="head">文档工程师审校 PR</text><text x="1020" y="458" class="sub">单页面 diff · 认知负荷低</text>
-
-<rect x="1150" y="360" width="110" height="40" rx="8" fill="#ffffff" stroke="#64748b"/>
-<text x="1205" y="386" class="sub" style="fill:#374151">直接网页微调</text>
-<rect x="1150" y="410" width="110" height="40" rx="8" fill="#ffffff" stroke="#64748b"/>
-<text x="1205" y="436" class="sub" style="fill:#374151">本地修改提交</text>
-<rect x="1150" y="460" width="110" height="40" rx="8" fill="#ffffff" stroke="#047857" stroke-width="2"/>
-<text x="1205" y="486" class="sub" style="fill:#047857;font-weight:600">Approve 合并</text>
-<path d="M1130 440 H1138 M1138 380 V480" stroke="#64748b" stroke-width="2" fill="none"/>
-<path class="edge" d="M1138 380 H1143"/><path class="edge" d="M1138 430 H1143"/><path class="edge" d="M1138 480 H1143"/>
-
-<path class="edge" d="M1205 500 V545"/>
-<rect x="1090" y="545" width="170" height="64" rx="10" fill="#fef3c7" stroke="#b45309"/>
-<text x="1175" y="571" class="head" style="font-size:17px">master 权威目录</text><text x="1175" y="595" class="sub">localized-docs/zh-CN</text>
-
-<path class="edge" d="M1090 577 H870"/>
-<text x="980" y="567" class="sub" style="font-size:14px">Fetch 汇流</text>
-
-<rect x="520" y="545" width="350" height="64" rx="10" fill="#ffffff" stroke="#047857" stroke-width="2"/>
-<text x="695" y="571" class="head" style="font-size:17px">dev 产物与站点部署</text><text x="695" y="595" class="sub">写入 content/zh-CN/ · 部署至 docs.zilliz.com.cn</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="458" viewBox="0 0 1100 458" role="img" aria-labelledby="title desc">
+  <title id="title">中文 Guides 翻译与发布</title>
+  <desc id="desc">从有来源凭据的英文产物和 master 已审中文生成受限草稿。文档负责人批准当前 PR head，必需检查通过才合入。下一次 Fetch 根据中文归属发布到 dev，站点部署消费已验证的提交。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
+    <style>
+      text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1e293b; }
+      .title { font-size: 25px; font-weight: 650; }
+      .head { font-size: 22px; font-weight: 650; }
+      .body { font-size: 18px; fill: #42536a; }
+      .edge { fill: none; stroke: #61718a; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1100" height="458" fill="#ffffff"/>
+  <text class="title" x="24" y="42">中文 Guides 翻译与发布</text>
+  <rect x="24" y="72" width="326" height="130" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="42" y="105">核验英文产物</text>
+  <text class="body" x="42" y="135">已验证的 dev Fetch 来源凭据</text>
+  <text class="body" x="42" y="160">固定页面、目标与通道摘要</text>
+  <rect x="387" y="72" width="326" height="130" rx="12" fill="#f5f0ff" stroke="#c4b4ed"/>
+  <text class="head" x="405" y="105">生成受限编辑</text>
+  <text class="body" x="405" y="135">英文差异与 master 已审中文</text>
+  <text class="body" x="405" y="160">按块提出编辑并执行门禁</text>
+  <rect x="750" y="72" width="326" height="130" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="768" y="105">审阅当前 PR head</text>
+  <text class="body" x="768" y="135">中文候选检查与文档负责人批准</text>
+  <text class="body" x="768" y="160">通过后合入正文与基线</text>
+  <path class="edge" d="M350 137 H379"/>
+  <path class="edge" d="M713 137 H742"/>
+  <path class="edge" d="M913 202 V237"/>
+  <rect x="750" y="245" width="326" height="118" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
+  <text class="head" x="768" y="278">master 审校源</text>
+  <text class="body" x="768" y="308">等待定时或获准手动 Fetch</text>
+  <text class="body" x="768" y="333">固定已合入的正文和基线</text>
+  <rect x="387" y="245" width="326" height="118" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="405" y="278">Fetch 检查点写入 dev</text>
+  <text class="body" x="405" y="308">核对中文归属、通道与来源</text>
+  <text class="body" x="405" y="333">同一提交更新发布产物与凭据</text>
+  <rect x="24" y="245" width="326" height="118" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="42" y="278">站点部署</text>
+  <text class="body" x="42" y="308">消费已验证的 dev 提交</text>
+  <text class="body" x="42" y="333">分别验收 CURRENT 和 NEXT</text>
+  <path class="edge" d="M750 304 H721"/>
+  <path class="edge" d="M387 304 H358"/>
+  <rect x="24" y="382" width="1052" height="64" rx="12" fill="#fff2ef" stroke="#e3aa9e"/>
+  <text class="head" x="42" y="415">公开范围是准入条件。审批、通道或输入校验失败时保留已验证版本。</text>
 </svg>

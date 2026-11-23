@@ -1,45 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="324" viewBox="0 0 1280 540" role="img" aria-labelledby="title desc">
-<title id="title">中文页面从飞书切换到 Git 的四个阶段</title>
-<desc id="desc">阶段一飞书存量：多维表格和知识库为正式来源，手动编写。阶段二底稿建仓：提取现有中文写入 master 的 localized-docs 并绑定基线，分批 PR 审校入库。阶段三切换激活：在表格中把 Docs 链接换成 GitHub 地址，Fetch 停止抓取飞书正文改用 Git，旧飞书任务失去写权。阶段四稳态维护：英文变更触发 3-way 增量，文档工程师在 GitHub PR 中审阅合入，飞书完全退役。</desc>
-<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;fill:#374151;}.head{font-size:20px;font-weight:600;}.t{font-size:16px;fill:#475569;}.lbl{font-size:15px;fill:#475569;text-anchor:middle;}.band{font-size:16px;font-weight:600;text-anchor:middle;}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow);}</style></defs>
-<rect width="1280" height="540" fill="#ffffff"/>
-
-<text x="40" y="34" class="t" style="font-weight:600">中文页面的权威来源</text>
-<rect x="40" y="48" width="280" height="34" rx="6" fill="#f1f5f9" stroke="#94a3b8"/><text x="180" y="71" class="band" style="fill:#475569">飞书知识库</text>
-<rect x="360" y="48" width="880" height="34" rx="6" fill="#fef3c7" stroke="#b45309"/><text x="800" y="71" class="band" style="fill:#92400e">Git 仓库 (zdoc master: localized-docs/zh-CN/)</text>
-
-<rect x="40" y="110" width="280" height="230" rx="14" fill="#ffffff" stroke="#64748b"/>
-<text x="64" y="148" class="head">1. 飞书存量</text>
-<text x="64" y="185" class="t">· 飞书表格记录 Docs 链接</text>
-<text x="64" y="215" class="t">· 文档工程师在飞书编写</text>
-<text x="64" y="245" class="t">· Fetch 定时抓取飞书正文</text>
-<text x="64" y="285" class="t" style="fill:#b45309;font-weight:600">英文变更时靠人工抄录</text>
-
-<rect x="360" y="110" width="280" height="230" rx="14" fill="#ffffff" stroke="#64748b"/>
-<text x="384" y="148" class="head">2. 底稿建仓</text>
-<text x="384" y="185" class="t">· 提取飞书现存中文为底稿</text>
-<text x="384" y="215" class="t">· 写入 master 权威路径</text>
-<text x="384" y="245" class="t">· 生成 .baseline.json 记录</text>
-<text x="384" y="285" class="t" style="fill:#047857;font-weight:600">分 6~8 批次 PR 集中建仓</text>
-
-<rect x="680" y="110" width="280" height="230" rx="14" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
-<text x="704" y="148" class="head">3. 切换激活 (Cutover)</text>
-<text x="704" y="185" class="t">· 表格中换 Docs 链接为 Git</text>
-<text x="704" y="215" class="t">· Fetch 按 active.json 切流</text>
-<text x="704" y="245" class="t">· 飞书任务失去该页写权</text>
-<text x="704" y="285" class="t" style="font-size:14px;fill:#64748b">按篇逐步切量，零停机风险</text>
-
-<rect x="1000" y="110" width="240" height="230" rx="14" fill="#ffffff" stroke="#64748b"/>
-<text x="1024" y="148" class="head">4. Git 稳态</text>
-<text x="1024" y="185" class="t">· 每日 3-way 增量更新</text>
-<text x="1024" y="215" class="t">· 文档工程师 PR 把关</text>
-<text x="1024" y="245" class="t">· 合并即触发 Fetch 发布</text>
-<text x="1024" y="285" class="t" style="fill:#047857;font-weight:600">飞书流程完全退役</text>
-
-<path class="edge" d="M320 220 H353"/>
-<path class="edge" d="M640 220 H673"/>
-<path class="edge" d="M960 220 H993"/>
-
-<text x="40" y="380" class="t" style="font-size:15px;fill:#64748b">切换约定：复用 Phase 1 技术设计 05b 机制。Docs 链接指向 GitHub 目录即代表切换为 Git 权威源；同一篇文档任一时刻只有一个正式来源。</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="412" viewBox="0 0 1100 412" role="img" aria-labelledby="title desc">
+  <title id="title">中文页面逐页切流</title>
+  <desc id="desc">飞书仍为发布来源时导出和审核 Git 候选。换 Docs 只提交激活请求。Fetch 通过后同一个 dev 提交写入产物、导航、链接映射、独立激活记录和来源凭据，并转移正文写权。失败按激活状态恢复。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
+    <style>
+      text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1e293b; }
+      .title { font-size: 25px; font-weight: 650; }
+      .head { font-size: 22px; font-weight: 650; }
+      .body { font-size: 18px; fill: #42536a; }
+      .edge { fill: none; stroke: #61718a; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1100" height="412" fill="#ffffff"/>
+  <text class="title" x="24" y="42">中文页面逐页切流</text>
+  <rect x="24" y="72" width="234" height="152" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="head" x="42" y="105">飞书维护</text>
+  <text class="body" x="42" y="135">飞书正文仍供发布</text>
+  <text class="body" x="42" y="160">记录修订、slug、</text>
+  <text class="body" x="42" y="185">通道与发布目标</text>
+  <rect x="296" y="72" width="234" height="152" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="314" y="105">Git 候选</text>
+  <text class="body" x="314" y="135">固定修订，分批 PR</text>
+  <text class="body" x="314" y="160">比对正文、锚点、</text>
+  <text class="body" x="314" y="185">导航和媒体</text>
+  <rect x="568" y="72" width="234" height="152" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
+  <text class="head" x="586" y="105">待激活</text>
+  <text class="body" x="586" y="135">核对修订后冻结正文</text>
+  <text class="body" x="586" y="160">换 Docs，等待 Fetch</text>
+  <text class="body" x="586" y="185">站点保留已发布版本</text>
+  <rect x="840" y="72" width="236" height="152" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="858" y="105">Git 已激活</text>
+  <text class="body" x="858" y="135">同一 dev 提交凭据</text>
+  <text class="body" x="858" y="160">与产物一起生效</text>
+  <text class="body" x="858" y="185">Git 取得正文写权</text>
+  <path class="edge" d="M258 148 H288"/>
+  <path class="edge" d="M530 148 H560"/>
+  <path class="edge" d="M802 148 H832"/>
+  <path class="edge" d="M670 224 V249"/>
+  <path class="edge" d="M958 224 V249"/>
+  <rect x="24" y="258" width="658" height="133" rx="12" fill="#fff2ef" stroke="#e3aa9e"/>
+  <text class="head" x="42" y="291">激活失败</text>
+  <text class="body" x="42" y="321">保留原 dev 产物和激活状态。确认请求未写入后可撤回换链。</text>
+  <text class="body" x="42" y="346">结果未知时核实远端，再决定后续操作。</text>
+  <rect x="714" y="258" width="362" height="133" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="head" x="732" y="291">部署失败</text>
+  <text class="body" x="732" y="321">重试或回滚镜像，Git 保持写权。</text>
+  <text class="body" x="732" y="346">首期保留 Base 导航记录。</text>
 </svg>
