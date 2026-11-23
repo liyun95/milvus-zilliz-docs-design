@@ -1,49 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="412" viewBox="0 0 1100 412" role="img" aria-labelledby="title desc">
-  <title id="title">中文页面逐页切流</title>
-  <desc id="desc">飞书仍为发布来源时导出和审核 Git 候选。换 Docs 只提交激活请求。Fetch 通过后同一个 dev 提交写入产物、导航、链接映射、独立激活记录和来源凭据，并转移正文写权。失败按激活状态恢复。</desc>
-  <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
-    <style>
-      text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1e293b; }
-      .title { font-size: 25px; font-weight: 650; }
-      .head { font-size: 22px; font-weight: 650; }
-      .body { font-size: 18px; fill: #42536a; }
-      .edge { fill: none; stroke: #61718a; stroke-width: 2; marker-end: url(#arrow); }
-    </style>
-  </defs>
-  <rect width="1100" height="412" fill="#ffffff"/>
-  <text class="title" x="24" y="42">中文页面逐页切流</text>
-  <rect x="24" y="72" width="234" height="152" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="head" x="42" y="105">飞书维护</text>
-  <text class="body" x="42" y="135">飞书正文仍供发布</text>
-  <text class="body" x="42" y="160">记录修订、slug、</text>
-  <text class="body" x="42" y="185">通道与发布目标</text>
-  <rect x="296" y="72" width="234" height="152" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
-  <text class="head" x="314" y="105">Git 候选</text>
-  <text class="body" x="314" y="135">固定修订，分批 PR</text>
-  <text class="body" x="314" y="160">比对正文、锚点、</text>
-  <text class="body" x="314" y="185">导航和媒体</text>
-  <rect x="568" y="72" width="234" height="152" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
-  <text class="head" x="586" y="105">待激活</text>
-  <text class="body" x="586" y="135">核对修订后冻结正文</text>
-  <text class="body" x="586" y="160">换 Docs，等待 Fetch</text>
-  <text class="body" x="586" y="185">站点保留已发布版本</text>
-  <rect x="840" y="72" width="236" height="152" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
-  <text class="head" x="858" y="105">Git 已激活</text>
-  <text class="body" x="858" y="135">同一 dev 提交凭据</text>
-  <text class="body" x="858" y="160">与产物一起生效</text>
-  <text class="body" x="858" y="185">Git 取得正文写权</text>
-  <path class="edge" d="M258 148 H288"/>
-  <path class="edge" d="M530 148 H560"/>
-  <path class="edge" d="M802 148 H832"/>
-  <path class="edge" d="M670 224 V249"/>
-  <path class="edge" d="M958 224 V249"/>
-  <rect x="24" y="258" width="658" height="133" rx="12" fill="#fff2ef" stroke="#e3aa9e"/>
-  <text class="head" x="42" y="291">激活失败</text>
-  <text class="body" x="42" y="321">保留原 dev 产物和激活状态。确认请求未写入后可撤回换链。</text>
-  <text class="body" x="42" y="346">结果未知时核实远端，再决定后续操作。</text>
-  <rect x="714" y="258" width="362" height="133" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="head" x="732" y="291">部署失败</text>
-  <text class="body" x="732" y="321">重试或回滚镜像，Git 保持写权。</text>
-  <text class="body" x="732" y="346">首期保留 Base 导航记录。</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="448" viewBox="0 0 1240 448" role="img" aria-labelledby="title desc">
+<title id="title">一页从飞书到 Git 的交接</title><desc id="desc">从飞书导出的候选稿先走人审。短暂停改、核对最后修订，再改飞书链接。Fetch 在同一 dev 提交中接管正文、导航、链接映射并留下来源记录。确认采用 Git 后更新编辑入口，部署后验收原网址和图片。</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker></defs>
+<style>text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle;fill:#374151}.head{font-size:21px;font-weight:600}.sub{font-size:17px;fill:#475569}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}</style>
+<rect width="1240" height="448" fill="white"/>
+<rect x="12" y="14" width="1216" height="148" rx="12" fill="white" stroke="#64748b"/>
+<path d="M127 14 v148" stroke="#64748b"/>
+<text x="70" y="84.0" class="head">文档团队</text>
+<text x="70" y="111.0" class="sub">准备这一页</text>
+<rect x="12" y="214" width="1216" height="194" rx="12" fill="white" stroke="#64748b"/>
+<path d="M127 214 v194" stroke="#64748b"/>
+<text x="70" y="307.0" class="head">发布与交接</text>
+<text x="70" y="334.0" class="sub">按页确认</text>
+<rect x="148" y="39" width="251" height="96" rx="10" fill="#fef3c7" stroke="#b45309"/>
+<text x="273.5" y="81.0" class="head">① 飞书仍可编辑</text>
+<text x="273.5" y="105.0" class="sub">记录导出时的正文修订</text>
+<rect x="435" y="39" width="317" height="96" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
+<text x="593.5" y="81.0" class="head">② 文档工程师审 Git 候选</text>
+<text x="593.5" y="105.0" class="sub">对齐英文，核对旧锚点和图片</text>
+<rect x="796" y="39" width="407" height="96" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
+<text x="999.5" y="81.0" class="head">③ 负责人暂停该页编辑</text>
+<text x="999.5" y="105.0" class="sub">复核最后修订，再把飞书 Docs 指向 Git</text>
+<path class="edge" d="M399 87 H429"/>
+<path class="edge" d="M752 87 H790"/>
+<path class="edge" d="M1000 135 V187 H273 V233"/>
+<text x="637" y="180" class="sub">换链接发起切换；等待期间原站继续服务</text>
+<rect x="148" y="240" width="251" height="96" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="273.5" y="270.0" class="head">④ Fetch 核验并接管</text>
+<text x="273.5" y="294.0" class="sub">同一 dev 提交记录来源</text>
+<text x="273.5" y="318.0" class="sub">写入正文、导航和旧链接映射</text>
+<rect x="447" y="240" width="305" height="96" rx="10" fill="#93c5fd" stroke="#1e3a8a"/>
+<text x="599.5" y="282.0" class="head">⑤ 负责人确认已采用 Git</text>
+<text x="599.5" y="306.0" class="sub">清单中的正文编辑入口改为 Git</text>
+<rect x="798" y="240" width="405" height="96" rx="10" fill="#fff" stroke="#64748b"/>
+<text x="1000.5" y="270.0" class="head">⑥ 部署后验收中文站</text>
+<text x="1000.5" y="294.0" class="sub">打开旧 URL、段落链接和图片</text>
+<text x="1000.5" y="318.0" class="sub">通过后，在旧飞书正文标记已迁移</text>
+<path class="edge" d="M399 288 H441"/>
+<path class="edge" d="M752 288 H792"/>
+<text x="633" y="383" class="sub">尚未激活可撤回并恢复飞书编辑；结果不明继续停改核实；已激活后部署失败，正文仍归 Git。</text>
+<text x="620" y="435" class="sub">只有这一页转交正文编辑权，飞书记录继续管理导航。</text>
 </svg>
