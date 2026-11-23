@@ -16,9 +16,9 @@
 
 共享英文原文在 `milvus-docs` 维护。Cloud 团队在 zdoc 的 `shared-docs` 中选择采用的上游版本，配置目标手册，按需补写 Cloud 专用英文片段。**翻译依据是这些输入最终生成的、对应手册和版本的 Cloud 英文文件。** 同一共享页若同时生成 Guides 和 BYOC，中文 Guides 应明确绑定 Guides 的英文输出。
 
-**首次接入**时，现有 `fetch lark docs` 工作流按中文 Guides 飞书记录的 `Docs` 链接抓取已有的中文正文。方案拟在取稿后增加导入步骤，把中文稿和来源修订整理成面向 `master` 的 PR，由文档工程师对照目标手册的英文审校。**后续英文更新**时，工具才比较新旧英文，在 Git 中已审过的中文上起草修改。[现有 Fetch 的中文 Guides 任务](https://github.com/zilliztech/zdoc/blob/75e79b0205ce7f9f7b842f163472e64eada35e71/.github/workflows/fetch-docs.yml#L348-L359)
+![首次导入：Fetch 读取飞书中文，文档工程师对照英文审导入 PR，形成 Git 底稿。后续更新：根据 Cloud 英文变化起草中文，工程师审更新 PR，随对应版本部署上线。](./assets/zh-guides-source-map.png)
 
-![目标工作流。首次由 Fetch 取飞书中文，拟新增的导入步骤准备 PR，文档工程师对照英文审校。后续在 Git 已审中文上更新，已切换页面由 Fetch 从 Git 取稿。](./assets/zh-guides-source-map.png)
+图中第一步复用现有 `fetch lark docs` 工作流，按中文飞书记录的 `Docs` 链接取稿。将中文和来源修订整理成导入 PR 是本次拟新增的步骤。首份底稿合入后，等 Fetch 确认该页已从 Git 取稿，才把日常编辑入口切到 Git。[现有 Fetch 的中文 Guides 任务](https://github.com/zilliztech/zdoc/blob/75e79b0205ce7f9f7b842f163472e64eada35e71/.github/workflows/fetch-docs.yml#L348-L359)
 
 | 角色 | 负责的决定 | 工作完成的标志 |
 |---|---|---|
