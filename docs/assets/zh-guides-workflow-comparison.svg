@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1072" height="503" viewBox="0 0 1072 503" role="img" aria-labelledby="title desc">
+  <title id="title">中文 Guides 改造前后</title>
+  <desc id="desc">现在由文档工程师主动跟进英文更新，在飞书编辑中文，走现有发布流程。改造后，工具根据 Cloud 已采用的英文起草，文档工程师在 GitHub PR 修改和批准。普通修订合入并部署后上线，新功能先在 UAT 核对，功能发版并部署后进入正式站。确认页面发布已采用 Git 后，正文转到 Git，飞书继续管理导航。</desc>
+  <style>
+    text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #24334b; }
+    .title { font-size: 29px; font-weight: 650; }
+    .column { font-size: 22px; font-weight: 650; }
+    .label { font-size: 20px; font-weight: 650; }
+    .body { font-size: 20px; }
+    .emphasis { font-weight: 650; fill: #154d59; }
+  </style>
+
+  <rect width="1072" height="503" fill="#fff"/>
+  <text class="title" x="24" y="45">中文 Guides 改造前后</text>
+
+  <rect x="209" y="65" width="352" height="47" rx="8" fill="#e9eef4"/>
+  <rect x="578" y="65" width="470" height="47" rx="8" fill="#d6ede9"/>
+  <text class="column" x="228" y="96">现在怎么做</text>
+  <text class="column" x="597" y="96">改完怎么做</text>
+
+  <rect x="24" y="124" width="169" height="96" rx="8" fill="#f3f5f8"/>
+  <rect x="209" y="124" width="352" height="96" rx="8" fill="#f6f8fb" stroke="#dce3ec"/>
+  <rect x="578" y="124" width="470" height="96" rx="8" fill="#f0f8f6" stroke="#c4e1da"/>
+  <text class="label" x="40" y="161">英文更新后</text>
+  <text class="label" x="40" y="191">谁来审</text>
+  <text class="body" x="228" y="161">文档工程师主动跟进英文</text>
+  <text class="body" x="228" y="191">人工对照，在飞书修改中文</text>
+  <text class="body" x="597" y="161">工具按 Cloud 已采用的英文起草</text>
+  <text class="body emphasis" x="597" y="191">文档工程师在 GitHub PR 中审校并批准</text>
+
+  <rect x="24" y="232" width="169" height="116" rx="8" fill="#f3f5f8"/>
+  <rect x="209" y="232" width="352" height="116" rx="8" fill="#f6f8fb" stroke="#dce3ec"/>
+  <rect x="578" y="232" width="470" height="116" rx="8" fill="#f0f8f6" stroke="#c4e1da"/>
+  <text class="label" x="40" y="297">什么时候发布</text>
+  <text class="body" x="228" y="281">飞书稿走现有发布流程</text>
+  <text class="body" x="228" y="311">部署成功后，站点显示更新</text>
+  <text class="body" x="597" y="264">普通修订获批合入后，随部署上线</text>
+  <text class="body" x="597" y="293">新功能说明先在预发布站（UAT）核对</text>
+  <text class="body emphasis" x="597" y="322">发布负责人确认，发版部署后进入正式站</text>
+
+  <rect x="24" y="360" width="169" height="119" rx="8" fill="#f3f5f8"/>
+  <rect x="209" y="360" width="352" height="119" rx="8" fill="#f6f8fb" stroke="#dce3ec"/>
+  <rect x="578" y="360" width="470" height="119" rx="8" fill="#f0f8f6" stroke="#c4e1da"/>
+  <text class="label" x="40" y="409">飞书何时退出</text>
+  <text class="label" x="40" y="439">正文维护</text>
+  <text class="body" x="228" y="424">正文和导航都在飞书维护</text>
+  <text class="body" x="597" y="392">文档负责人逐页安排切换</text>
+  <text class="body emphasis" x="597" y="421">确认发布已采用 Git 后，正文改在 Git</text>
+  <text class="body" x="597" y="450">验收后标记旧稿已迁移，飞书继续管导航</text>
+</svg>
