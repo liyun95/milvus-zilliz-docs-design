@@ -17,6 +17,7 @@ Milvus × Zilliz Cloud 文档同源设计仓库，维护方案、架构、实施
 | [技术设计](docs/design/README.md) | 工具怎样实现产品需求：架构、数据文件、各环节的实现规则？（面向 zdoc 与 md2md 维护者） |
 | [Phase 1 实施计划](docs/phase-1.md) | Phase 1 做什么、按什么顺序、怎样算完成？含待确认事项的唯一清单（面向实施者与评审人） |
 | [Phase 1 实现指南](docs/implementation/README.md) | 实现怎样切分成工作包、每一步怎样验证、怎样审阅？含交给实现 Agent 的任务卡（面向实现 Agent 与审阅人） |
+| [中文本地化流水线设计](docs/localization/README.md) | 中文文档如何脱离飞书、通过 Git PR 门禁与大模型语义 3-way 增量流水线实现高质量维护？（面向文档团队与 zdoc 维护者） |
 
 ## 设计样例
 
