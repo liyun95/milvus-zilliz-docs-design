@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="566" viewBox="0 0 1160 566" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="613" viewBox="0 0 1160 613" role="img" aria-labelledby="title desc">
 <title id="title">中文 Guides 增量翻译的工具链与变更范围</title>
-<desc id="desc">沿用英文生成，读取 dev 上固定版本的 Guides 英文。橙色虚线内新增增量起草、文档工程师必审的 PR 和 master 中文编辑源。下游扩展中文 Fetch 以读取已切换页的 Git 正文，向 dev 提交中文发布内容，再经现有站点部署发布。飞书供首次取稿，并继续供未迁移页取稿。</desc>
+<desc id="desc">沿用英文生成，读取 dev 上固定版本的 Guides 英文。橙色虚线内新增增量起草、文档工程师必审的 PR 和 master · 已审中文。下游扩展中文 Fetch 以读取已切换页的 Git 正文，向 dev 提交中文发布内容，再经现有站点部署发布。飞书供首次取稿，并继续供未迁移页取稿。黄色为文件或内容，紫色为工具处理，蓝色为人工审校，白色节点为站点，橙色虚线框为本期新增范围。</desc>
 <defs><marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="#64748b"/></marker></defs>
 <style>text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle;fill:#334155}.head{font-size:21px;font-weight:600}.note{font-size:17px}.cap{font-size:16px;fill:#475569}.change{font-size:17px;fill:#a53c06;font-weight:600}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arr)}</style>
-<rect width="1160" height="566" fill="white"/>
+<rect width="1160" height="613" fill="white"/>
 <rect x="12" y="12" width="1136" height="118" rx="10" fill="white" stroke="#94a3b8" />
 <path d="M135 12 v118" stroke="#94a3b8"/>
 <text x="74" y="69" class="head">英文生产</text>
@@ -17,14 +17,14 @@
 <text x="74" y="472" class="head">中文发布</text>
 <text x="74" y="499" class="cap">下游依赖</text>
 <rect x="155" y="31" width="268" height="80" rx="10" fill="#fef3c7" stroke="#b45309" />
-<text x="289.0" y="65" class="head">共享英文与 Cloud 配置</text>
-<text x="289.0" y="94" class="note">milvus-docs + shared-docs</text>
+<text x="289.0" y="65" class="head">milvus-docs 的共享英文</text>
+<text x="289.0" y="94" class="note">+ zdoc master 的 shared-docs/</text>
 <rect x="465" y="31" width="255" height="80" rx="10" fill="#ddd6fe" stroke="#6d28d9" />
 <text x="592.5" y="65" class="head">zdoc 生成 Cloud 页面</text>
 <text x="592.5" y="94" class="note">按手册应用配置与变量</text>
 <rect x="806" y="31" width="314" height="80" rx="10" fill="#fef3c7" stroke="#b45309" />
 <text x="963.0" y="65" class="head">Cloud Guides 英文文件</text>
-<text x="963.0" y="94" class="note">dev · 固定版本和手册</text>
+<text x="963.0" y="94" class="note">dev · content/en/guides/</text>
 <path class="edge" d="M428 71 H458"/>
 <path class="edge" d="M725 71 H799"/>
 <rect x="434" y="202" width="698" height="134" rx="10" fill="#fffaf5" stroke="#c2410c" stroke-dasharray="7 5"/>
@@ -39,8 +39,8 @@
 <text x="786.5" y="272" class="head">文档工程师审 PR</text>
 <text x="786.5" y="301" class="note">核对、修订或暂缓</text>
 <rect x="919" y="238" width="200" height="81" rx="10" fill="#fef3c7" stroke="#b45309" />
-<text x="1019.0" y="272" class="head">master 中文编辑源</text>
-<text x="1019.0" y="301" class="note">合入正文和英文基线</text>
+<text x="1019.0" y="272" class="head">master · 已审中文</text>
+<text x="1019.0" y="301" class="note">localized-docs/</text>
 <path class="edge" d="M965 111 V162 H551 V232"/>
 <text x="759" y="154" class="cap">① 读取上次已审与本次采用的英文</text>
 <path class="edge" d="M400 277 H444"/>
@@ -52,12 +52,27 @@
 <text x="990.0" y="485" class="head">中文 Fetch</text>
 <text x="990.0" y="514" class="note">扩展 · 为已切换页读取 Git</text>
 <rect x="479" y="451" width="281" height="80" rx="10" fill="#fef3c7" stroke="#b45309" />
-<text x="619.5" y="485" class="head">dev 中文发布内容</text>
-<text x="619.5" y="514" class="note">正文、导航和来源记录</text>
+<text x="619.5" y="485" class="head">dev · 中文发布内容</text>
+<text x="619.5" y="514" class="note">content/zh-CN/ 与生成的导航</text>
 <rect x="157" y="451" width="231" height="80" rx="10" fill="white" stroke="#64748b" />
 <text x="272.5" y="485" class="head">Cloud 中文站</text>
 <text x="272.5" y="514" class="note">沿用 UAT / Prod 部署</text>
 <path class="edge" d="M841 491 H768"/>
 <path class="edge" d="M471 491 H395"/>
 <text x="600" y="434" class="cap">过渡期：未切换页继续从飞书取稿</text>
+<g aria-label="图例" font-size="17">
+<text x="49" y="587" class="head">图例</text>
+<rect x="99" y="568" width="26" height="22" rx="4" fill="#fef3c7" stroke="#b45309"/>
+<text x="135" y="585" style="text-anchor:start">文件或内容</text>
+<rect x="283" y="568" width="26" height="22" rx="4" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="319" y="585" style="text-anchor:start">工具处理</text>
+<rect x="445" y="568" width="26" height="22" rx="4" fill="#dbeafe" stroke="#2563eb"/>
+<text x="481" y="585" style="text-anchor:start">人工审校</text>
+<rect x="604" y="568" width="26" height="22" rx="4" fill="white" stroke="#64748b"/>
+<text x="640" y="585" style="text-anchor:start">发布站点</text>
+<rect x="763" y="568" width="26" height="22" rx="4" fill="#fffaf5" stroke="#c2410c" stroke-dasharray="5 3"/>
+<text x="799" y="585" style="text-anchor:start">本期新增范围</text>
+<path class="edge" d="M962 580 h32"/>
+<text x="1006" y="585" style="text-anchor:start">内容流向</text>
+</g>
 </svg>
