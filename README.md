@@ -12,12 +12,12 @@ Milvus × Zilliz Cloud 文档同源设计仓库，维护方案、架构、实施
 |---|---|
 | [方案总览](docs/proposal.md) | 为什么改、目标工作方式是什么、怎样逐步演进？（2026-10-13 对齐会材料，已冻结） |
 | [Phase 1 产品需求](docs/prd.md) | Phase 1 交付后，文档工程师和文档负责人怎样工作、网站上看到什么、出错时怎样处理？作者的写法也在这里定下（评审与验收的依据） |
+| [中文 Guides 改造方案](docs/prd-zh-cn-guides.md) | 文档团队怎样审中文、确认上线、逐页从飞书切换到 Git？（供文档团队对齐） |
 | [共享页写法速查](docs/authoring-spec.md) | 产品需求的附录：作者要写的文件、字段与出错情形的速查表 |
 | [术语表](docs/glossary.md) | 本方案用到的术语分别指什么？ |
 | [技术设计](docs/design/README.md) | 工具怎样实现产品需求：架构、数据文件、各环节的实现规则？（面向 zdoc 与 md2md 维护者） |
 | [Phase 1 实施计划](docs/phase-1.md) | Phase 1 做什么、按什么顺序、怎样算完成？含待确认事项的唯一清单（面向实施者与评审人） |
 | [Phase 1 实现指南](docs/implementation/README.md) | 实现怎样切分成工作包、每一步怎样验证、怎样审阅？含交给实现 Agent 的任务卡（面向实现 Agent 与审阅人） |
-| [中文本地化流水线设计](docs/design/11-zh-cn-translation-pipeline.md) | 中文文档如何脱离飞书、通过 Git PR 门禁与大模型语义 3-way 增量流水线实现高质量维护？（面向文档团队与 zdoc 维护者） |
 
 ## 设计样例
 
