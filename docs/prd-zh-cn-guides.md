@@ -1,95 +1,70 @@
 # Zilliz Cloud 中文 Guides 改造方案
 
-**状态**　待文档团队评审。英文共享页已在使用；本文提议逐页迁移中文正文，并引入 GitHub 审校。
+**草案 · 待文档团队评审**
 
-当 Cloud 采用一处英文更新时，负责中文版的人应能直接看到这次要审哪几段、哪些中文可以保留，以及批准后读者何时能看到。下面用一篇真实的共享页 **Delete Entities** 说明文档工程师在改造前后怎样工作。文中的英文文件可查，中文迁移和审校流程是拟议方案。
+今天，Cloud 英文 Guide 改了一条操作说明，负责中文版的文档工程师要自己发现变化，找到飞书里的那一页，再决定怎么改。下一位同事接手时，很难看出中文上次审到了哪一版英文。
 
-## 1. 今天，英文和中文分别在哪里改？
+我们建议把中文正文逐页迁到 Git。**已切换的页面，文档工程师在 GitHub 审中文；仍由飞书维护的页面，继续在飞书改。** Cloud 采用新的英文后，工具给该页负责人开一个审校请求（PR），列出英文变了什么，并用模型在现有中文上起草修改。负责人可以改稿、批准或暂缓。批准的稿件随对应站点部署上线。
 
-![现状。共享英文原稿和 Cloud 配置生成英文 Guide。文档工程师自行发现变化，打开飞书中文正文逐段核对并修改；Fetch 按飞书记录取稿，中文站随部署更新。](./assets/zh-guides-current-workflow.png)
+## 1. 改《删除 Entity》时，我该打开哪份文件？
 
-图 1 · 已接入共享英文、中文仍在飞书维护的一页
+这篇 Guide 的英文与 Milvus 共享。共同的操作步骤在 `milvus-docs` 改。Cloud 在 zdoc 的 `shared-docs` 中选择采用的英文版本、配置 Cloud 差异，按需补写专用英文片段。目前，负责中文版的文档工程师要自己对照生成的 Cloud 英文，再改飞书正文。[Delete Entities 的共享原稿](https://github.com/milvus-io/milvus-docs/blob/3e6b7499cbfcb6b5a365fb1f084a74836f625fc2/site/en/userGuide/insert-and-delete/delete-entities.md) · [Cloud 的页面配置](https://github.com/zilliztech/zdoc/blob/7ee39054f37047b586ad789d876b2047c6f2c465/shared-docs/guides/pages/delete-entities/page.yaml)
 
-**英文已能复用。** 修改 Delete Entities 的通用删除步骤，作者去 `milvus-io/milvus-docs` 改英文原稿；Cloud 团队在 `zilliztech/zdoc` 的 `shared-docs` 里决定采用哪个上游版本、放进哪本手册。若一节只有 Cloud 的操作不同，对应的规则和英文片段也在 zdoc 维护。zdoc 把这些输入组装成 Cloud 英文页。[共享文档改造方案](./proposal.md)
+![现状工作流。共享原文和 Cloud 配置生成英文页。文档工程师发现变化后修改飞书中文，Fetch 取稿，中文站随部署更新。](./assets/zh-guides-current-workflow.png)
 
-**中文仍需人工跟进。** 负责中文的工程师发现 Cloud 英文有变后，找到飞书多维表格中该页的记录，打开它链接的中文正文，对照英文更新译文。Fetch 按记录取稿，部署成功后读者看到修改。容易漏的是两次英文更新之间又改过的地方，也很难从飞书正文追溯某段中文上次审到哪版英文。
+**翻译时看 Cloud Guides 实际采用的英文。** Delete Entities 的同一份共享原稿会生成 Guides 和 BYOC 两份文件。负责中文 Guides 就打开对应版本的 **Guides 英文文件**，其中已经包含这本手册使用的产品名、示例和链接。[查看 Guides 英文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [查看两份英文的生成记录](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/generated/en/manifests/shared-pages/guides/delete-entities.json)
 
-首期面向 Zilliz Cloud 中文 Guides 正文。按页确认中英文对应关系后再接入，Guides 首页、工具教程（`tutorials/tools/`）、Reference 和日文沿用现行流程。飞书在过渡期继续管理导航。
+**改中文时看迁移清单上的编辑入口。** 拟为每篇接入的中文建一个目录。假设团队确认《删除 Entity》的中文页面 ID 为 `delete-entities`，切换后就到 zdoc 的 `master` 分支改这个文件：
 
-## 2. 改造后，一篇中文 Guide 从哪里来？
+```text
+localized-docs/zh-CN/guides/delete-entities/index.md
+```
 
-![目标。Milvus 英文原文和 zdoc 的共享配置生成特定手册的 Cloud 英文页。工具对比这页的新旧英文，在已有中文上起草修改；文档工程师审校合入 zdoc 的中文编辑源。对已切换的页面，Fetch 从 Git 取稿，按通道部署到中文站。](./assets/zh-guides-source-map.png)
+打开 `index.md` 就能看到整篇《删除 Entity》，包括标题、操作步骤、代码和链接。只想修一个中文术语，也可以直接给这个文件提 PR。Fetch 是 zdoc 的取稿流程；页面切换后，它负责把已审中文送入 `dev` 分支，供中文站部署。
 
-图 2 · 共享页从英文原稿到中文上线。黄色是文件，紫色是工具，蓝色是文档工程师的决定；虚线框标出新增的起草与审校环节。
+![目标工作流。从共享原文生成 Guides 英文，工具据此在已有中文上起草修改。文档工程师审校后合入 Git，Fetch 从 Git 读取已切换页面。](./assets/zh-guides-source-map.png)
 
-按图中的 ①–④，跟着 Delete Entities 走一遍。
+<details>
+<summary>为什么中文放在 localized-docs？日文为什么放在 i18n？</summary>
 
-1. **① zdoc 用 Cloud 选定的原稿版本生成英文页。** 这篇的共享原文是 `site/en/userGuide/insert-and-delete/delete-entities.md`。在 zdoc 的 `master` 上，`shared-docs/guides/pages/delete-entities/page.yaml` 指定原稿和目标手册，同目录的 `lock.yaml` 固定采用的版本。Milvus 合入更新后，Cloud 可以先审上游更新 PR，再决定何时采用。[共享英文原文](https://github.com/milvus-io/milvus-docs/blob/3e6b7499cbfcb6b5a365fb1f084a74836f625fc2/site/en/userGuide/insert-and-delete/delete-entities.md) · [Cloud 页面配置](https://github.com/zilliztech/zdoc/blob/7ee39054f37047b586ad789d876b2047c6f2c465/shared-docs/guides/pages/delete-entities/page.yaml) · [采用版本](https://github.com/zilliztech/zdoc/blob/7ee39054f37047b586ad789d876b2047c6f2c465/shared-docs/guides/pages/delete-entities/lock.yaml)
-2. **② 翻译依据是目标手册实际生成的 Cloud 英文文件。** 这篇共享原文生成了 Guides 和 BYOC 两份不同的英文。中文 Guides 对应的是 zdoc 的 `dev` 上已验证版本中的 `content/en/guides/tutorials/development/insert-and-delete/delete-entities.md`。打开这份文件，看到的才是该手册采用的产品说法、示例和链接。即使上游文件名相同，也要核对手册和生成版本。[这次生成的 Guides 英文文件](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [两份英文输出记录](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/generated/en/manifests/shared-pages/guides/delete-entities.json)
-3. **③ 工具在已审中文上起草本次改动。** 首次接入时，先由文档工程师核对飞书中文与第②步的 Cloud 英文，建立审校基线。此后再比较**上次审校接受的英文**与**本次 Cloud 采用的英文**，在 Git 中已审过的中文上提出局部修改。找不到旧英文时，先请工程师补做对齐。遇到段落重组或前后指代不清，工具标出受影响的位置，由审校人决定怎样改。
-4. **④ 文档工程师审的是一整篇可继续编辑的中文稿。** 拟在 zdoc 的 `master` 上为每篇接入的中文 Guide 建一个目录，目录名是稳定的中文页面 ID，里面的 `index.md` 就是**这一页的完整中文正文**。文件里写标题、操作步骤、示例和链接，沿用首轮从飞书导入并审过的内容。以后改一句话，就在这个文件改一句，PR 展示实际改动。英文来源和已审版本另行记录。页面切换后，Fetch 读取这份正文，生成 `dev` 下供中文站部署的页面；网站沿用原 URL。
+日文随英文站构建，`i18n/ja-JP/` 存放日文翻译流水线的产物。中文有独立站点，从 `content/zh-CN/` 构建。按 zdoc 的分支约定，这两处发布内容都由 `dev` 管理。方案在 `master` 新增 `localized-docs/`，让文档工程师在固定位置维护已审中文。[站点与目录分工](https://github.com/zilliztech/zdoc/blob/1ceb4eb30e49c105634d313ee374b491b0eb3007/README.md#L169-L188) · [分支所有权契约](https://github.com/zilliztech/zdoc/blob/1ceb4eb30e49c105634d313ee374b491b0eb3007/deploy/contracts/master-tooling-sync.json)
 
-**为什么中文编辑源放在 `localized-docs`？** 日文随英文站构建，`i18n/ja-JP/` 存放日文翻译流水线产出的文件。中文有独立站点，从 `content/zh-CN/` 构建。按 zdoc 现有分支约定，`i18n/` 和 `content/` 下的发布内容由 `dev` 管理。新增 `master` 下的 `localized-docs/`，让文档团队有一个通过 PR 审校中文正文的固定入口。对于已切换的页面，只改中文术语就在这里提 PR，合入后由 Fetch 取稿发布。[zdoc 的站点与目录分工](https://github.com/zilliztech/zdoc/blob/1ceb4eb30e49c105634d313ee374b491b0eb3007/README.md#L169-L188) · [分支所有权契约](https://github.com/zilliztech/zdoc/blob/1ceb4eb30e49c105634d313ee374b491b0eb3007/deploy/contracts/master-tooling-sync.json)
+</details>
 
-对于 Cloud 独有页，英文由 Cloud 作者维护。等它能提供同样可核对的英文文件和版本，就能从图 2 的②接入翻译。
+## 2. 第一次接入，怎样把飞书这一页交给 Git？
 
-### 第一次接入，文档团队要准备哪些页面？
+**选页。** 文档负责人从 `shared-docs/guides/pages/` 已注册且已生成 Cloud Guides 英文的页面中选试点。每选一篇，在迁移清单里记下英文共享页 ID 和手册、对应的中文飞书记录、拟用的中文 ID 和主审。遇到一条飞书记录供多本手册使用，先核对所有发布目标。缺中文的列为“待首译评估”；缺少可核对的英文或有拆页、合页的，保留现有维护方式，等负责人确认。
 
-**首期建议从已注册的共享英文页列候选，每次确认一对，再建一篇中文稿。** 文档负责人先查看 `shared-docs/guides/pages/` 中各页的发布目标，选出范围内、已经生成 Cloud Guides 英文文件的页面，再去中文飞书多维表格查找对应正文。共享目录回答“有哪些英文可供选择”，迁移清单回答“本批实际准备哪几篇中文”。约 89 篇是待分批梳理的存量规模，首批先从第 5 节的三个试点开始。
+**给中文页定 ID。** 它是这篇中文在 Git 中的固定目录名，今后改标题或网址都保留。建议中英文一一对应且名称可用时沿用英文 ID；已有不同的稳定中文 ID 或遇到重名时，登记两者的对应关系。这项命名约定待团队确认。
 
-以 **Delete Entities** 为例，首份导入 PR 应让审校人核对下面这组对应关系。
+**审第一份底稿。** 方案拟复用 Fetch 读取最新飞书中文，记下修订版本，生成导入 PR。文档工程师打开同一手册的英文逐段核对。例如，在同一次发布提交中，英文删除示例写的是 `red_7025` 和 `purple_4976`，中文写的是 `red` 和 `green`。主审要结合最新飞书稿和示例代码，决定保留哪种写法。确认过的段落记录对应的英文版本，欠译另列待办。**此时即使导入 PR 已合并，正文仍在飞书改。** [核对该版本的英文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [核对同一版本的中文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/zh-CN/guides/tutorials/development/insert-and-delete/delete-entities.md)
 
-| 首次导入时核对什么 | Delete Entities 的例子 |
+**交接编辑入口。** 文档负责人通知大家短暂停改这一页，补齐导出后新增的飞书修改，核对正文、图片和旧链接，再把飞书记录的 `Docs` 链接指向 Git 目录。等 Fetch 的发布记录确认已采用 Git，才把迁移清单的编辑入口改为 Git。部署后，从原网址打开并检查图片和段落链接，通过后将旧稿标为“已迁移”。过渡期导航仍在飞书维护。
+
+![逐页交接。飞书继续供稿，直至暂停编辑并发起切换。Fetch 确认接管后，负责人更新编辑入口，再验收网站。](./assets/zh-page-cutover.png)
+
+若切换结果不明，该页继续停改，负责人核实发布记录。确认尚未接管时，可以撤回请求、恢复飞书编辑；Git 已接管后若部署失败，恢复站点时仍以 Git 为正文编辑入口。
+
+## 3. 下次英文更新，谁审？读者什么时候看到？
+
+**文档工程师审一页的累计变化。** 拟在工作日北京时间 09:30 汇总 Cloud 已采用的更新，补上周末或上次遗漏的变化；急修可按页提前发起。工具比较这页上次审过的英文与本次英文，在 Git 已审中文上拟出修改。PR 给出两版英文的差异、中文改稿和预览，标出数字、限制、命令与链接变化。段落对应不清时交给主审判断，无关段落保留原文。
+
+例如，周一的英文给“按条件删除”加了限制，你已经在 PR 中润色了中文。周二英文又修正示例，打开**同一个 PR** 就能看到新差异及周一的修改。两次修改碰到同一句时，由你处理冲突。最终稿需要重新批准，批准合入后才记为已审；暂缓的页面留在待办中。
+
+| 审过的是哪种修改？ | 读者什么时候看到？ |
 |---|---|
-| 英文共享页与目标手册 | 共享页 ID 是 `delete-entities`，英文配置列出 Guides 和 BYOC。本次选 `guides`，英文版本取图 2 第②步链接的 Guides 文件。 |
-| 中文底稿与发布位置 | 同一个 zdoc 的 `dev` 提交中，中文 Guides 已有《删除 Entity》，网址为 `/delete-entities`。负责人还要确认中文飞书原记录、最新修订和它覆盖的发布目标。若一条记录同时供多本手册使用，须先确认如何保留所有目标。 |
-| 审校人实际要改的文件 | 若确认一一对应且 ID 可用，拟建 `localized-docs/zh-CN/guides/delete-entities/index.md`。打开这个文件应看到《删除 Entity》的正文，从“基于过滤表达式批量删除 Entity”等段落开始核对。 |
+| 已上线功能的中文修订 | Fetch 取到已审稿，正式站（Prod）部署成功后可见。同页还有待发功能时，旧操作的急修可单独发布。 |
+| 随下一版本上线的新说明 | 先在预发布站（UAT）核对。发版时，发布负责人确认英文仍与已审稿对应，再把验收过的中文提升为当前版（Promote）。Prod 部署成功后可见。 |
+| 发版前英文又改了，或中文尚未批准 | 中文保留上一份可用版本，只有预览稿的新页继续隐藏。要求双语同步的页面等两边都通过再发布。 |
 
-这里有个可以直接核对的差异：同一提交里，英文“按条件删除”一节用 `red_7025` 和 `purple_4976` 举例，当时的中文正文写的是 `red` 和 `green`。首轮审校要对照最新飞书稿及对应代码，判断该更新示例还是保留中文写法。即使中英文网址相同，这个判断也需要人来做。[已生成的英文 Guides](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [同一提交的中文 Guides](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/zh-CN/guides/tutorials/development/insert-and-delete/delete-entities.md)
+公开 PR 和预览只接收可提前公开的内容。需保密的发版说明继续在受限渠道协作。
 
-**中英文的页面 ID 要一样吗？** 本方案要求每篇接入的中文有稳定 ID，并明确记录它对应的英文共享页、目标手册和中文飞书记录。**命名约定待团队确认。** 建议一一对应且名称可用时，中文 ID 默认沿用共享页 ID。名称冲突或已有不同的稳定中文 ID 时，保留唯一中文 ID，明确登记对应关系。页面改标题或改网址，沿用原 ID。判断是否配对，要看确认过的手册与正文，不能只比目录名、网址或飞书记录 ID。
+## 4. 文档团队这次要定什么？
 
-**遇到配不上的页面怎么做？** 有英文但找不到中文底稿的，列为“缺中文”，由负责人决定是否另行安排首译。只有飞书中文、缺少可核对的 Cloud 英文，或存在一对多、拆页合页的，列为“待确认”，保留原维护方式。负责人确认范围和对应关系后，再建立基线、接入增量更新。
+1. **选三篇试点，指定主审和备份。** 普通更新页验证英文连续改两次时能否保住人工润色，并记录审一页用时。待发功能页验证 UAT 有新说明时能否单独修正 Prod。有旧锚点和图片的页面验证切换失败时原网址仍可用、切换成功后原链接仍指向正确段落。
+2. **确认每页怎样交接。** 确认中英文的对应关系和 ID 命名约定，安排单页停改窗口，指定负责核实 Fetch 结果、更新清单及验收网站的人。
+3. **与发布负责人约定哪些页须双语同步。** 对试点走一次 Promote，确认 Prod 展示 UAT 审过的版本；验收后英文又改时，能指出应暂缓的页面和原因。
 
-## 3. 英文再次更新，谁审？什么时候上线？
+试点通过后，约 89 篇存量 Guides 拟分 6～8 批审校入库，仍按页确认切换。Guides 首页、工具教程（`tutorials/tools/`）、Reference 和日文沿用现行流程。Cloud 独有页待能提供可核对版本的英文文件后再接入。
 
-**工作日，文档工程师审一页的累计改动。** 拟于工作日北京时间 09:30 汇总自上次成功处理以来的英文变化，按页给负责的工程师开一个滚动 PR。周末积累的变更一并补上，急修可按页提前发起。待审项列出负责人、英文改动摘要、中文差异、预览和需要判断的段落。
-
-以 Delete Entities 做一个验收演练：假设英文为“按条件删除”补了一条适用限制，工程师已在 PR 中润色译文。这时英文又修正了同节的示例。
-
-- **打开原 PR**，应能看到新增限制、修正的示例和两次改动的累计结果。数字、否定、命令和链接目标的变化都要能看见；无关段落的已审措辞逐字保留。
-- **继续审稿**，先前的人工润色应仍在。若新示例影响了正在改的句子，工具停在冲突处，交由工程师决定。最终稿变化后重新审批。仅在获批合入后，才把这次英文记为已审；暂缓或关掉 PR 的页面下次仍能找到。
-- **只需修中文**，工程师也可以直接改这页的中文编辑源。经审校合入的措辞成为下一次的底稿，上次已审的英文版本沿用。
-
-**合入后，普通修订随站点部署生效；新功能先在 UAT 验收。** 对已切换的页，Fetch 采用已审稿后，文档工程师在预发布站（UAT）核对页面。若上述示例只适用于下一版本，当前正式站（Prod）继续提供原操作。此时若旧操作需要急修，可单独审校、发布该处更正，同时核对 UAT 的待发内容。
-
-**发版时，由发布负责人确认 Promote（将已验收的下一版升为当前版）。** 确认拟发布英文与中文审校所依据的版本仍相符，再把 UAT 已审的中文随本次发版提升。部署成功后，读者在 Prod 看到这份说明。英文在验收后又变，或中文尚未获批，就保留上一份可用中文，只有预览版本的新页继续隐藏。要求中英文同步发布的页面等两边都就绪。公开 PR 和预览只承载可提前公开的内容，保密材料沿用受限渠道。
-
-## 4. 什么时候停止在飞书改这一页？
-
-![逐页交接。先保留飞书编辑，审校 Git 候选；短暂停改并核对飞书最后修订后，负责人改链接请求切换。Fetch 确认已采用 Git 时，正文编辑权交给 Git；部署验收后标记旧稿。失败或结果待核实时保持原站可用。](./assets/zh-page-cutover.png)
-
-图 3 · 一页一次交接。迁移清单显示负责人、当前编辑入口和切换状态。
-
-1. **第一次建仓，先审底稿，期间照常在飞书编辑。** 拟复用 Fetch 的飞书抓取能力，取出该页最新中文并记录飞书修订，以只读方式准备材料。把材料整理成导入 PR 是本次新增的步骤。文档工程师打开同一手册、固定版本的 Cloud 英文，逐段确认哪些已对齐、哪些欠译、哪些是有意保留的中文说明，并对照当前中文站核对图片、导航和旧链接。只有经审校确认并随 PR 合入的部分才建立英文基线，欠译继续列为待办。此时发布流程仍从飞书取稿。
-2. **申请切换时，只暂停这一页。** 文档负责人通知编辑者暂停，复核飞书最后一次修订；有新改动就补入候选并重新验收。然后把原飞书记录的 `Docs` 链接改为这页的 Git 目录。此时状态为“等待切换确认”，站点继续服务，编辑者暂缓写入两边。
-3. **Fetch 确认采用 Git 后，在清单中把编辑入口切到 Git。** 负责人应能查到该次发布记录，确认同一次提交已经接管这页的正文、导航和旧链接映射。部署后打开原 URL 和旧段落链接，检查图片，验收通过再给旧飞书正文标记“已迁移”。飞书记录继续管导航。
-4. **切换异常时，先查谁持有正文。** 确认尚未激活，可撤回请求、恢复原链接并通知大家继续改飞书。结果不明时，保持单页停改并查发布记录。Git 已接管后若部署失败，按现有机制恢复站点，后续正文仍在 Git 修改。
-
-## 5. 怎样决定可以扩大迁移？
-
-先挑三页：一页普通更新（可从 Delete Entities 核对中英文对应关系），一页同时有待发功能和正式站急修，一页带飞书旧锚点和图片。由实际负责该页的人完成下面的验收，再决定是否扩大批次。
-
-| 谁来验收 | 要能当场演示什么 |
-|---|---|
-| 文档工程师 | 从待审项找到对应的 Cloud 英文；同页英文再改一次，能在原 PR 看清新增差异、保留人工修订。记录审一页用时和需要手工补改的位置。 |
-| 发布负责人 | UAT 有下一版说明时，Prod 可以单独修错；Promote 后 Prod 显示验收过的版本。若英文在验收后变化，可以指出暂缓的是哪一页、原因是什么。 |
-| 文档负责人 | 对照迁移清单找到唯一编辑入口；演练一次切换未成功，原 URL 仍可访问；成功后旧锚点和图片可用，旧飞书正文的修改不影响网站。 |
-
-试点通过后，拟将约 89 篇存量 Guides 分 6～8 批审校入库，再逐页确认切换。试点启动前，文档负责人和各页主审需要确认三件事。
-
-1. 圈定首批三页，逐页填写英文共享页 ID、目标手册及英文文件、中文飞书记录、拟用中文 ID 和负责人。标明哪些候选缺中文、缺英文或有多个发布目标。
-2. 决定是否采用“一一对应时中文 ID 默认同名”的约定，并为本批有歧义的页面明确处理方式或暂缓原因。
-3. 安排主审、备份和单页停改窗口，与发布负责人明确哪些页面要求双语同步上线。
-
-[共享文档方案总览](./proposal.md) · [Phase 1 产品需求](./prd.md) · [中文 Guides 技术设计与验收契约](./design/11-zh-cn-translation-pipeline.md)
+[共享文档改造方案](./proposal.md) · [Phase 1 产品需求](./prd.md) · [中文 Guides 技术设计与验收契约](./design/11-zh-cn-translation-pipeline.md)
