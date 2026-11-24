@@ -164,3 +164,14 @@ pnpm docs-tooling shared-docs promote-guides --mode prepare --uat-record "$recor
 | 4. 验收正常与暂停 | 先用已留存归档验证真实字段布局；用英文 Prod、中文 UAT、旧英文 UAT、错误 SHA/digest、歧义阶段、归档变化和访问失败验证停止原因。下一次正常英文 UAT 到来后，用一页仍有 current/next 差异、回执未变且两目标齐备的 Guides 跑真实预览。正式发版验收还需对不可变 digest 独立核对镜像的 revision 和 Jenkins build ID 标签，并记录发版人确认及同页开放更新 PR 的观察。 |
 
 **实现交接。** 在最新 master 核对 #1353 的状态与差异后定实现基线。将 Jenkins HTTP 边界和归档验证收在 shared-docs 的发布证据 adapter，`packages/docs-tooling/src/shared-docs/adapters/promotion.ts` 复用已有单页比对，`packages/docs-tooling/src/shared-docs/commands/promote-guides.ts` 明确区分 Jenkins 实时、挂载和 replay 的预览入口。定向测试放在 `packages/docs-tooling/src/shared-docs/testing/`，覆盖请求目标、身份绑定、读回漂移、过期停止和正式预览进入 `prepare` 的拒绝。以 `pnpm test:for-change -- --base <base> --head HEAD` 核对完整差异并执行命中的命令。先交短方案和只读运行身份的证据，主审通过后再实现。Actions、批量提升 Draft 和实际部署各自另行交付。
+
+### 2026-11-24 英文 UAT 核对
+
+Jenkins #164 于北京时间 10:27 成功部署英文 UAT，源提交为 `5fa76318e2a43135d080cff6f11498666730bff6`。构建镜像与实际部署镜像的摘要均为 `sha256:fdd13b1fc1a6febfdd48f35bb3cf5aa966564a79996e8fb54974320ce1680d18`。按摘要读取的镜像标签也与源提交和 Jenkins 构建身份一致。[Jenkins #164](https://jenkins-3.zilliz.cc/job/zilliz-docs/job/zdoc-release/164/)
+
+| 使用 #164 真实归档的只读重放 | 结果 |
+| --- | --- |
+| 固定在部署时的 dev | 95 个已激活页面中，11 页可供发版人验收，82 页无需提升，2 页需协调整页发布。 |
+| 对照后续 dev `a54427538ec6fa912a55cece460e9c3c3ea4de39` | 95 页的发布回执都已更新。示例页 `basic-filtering-operators` 的 Cloud 和 BYOC 正文分别与部署时相同，两侧仍需使用覆盖新版回执的 UAT 构建验收。 |
+
+上述重放使用 #1353 的 `b41d07df`。同步到 master 后的 `d30dcab2` 保持相同功能差异，CI 通过。下一次成功的英文 UAT 部署后，在 Fetch 再次更新回执之前，用 runner 注入的只读身份执行 `--jenkins-build` 直连预览，并记录发版人实际验收的页面和两侧视图。当前直连环境仍缺只读身份，人工验收待补。[实现 PR #1353](https://github.com/zilliztech/zdoc/pull/1353)
