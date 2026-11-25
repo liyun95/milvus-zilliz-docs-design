@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1240" height="545" viewBox="0 0 1240 545" role="img" aria-labelledby="title desc">
 <title id="title">日常运转：从英文变化到主审合入或暂缓</title>
-<desc id="desc">工具工作日北京时间 08:30 定时或手动扫描英文变化，先由程序定位差异，存量页局部起草、新注册页起草首译并执行代码块保护与双通道校验，材料齐备后按页发 Ready for review 滚动 PR 并推飞书日报提醒。文档工程师核对预览与待确认项，决定批准合入（推进基线并由沿用的 Fetch 与部署上线），或短期暂缓（挂 deferred 标签）/ 长期时间差（关 PR 记账，基线不动）。</desc>
+<desc id="desc">工具工作日北京时间 08:00 定时或手动扫描英文变化，先由程序定位差异，存量页局部起草、新注册页起草首译并执行代码块保护与双通道校验，材料齐备后按页发 Ready for review 滚动 PR 并推飞书日报提醒。文档工程师核对预览与待确认项，决定批准合入（推进基线并由沿用的 Fetch 与部署上线），或短期暂缓（挂 deferred 标签）/ 长期时间差（关 PR 记账，基线不动）。</desc>
 <defs>
   <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
 </defs>
@@ -20,7 +20,7 @@
 <rect x="12" y="14" width="1216" height="172" rx="12" fill="white" stroke="#94a3b8"/>
 <path d="M132 14 v172" stroke="#94a3b8"/>
 <text x="72" y="92" class="lane">工具准备</text>
-<text x="72" y="118" class="cap">08:30 / 手动</text>
+<text x="72" y="118" class="cap">08:00 / 手动</text>
 
 <!-- Orange dashed new-scope frame in Lane 1 -->
 <rect x="144" y="24" width="1072" height="150" rx="10" fill="#fffaf5" stroke="#c2410c" stroke-dasharray="7 5"/>
