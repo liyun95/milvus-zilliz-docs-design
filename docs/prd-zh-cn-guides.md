@@ -93,59 +93,68 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 
 </details>
 
-## 3. 系统怎么接：工具链、归属与改造边界
+## 3. 系统怎么接：工具链、目录与改造边界
+
+前面讲清了“为什么改”和“人每天怎么审”，这一节把涉及的资产、上下游接线和工程改造边界落到实处。
+
+### 3.1 工具链怎么接
 
 整体沿用上游英文生产和下游站点部署，只把中间“人工发现变化 → 飞书对照翻译”的环节升级为 Git 内的增量起草、PR 校验与人审。
 
 ![目标工具链分为英文生产、翻译与审校、中文发布三层。上游沿用英文生成并读取 dev 上固定版本的 Guides 英文；橙色虚线内新增增量起草、PR 候选检查与人审，以及 master 上的已审中文目录；日常增量循环读 master 已审中文，飞书存量底稿仅用于首次一次性建仓；下游扩展中文 Fetch 读取已切换页的 Git 中文，沿用现有站点部署。](./assets/zh-guides-source-map.png)
 
-**两个核心接入点与分支归属：**
-- **上游读 `dev`（英文已验证产物）**：工具读取 zdoc `dev` 分支固定提交下的 `content/en/guides/` 正文及生成记录，而不是直接扫 `master` 的 `shared-docs` 提交，确保翻译输入与 Cloud Guides 读者看到的英文完全一致。
-- **中文编辑源归 `master`，发布产物归 `dev`**：已审中文保存在 `master` 的 `localized-docs/zh-CN/guides/<中文页面 ID>/`（含正文 `index.md` 与英文基线记录 `.baseline.json`），避开 `dev` 独占的发布目录。页面切换后，中文 Fetch 从固定 `master` 提交取稿，将正文、导航、旧链接映射和来源记录写入同一 `dev` 提交。
+数据流分三段，与第 2 节一一对应：
+- **上游怎么来（读 `dev` 英文产物）**：工具直接读取 zdoc `dev` 分支上最新通过验证的 Cloud Guides 英文正文及生成记录，而不是扫 `master` 的 `shared-docs` 源码——保证翻译看到的就是英文站实际生成的版本。
+- **中间怎么管（编辑源归 `master`）**：所有中文编辑源、英文基线锚点、接入清单和术语规范统一放在 `master` 独立目录，彻底避开 `dev` 独占的发布目录。
+- **下游怎么发（扩展中文 Fetch 写 `dev`）**：页面切换后，下一次定时或手动中文 Fetch 从固定 `master` 提交取稿，在同一 `dev` 提交中写入中文正文、导航、旧链接映射和来源记录，再沿用现有 UAT / Prod 构建部署。
 
-**改造边界速览：**
-- **沿用**：Cloud 英文生成、现有站点构建与 UAT / Prod 部署、内容保护与 MDX 校验模块、以及现有日文与 Reference 自动翻译流程。
-- **新增**：翻译调度工作流（`translate-zh-guides.yml`）、中文 Guides 增量起草 CLI 与受限模型调用、中文 Guides 术语与风格载体（基于 `zh-CN-reference.json` 提炼）、`zdoc` 侧轻量 `<UI>` 界面词组件、**`master` 上的中文候选 PR 检查（含双通道预览/渲染校验）与文档团队 CODEOWNERS 审批保护**，以及一次性飞书底稿导入脚本。
-- **扩展**：现有中文 Fetch（为已切换页读取固定 `master` 的 Git 中文，未切换页继续读飞书）。
-- **不动**：不修改日文/Reference 的选页与发布规则，不改动 `milvus-docs` 或 `md2md`；翻译任务不持有生产发布锁，也不因单个翻译 PR 合入额外触发生产 Fetch。
+### 3.2 Git 里的中文目录长什么样
 
-<details>
-<summary>展开查看：为什么 shared-docs 有提交不一定触发翻译，而 Cloud 配置变化反而会触发？</summary>
-
-- **为什么 `shared-docs` 有提交不一定触发？** 一方面，`master` 上改了工具脚本、注释、未激活页面，或只改了 `guides-byoc` 手册的差异时，`guides` 手册的英文输出并未变化；另一方面，`master` 上的改动须先经英文 Fetch 生成并验证写入 `dev` 才成为正式产物，翻译工具只比对 `dev` 上 `guides` 手册的新旧产物校验值（含 Prod / UAT 两通道投影）。
-- **为什么上游 `milvus-docs` 没变，Cloud 配置变化也可能触发？** 即使上游 commit 未变，只要 `shared-docs` 中的变量、页面配置或 Cloud 专用英文片段更新并经英文 Fetch 生成到 `dev`，`content/en/guides/` 下的正文或通道内容就会变化，工具会捕捉到差异并起草中文跟进。
-
-</details>
-
-<details>
-<summary>展开查看：工程职责分工、目录结构、分支归属与同步队列边界（供研发估量）</summary>
-
-#### 中文权威目录结构（`master`）
+第 1、2 节提到的“中文正文文件”“上次已审英文锚点”“接入清单”和“术语载体”，在 `master` 上统一收口在 `localized-docs/zh-CN/guides/`（具体文件名可在技术实现阶段微调）：
 
 ```text
-localized-docs/zh-CN/guides/<中文页面 ID>/
-├── index.md        整篇面向网站读者的中文正文（标题、步骤、代码、链接）；文档工程师在 PR 中审改
-└── .baseline.json  该页绑定的英文手册、已审英文版本（dev 提交与通道校验值）及段落对应关系；随已审正文合入更新
+localized-docs/zh-CN/guides/          # 位于 master，不在 devOwnedPaths 中，文档团队通过 PR 维护
+├── registry.yaml                     # 页面接入清单：中英映射、主审/备份、维护模式（自动增量 / 待首译 / 手工维护 / 长期挂起）
+├── terminology.json                  # 中文 Guides 术语与风格载体（首期基于 zh-CN-reference.json 提炼，统一用“您”）
+└── <中文页面 ID>/
+    ├── index.md                      # 面向网站读者的中文正文（工具可局部起草，文档工程师也可随时直接手写）
+    └── .baseline.json                # 该页绑定的“上次已审英文”锚点（dev 提交、双通道校验值与段落对应关系）
 ```
 
-#### 各环节职责、现状与输入输出
+### 3.3 改造边界速览（动什么、不动什么）
+
+| 分类 | 涉及范围 |
+|---|---|
+| **沿用** | Cloud 英文生成、现有站点构建与 UAT / Prod 部署、内容保护与 MDX 校验模块、以及现有日文与 SDK/CLI Reference 翻译底座。 |
+| **新增** | ① 翻译调度工作流（`translate-zh-guides.yml`，含 08:30 定时、手动按页触发与飞书群日报提醒）；<br/>② 中文 Guides 起草 CLI（程序定位差异 + 代码块三档同步 + 受限 LLM 调用 + `<UI>` 界面词识别）与 `zdoc` 侧轻量 `<UI>` 组件；<br/>③ `master` 上的中文候选 PR 检查（双通道/MDX 校验与候选预览）及文档团队 CODEOWNERS 审批保护；<br/>④ 中文编辑目录（含术语载体、接入清单）与一次性飞书底稿导入脚本。 |
+| **扩展** | 现有中文 Fetch（已切换页读取固定 `master` 的 Git 中文，未切换页继续读飞书）。 |
+| **不动** | 不修改日文与 Reference 的选页和发布规则；不改动 `milvus-docs` 和 `md2md`；翻译调度不持有生产发布锁，也不因单个翻译 PR 合入额外触发生产 Fetch。 |
+
+<details>
+<summary>展开查看：各环节详细职责、输入输出与完成条件（供工程估量）</summary>
 
 | 环节 / 角色 | 现状与本期安排 | 输入 → 输出 | 完成条件 |
 |---|---|---|---|
 | **英文生成**（现有英文 Fetch） | **沿用**（已存在） | `milvus-docs` + `master:shared-docs/` → `dev:content/en/guides/` 与生成记录 | 英文 Fetch 通过检查并写入 `dev` |
 | **首次飞书取底稿**（一次性建仓，见附录） | **沿用**中文 Fetch 取稿 + **新增**一次性导入脚本（与日常增量完全独立） | 飞书固定修订中文 + 对应 `dev` 英文 → 建仓导入 PR（不发布、不改网站） | 导入 PR 经主审核对并合入 `master`，正文此时仍在飞书维护 |
-| **翻译调度**（`translate-zh-guides.yml`） | **新增** GitHub Actions 工作流（不改动日文/Reference 自动翻译） | 定时/手动触发 + 接入页清单 → 调用起草工具，创建或更新按页滚动 PR | 无新变化跳过；来源不明记阻塞待办；材料齐备时以 Ready for review 请求主审 |
-| **增量起草工具**（中文 Guides CLI） | **新增**命令行工具（复用现有内容保护和 MDX 校验，不改日文状态） | 同手册旧/新英文 + `master` 已审 `index.md` 与 `.baseline.json`（或显式注册为“待首译”的新共享页英文） → 局部改稿（或整篇首译初稿）、差异摘要与待确认项 | 增量模式仅改动受影响区间、未涉及段落经程序校验逐字保留；新页首译显式声明模式，不与基线缺失异常混淆 |
-| **大语言模型（LLM）** | **新增**受限模型调用（具体模型在试点评估） | 变更段落、邻接上下文、术语与对应中文 → 带段落定位的局部改稿建议 | 仅产出受限文本提案；不得直接写仓、执行代码或自行改动通道边界 |
+| **翻译调度**（`translate-zh-guides.yml`） | **新增** GitHub Actions 工作流（不改动日文/Reference 自动翻译） | 08:30 定时/手动触发 + `registry.yaml` → 调用起草工具，创建/更新按页滚动 PR 并推送飞书群日报 | 无变化跳过；手工/长期挂起跳过起草；来源不明记阻塞待办；材料齐备发 Ready for review |
+| **起草工具**（中文 Guides CLI） | **新增**命令行工具（复用现有分段 diff、内容保护与 MDX 校验） | 同手册旧/新英文 + `index.md` / `.baseline.json` + `terminology.json`（或“待首译”新页英文） → 局部改稿（或首译初稿）、代码块三档处理、`<UI>` 词与疑点清单 | 增量模式未涉及段落逐字保留；代码块不交模型翻译；新页首译与基线缺失异常严格区分 |
+| **大语言模型（LLM）** | **新增**受限模型调用（复用 SDK Reference 已有模型通道，具体模型在试点评估） | 变更正文段落、邻接中文上下文与术语表 → 带段落定位的局部中文提案 | 仅产出受限文本提案；不得直接写仓、改写代码块或编造 `<NextChannel>` 通道边界 |
 | **PR 候选检查与双通道预览** | **新增**必需校验工作流与分支保护（现状 `site-validation.yml` 对 `master` PR 跳过内容检查，`shared-docs-validate.yml` 不覆盖中文，`master` 也尚未配置文档团队 CODEOWNERS 强制审批） | PR 最新 head 的 `index.md` / `.baseline.json` + 对应英文输入 → 通道/MDX/链接校验结果、UAT 与 Prod 候选预览（或渲染检查结果） | 所有必需检查在当前 PR head 通过，且未决待确认项清零；稿件更新自动重跑并撤销旧审批 |
-| **人工审校**（文档工程师） | **新增**逐页审校与审批门禁 | PR 差异、待确认项与两通道预览 → 修订、批准合入或暂缓 | 主审逐条记录待确认项结论并批准当前最新 head，合入 `master` 后推进英文基线 |
+| **人工审校与直接写作**（文档工程师） | **新增**逐页审校门禁（同时支持直接提 PR 写中文） | PR 差异、待确认项与两通道预览 → 修订、批准合入、暂缓或直接手写 PR | 待确认项清零并批准当前最新 head，合入 `master` 后按规则推进（或沿用）英文基线 |
 | **中文取稿与发布交接**（中文 Fetch） | **扩展**现有中文 Fetch（现状仅英文支持 shared-docs Git 选源） | 固定 `master` 提交 + 飞书表格路由记录 → 同一 `dev` 提交写入中文正文、导航、旧链接映射与来源记录 | 已切换页读取 Git 中文，未切换页继续读飞书；校验通过后原子提交到 `dev` |
 | **站点构建与部署** | **沿用**（验证新来源） | 通过验证的 `dev` 提交 → 中文 UAT / Prod 站点部署 | 对应环境部署成功并验证原网址、通道内容与图片后，才算上线 |
 
-#### 分支契约、队列与写入隔离备忘
+</details>
 
-- **目录所有权**：日文随英文站构建（`i18n/ja-JP/`），中文有独立站点（`content/zh-CN/`），两者发布产物均属于 `devOwnedPaths`。`localized-docs/` 位于 `devOwnedPaths` 之外，归 `master` 维护。
-- **同步与生产队列**：合入 `master` 会随现行 `sync-master-tooling-to-dev.yml` 同步工具与源码。为避免争抢 `docs-production-dev` 并发锁，翻译调度与 PR 校验不持有该锁，也不因单个翻译 PR 合入额外触发生产 Fetch；已审正文由下一次定时或获准手动 Fetch 统一取稿写入 `dev`。
+<details>
+<summary>展开查看：研发边界备忘（英文触发条件、分支归属、同步队列与路径隔离）</summary>
+
+- **为何 `shared-docs` 有提交不一定触发翻译，而 Cloud 配置变了反而会触发？**
+  - `master` 上改了工具脚本、未激活页面或仅影响 `guides-byoc` 手册的配置时，`guides` 手册英文输出不变；且 `master` 改动须先经英文 Fetch 生成写入 `dev` 才成为正式产物，所以不直接扫 `master`。
+  - 反过来，即使上游 `milvus-docs` commit 未变，只要 `shared-docs` 中的变量、页面配置或 Cloud 专用片段更新并经英文 Fetch 重新生成到 `dev`，`content/en/guides/` 正文或通道校验值变了就会触发中文跟进。
+- **目录所有权契约**：日文随英文站构建（`i18n/ja-JP/`），中文有独立站点（`content/zh-CN/`），两者发布产物均属于 `devOwnedPaths`。`localized-docs/` 在 `devOwnedPaths` 之外，归 `master` 维护。
+- **同步与生产队列**：合入 `master` 会随现行 `sync-master-tooling-to-dev.yml` 同步工具与源码。为避免争抢 `docs-production-dev` 并发锁，翻译调度与 PR 校验不持有该锁，也不因单个翻译 PR 合入额外触发生产 Fetch；已审正文由下一次定时（北京时间 02:00 / 10:00 / 18:00）或获准手动 Fetch 统一取稿写入 `dev`。
 - **路径写入隔离**：现有 `zh-CN-reference` 映射仍含 `content/zh-CN/guides/tutorials`（服务 `tutorials/tools/`），试点须核实写入隔离，防止自动翻译与人工中文互踩。
 
 参考：[站点与目录分工](https://github.com/zilliztech/zdoc/blob/1ceb4eb30e49c105634d313ee374b491b0eb3007/README.md#L169-L188) · [分支所有权契约](https://github.com/zilliztech/zdoc/blob/1ceb4eb30e49c105634d313ee374b491b0eb3007/deploy/contracts/master-tooling-sync.json) · [现有中文 Guides 抓取任务](https://github.com/zilliztech/zdoc/blob/75e79b0205ce7f9f7b842f163472e64eada35e71/.github/workflows/fetch-docs.yml#L333-L396) · [中文 Guides 技术设计](./design/11-zh-cn-translation-pipeline.md)
