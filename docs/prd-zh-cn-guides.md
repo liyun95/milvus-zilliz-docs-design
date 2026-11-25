@@ -83,16 +83,19 @@ localized-docs/zh-CN/guides/<中文页面 ID>/
 
 中文文件 `localized-docs/zh-CN/guides/delete-entities/index.md`
 
-**英文改了什么？** 下列差异中的空行是原有段落边界。新版把“按条件选中 Entity”和“提交删除请求”合成一段，中间新增核对表达式的动作。
+**英文只新增了一个操作：提交删除请求前，先核对过滤表达式。** 编辑同时把原来的两段合成了一段。
 
-```diff
-- Use a filter expression to select the entities to delete.
--
-- Submit the delete request with that expression.
-+ Use a filter expression to select the entities to delete. Check the filter expression before submitting the delete request. Submit the delete request with that expression.
-```
+旧版英文（两段）：
 
-**已有中文怎样写？** “基于过滤表达式批量删除 Entity”一节原有以下三段，后面紧接代码示例。中间的提示由中文编辑添加。
+> Use a filter expression to select the entities to delete.
+>
+> Submit the delete request with that expression.
+
+新版英文（一段，加粗处为新增句）：
+
+> Use a filter expression to select the entities to delete. **Check the filter expression before submitting the delete request.** Submit the delete request with that expression.
+
+**为什么还需要主审判断？** 原来的两段中文之间夹着一条中文编辑写的提示，用来解释下方代码示例里的颜色值。请先看它原来放在哪里：
 
 > 使用过滤表达式选中要删除的 Entity。
 >
@@ -100,7 +103,9 @@ localized-docs/zh-CN/guides/<中文页面 ID>/
 >
 > 使用该表达式提交删除请求。
 
-**中文拟改与待办。** 工具已将新增动作译为“提交删除请求前，请核对过滤表达式。”候选 A 将两段操作合并，中文提示保留原句，暂时单列在操作段之后、代码示例之前。请主审决定：这句提示只解释示例取值，是否应继续紧贴代码单列？若希望它随操作一起阅读，请调整位置并核对改后的预览。
+**工具已起草**“提交删除请求前，请核对过滤表达式。”请核对这句译文。两段操作合并以后，原来夹在中间的中文提示也需要安排位置。
+
+**请主审决定提示放在哪里。** 候选 A 将提示单独放在新操作段之后，紧接着就是它所解释的代码示例。你可以确认这个位置，也可以把提示并入操作段，再检查预览。
 
 **主审怎样核对预览？** 打开同一候选 A 的两种视图，均定位到 `/delete-entities#delete-entities-by-filtering-conditions`。本次演练约定新增步骤只进入下一版。下表提供两种视图的模拟渲染摘录，供主审直接比对。
 
