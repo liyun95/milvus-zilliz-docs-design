@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="458" viewBox="0 0 1100 458" role="img" aria-labelledby="title desc">
+  <title id="title">中文 Guides 翻译与发布</title>
+  <desc id="desc">从有来源凭据的英文产物和 master 已审中文生成受限草稿。文档负责人批准当前 PR head，必需检查通过才合入。下一次 Fetch 根据中文归属发布到 dev，站点部署消费已验证的提交。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
+    <style>
+      text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1e293b; }
+      .title { font-size: 25px; font-weight: 650; }
+      .head { font-size: 22px; font-weight: 650; }
+      .body { font-size: 18px; fill: #42536a; }
+      .edge { fill: none; stroke: #61718a; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1100" height="458" fill="#ffffff"/>
+  <text class="title" x="24" y="42">中文 Guides 翻译与发布</text>
+  <rect x="24" y="72" width="326" height="130" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="42" y="105">核验英文产物</text>
+  <text class="body" x="42" y="135">已验证的 dev Fetch 来源凭据</text>
+  <text class="body" x="42" y="160">固定页面、目标与通道摘要</text>
+  <rect x="387" y="72" width="326" height="130" rx="12" fill="#f5f0ff" stroke="#c4b4ed"/>
+  <text class="head" x="405" y="105">生成受限编辑</text>
+  <text class="body" x="405" y="135">英文差异与 master 已审中文</text>
+  <text class="body" x="405" y="160">按块提出编辑并执行门禁</text>
+  <rect x="750" y="72" width="326" height="130" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="768" y="105">审阅当前 PR head</text>
+  <text class="body" x="768" y="135">中文候选检查与文档负责人批准</text>
+  <text class="body" x="768" y="160">通过后合入正文与基线</text>
+  <path class="edge" d="M350 137 H379"/>
+  <path class="edge" d="M713 137 H742"/>
+  <path class="edge" d="M913 202 V237"/>
+  <rect x="750" y="245" width="326" height="118" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
+  <text class="head" x="768" y="278">master 审校源</text>
+  <text class="body" x="768" y="308">等待定时或获准手动 Fetch</text>
+  <text class="body" x="768" y="333">固定已合入的正文和基线</text>
+  <rect x="387" y="245" width="326" height="118" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="405" y="278">Fetch 检查点写入 dev</text>
+  <text class="body" x="405" y="308">核对中文归属、通道与来源</text>
+  <text class="body" x="405" y="333">同一提交更新发布产物与凭据</text>
+  <rect x="24" y="245" width="326" height="118" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="42" y="278">站点部署</text>
+  <text class="body" x="42" y="308">消费已验证的 dev 提交</text>
+  <text class="body" x="42" y="333">分别验收 CURRENT 和 NEXT</text>
+  <path class="edge" d="M750 304 H721"/>
+  <path class="edge" d="M387 304 H358"/>
+  <rect x="24" y="382" width="1052" height="64" rx="12" fill="#fff2ef" stroke="#e3aa9e"/>
+  <text class="head" x="42" y="415">公开范围是准入条件。审批、通道或输入校验失败时保留已验证版本。</text>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="476" viewBox="0 0 1100 476" role="img" aria-labelledby="title desc">
+  <title id="title">语义 3-way 的编辑边界</title>
+  <desc id="desc">基准英文与最新英文引用可复核的英文产物，现有中文固定在 master。程序划定可编辑的 MDX 块，模型建议局部变更，未编辑区间原样拼接。验证失败进入人工处理，基线随已审 PR 合入推进。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
+    <style>
+      text { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1e293b; }
+      .title { font-size: 25px; font-weight: 650; }
+      .head { font-size: 22px; font-weight: 650; }
+      .body { font-size: 18px; fill: #42536a; }
+      .edge { fill: none; stroke: #61718a; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1100" height="476" fill="#ffffff"/>
+  <text class="title" x="24" y="42">语义 3-way 的编辑边界</text>
+  <rect x="24" y="72" width="326" height="107" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="42" y="105">base_en · 已审英文</text>
+  <text class="body" x="42" y="135">固定来源凭据及通道摘要</text>
+  <rect x="387" y="72" width="326" height="107" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="405" y="105">new_en · 候选英文</text>
+  <text class="body" x="405" y="135">核验同一目标的最新产物</text>
+  <rect x="750" y="72" width="326" height="107" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
+  <text class="head" x="768" y="105">cur_zh · 已审中文</text>
+  <text class="body" x="768" y="135">固定 master 提交与正文摘要</text>
+  <path class="edge" d="M187 179 V213"/>
+  <path class="edge" d="M550 179 V213"/>
+  <path class="edge" d="M913 179 V213"/>
+  <rect x="24" y="221" width="1052" height="91" rx="12" fill="#f5f0ff" stroke="#c4b4ed"/>
+  <text class="head" x="42" y="254">按 MDX 结构和通道对齐，划定允许编辑的块</text>
+  <text class="body" x="42" y="284">模型返回带块 ID 的编辑建议。程序按原文区间拼接，再验证技术字面量、链接、结构和两通道。</text>
+  <path class="edge" d="M187 312 V341"/>
+  <path class="edge" d="M550 312 V341"/>
+  <path class="edge" d="M913 312 V341"/>
+  <rect x="24" y="349" width="326" height="111" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
+  <text class="head" x="42" y="382">无变化</text>
+  <text class="body" x="42" y="412">保留未编辑区间原始字节</text>
+  <text class="body" x="42" y="437">无需模型改写</text>
+  <rect x="387" y="349" width="326" height="111" rx="12" fill="#eff6ff" stroke="#93b9eb"/>
+  <text class="head" x="405" y="382">允许的局部变更</text>
+  <text class="body" x="405" y="412">PR 附差异和通道预览</text>
+  <text class="body" x="405" y="437">审批合入后推进基线</text>
+  <rect x="750" y="349" width="326" height="111" rx="12" fill="#fff2ef" stroke="#e3aa9e"/>
+  <text class="head" x="768" y="382">对齐不明或检查失败</text>
+  <text class="body" x="768" y="412">定位到页面、通道和块</text>
+  <text class="body" x="768" y="437">人工处理，保留已审基线</text>
+</svg>
