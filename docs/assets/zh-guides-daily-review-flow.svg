@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="476" viewBox="0 0 1240 476" role="img" aria-labelledby="title desc">
+<title id="title">日常运转：从英文变化到主审合入或暂缓</title>
+<desc id="desc">工具工作日定时或手动扫描英文变化，跳过无实质变化并阻塞来源不明页；对存量页局部起草或对新注册页起草首译，校验未改段逐字保留与双通道；材料齐备后按页发 Ready for review 滚动 PR。文档工程师在 PR 中核对差异、预览和处理待确认项，决定合入（推进基线并由下一次 Fetch 部署上线）或暂缓（保留原 PR 与基线，无新变化不催办，有新实质变化通知一次）。</desc>
+<defs>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/></marker>
+</defs>
+<style>
+  text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle;fill:#334155}
+  .head{font-size:20px;font-weight:600}
+  .sub{font-size:15.5px;fill:#475569}
+  .lane{font-size:19px;font-weight:600}
+  .cap{font-size:15px;fill:#475569}
+  .edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}
+  .stem{fill:none;stroke:#64748b;stroke-width:2}
+</style>
+<rect width="1240" height="476" fill="white"/>
+
+<!-- Lane 1: 工具自动准备 -->
+<rect x="12" y="14" width="1216" height="150" rx="12" fill="white" stroke="#94a3b8"/>
+<path d="M132 14 v150" stroke="#94a3b8"/>
+<text x="72" y="82" class="lane">工具准备</text>
+<text x="72" y="108" class="cap">09:30 / 手动</text>
+
+<rect x="152" y="36" width="290" height="106" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="297" y="68" class="head">① 发现英文变化</text>
+<text x="297" y="96" class="sub">对比已审基线与最新英文</text>
+<text x="297" y="121" class="cap">无变化跳过 · 来源不明整页阻塞</text>
+
+<rect x="484" y="36" width="322" height="106" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="645" y="68" class="head">② 起草中文并跑检查</text>
+<text x="645" y="96" class="sub">存量页局部改稿 · 新页起草首译</text>
+<text x="645" y="121" class="cap">核验未改段逐字保留 + 双通道校验</text>
+
+<rect x="848" y="36" width="358" height="106" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
+<text x="1027" y="68" class="head">③ 按页发 / 更新滚动 PR</text>
+<text x="1027" y="96" class="sub">附差异、待确认项与两通道预览</text>
+<text x="1027" y="121" class="cap">材料齐备直接 Ready for review</text>
+
+<path class="edge" d="M442 89 H477"/>
+<path class="edge" d="M806 89 H841"/>
+
+<!-- Lane 2: 文档工程师审校 -->
+<rect x="12" y="216" width="1216" height="246" rx="12" fill="white" stroke="#94a3b8"/>
+<path d="M132 216 v246" stroke="#94a3b8"/>
+<text x="72" y="330" class="lane">文档工程师</text>
+<text x="72" y="356" class="cap">PR 审校决定</text>
+
+<!-- Bridge between Lane 1 and Lane 2 (drawn after Lane 2 background so arrowhead is visible) -->
+<path class="edge" d="M1027 142 V194 H297 V269"/>
+<text x="662" y="186" class="cap">审校中同页英文再变：原 PR 追加更新并保留人工修订（重叠冲突则暂停自动写入）</text>
+
+<rect x="152" y="276" width="290" height="118" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+<text x="297" y="311" class="head">④ 主审在 PR 中核对</text>
+<text x="297" y="340" class="sub">看英文变了什么 · 查两通道预览</text>
+<text x="297" y="366" class="cap">处理待确认项或直接修订正文</text>
+
+<!-- Split branch from Box 4 -->
+<path class="stem" d="M442 335 H476 M476 284 V394"/>
+<path class="edge" d="M476 284 H508"/>
+<path class="edge" d="M476 394 H508"/>
+
+<!-- Upper outcome: 合入 -->
+<rect x="515" y="236" width="320" height="96" rx="10" fill="#f0fdf4" stroke="#047857" stroke-width="2"/>
+<text x="675" y="268" class="head" style="fill:#065f46">⑤a 清零待办并 Approve 合入</text>
+<text x="675" y="295" class="sub">最新 head 过检后合入 master</text>
+<text x="675" y="318" class="cap">只有合入才推进已审英文基线</text>
+
+<path class="edge" d="M835 284 H871"/>
+
+<rect x="878" y="236" width="328" height="96" rx="10" fill="white" stroke="#64748b"/>
+<text x="1042" y="268" class="head">⑥ Fetch 取稿并部署上线</text>
+<text x="1042" y="295" class="sub">下一次定时/手动 Fetch 写入 dev</text>
+<text x="1042" y="318" class="cap">对应站点部署成功才算上线</text>
+
+<!-- Lower outcome: 暂缓 -->
+<rect x="515" y="348" width="691" height="96" rx="10" fill="#fffbeb" stroke="#b45309" stroke-dasharray="6 4"/>
+<text x="860" y="378" class="head" style="fill:#92400e">⑤b 暂缓整页（保留原 PR、写明原因与跟进人，复核日期可选）</text>
+<text x="860" y="405" class="sub">已审英文基线不动 · 无新实质变化不重复催办</text>
+<text x="860" y="429" class="cap">有新实质变化通知一次，同时列出“自暂缓后新变化”和“自上次合入累计变化”</text>
+</svg>
