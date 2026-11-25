@@ -321,7 +321,14 @@ pages:
 
 ### 6.3 Fetch 接线与恢复
 
-接线借鉴 [05b](./05b-cutover-and-ownership.md)，现有 shared-docs 路由和激活记录只服务英文。中文须增加站点限定的 Git 来源类型、独立激活记录和来源凭据。目录 URL 只用于选源，按 Fetch 固定的 master SHA 读取仓库内受控路径，禁止跨站、重复所有者、路径逃逸和符号链接。保持 Base 记录、页面 ID、发布目标与实际写入路径可核对。快照和缓存身份包含已审批中文及所需资源的摘要。飞书记录无变化而 Git 正文、配套资源或归属变化时，也要重新生成或核验。中文候选还要贯通媒体处理、表格渲染、组装、检查点、发布和恢复。凭据至少记录使用的 master/dev 提交、Base 记录与通道、正文、导航及媒体摘要和 Fetch 运行 ID。
+接线借鉴 [05b](./05b-cutover-and-ownership.md) 与现有 `source-state.ts` 路由模型，但现有 shared-docs 路由和激活记录只服务英文。中文须落实四项站点限定的硬契约：
+
+1. **按站点路由互斥**：`site=zh-CN` 仅识别 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/<page-id>` 作为 Git 中文来源（拒绝 `shared-docs/...` 或其他 locale）；`site=en` 仅识别 `shared-docs/...`（拒绝 `localized-docs/...`）。`Placement Type` 保持 `canonical`，导航层级、排序与 `Release Channel` 照旧由中文 Base 管理。
+2. **页面 ID 与存在性校验**：`<page-id>` 须符合小写连字符 slug 规范（`/^[a-z0-9]+(?:-[a-z0-9]+)*$/`），禁止 `active`、`registry`、`terminology` 等保留名，且必须在 Fetch 固定的 `master` SHA 下存在对应目录、`index.md` 与 `registry.yaml` 记录，禁止路径逃逸、符号链接与重复所有者，否则报 `OWNERSHIP_CONFIG_MISSING`。
+3. **独立的 `dev` 激活与来源凭据路径**（与英文 `generated/en/manifests/shared-pages/guides/` 对称）：写入 `generated/zh-CN/manifests/localized-pages/guides/active.json` 与 `generated/zh-CN/manifests/localized-pages/guides/<page-id>.json`。凭据至少记录使用的 master/dev 提交、Base 记录与通道、正文、导航及媒体摘要和 Fetch 运行 ID。
+4. **激活后回退拦截**：沿用 `OWNERSHIP_REVERTED` 语义——页面进入中文 `active.json` 后，若表格 `Docs` 误改回飞书链接，Fetch 直接报错拦截，防止旧飞书覆盖。
+
+快照和缓存身份包含已审批中文及所需资源的摘要。飞书记录无变化而 Git 正文、配套资源或归属变化时，也要重新生成或核验。中文候选还要贯通媒体处理、表格渲染、组装、检查点、发布和恢复。
 
 激活前的失败保留原 dev 产物及状态。若要撤回请求，先确认旧请求已结束且未写入，再由负责人恢复原链接和编辑权。结果未知时停下并核实远端。激活后的全量抓取、缓存恢复与删除流程均须遵守 Git 写权。误改链接、删记录、重命名或拟下线时按归属保护处理，修复记录或走受控下线路径。部署失败走现有重试或镜像回滚，编辑权仍归 Git。逐页验证可独立完成，任何新步骤都不得持有生产队列锁去等待另一个生产写入任务。
 
