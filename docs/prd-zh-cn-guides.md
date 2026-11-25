@@ -52,7 +52,11 @@ localized-docs/zh-CN/guides/<中文页面 ID>/
 
 1. **找变化。** 拟在工作日北京时间 09:30 扫描已接入的中文页，急修可手动按页触发。旧版英文取该页上次获批合入时记录的版本，新版英文取 `dev` 上同一手册最近通过验证的产物。先比正文和各发布通道的校验值，有差异再逐段核对。只改了 BYOC 示例、Guides 输出相同，或只有确认可忽略的格式变化，就跳过。周末累积的实质变化从上次已审版本一并算起。
 2. **在已审中文上起草。** 程序定位受影响的段落，把英文变化、相邻上下文和对应中文交给模型，再核验修改范围外的文字是否逐字保留。页面和英文基线明确时，能可靠定位的改动先起草。遇到段落拆并、指代不清或中文独有说明，保留疑点处的原文，在同一 PR 中列出位置、原因和需要主审回答的问题。
-3. **准备一页的审校材料。** 一般每页一个活动 PR。页首给出英文来源与累计差异、中文拟改、待确认项和 UAT / Prod 预览，突出数字、限制、代码和链接变化。当来源可核对，且已有可审的差异或主审能回答的具体问题时，工具直接以 **Ready for review** 请求该页主审，无需人工先将 Draft 转为 Ready。
+3. **准备一页的审校材料。** 一般每页一个活动 PR。页首给出英文来源与累计差异、中文拟改和待确认项，突出数字、限制、代码和链接变化。来源可核对、有可审的改动或具体问题，并备齐以下材料后，工具直接以 **Ready for review** 请求该页主审。
+
+   - **疑点要带上下文。** 每项贴出中文原句、所在小节及前后各一段，并给出对应英文改前、改后的差异。涉及拆并段时保留原来的分段。写清需要主审决定什么、工具目前怎样处理，主审应能据此判断或指出还需谁确认。
+   - **两个通道都要可核对。** 为同一 PR 最新提交提供可打开的 UAT、Prod 候选预览，或附上相应的渲染检查结果。标明页面及段落锚点、各通道预期看到什么，让主审能查看该位置实际显示的内容。材料缺失或已过期，先在原 PR 补齐；稿件更新后同步刷新。
+
 4. **交给主审。** 审校期间同页英文再次变化，工具更新原 PR，标出本次新增差异，并保留人工修订。新改动与人工编辑重叠时，暂停自动写入，把冲突位置交给主审。主审在原 PR 内修订、批准或暂缓。
 
 **何时整页阻塞？** 找不到上次英文、目标手册不唯一或输入来源无法核实时，负责人先处理一条阻塞待办。待办列出页面、缺失的材料和负责人，保留原基线，待来源确认后再起草。
@@ -71,21 +75,41 @@ localized-docs/zh-CN/guides/<中文页面 ID>/
 
 ### 示意 PR · Delete Entities 更新“按条件删除”
 
-页面来源可以在仓库核对：该共享页生成 Guides 和 BYOC 两份英文，下例选用 Guides。以下英文更新、发布通道和审校状态均为试点演练设定。[共享原稿](https://github.com/milvus-io/milvus-docs/blob/3e6b7499cbfcb6b5a365fb1f084a74836f625fc2/site/en/userGuide/insert-and-delete/delete-entities.md) · [Cloud 页面配置](https://github.com/zilliztech/zdoc/blob/7ee39054f37047b586ad789d876b2047c6f2c465/shared-docs/guides/pages/delete-entities/page.yaml) · [两份英文输出记录](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/generated/en/manifests/shared-pages/guides/delete-entities.json)
+该页实际生成 Guides 和 BYOC 两份英文，本例审 Guides。以下新旧段落、中文专用提示以及两份预览摘录均为**试审用的同一候选稿 A**。真实页面可用来核对手册、示例和小节位置；真实翻译 PR 应附该次提交的候选预览或检查结果。[Cloud 页面配置](https://github.com/zilliztech/zdoc/blob/7ee39054f37047b586ad789d876b2047c6f2c465/shared-docs/guides/pages/delete-entities/page.yaml) · [两份英文输出记录](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/generated/en/manifests/shared-pages/guides/delete-entities.json) · [英文正文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [同一提交的中文正文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/zh-CN/guides/tutorials/development/insert-and-delete/delete-entities.md)
 
-> **[zh-CN Guides] 删除 Entity：补充提交删除请求前的检查步骤**
->
-> **已请求主审 review · 待确认 1 项 · 合入受阻**
->
-> **英文变化**　相较上次已审的 Guides 英文，“按条件删除”新增一步：*Check the filter expression before submitting the delete request.* 同一节将原来的两个说明段落合并。
->
-> **中文拟改**　在 `localized-docs/zh-CN/guides/delete-entities/index.md` 的对应步骤补入“提交删除请求前，请核对过滤表达式。”已审示例中使用的 `red` 和 `green` 保留原样。
->
-> **请主审决定**　合并段落旁有一句中文专用提示。工具保留了原位置。请确认这句提示应并入新的说明段，还是继续单列；选择后请更新正文或注明保留理由。
->
-> **通道预览**　本例假设这条新增说明随下一版功能发布。UAT 预览应显示新增步骤；Prod 预览应显示现行步骤。
+**[zh-CN Guides] 删除 Entity · 在“按条件删除”中补充提交前的检查步骤**
 
-主审若当场确认“中文提示继续单列”，可以记录理由、核对两份预览，待检查通过后批准。若需等产品确认提示的适用范围，可以写“暂缓，等产品确认；由本页主审跟进”。两种情况都沿用这份 PR。实际已发布的中英文示例可供试点比对。[Guides 英文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [同一提交的中文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/zh-CN/guides/tutorials/development/insert-and-delete/delete-entities.md)
+已请求主审 review · 待确认 1 项 · 合入受阻
+
+中文文件 `localized-docs/zh-CN/guides/delete-entities/index.md`
+
+**英文改了什么？** 下列差异中的空行是原有段落边界。新版把“按条件选中 Entity”和“提交删除请求”合成一段，中间新增核对表达式的动作。
+
+```diff
+- Use a filter expression to select the entities to delete.
+-
+- Submit the delete request with that expression.
++ Use a filter expression to select the entities to delete. Check the filter expression before submitting the delete request. Submit the delete request with that expression.
+```
+
+**已有中文怎样写？** “基于过滤表达式批量删除 Entity”一节原有以下三段，后面紧接代码示例。中间的提示由中文编辑添加。
+
+> 使用过滤表达式选中要删除的 Entity。
+>
+> **提示：** 下方示例中的颜色值仅作演示，请按目标 Collection 中的实际取值替换。
+>
+> 使用该表达式提交删除请求。
+
+**中文拟改与待办。** 工具已将新增动作译为“提交删除请求前，请核对过滤表达式。”候选 A 将两段操作合并，中文提示保留原句，暂时单列在操作段之后、代码示例之前。请主审决定：这句提示只解释示例取值，是否应继续紧贴代码单列？若希望它随操作一起阅读，请调整位置并核对改后的预览。
+
+**主审怎样核对预览？** 打开同一候选 A 的两种视图，均定位到 `/delete-entities#delete-entities-by-filtering-conditions`。本次演练约定新增步骤只进入下一版。下表提供两种视图的模拟渲染摘录，供主审直接比对。
+
+| 视图 | 该小节显示的内容（按阅读顺序） | 主审核对什么 |
+|---|---|---|
+| UAT · 下一版 | **操作段**　使用过滤表达式选中要删除的 Entity。提交删除请求前，请核对过滤表达式。使用该表达式提交删除请求。<br>**提示**　下方示例中的颜色值仅作演示，请按目标 Collection 中的实际取值替换。<br>**代码示例** | 新增检查出现一次，在“提交删除请求”之前。提示仍然可见，并且紧邻它解释的代码示例。 |
+| Prod · 当前版 | **第一段**　使用过滤表达式选中要删除的 Entity。<br>**提示**　下方示例中的颜色值仅作演示，请按目标 Collection 中的实际取值替换。<br>**第二段**　使用该表达式提交删除请求。<br>**代码示例** | 对照原中文，原有两段及提示位置都保留，没有提前显示新增的检查步骤。 |
+
+**这轮试审怎么收尾？** 若认可 UAT 中提示的位置，在待办上记录“保留单列，紧邻代码，因为提示只解释示例里的颜色值”。若调整正文，重新核对新提交的两种视图。若 Prod 提前显示了新增句，退回修正通道后再审。只有待办已处理、最新稿检查通过且主审批准，才可合入；确需等外部确认时，在原 PR 填写暂缓原因和跟进人。
 
 ## 5. 何时上线，怎样验收试点
 
