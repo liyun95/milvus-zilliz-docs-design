@@ -114,12 +114,103 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 
 ```text
 localized-docs/zh-CN/guides/          # 位于 master，不在 devOwnedPaths 中，文档团队通过 PR 维护
-├── registry.yaml                     # 页面接入清单：中英映射、主审/备份、维护模式（自动增量 / 待首译 / 手工维护 / 长期挂起）
-├── terminology.json                  # 中文 Guides 术语与风格载体（首期基于 zh-CN-reference.json 提炼，统一用“您”）
+├── registry.yaml                     # 页面接入清单（人维护）：中英映射、主审、维护模式（自动增量 / 待首译 / 手工维护 / 长期挂起）
+├── terminology.json                  # 中文 Guides 术语与风格载体（人维护，首期基于 zh-CN-reference.json 提炼，统一用“您”）
 └── <中文页面 ID>/
     ├── index.md                      # 面向网站读者的中文正文（工具可局部起草，文档工程师也可随时直接手写）
-    └── .baseline.json                # 该页绑定的“上次已审英文”锚点（dev 提交、双通道校验值与段落对应关系）
+    └── .baseline.json                # 该页绑定的“上次已审英文”锚点（全由工具自动写入并随 PR 合入，人无需手改）
 ```
+
+<details>
+<summary>展开查看：registry.yaml 与 .baseline.json 初步定义与样例</summary>
+
+#### 1. `registry.yaml`（接入清单 · 文档团队通过 PR 维护）
+
+只在登记新页、调整主审、切换“手工维护”或标记“长期挂起”时修改；日常英文更新和 PR 审校不需要改动它。
+
+```yaml
+schema_version: 1
+manual: guides
+
+pages:
+  # 1) 常规自动增量页（绝大多数 shared-docs 页面）
+  - page_id: delete-entities            # 稳定目录名，改标题/改 URL 也不变
+    mode: incremental                   # incremental | bootstrap_new | manual | paused
+    en_source:
+      manual: guides                    # 明确绑定 Guides 手册（区别于 guides-byoc）
+      shared_page: delete-entities
+    owner: "@doc-owner-a"               # 主审（工具自动 Assign + 飞书提醒）
+    sync_policy: independent            # independent（可独立发版）| bilingual_sync（须双语同步）
+    feishu_record_id: recXXXXXXXX       # 过渡期关联中文飞书表格记录（用于核对导航与切链）
+
+  # 2) shared-docs 新增页面，人工确认中国站需要后登记首译
+  - page_id: hybrid-search-new
+    mode: bootstrap_new                 # 工具起草整篇首译 PR；合入后自动转为 incremental
+    en_source:
+      manual: guides
+      shared_page: hybrid-search-new
+    owner: "@doc-owner-a"
+    sync_policy: independent
+
+  # 3) 中英文差异极大，由文档工程师直接手写中文
+  - page_id: region-and-network
+    mode: manual                        # 工具不自动起草翻译 PR；英文有变仅可选发轻量提醒
+    en_source:
+      manual: guides
+      shared_page: region-and-network
+    owner: "@doc-owner-c"
+    notify_on_en_change: true
+
+  # 4) 海外已上、中国站 1 个月以上暂不上（长期挂起，不留僵尸 PR）
+  - page_id: global-only-feature
+    mode: paused
+    en_source:
+      manual: guides
+      shared_page: global-only-feature
+    owner: "@doc-owner-a"
+    pause_reason: "中国站暂未上线该能力，待排期确认后恢复"
+    follow_up: "@doc-owner-a"
+```
+
+#### 2. `.baseline.json`（单页英文锚点 · 存在 `master`，全由工具自动写入）
+
+紧挨同页 `index.md` 存在 `master` 分支下，包括 `sections` 在内的全部字段均由工具自动计算并随已审 PR 合入更新，文档工程师不需要手改。
+
+```json
+{
+  "schema_version": 1,
+  "page_id": "delete-entities",
+  "en_baseline": {
+    "manual": "guides",
+    "shared_page": "delete-entities",
+    "dev_commit": "5a62906a45a4e3250c619a5efcfa4de3f83a8eb6",
+    "en_path": "content/en/guides/tutorials/development/insert-and-delete/delete-entities.md",
+    "manifest_path": "generated/en/manifests/shared-pages/guides/delete-entities.json",
+    "file_sha256": "33c0303b15c620e76e491a6c18fdd9917ce0034aec1c053676dd4d26ce513e69",
+    "channels": {
+      "current_sha256": "a18c...f021",
+      "next_sha256": "a18c...f021"
+    }
+  },
+  "zh_reviewed": {
+    "index_sha256": "9b4e...77d2",
+    "reviewed_pr": 128,
+    "updated_at": "2026-11-25T08:45:00Z"
+  },
+  "sections": [
+    {
+      "anchor": "delete-entities-by-filtering-conditions",
+      "en_sha256": "7f20...19ab",
+      "zh_sha256": "c41d...8e33",
+      "code_blocks": [
+        { "lang": "python", "customized_for_zh": false, "en_sha256": "e801...44aa" }
+      ]
+    }
+  ]
+}
+```
+
+</details>
 
 ### 3.3 改造边界速览（动什么、不动什么）
 
@@ -288,7 +379,7 @@ localized-docs/zh-CN/guides/          # 位于 master，不在 devOwnedPaths 中
 | **1. “待确认项清零”的合入拦截方式** | **A. PR 描述结构化勾选清单 + CI 检查**：在 GitHub PR 直接勾选回复，门槛低，需防误改 PR 正文。<br/>**B. 仓内审校记录文件随 PR 提交**：全入 Git 审计，但每次回复都要改文件提交，摩擦大。 | 推荐 **A**，配合评论留痕与必需检查。 |
 | **2. 试点期 PR 双通道预览形态** | **A. 校验工作流输出双通道渲染检查报告 + 静态差异/可下载产物**：交付快、零额外托管运维，但不能一键打开在线网页。<br/>**B. 建设每 PR 独立的 UAT / Prod 在线预览环境**：体验最好，但需额外搭建托管与清理机制，工期长。 | 试点期先走 **A** 验证流程与质量，再决定全量阶段是否投入 **B**。 |
 | **3. 中文页面 ID 命名规则** | **A. 默认沿用英文共享页 ID**，重名或已有稳定中文 ID 时独立登记：对应直观。<br/>**B. 全部新建独立中文 ID**：彻底解耦命名，但查表与排障成本更高。 | 推荐 **A**。 |
-| **4. 试点分工与发布约束** | 需确定：首批试点 3 页、每页主审与备份、单页停改窗口时长、哪些页面须双语同步发布。 | 评审会现场认领并登记。 |
+| **4. 试点分工与发布约束** | 需确定：首批试点页（3 页存量 + 1 页新增共享页）、每页主审、单页停改窗口时长、哪些页面须双语同步发布。 | 评审会现场认领并登记。 |
 | **5. 翻译模型选型** | 不同模型在术语遵循、通道结构和审校耗时上差异明显。 | 不在评审前写死，在只读试点中用真实样本（事实漏改、非授权改写、审校耗时）对比后定型。 |
 
 ## 附录：存量迁移与新增共享页接入
