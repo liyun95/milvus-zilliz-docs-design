@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1160" height="645" viewBox="0 0 1160 645" role="img" aria-labelledby="title desc">
 <title id="title">中文 Guides 增量翻译的工具链与变更范围</title>
-<desc id="desc">沿用英文生成，读取 dev 上固定版本的 Guides 英文。橙色虚线内新增增量起草、PR 候选检查与文档工程师必审，以及 master 上的已审中文目录。日常增量循环从 master 已审中文取底稿和基线；飞书存量底稿仅用于首次建仓的一次性导入（虚线）。下游扩展中文 Fetch 为已切换页读取固定 master 提交，写入 dev 中文发布内容，再经现有站点部署发布。</desc>
+<desc id="desc">沿用英文生成，读取 dev 上固定版本的 Guides 英文。橙色虚线内新增增量起草、PR 候选检查与文档工程师必审，以及 master 上的 pre-md2md 中文源码目录（source.md、Variables.json 与 .baseline.json）。日常增量循环从 master 已审源码取底稿和基线；飞书存量底稿仅用于首次建仓的一次性导入（虚线）。下游扩展中文 Fetch 读取固定 master 提交，经 md2md 预处理与站点组装写入 dev 中文发布内容，再经现有站点部署发布。</desc>
 <defs>
   <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="#64748b"/></marker>
   <marker id="arr-dash" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="#94a3b8"/></marker>
@@ -43,7 +43,7 @@
 <rect x="155" y="232" width="214" height="84" rx="10" fill="#fef9c3" stroke="#b45309" stroke-dasharray="5 3"/>
 <text x="262" y="264" class="head">飞书存量底稿</text>
 <text x="262" y="288" class="note">首次建仓一次性导入</text>
-<text x="262" y="308" class="cap">（非日常入口，见附录）</text>
+<text x="262" y="308" class="cap">（非日常入口，见技术设计）</text>
 
 <!-- Inside orange dashed box -->
 <rect x="408" y="232" width="194" height="84" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
@@ -57,9 +57,9 @@
 <text x="732" y="307" class="note">批准后合入 master</text>
 
 <rect x="862" y="232" width="258" height="84" rx="10" fill="#fef3c7" stroke="#b45309"/>
-<text x="991" y="262" class="head">master · 已审中文</text>
+<text x="991" y="262" class="head">master · pre-md2md 源码</text>
 <text x="991" y="286" class="note">localized-docs/zh-CN/guides/</text>
-<text x="991" y="307" class="cap">index.md + .baseline.json</text>
+<text x="991" y="307" class="cap">source.md + Variables + 基线</text>
 
 <!-- Arrow 1: English dev -> Drafting -->
 <path class="edge" d="M963 111 V156 H505 V225"/>
@@ -88,8 +88,8 @@
 <text x="1050" y="424" class="cap" style="text-anchor:end">② 下一次定时/手动 Fetch 读取固定 master 提交</text>
 
 <rect x="844" y="480" width="286" height="82" rx="10" fill="#ddd6fe" stroke="#6d28d9"/>
-<text x="987" y="512" class="head">中文 Fetch</text>
-<text x="987" y="538" class="note">扩展 · 已切换读 Git，未切换读飞书</text>
+<text x="987" y="512" class="head">中文 Fetch（含 md2md）</text>
+<text x="987" y="538" class="note">扩展 · 组装 Git 源码，未切换读飞书</text>
 
 <rect x="476" y="480" width="294" height="82" rx="10" fill="#fef3c7" stroke="#b45309"/>
 <text x="623" y="512" class="head">dev · 中文发布内容</text>
