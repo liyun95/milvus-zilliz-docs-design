@@ -10,7 +10,7 @@
 |---|---|---|
 | 文档工程师审批当前版本 | 为 `localized-docs/zh-CN/guides/` 配置文档团队 CODEOWNERS，并在 `master` 分支保护或规则集中强制代码所有者审批和中文候选检查。候选代码、审批和检查均绑定当前 PR head。推送审阅相关变更后撤销旧审批并重跑检查。机器人无合并或绕过权限。手写修订、迁移导入、新页首译与 Promote 中的中文变更同样受保护。 | 未获文档团队批准、旧 head 已批准、候选检查失败、机器人尝试合并四种情形均无法合入。机器人开 PR 和追加提交后，必需检查能在相应 head 上启动并回报结果。 |
 | 通道完整性 | 使用 `<NextChannel action="include">` 和 `<NextChannel action="exclude">`，由程序构造或保留边界。校验块归属，并验证 CURRENT 与 NEXT 的实际站点输出，详见第 4 节。 | 属性错误、块换位、未闭合、遗漏整页通道和代码指令错置均被拦截。故意置入的 NEXT 哨兵在 CURRENT 可见输出中缺失，在 NEXT 预期位置出现。 |
-| 控制台 UI 词隔离 | 在 `zdoc` 侧提供极简 `<UI>` MDX 组件（渲染为统一加粗/UI 样式，不影响 `milvus-docs` 或 `md2md`）。翻译解析器识别 `<UI>` 节点，不交模型自由翻译。 | `<UI>` 组件在双站正常渲染；翻译起草时不改动 `<UI>` 原词，自动归入 PR 待确认清单。 |
+| 控制台 UI 词隔离 | 先在 `packages/docs-ui` 注册极简 `<UI>` 全局 MDX 组件（渲染为统一加粗/UI 样式），并在 `packages/docs-tooling/src/shared-docs/core/site/components.ts` 将 `UI` 加入允许的标签白名单（零改动 `milvus-docs` 或 `md2md`）；再由作者在 `master` 的 `shared-docs/guides/pages/<page>/cloud-*.md`（及未来 Cloud Only 英文源）中打 `<UI>` 标签，经英文 Fetch 透传至 `dev`。翻译解析器识别 `<UI>` 节点，不交模型自由翻译。 | `<UI>` 组件在双站正常渲染，且 `shared-docs-validate` 放行；英文 Fetch 将 `<UI>` 透传至 `dev`；翻译起草时不改动 `<UI>` 原词，自动归入 PR 待确认清单。 |
 | 可提前公开 | zdoc 是公开仓库。共享镜像将 NEXT 正文随浏览器 JS 交付，中文搜索索引还可能显示 NEXT 整页标题。页面所有者须确认正文、媒体和审校材料均可提前公开，才能进入这条流水线。需保密的内容使用受限来源与独立预览产物，按批准的数据范围处理。 | 敏感内容在进入公开分支、PR、日志、产物、媒体存储或模型请求前被拦截。对需要保密的预览产物做独立发布验证。 |
 
 当前 zdoc 的 `master` 尚未强制文档负责人审批。现有 `shared-docs-validate` 和 `site-validation.yml` 的 master PR 路径（`skip_content=true`）也不能为中文候选提供所需覆盖。新增必需检查由受信任的工作流对拟合入的中文稿运行只读生成、通道检查和中文站点验证，并校验相关英文输入仍有效。候选检查不授予 PR 内容生产凭据。可以用受限 GitHub App 自动触发检查，或使用显式派发并验证检查回报的 SHA。发布前必须选定一种方式并验证真实分支保护下的通过与拒绝路径。
@@ -33,63 +33,53 @@
 
 ### 2.2 目录结构与配置样例
 
-中文编辑资产统一收口在 `master` 分支的 `localized-docs/zh-CN/guides/`（具体文件名可在实现阶段微调）：
+中文编辑资产按页独立收口在 `master` 分支的 `localized-docs/zh-CN/guides/`（与英文 `shared-docs/guides/pages/` 镜像对称，避免集中清单造成多 PR 并发冲突）：
 
 ```text
 localized-docs/zh-CN/guides/          # 位于 master，不在 devOwnedPaths 中，文档团队通过 PR 维护
-├── registry.yaml                     # 页面接入清单（人维护）：中英映射、主审、维护模式
-├── terminology.json                  # 中文 Guides 术语与风格载体（人维护，首期基于 zh-CN-reference.json 提炼）
-└── <page-id>/
-    ├── index.md                      # 面向网站读者的中文正文（工具可局部起草，文档工程师也可随时直接手写）
-    └── .baseline.json                # 单页英文锚点（存在 master，全由工具自动写入并随 PR 合入，人无需手改）
+└── <page-id>/                        # 目录即注册；飞书切链时 Docs 指向此目录
+    ├── page.yaml                     # [TW 维护] 本页配置：绑定英文源、维护模式、发布策略（类比 shared-docs/page.yaml）
+    ├── index.md                      # [TW 审改 / 手写] 面向网站读者的中文正文（新增共享页首译前暂不存在）
+    └── .baseline.json                # [工具自动维护] 单页英文锚点（类比 shared-docs/lock.yaml，人无需手改）
 ```
 
-#### `registry.yaml` 初步样例（文档团队通过 PR 维护）
+> **为什么不在 `page.yaml` 写死个人 `owner`？** 审校归属统一收口到 GitHub `CODEOWNERS`（绑定文档团队 GitHub Team，如 `@zilliztech/docs-team`）。人员入离职或模块轮岗只需维护 GitHub Team，无需批量改写几十上百篇页面配置。
+> **为什么不在目录下另建独立术语表？** 首期直接只读复用 `config/translation/zh-CN-reference.json`，保持单一中文术语真相，详见 §3.3。
 
-只在登记新页、调整主审、切换“手工维护”或标记“长期挂起”时修改；日常英文更新和 PR 审校不改动它。
+#### `page.yaml` 初步样例（每页一份，文档团队通过 PR 维护）
+
+只在接入新页、切换“手工维护”或标记“长期挂起”时修改；日常英文更新和 PR 审校不改动它（工具也不回改 `page.yaml`）。
 
 ```yaml
+# 示例 1：常规自动增量页（新增共享页同样建此文件：尚无 index.md 与 .baseline.json 时工具自动起草首译 PR，合入后自然进入增量）
 schema_version: 1
-manual: guides
+mode: incremental                     # incremental | manual | paused
+en_source:
+  manual: guides                      # 明确绑定 Guides 手册（区别于 guides-byoc）
+  shared_page: delete-entities
+sync_policy: independent              # independent（可独立发版）| bilingual_sync（须双语同步）
+feishu_record_id: recXXXXXXXX         # 过渡期关联中文飞书表格记录（用于核对导航与切链；新增页补齐导航后填写）
+```
 
-pages:
-  # 1) 常规自动增量页（绝大多数 shared-docs 页面）
-  - page_id: delete-entities            # 稳定目录名，改标题/改 URL 也不变
-    mode: incremental                   # incremental | bootstrap_new | manual | paused
-    en_source:
-      manual: guides                    # 明确绑定 Guides 手册（区别于 guides-byoc）
-      shared_page: delete-entities
-    owner: "@doc-owner-a"               # 主审（工具自动 Assign + 飞书提醒）
-    sync_policy: independent            # independent（可独立发版）| bilingual_sync（须双语同步）
-    feishu_record_id: recXXXXXXXX       # 过渡期关联中文飞书表格记录（用于核对导航与切链）
+```yaml
+# 示例 2：中英文差异极大，由文档工程师直接手写中文
+schema_version: 1
+mode: manual                          # 工具不自动起草翻译 PR；英文有变仅可选发轻量提醒
+en_source:
+  manual: guides
+  shared_page: region-and-network
+notify_on_en_change: true
+```
 
-  # 2) shared-docs 新增页面，人工确认中国站需要后登记首译
-  - page_id: hybrid-search-new
-    mode: bootstrap_new                 # 工具起草整篇首译 PR；合入后自动转为 incremental
-    en_source:
-      manual: guides
-      shared_page: hybrid-search-new
-    owner: "@doc-owner-a"
-    sync_policy: independent
-
-  # 3) 中英文差异极大，由文档工程师直接手写中文
-  - page_id: region-and-network
-    mode: manual                        # 工具不自动起草翻译 PR；英文有变仅可选发轻量提醒
-    en_source:
-      manual: guides
-      shared_page: region-and-network
-    owner: "@doc-owner-c"
-    notify_on_en_change: true
-
-  # 4) 海外已上、中国站 1 个月以上暂不上（长期挂起，不留僵尸 PR）
-  - page_id: global-only-feature
-    mode: paused
-    en_source:
-      manual: guides
-      shared_page: global-only-feature
-    owner: "@doc-owner-a"
-    pause_reason: "中国站暂未上线该能力，待排期确认后恢复"
-    follow_up: "@doc-owner-a"
+```yaml
+# 示例 3：海外已上、中国站 1 个月以上暂不上（长期挂起，关 PR 不留僵尸）
+schema_version: 1
+mode: paused
+en_source:
+  manual: guides
+  shared_page: global-only-feature
+pause_reason: "中国站暂未上线该能力，待排期确认后恢复"
+follow_up: "@zilliztech/docs-team"    # 临时跟进团队或责任人（仅 paused 时选填）
 ```
 
 #### `.baseline.json` 初步样例（存在 `master`，全由工具自动写入）
@@ -136,8 +126,8 @@ pages:
 |---|---|---|---|
 | **英文生成**（现有英文 Fetch） | **沿用**（已存在） | `milvus-docs` + `master:shared-docs/` → `dev:content/en/guides/` 与生成记录 | 英文 Fetch 通过检查并写入 `dev` |
 | **首次飞书取底稿**（一次性建仓） | **沿用**中文 Fetch 取稿 + **新增**一次性导入脚本（与日常增量独立） | 飞书固定修订中文 + 对应 `dev` 英文 → 建仓导入 PR（不发布、不改网站） | 导入 PR 经主审核对并合入 `master`，正文此时仍在飞书维护 |
-| **翻译调度**（`translate-zh-guides.yml`） | **新增** GitHub Actions 工作流（不改日文/Reference 调度） | 工作日 08:00 定时/手动触发 + `registry.yaml` → 调用起草工具，创建/更新按页滚动 PR 并推送飞书群日报 | 无变化跳过；`manual`/`paused` 跳过起草；来源不明记阻塞待办；材料齐备发 Ready for review |
-| **起草工具**（中文 Guides CLI） | **新增**命令行工具（复用分段 diff、内容保护与 MDX 校验） | 同手册旧/新英文 + `index.md`/`.baseline.json` + `terminology.json`（或 `bootstrap_new` 新页英文） → 局部改稿（或首译初稿）、代码块三档处理、`<UI>` 与疑点清单 | 增量模式未涉及段落逐字保留；代码块不交模型翻译；新页首译与基线缺失异常严格区分 |
+| **翻译调度**（`translate-zh-guides.yml`） | **新增** GitHub Actions 工作流（不改日文/Reference 调度） | 工作日 08:00 定时/手动触发 + 扫描 `localized-docs/zh-CN/guides/*/page.yaml` → 调用起草工具，创建/更新按页滚动 PR 并推送飞书群日报 | 无变化跳过；`manual`/`paused` 跳过起草；来源不明记阻塞待办；材料齐备发 Ready for review（审校归属走团队 `CODEOWNERS`） |
+| **起草工具**（中文 Guides CLI） | **新增**命令行工具（复用分段 diff、内容保护与 MDX 校验） | 同手册旧/新英文 + `page.yaml` + `index.md`/`.baseline.json` + 只读复用 `config/translation/zh-CN-reference.json` → 局部改稿（或新页首译初稿）、代码块三档处理、`<UI>` 与疑点清单 | 增量模式未涉及段落逐字保留；代码块不交模型翻译；新页首译（有 `page.yaml` 无正文/基线）与基线缺失异常（有正文缺基线）严格区分 |
 | **大语言模型（LLM）** | **新增**受限模型调用（复用 SDK Reference 已有模型通道，具体模型试点定） | 变更正文段落、邻接中文上下文与术语表 → 带段落定位的局部中文提案 | 仅产出受限文本提案；不得直接写仓、改写代码块或编造 `<NextChannel>` 边界 |
 | **PR 候选检查与双通道预览** | **新增**必需校验工作流与分支保护（补齐现有 `site-validation.yml` 与 `shared-docs-validate.yml` 的空白） | PR 最新 head 的 `index.md`/`.baseline.json` + 对应英文输入 → 通道/MDX/链接校验结果、UAT 与 Prod 候选预览（或渲染检查结果） | 所有必需检查在当前 PR head 通过且待确认项清零；稿件更新自动重跑并撤销旧审批 |
 | **人工审校与直接写作**（文档工程师） | **新增**逐页审校门禁（支持随时直接提 PR 写中文） | PR 差异、待确认项与两通道预览 → 修订、批准合入、暂缓或直接手写 PR | 待确认项清零并批准最新 head，合入 `master` 后按规则推进（或沿用）英文基线 |
@@ -167,30 +157,30 @@ pages:
 
 - **为何 `shared-docs` 有提交不一定触发翻译，而 Cloud 配置变了反而触发？** `master` 上改了工具脚本、未激活页面或仅影响 `guides-byoc` 手册时，`guides` 输出不变，且改动须经英文 Fetch 写入 `dev` 才成为正式输入；反过来，即使上游 `milvus-docs` commit 未变，只要 `shared-docs` 的变量、页面配置或 Cloud 专用片段更新并经英文 Fetch 重新生成到 `dev`，`content/en/guides/` 正文或通道校验值变化即触发中文跟进。
 - **新增共享页首译 vs 基线缺失阻塞**：
-  - `registry.yaml` 中显式声明 `mode: bootstrap_new` 且尚无 `index.md` / `.baseline.json` 的页面，视为合法新页首译，读取最新已验证英文起草整篇首译 PR，合入后生成第一份 `index.md` 与 `.baseline.json` 并转为 `incremental`；
-  - 已接入的 `incremental` 页面若缺少有效英文凭据、历史快照无法读取、匹配目标不明或中文摘要异常冲突，**严禁当作新页首译**，必须整页阻塞并产出阻塞待办，保留原基线与线上中文。
+  - 目录下已由人工提交 `page.yaml`（`mode: incremental`）且尚无 `index.md` 与 `.baseline.json` 的页面，视为合法新页首译，读取最新已验证英文起草整篇首译 PR，合入后生成第一份 `index.md` 与 `.baseline.json`（工具无需回改 `page.yaml`）；
+  - 已存在 `index.md` 的 `incremental` 页面若缺少有效 `.baseline.json`、缺少有效英文凭据、历史快照无法读取、匹配目标不明或中文摘要异常冲突，**严禁当作新页首译**，必须整页阻塞并产出阻塞待办，保留原基线与线上中文。
 - **基线推进原则**：只有包含对应正文与基线的已审批 PR 合入 `master`，才能推进英文基线。草稿、失败、取消、暂缓及关闭 PR 均不推进。
 
 ### 3.2 确定性编辑门禁
 
 1. **程序先划定编辑范围。** 解析三份 MDX，按稳定块 ID / 标题小节与唯一结构匹配定位变化（复用现有分段 diff 能力），保留语言与通道归属。列表、表格、提示框和代码组按结构整体处理。格式归一只允许白名单中的非语义差异；数字、单位、否定、默认值、参数、链接目标及代码变更必须显式进入审阅。
-2. **受限调用模型。** 给模型变更正文段落、必要相邻中文上下文与 `terminology.json`。输出限于带块 ID 的局部改稿提案。拆并段、标题重命名、多个候选匹配、跨段指代不明或中文独有内容受影响时，保留原中文文字不删改（原夹层位置消失时可提议候选位置），列入 PR 待确认项交人工决定。模型输出不得执行代码或直接写仓。
+2. **受限调用模型。** 给模型变更正文段落、必要相邻中文上下文与共享术语契约（首期只读 `config/translation/zh-CN-reference.json`）。输出限于带块 ID 的局部改稿提案。拆并段、标题重命名、多个候选匹配、跨段指代不明或中文独有内容受影响时，保留原中文文字不删改（原夹层位置消失时可提议候选位置），列入 PR 待确认项交人工决定。模型输出不得执行代码或直接写仓。
 3. **程序拼接并逐字节复核。** 对照 `cur_zh` 原始字节，只应用获准区间变更，校验其余区间逐字保留。保护占位符、链接、资源、锚点、代码、JSX 与 front matter，校验两通道归属与渲染完整性。
 4. **失败冻结候选。** 来源摘要冲突、越界编辑、非法结构或对齐不明时，保留已发布内容与基线，生成定位到页面、通道和块的报告。
 
-### 3.3 代码块三档保护、术语载体与 UI 界面词
+### 3.3 代码块三档保护、术语复用与 UI 界面词
 
 - **代码块三档同步（绝不交 LLM 翻译，代码英文注释保持英文）**：
   1. **无中国站定制（`customized_for_zh: false`）**：`cur_zh` 与 `base_en` 代码块字节一致时，英文代码更新由程序直接原样同步，在 PR 标明“代码块已原样同步”；
   2. **固定地域/域名映射（按需配置白名单）**：如 `cloud.zilliz.com` → `cloud.zilliz.com.cn` 等确定性替换按显式规则换算，并在 PR 标出核对；
   3. **页面级中国站定制（`customized_for_zh: true`）**：`cur_zh` 代码块原本就与 `base_en` 不同时，英文再变**不强行覆写**，暂停自动同步该块并在 PR 待确认项并排给英文 diff 与中文定制代码交主审合并。
-- **术语与风格载体（`terminology.json`）**：首期基于现有 `config/translation/zh-CN-reference.json` 提炼（统一用“您”，保留 `Collection` / `Entity` / `Schema` / `Compaction` 等英文词与禁译规则），随审校 PR 持续补充，作为 LLM 硬约束上下文与 PR 提示，不做容易误报的机械词频卡死。
-- **控制台 `<UI>` 界面词**：仅用于 `zdoc` 侧 Cloud 定制英文（开源 `milvus-docs` 无控制台，零上游外溢）。程序解析 `<UI>...</UI>` 节点后不交 LLM 自由翻译，首期保留原词并在 PR 待确认项集中列出由主审对照中文控制台替换；后续若建专门的 UI 词映射表，亦仅作用于 `<UI>` 节点内部，不触碰普通正文。
+- **术语与风格复用（单一中文术语源）**：首期直接只读复用现有 `config/translation/zh-CN-reference.json`（统一用“您”，保留 `Collection` / `Entity` / `Schema` / `Compaction` 等英文词与禁译规则），不在 `localized-docs/` 另建重复术语表。因现有 `scripts/translation/localeContract.js` 对该文件执行严格的 `exactKeys` 校验且 Reference 流水线对其 `mandatoryTerms` 做词频强校验，首期不得直接往该文件添加不兼容字段或高误报词条；后续需要扩充 Guides 专属术语时，在 `config/translation/` 下演进为公共中文词库 + Guides 轻量补充，作为 LLM 硬约束上下文与 PR 提示，不做容易误报的机械词频卡死。
+- **控制台 `<UI>` 界面词（写入路径、白名单与上线顺序）**：仅用于 `zdoc` 侧 Cloud 定制英文（开源 `milvus-docs` 无控制台，零上游外溢）。实施顺序须严格遵循：**先在 `packages/docs-ui` 注册极简 `<UI>` 全局组件，并在 `packages/docs-tooling/src/shared-docs/core/site/components.ts` 将 `UI` 加入允许的标签白名单** → 作者再在 `master` 分支的 `shared-docs/guides/pages/<page>/cloud-*.md`（及未来 Git 化的 Cloud Only 英文源）中打 `<UI>Create Cluster</UI>` 标签 → 英文 Fetch 自动原样透传写入 `dev:content/en/guides/`（绝不手改 `dev`）。中文翻译解析器识别 `<UI>...</UI>` 节点后不交 LLM 自由翻译，首期保留原词并在 PR 待确认项集中列出由主审对照中文控制台替换为实际文案（如 `<UI>创建集群</UI>`）；后续若建专门的 UI 词映射表，亦仅作用于 `<UI>` 节点内部，不触碰普通正文。
 
 ### 3.4 直接手写与手工维护模式
 
 - **随时直接提 PR 写中文**：文档工程师可直接提 PR 改写或增补任意 `incremental` 页的 `index.md`，走同一必需检查与审批，合入后更新 `zh_reviewed.index_sha256` 并沿用原 `en_baseline`；下次英文增量时，手写独有段受未涉及区间保护，不静默覆盖。
-- **手工维护模式（`mode: manual`）**：中英文结构或产品逻辑差异极大、不适合自动跟翻的页面，在 `registry.yaml` 标为 `manual`，完全由文档工程师直接提 PR 发布；若 `notify_on_en_change: true`，英文更新时仅发轻量提醒，不自动起草翻译 PR。
+- **手工维护模式（`mode: manual`）**：中英文结构或产品逻辑差异极大、不适合自动跟翻的页面，在本页 `page.yaml` 标为 `manual`，完全由文档工程师直接提 PR 发布；若 `notify_on_en_change: true`，英文更新时仅发轻量提醒，不自动起草翻译 PR。
 
 ## 4. 通道与 Promote
 
@@ -212,10 +202,10 @@ pages:
 
 ### 5.1 08:00 定时调度、飞书提醒与两档暂缓
 
-- **调度窗口与去重**：拟在工作日北京时间 **08:00（UTC 00:00）** 扫描（承接凌晨 02:00 Fetch，预留充足运行时间以便 09:30 上班前送达飞书日报，并避开 10:00 Fetch 与 09:00–12:00 巡检高峰），支持手动按页触发。定时和手动共用并发与去重规则，按页面、目标和输入产物摘要去重；周末、延迟或中断后补扫。扫描完成后向文档团队**飞书群发送每日汇总卡片**（列出当日新开/更新 PR 链接与主审）。
+- **调度窗口与去重**：拟在工作日北京时间 **08:00（UTC 00:00）** 扫描所有 `localized-docs/zh-CN/guides/*/page.yaml`（承接凌晨 02:00 Fetch，预留充足运行时间以便 09:30 上班前送达飞书日报，并避开 10:00 Fetch 与 09:00–12:00 巡检高峰），支持手动按页触发。定时和手动共用并发与去重规则，按页面、目标和输入产物摘要去重；周末、延迟或中断后补扫。扫描完成后向文档团队**飞书群发送每日汇总卡片**（列出当日新开/更新 PR 链接，审校归属走团队 `CODEOWNERS`）。
 - **两档暂缓（绝不阻塞他页与同页 Prod 急修）**：
   - **短期等待（几天～2 周）**：保留原 PR、贴 `deferred` 标签并在评论写明原因、跟进人（复核日期可选）；无新实质变化不重复催办；有新实质变化时在原 PR 单列“自暂缓后新变化”并保留“自上次合入累计变化”，**通知一次**（主审决定恢复、更新暂缓点继续暂缓，或转入长期挂起）；到复核日期时提醒一次。
-  - **长期时间差（1 个月以上暂不上）**：关闭该 PR 并在 `registry.yaml` 记 `mode: paused`（附 `pause_reason` 与 `follow_up`），不留僵尸 PR；已审英文基线停在旧版不丢账，待中国站就绪再手动触发重开。
+  - **长期时间差（1 个月以上暂不上）**：关闭该 PR 并在本页 `page.yaml` 记 `mode: paused`（附 `pause_reason` 与可选 `follow_up`），不留僵尸 PR；已审英文基线停在旧版不丢账，待中国站就绪再手动触发重开。
 
 ### 5.2 异常与并发处理矩阵
 
@@ -225,7 +215,7 @@ pages:
 | **审校中英文再次变化** | 按页面串行，在预期旧 head 仍匹配时向原 PR 追加提交，标出新增差异与累计差异，刷新预览、重跑必需检查并撤销旧审批。 | 未与新英文变化重叠的人工修订自动保留 | 不受影响 |
 | **两个人改到同一句**（英文再变与 PR 内人工编辑重叠；同期纯中文 PR 合入 `master` 冲突；两名编辑同改一 PR） | 检测到重叠或无法证明互不干扰即**暂停自动写入**，在 PR 中标出冲突位置交主审合并解决后重跑检查和审批；两名编辑同改一 PR 按 Git 冲突处理，保留提交历史。 | 全部保留在分支或提交历史中，不静默覆盖 | 不受影响 |
 | **生成期间输入或状态变化** | 生成期间 head、基线、Promote 状态或相关英文产物变化时，旧结果不得写入，也不能作为通过证据；重核输入后在最新 head 重检重审。 | 保留 | 不受影响 |
-| **英文基线缺失或来源不可核实** | **整页阻塞。** 不开错误翻译 PR，生成阻塞待办（列出页面、缺失材料与负责人），由文档负责人补齐或重新确认基线后再起草（严禁误走 `bootstrap_new`）。 | 保留原 `master` 已审中文与 `.baseline.json` | 不受影响 |
+| **英文基线缺失或来源不可核实** | **整页阻塞。** 不开错误翻译 PR，生成阻塞待办（列出页面、缺失材料与负责团队），由文档负责人补齐或重新确认基线后再起草（已有 `index.md` 但缺 `.baseline.json` 时严禁误当新页首译）。 | 保留原 `master` 已审中文与 `.baseline.json` | 不受影响 |
 | **段落对应不清**（拆并段、指代不明、中文独有说明） | 来源可信前提下，同 PR 交付其余可靠改动，疑点处保留原中文文字不删改（必要时提议候选位置）并在 PR 列出上下文和问题交主审决定。 | 原中文文字逐字保留 | 待办清零前合入检查拦截，线上不受影响 |
 | **待发内容还不能进 Prod**（急修与待发共存） | 线上急修只改 CURRENT 区间独立审核上线；待发内容留在 NEXT 区间不随急修放出。 | 两通道已审中文互相隔离保留 | 急修仅更新 Prod 对应说明，待发内容在 Prod 保持隐藏 |
 | **页面重命名、下线或跨页联动** | 重命名沿用页面 ID，显示路径/导航/链接差异；下线后停止生成更新由负责人处理活动 PR；跨页联动使用同一 PR 或受控发布批次。 | 受控处理 | 不受破坏 |
@@ -293,7 +283,7 @@ pages:
 
 > 译文准确。颜色提示解释的是下方 `color in [...]` 示例，同意在 UAT 中挪到代码示例正上方。已对照英文双通道分段核对 Prod / UAT 预览，通道正确，关闭此待办并批准合入。
 
-待办清零、必需检查绿灯并获 Approve 后合入 `master` 并自动更新 `.baseline.json`。若短期需等产品确认，则在原 PR 贴 `deferred` 标签写明原因与跟进人；若遇长期时间差，则关闭 PR 并在 `registry.yaml` 记为 `paused`。
+待办清零、必需检查绿灯并获 Approve 后合入 `master` 并自动更新 `.baseline.json`。若短期需等产品确认，则在原 PR 贴 `deferred` 标签写明原因与跟进人；若遇长期时间差，则关闭 PR 并在本页 `page.yaml` 记为 `paused`。
 
 真实参考文件：[Cloud 页面配置](https://github.com/zilliztech/zdoc/blob/7ee39054f37047b586ad789d876b2047c6f2c465/shared-docs/guides/pages/delete-entities/page.yaml) · [两份英文输出记录](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/generated/en/manifests/shared-pages/guides/delete-entities.json) · [英文正文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/en/guides/tutorials/development/insert-and-delete/delete-entities.md) · [同一提交的中文正文](https://github.com/zilliztech/zdoc/blob/5a62906a45a4e3250c619a5efcfa4de3f83a8eb6/content/zh-CN/guides/tutorials/development/insert-and-delete/delete-entities.md)
 
@@ -315,8 +305,8 @@ pages:
 ### 6.2 新增共享页注册与首译接入
 
 当 `shared-docs/guides/pages/` 新增一篇尚无飞书中文旧稿的页面时：
-1. **人工确认并登记**：中文负责人确认中国站需要该页后，在 `registry.yaml` 登记 `page_id`、`en_source`、`owner` 并显式标为 `mode: bootstrap_new`；
-2. **首译 PR 建仓**：英文产物写入 `dev` 后，工具起草整篇中文首译 PR；主审审校、过检并 Approve 合入 `master`，生成第一份 `index.md` 与 `.baseline.json` 并转为 `incremental`；
+1. **人工确认并新建 `page.yaml`**：中文负责人确认中国站需要该页后，在 `localized-docs/zh-CN/guides/<page-id>/` 下新建 `page.yaml`（声明 `mode: incremental` 与绑定的 `en_source`，不绑死个人 `owner`）并提 PR 合入 `master`；
+2. **首译 PR 建仓**：英文产物写入 `dev` 后，工具检测到该目录有 `page.yaml` 但尚无 `index.md` 与 `.baseline.json`，自动起草整篇中文首译 PR；主审审校、过检并 Approve 合入 `master`，生成第一份 `index.md` 与 `.baseline.json`（无需回改 `page.yaml`，此后自然进入日常增量）；
 3. **补齐导航并发布**：过渡期在中文飞书表格新增导航记录，填好目录层级与 `Release Channel`，并将 `Docs` 直接指向 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/<page-id>`，由下一次 Fetch 编入中文站发布。
 
 ### 6.3 Fetch 接线与恢复
@@ -324,7 +314,7 @@ pages:
 接线借鉴 [05b](./05b-cutover-and-ownership.md) 与现有 `source-state.ts` 路由模型，但现有 shared-docs 路由和激活记录只服务英文。中文须落实四项站点限定的硬契约：
 
 1. **按站点路由互斥**：`site=zh-CN` 仅识别 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/<page-id>` 作为 Git 中文来源（拒绝 `shared-docs/...` 或其他 locale）；`site=en` 仅识别 `shared-docs/...`（拒绝 `localized-docs/...`）。`Placement Type` 保持 `canonical`，导航层级、排序与 `Release Channel` 照旧由中文 Base 管理。
-2. **页面 ID 与存在性校验**：`<page-id>` 须符合小写连字符 slug 规范（`/^[a-z0-9]+(?:-[a-z0-9]+)*$/`），禁止 `active`、`registry`、`terminology` 等保留名，且必须在 Fetch 固定的 `master` SHA 下存在对应目录、`index.md` 与 `registry.yaml` 记录，禁止路径逃逸、符号链接与重复所有者，否则报 `OWNERSHIP_CONFIG_MISSING`。
+2. **页面 ID 与存在性校验**：`<page-id>` 须符合小写连字符 slug 规范（`/^[a-z0-9]+(?:-[a-z0-9]+)*$/`），禁止 `active` 等保留名，且必须在 Fetch 固定的 `master` SHA 下存在对应目录、`page.yaml` 与 `index.md`，禁止路径逃逸、符号链接与重复所有者，否则报 `OWNERSHIP_CONFIG_MISSING`。
 3. **独立的 `dev` 激活与来源凭据路径**（与英文 `generated/en/manifests/shared-pages/guides/` 对称）：写入 `generated/zh-CN/manifests/localized-pages/guides/active.json` 与 `generated/zh-CN/manifests/localized-pages/guides/<page-id>.json`。凭据至少记录使用的 master/dev 提交、Base 记录与通道、正文、导航及媒体摘要和 Fetch 运行 ID。
 4. **激活后回退拦截**：沿用 `OWNERSHIP_REVERTED` 语义——页面进入中文 `active.json` 后，若表格 `Docs` 误改回飞书链接，Fetch 直接报错拦截，防止旧飞书覆盖。
 
@@ -343,10 +333,10 @@ pages:
 | 试点场景 | 通过条件 |
 |---|---|
 | 普通更新页（含代码保护、术语与飞书提醒） | 取一处已知的英文限制或参数变化。08:00 扫描后在 09:30 前飞书群收到日报提醒；主审能在 PR 中找到对应中文改动，术语遵循契约（统一用“您”及保留英文词），未受影响段落经程序核验逐字保留；无中国站定制的代码块由程序原样同步（不走 LLM），有中国站定制的代码块不强行覆写而是给 diff 交主审。审稿中英文再变时，原 PR 保留人工修订、撤销旧审批并重跑必需检查。记录漏改、额外改写及审校用时。 |
-| 新增共享页首译接入 | 在 `registry.yaml` 登记一页无飞书旧稿的新注册共享页（`mode: bootstrap_new`）。工具生成整篇首译 PR 而非误报基线缺失；主审审校合入后自动建立 `index.md` 与 `.baseline.json` 并转为 `incremental`；在飞书表格新增导航记录指向 Git 目录后，Fetch 正常编入中文站，后续英文更新自动转入局部增量模式。 |
-| 直接手写与手工维护模式 | 验证两项：① 文档工程师直接提 PR 修改/增补中文正文，合入后沿用原英文基线，下次增量不覆盖手写独有段落；② 将差异极大页设为 `mode: manual` 后，工具不再自动起草翻译 PR。 |
-| 同 PR 交付可靠改动与疑点，并演练两档暂缓 | 一处可靠改动和一处疑点同 PR 送审，疑点未清零时合入检查拦截。短期挂 `deferred` 后重复扫描不催办，英文再变时只通知一次并同时展示“自暂缓后新变化”与“自上次合入累计变化”；长期时间差关闭 PR 并在 `registry.yaml` 记 `paused` 后，英文基线不推进且不重复建 PR。恢复审校并获批合入后，英文基线才推进。 |
-| 来源无法确认或英文基线缺失 | 构造已接入页基线缺失或目标手册不唯一的情形。工具整页阻塞并产出阻塞待办，不发错误翻译 PR，保留原有基线与线上中文（严禁把异常基线缺失误当成新页首译）。 |
+| 新增共享页首译接入 | 为一页无飞书旧稿的新注册共享页新建 `<page-id>/page.yaml`（`mode: incremental`）。工具检测到尚无 `index.md` 与 `.baseline.json` 后生成整篇首译 PR 而非误报基线缺失；主审审校合入后自动建立 `index.md` 与 `.baseline.json`（无需回改 `page.yaml`）；在飞书表格新增导航记录指向 Git 目录后，Fetch 正常编入中文站，后续英文更新自动转入局部增量模式。 |
+| 直接手写与手工维护模式 | 验证两项：① 文档工程师直接提 PR 修改/增补中文正文，合入后沿用原英文基线，下次增量不覆盖手写独有段落；② 将差异极大页的 `page.yaml` 设为 `mode: manual` 后，工具不再自动起草翻译 PR。 |
+| 同 PR 交付可靠改动与疑点，并演练两档暂缓 | 一处可靠改动和一处疑点同 PR 送审，疑点未清零时合入检查拦截。短期挂 `deferred` 后重复扫描不催办，英文再变时只通知一次并同时展示“自暂缓后新变化”与“自上次合入累计变化”；长期时间差关闭 PR 并在本页 `page.yaml` 记 `paused` 后，英文基线不推进且不重复建 PR。恢复审校并获批合入后，英文基线才推进。 |
+| 来源无法确认或英文基线缺失 | 构造已有 `index.md` 但缺失 `.baseline.json` 或目标手册不唯一的情形。工具整页阻塞并产出阻塞待办，不发错误翻译 PR，保留原有基线与线上中文（严禁把异常基线缺失误当成新页首译）。 |
 | 并发冲突（两个人改到同一句） | 模拟英文再变与 PR 内人工修改重叠（或同期纯中文术语 PR 冲突）。工具暂停自动写入并标出冲突位置，已有人工修订不丢失，线上内容不受影响。 |
 | 同时有待发功能和线上急修的页面 | Prod 能单独修正旧说明而不泄露 UAT 内容。Promote 后 Prod 展示 UAT 已验收的版本；验收后英文变化时能指出阻断原因并保留旧版。 |
 | 有飞书历史链接和图片的页面 | 切换失败时原网址仍可访问；确认切换后，原链接、锚点和图片可用，旧飞书正文的修改不会覆盖网站，且与 `zh-CN-reference` 写入互不冲突。 |
@@ -360,7 +350,7 @@ pages:
 | **1. “待确认项清零”的机检方式** | A. PR 描述结构化勾选清单 + CI 检查（审校摩擦低，需防误改 PR 正文）；B. 仓内审校记录文件随 PR 提交（全入 Git 审计但每次回复需改文件）。 | 推荐 **A**，配合评论留痕与必需检查。 |
 | **2. 试点期 PR 双通道预览形态** | A. 校验工作流输出双通道渲染检查报告 + 静态差异/可下载产物（交付快、零托管运维）；B. 建设每 PR 独立在线预览环境（体验最好但工期长）。 | 试点期先走 **A**，全量阶段再评估是否投入 **B**。 |
 | **3. 中文页面 ID 命名规则** | A. 默认沿用英文共享页 ID，重名或已有稳定中文 ID 时独立登记；B. 全部新建独立中文 ID。 | 推荐 **A**。 |
-| **4. 试点分工与发布约束** | 实施启动时确认首批试点页（3 页存量 + 1 页新增）、每页主审、单页停改窗口与须双语同步发布的清单。 | 启动试点前登记至 `registry.yaml`。 |
+| **4. 试点分工与发布约束** | 实施启动时确认首批试点页（3 页存量 + 1 页新增）、文档团队 `CODEOWNERS` 组、单页停改窗口与须双语同步发布的清单。 | 启动试点前为各试点页建立 `page.yaml` 并配置团队 `CODEOWNERS`。 |
 | **5. 翻译模型与扫描时间微调** | 在只读试点中用真实样本对比事实漏改、非授权改写与审校耗时后再定型模型；`08:00` 扫描窗口可按实测耗时前移或微调。 | 试点实测后定型。 |
 
 实现阶段预计新增 `translate-zh-guides.yml`、中文 Guides CLI 与轻量 `<UI>` 组件，复用现有的内容保护和 MDX 校验能力，并扩展中文 Fetch 与 PR 校验契约。试点必须先证明路由、审校和发布证据连通，再开展生产切流。
