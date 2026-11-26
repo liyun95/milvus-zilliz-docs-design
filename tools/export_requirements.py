@@ -18,8 +18,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PRD = ROOT / "docs" / "prd.md"
-PLAN = ROOT / "docs" / "phase-1.md"
+PRD = ROOT / "docs" / "prd" / "shared-guides.md"
+PLAN = ROOT / "docs" / "implementation" / "phase-1.md"
 ERRORS = ROOT / "docs" / "design" / "09-error-catalog.md"
 OUTPUT = ROOT / "docs" / "implementation" / "requirements.json"
 
@@ -106,7 +106,7 @@ def errors() -> list[dict]:
 
 
 def prd_commit() -> str:
-    result = subprocess.run(["git", "-C", str(ROOT), "log", "-1", "--format=%H", "--", "docs/prd.md"],
+    result = subprocess.run(["git", "-C", str(ROOT), "log", "-1", "--format=%H", "--follow", "--", "docs/prd/shared-guides.md"],
                             capture_output=True, text=True, check=False)
     return result.stdout.strip() or "uncommitted"
 
@@ -115,7 +115,7 @@ def build() -> dict:
     return {
         "schema_version": 1,
         "generated_by": "tools/export_requirements.py",
-        "source": {"prd": "docs/prd.md", "plan": "docs/phase-1.md",
+        "source": {"prd": "docs/prd/shared-guides.md", "plan": "docs/implementation/phase-1.md",
                    "errors": "docs/design/09-error-catalog.md", "prd_commit": prd_commit()},
         "behaviours": behaviours(),
         "acceptance": acceptance(),

@@ -1,6 +1,6 @@
 # Zilliz Cloud 中文 Guides 翻译方案（对齐稿）
 
-**已对齐定稿（2026-11-26）· 进入工程实施** · 详细目录样例、异常兜底、PR 模板与验收契约见[中文 Guides 技术设计](./design/11-zh-cn-translation-pipeline.md)
+**已对齐定稿（2026-11-26）· 进入工程实施** · 详细目录样例、异常兜底、PR 模板与验收契约见[中文 Guides 技术设计](../design/11-zh-cn-translation-pipeline.md)
 
 ## 1. 为什么改与目标体验
 
@@ -8,7 +8,7 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 
 但中文文档目前仍留在飞书维护，形成了明显的双轨割裂：文档工程师只能拿 `dev` 上生成的英文正文去人肉对照、修改飞书中文——**既没有版本管理，也看不出中文落后了几个英文版本**；交接时下一位编辑很难分辨哪些差异是欠译、哪些是有意保留的中文写法，术语和文体也缺乏统一约束。
 
-![现状工作流。Cloud 生成英文页后，文档工程师人工跟进飞书中文，Fetch 取稿，中文站随部署更新。](./assets/zh-guides-current-workflow.png)
+![现状工作流。Cloud 生成英文页后，文档工程师人工跟进飞书中文，Fetch 取稿，中文站随部署更新。](../assets/zh-guides-current-workflow.png)
 
 改造后，中文 Guides 正文迁入 Git，同步承接 **UAT（预发布）与 Prod（线上正式）双通道**。Cloud 采用新的英文 Guide 后，工具在已有已审中文上起草局部修改，给负责这页的文档工程师开一个按页滚动的 GitHub PR。主审打开它，应能直接回答三个问题：
 
@@ -36,11 +36,11 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 - **复用统一中文术语底座，不维护两套表**：在 `config/translation/` 抽出全站共享的 `zh-CN-common.json` 作为单一中文术语与通则源（统一用“您”、保留 `Collection` / `Entity` / `Schema` 等英文词及地域专有名词），Reference（`zh-CN-reference.json`）与 Guides（`zh-CN-guides.json`）作为极薄配置分别继承，日常增改术语只改这一个文件，不在 `localized-docs/` 另建重复术语表。
 - **控制台 UI 词与正文隔离**：开源 `milvus-docs` 无控制台界面，UI 词只出现在 `zdoc` 侧的 Cloud 定制内容中。作者在 **`master` 侧的 Cloud 独有英文片段**中用轻量语义标签（如 `<UI>Create Cluster</UI>`）标记（由英文 Fetch 自动透传到 `dev`，绝不手改 `dev`），翻译时不交 LLM 自由发挥，首期保留原词在 PR 中集中交主审对照中文控制台替换为实际文案（如 `<UI>创建集群</UI>`）。
 
-> 详细触发逻辑、代码块三档保护、术语与 UI 规则见[技术设计 §3](./design/11-zh-cn-translation-pipeline.md#3-英文基线增量起草代码块与术语规则)。
+> 详细触发逻辑、代码块三档保护、术语与 UI 规则见[技术设计 §3](../design/11-zh-cn-translation-pipeline.md#3-英文基线增量起草代码块与术语规则)。
 
 ## 3. 文档团队每天怎么工作
 
-![日常运转流程。工具在工作日 08:00 定时或手动比对英文变化，存量页局部起草、新注册页起草首译并执行代码保护与双通道校验，材料齐备后按页发 Ready for review 滚动 PR 并推飞书群日报提醒；文档工程师核对预览与待确认项，决定批准合入推进基线并等待部署上线，或按等待周期选择短期暂缓与长期关 PR 记账。](./assets/zh-guides-daily-review-flow.png)
+![日常运转流程。工具在工作日 08:00 定时或手动比对英文变化，存量页局部起草、新注册页起草首译并执行代码保护与双通道校验，材料齐备后按页发 Ready for review 滚动 PR 并推飞书群日报提醒；文档工程师核对预览与待确认项，决定批准合入推进基线并等待部署上线，或按等待周期选择短期暂缓与长期关 PR 记账。](../assets/zh-guides-daily-review-flow.png)
 
 日常运转围绕 **4 个自然动作** 展开：
 
@@ -51,13 +51,13 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
    - **长期时间差（如海外已上、中国站 1 个月以上暂不上）**：直接关闭 PR 并在本页 `page.yaml` 中标记为 `paused`（写明原因），基线停在旧版不丢账、不留僵尸 PR，待中国站就绪再手动重开。
 4. **人永远是最高编辑权威**：常规页随时可直接提 PR 修改或增补中文独有段（沿用原英文基线，下次增量不覆盖手写内容）；若整篇中英文差异极大（如 Region 差异页），可在本页 `page.yaml` 中标为 **“手工维护模式（`manual`）”**——工具不自动起草 PR，英文变动时合并进每日飞书汇总卡片提醒（按英文版本去重并附英文 diff 链接），由文档工程师按需直接写 PR 发布。
 
-> 完整 PR 结构示例（《删除 Entity》）见[技术设计 §5.3](./design/11-zh-cn-translation-pipeline.md#53-参考示例一份翻译-pr-的实际结构)；完整异常与并发处理规则（如英文再变、两人改到同一句、基线缺失阻塞）见[技术设计 §5.2](./design/11-zh-cn-translation-pipeline.md#52-异常与并发处理矩阵)。
+> 完整 PR 结构示例（《删除 Entity》）见[技术设计 §5.3](../design/11-zh-cn-translation-pipeline.md#53-参考示例一份翻译-pr-的实际结构)；完整异常与并发处理规则（如英文再变、两人改到同一句、基线缺失阻塞）见[技术设计 §5.2](../design/11-zh-cn-translation-pipeline.md#52-异常与并发处理矩阵)。
 
 ## 4. 怎么接进现有系统
 
 整体沿用上游英文生产和下游站点部署，只把中间“人工发现变化 → 飞书对照翻译”的环节升级为 Git 内的增量起草、PR 校验与人审。
 
-![目标工具链分为英文生产、翻译与审校、中文发布三层。上游沿用英文生成并读取 dev 上固定版本的 Guides 英文；橙色虚线内新增增量起草、PR 候选检查与人审，以及 master 上的 pre-md2md 中文源码目录；日常增量循环读 master 已审源码，飞书存量底稿仅用于首次一次性建仓；下游扩展中文 Fetch 经 md2md 预处理与站点组装输出 dev，沿用现有站点部署。](./assets/zh-guides-source-map.png)
+![目标工具链分为英文生产、翻译与审校、中文发布三层。上游沿用英文生成并读取 dev 上固定版本的 Guides 英文；橙色虚线内新增增量起草、PR 候选检查与人审，以及 master 上的 pre-md2md 中文源码目录；日常增量循环读 master 已审源码，飞书存量底稿仅用于首次一次性建仓；下游扩展中文 Fetch 经 md2md 预处理与站点组装输出 dev，沿用现有站点部署。](../assets/zh-guides-source-map.png)
 
 - **上游读 `dev` 英文产物**：直接消费已通过验证的 Cloud Guides 英文正文（天然包含 Cloud 定制片段、`<UI>` 标签、双通道与 Cloud 链接，无需重跑英文共享编译链），翻译工具仅剥离导航 frontmatter 与顶部 `import` 再按节比对。
 - **中间归 `master` 的 pre-`md2md` 中文源码**：严守 `master` 只维护人工配置与 pre-`md2md` 源码、`dev` 只存自动生成发布产物的分支边界。中文资产收口在 `master` 的 `localized-docs/zh-CN/guides/`（与 `shared-docs/guides/` 1:1 镜像对称，按页隔离避免多 PR 冲突）：
@@ -73,7 +73,7 @@ localized-docs/zh-CN/guides/          # 位于 master（镜像英文 shared-docs
         └── .baseline.json            # [工具自动维护] 上次已审英文锚点与通知去重记录（类比 lock.yaml，人无需手改）
 ```
 
-> `page.yaml` 与 `.baseline.json` 的具体字段样例见[技术设计 §2.2](./design/11-zh-cn-translation-pipeline.md#22-目录结构与配置样例)；术语统一维护在 `config/translation/zh-CN-common.json`，审校归属统一走文档团队 `CODEOWNERS`。
+> `page.yaml` 与 `.baseline.json` 的具体字段样例见[技术设计 §2.2](../design/11-zh-cn-translation-pipeline.md#22-目录结构与配置样例)；术语统一维护在 `config/translation/zh-CN-common.json`，审校归属统一走文档团队 `CODEOWNERS`。
 
 - **下游扩展中文 Fetch 经 `md2md` 组装写 `dev`**：已切换页由下一次定时或手动 Fetch 从固定 `master` 取中文 `source.md` 与 `Variables.json`，统一经 `@zilliz/mdtomd` 展开变量/片段并注入飞书导航 frontmatter、Docusaurus `import` 与旧链接映射，写入同一 `dev` 提交（路由绑定仅依页面 ID / `page url`，不强绑飞书 `record_id`），沿用现有 UAT / Prod 构建部署。
 
@@ -84,13 +84,13 @@ localized-docs/zh-CN/guides/          # 位于 master（镜像英文 shared-docs
 | **扩展** | 现有中文 Fetch（已切换页读固定 `master` 中文源码并经 `md2md` + 站点组装写 `dev`，路由仅绑定 `page url` 不强绑 `record_id`；未切换页继续读飞书）与 `localeContract.js`（轻量支持 `extends` 继承 `zh-CN-common.json`）。 |
 | **不动** | 不改日文/Reference 翻译行为，不改 `milvus-docs` 和 `md2md` 引擎本体；翻译调度不持有生产发布锁，也不因单个翻译 PR 合入额外触发生产 Fetch。 |
 
-> 各环节详细输入输出、同步队列与路径隔离契约见[技术设计 §2.3](./design/11-zh-cn-translation-pipeline.md#23-职责分工与研发边界)。
+> 各环节详细输入输出、同步队列与路径隔离契约见[技术设计 §2.3](../design/11-zh-cn-translation-pipeline.md#23-职责分工与研发边界)。
 
 ## 5. 平滑迁入与推进路线
 
 ### 5.1 怎么平滑迁入并上线
 
-![逐页交接。导入候选稿时仍在飞书编辑；短暂停改并换链接后等待 Fetch 确认，然后更新编辑入口，验收原网址。](./assets/zh-page-cutover.png)
+![逐页交接。导入候选稿时仍在飞书编辑；短暂停改并换链接后等待 Fetch 确认，然后更新编辑入口，验收原网址。](../assets/zh-page-cutover.png)
 
 - **存量页逐页迁入（沿用英文 `shared-docs` 同一套换链方式）**：先用导入 PR 以飞书旧中文为底稿、对照最新英文（工具辅助补齐历史欠译）经人审建立第一个已审基线锚点（此时正文仍在飞书）；再短暂停改，在中文飞书表格中将该页的 `Docs` 链接替换为 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/pages/<中文页面 ID>`（`Placement Type`、导航层级与通道字段照旧留在飞书；路由仅绑定 `page url` 不强绑 `record_id`，后续调整目录位置不致断链），**只有 Fetch 确认已接管才将编辑入口改为 Git**，零停机、不断旧链接。
 - **新增共享页直接接入**：人工确认中国站需要后新建该页 `page.yaml` 提 PR 登记 → 工具发现尚无中文源稿后自动起草首译 PR，审校合入即生成 `source.md` 与基线 → 在中文飞书表格补一条导航记录，并将 `Docs` 直接指向 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/pages/<中文页面 ID>` 即可发布。
@@ -109,8 +109,8 @@ localized-docs/zh-CN/guides/          # 位于 master（镜像英文 shared-docs
 2. **真实 Fetch 交接与双通道验收**：对已审稿跑通一次完整 Fetch 交接和 UAT / Prod 验收，通过全部 8 类试点场景；
 3. **分批建仓与逐页切换**：将约 89 篇存量 Guides 分 6～8 批审校建仓、按页切链；后续 `shared-docs` 新增页按需登记首译同步。
 
-> 存量建仓切链与新增接入操作细则见[技术设计 §6](./design/11-zh-cn-translation-pipeline.md#6-存量迁仓新增接入与-fetch-接线)；8 类试点通过条件及实施前待定细项见[技术设计 §7](./design/11-zh-cn-translation-pipeline.md#7-实施顺序与试点验收明细)。
+> 存量建仓切链与新增接入操作细则见[技术设计 §6](../design/11-zh-cn-translation-pipeline.md#6-存量迁仓新增接入与-fetch-接线)；8 类试点通过条件及实施前待定细项见[技术设计 §7](../design/11-zh-cn-translation-pipeline.md#7-实施顺序与试点验收明细)。
 
 ---
 
-相关文档：[共享文档改造方案](./proposal.md) · [Phase 1 产品需求](./prd.md) · [中文 Guides 技术设计与验收契约](./design/11-zh-cn-translation-pipeline.md)
+相关文档：[共享文档改造方案](./shared-guides-proposal.md) · [Phase 1 产品需求](./shared-guides.md) · [中文 Guides 技术设计与验收契约](../design/11-zh-cn-translation-pipeline.md)

@@ -2,7 +2,7 @@
 
 **第一次方案对齐会 · 已于 2026-10-13 讨论，结论见[第 7 节](#7-会议结论2026-10-13)**
 
-> 本文是 2026-10-13 对齐会的材料，已冻结，正文不再随设计细化同步。之后的细化以[接口设计](./design/README.md)、[产品需求](./prd.md)和[首期实施计划](./phase-1.md)为准；再开会时，结论追加到第 7 节。
+> 本文是 2026-10-13 对齐会的材料，已冻结，正文不再随设计细化同步。之后的细化以[接口设计](../design/README.md)、[产品需求](./shared-guides.md)和[首期实施计划](../implementation/phase-1.md)为准；再开会时，结论追加到第 7 节。
 
 本文说明为什么改、方案怎样逐条满足改造要求，以及先从哪些页面试点。本次会议对齐方向与范围，会议结论与待调研事项见[第 7 节](#7-会议结论2026-10-13)；配置字段、接口签名等实现设计留到后续会议。
 
@@ -12,7 +12,7 @@
 
 ### 1.1 现状：两份正文都能改，靠人工同步
 
-![现状维护关系：飞书正文与 milvus-docs 正文都可以独立编辑。文档工程师可以编辑飞书后导出到 Milvus（①），社区和文档工程师可以直接向 milvus-docs 提交 PR（②），Milvus 的修改需要文档工程师人工核对后抄回飞书（③，虚线）。](./assets/current-content-flow.png)
+![现状维护关系：飞书正文与 milvus-docs 正文都可以独立编辑。文档工程师可以编辑飞书后导出到 Milvus（①），社区和文档工程师可以直接向 milvus-docs 提交 PR（②），Milvus 的修改需要文档工程师人工核对后抄回飞书（③，虚线）。](../assets/current-content-flow.png)
 
 图 1 · 现状：共享内容的三条维护路径
 - 三条路径中，只有 ③“把 Milvus 的修改抄回飞书”是虚线：它没有提醒，也没有固定检查，两边冲突时也没有约定以哪一侧为准。
@@ -43,7 +43,7 @@
 
 下图是改造后的全貌，可与图 1 对照：两份正文合并为一份，靠人工抄回飞书的路径 ③ 不再需要。
 
-![目标协作方式：社区贡献者和文档工程师向 milvus-docs 提交共享内容，Milvus 沿用既有发布；文档工程师在 zdoc 维护 Cloud 差异与配置。上游变化后，工具在 zdoc 自动发起上游更新 PR，附生成结果与影响提示；Cloud 审核后合并，新版本先在 UAT 可见，Cloud 发布时进入 Prod；暂不合并则保持已批准版本；需要修改时回到对应源文件。](./assets/collaboration-overview.png)
+![目标协作方式：社区贡献者和文档工程师向 milvus-docs 提交共享内容，Milvus 沿用既有发布；文档工程师在 zdoc 维护 Cloud 差异与配置。上游变化后，工具在 zdoc 自动发起上游更新 PR，附生成结果与影响提示；Cloud 审核后合并，新版本先在 UAT 可见，Cloud 发布时进入 Prod；暂不合并则保持已批准版本；需要修改时回到对应源文件。](../assets/collaboration-overview.png)
 
 图 2 · 目标协作方式
 - **谁改哪里。** Cloud 文档工程师不再在飞书编辑迁移后的页面，改为在 Git 中提交 PR：共同内容改 milvus-docs，Cloud 差异和配置改 zdoc。同一位文档工程师可以两边都改；审核在 GitHub PR 中进行，结果在 PR 预览和 UAT 中查看。
@@ -62,7 +62,7 @@
 
 ## 3. 一处编辑：Cloud 直接读取 milvus-docs
 
-![目标工具链：Milvus 侧沿用 milvus-docs → md2md → web-content → milvus.io，md2md 新增两项能力：发布时清除命名块标记，以及供 zdoc 调用的预处理入口。zdoc 在 md2md 处理之前，按 commit 直接读取 milvus-docs 原文，结合页面配置（YAML）、Variables.json 和 Cloud 内容文件（Markdown）生成 Cloud 页面（MDX），生成时调用 md2md 的预处理，用 Cloud 的值展开变量与片段。生成结果在 zdoc 中经 PR 审核合并后，进入 zdoc 既有的校验、过滤、Current / Next、翻译与发布流程。过渡期未迁移的飞书页和后续迁入的 Cloud 独有页也进入同一流程。虚线框标出新增工作的范围。](./assets/target-publication-chains.png)
+![目标工具链：Milvus 侧沿用 milvus-docs → md2md → web-content → milvus.io，md2md 新增两项能力：发布时清除命名块标记，以及供 zdoc 调用的预处理入口。zdoc 在 md2md 处理之前，按 commit 直接读取 milvus-docs 原文，结合页面配置（YAML）、Variables.json 和 Cloud 内容文件（Markdown）生成 Cloud 页面（MDX），生成时调用 md2md 的预处理，用 Cloud 的值展开变量与片段。生成结果在 zdoc 中经 PR 审核合并后，进入 zdoc 既有的校验、过滤、Current / Next、翻译与发布流程。过渡期未迁移的飞书页和后续迁入的 Cloud 独有页也进入同一流程。虚线框标出新增工作的范围。](../assets/target-publication-chains.png)
 
 图 3 · 目标工具链（待实施）
 
@@ -89,7 +89,7 @@ Cloud 复用共享内容时要回答三个问题：哪里和 Milvus 不同（[4.
 
 按 Cloud 与 Milvus 的差异多少，页面分三类：
 
-![三类页面：无差异的页面整篇复用，如 Delete Entities，原文把产品值写成变量，zdoc 只需一份页面配置；有差异的页面在共享正文上叠加 Cloud 差异，如 OpenAI 与 Filtered Search，原文只加命名块，zdoc 维护页面配置与 Cloud 内容文件；Cloud 独有页在 zdoc 维护完整原文，首期不迁移。](./assets/page-types.png)
+![三类页面：无差异的页面整篇复用，如 Delete Entities，原文把产品值写成变量，zdoc 只需一份页面配置；有差异的页面在共享正文上叠加 Cloud 差异，如 OpenAI 与 Filtered Search，原文只加命名块，zdoc 维护页面配置与 Cloud 内容文件；Cloud 独有页在 zdoc 维护完整原文，首期不迁移。](../assets/page-types.png)
 
 图 4 · 三类页面
 - **无差异：整篇复用。** 例如 [Delete Entities](https://milvus.io/docs/delete-entities.md)。两端只有产品名、连接地址等值不同：Milvus 原文把它们写成变量，zdoc 写一份页面配置（YAML）引用整篇。首期 1a 先做这一类。
@@ -98,7 +98,7 @@ Cloud 复用共享内容时要回答三个问题：哪里和 Milvus 不同（[4.
 
 有差异的页面具体怎样写，以 OpenAI 页（[Milvus 原文](https://milvus.io/docs/openai.md) / [Cloud 页面](https://docs.zilliz.com/docs/openai)）为例：
 
-![OpenAI 页的差异：①共享正文整篇复用，产品名写成变量；②“Before you start”一节两端不同，milvus-docs 为这一节加命名块，zdoc 用 Cloud 内容文件替换；③代码中的凭证参数，milvus-docs 的代码不改，只给代码组加命名块；zdoc 页面配置中的一条 replace 规则按原文中连续的两行定位，把可选的 credential 注释换成 Cloud 必填的 integration_id。Milvus 站点与原文相同，只去掉命名块标记。](./assets/page-anatomy.png)
+![OpenAI 页的差异：①共享正文整篇复用，产品名写成变量；②“Before you start”一节两端不同，milvus-docs 为这一节加命名块，zdoc 用 Cloud 内容文件替换；③代码中的凭证参数，milvus-docs 的代码不改，只给代码组加命名块；zdoc 页面配置中的一条 replace 规则按原文中连续的两行定位，把可选的 credential 注释换成 Cloud 必填的 integration_id。Milvus 站点与原文相同，只去掉命名块标记。](../assets/page-anatomy.png)
 
 图 5 · OpenAI 页的差异怎样表达
 - **Milvus 原文只加中性的命名块。** Cloud 的内容和规则都在 zdoc，Milvus 作者不需要照顾 Cloud 的写法。原文也不写 `include-next-line` 这类产品指令，否则 Milvus 发布链也要跟着过滤。命名块是一对 HTML 注释，只用来定位：zdoc 生成 Cloud 页面时按页面配置处理它，Milvus 发布时 md2md 把它清掉。
@@ -178,7 +178,7 @@ Prod 用上次 Cloud 发布时的 commit，UAT 用最新批准的 commit；两�
 
 ## 6. 试点与路线
 
-![项目路线：首期分 1a 与 1b。1a 用 Delete Entities 跑通整篇复用，从固定源生成到 UAT 预览，建议年底前完成；1b 用 Filtered Search 与 OpenAI 验证差异与上游更新 PR，接入正式发布、翻译与恢复，并切换试点页。后续分批迁移共享页与 Cloud 独有页，依赖清零后飞书退出。](./assets/rollout-roadmap.png)
+![项目路线：首期分 1a 与 1b。1a 用 Delete Entities 跑通整篇复用，从固定源生成到 UAT 预览，建议年底前完成；1b 用 Filtered Search 与 OpenAI 验证差异与上游更新 PR，接入正式发布、翻译与恢复，并切换试点页。后续分批迁移共享页与 Cloud 独有页，依赖清零后飞书退出。](../assets/rollout-roadmap.png)
 
 图 6 · 项目路线
 - **1a 只走最短路径**：用不需要差异的 Delete Entities 验证真实工具链能生成完整页面，生成结果只进入预览，不写生产。
@@ -187,11 +187,11 @@ Prod 用上次 Cloud 发布时的 commit，UAT 用最新批准的 commit；两�
 
 | 候选 | 验证什么 | 状态 |
 |---|---|---|
-| [Delete Entities](../examples/delete-entities/walkthrough.md) | 整篇复用：变量绑定连接值，生成多语言代码 Tabs | 本地样例已验证 |
-| [Filtered Search](../examples/filtered-search/walkthrough.md) | 产品名变量；在共享代码组中加入 Cloud CLI | 本地样例已验证 |
+| [Delete Entities](../../examples/delete-entities/walkthrough.md) | 整篇复用：变量绑定连接值，生成多语言代码 Tabs | 本地样例已验证 |
+| [Filtered Search](../../examples/filtered-search/walkthrough.md) | 产品名变量；在共享代码组中加入 Cloud CLI | 本地样例已验证 |
 | OpenAI（[Milvus](https://milvus.io/docs/openai.md) / [Cloud](https://docs.zilliz.com/docs/openai)） | 前提条件整节替换；凭证参数的代码行替换；先对齐历史漂移 | 候选，未制作样例 |
 
-两篇样例的共享原文含有尚未合入 Milvus 的共同修订和语言补齐，内容与 SDK 适用性仍需审核。OpenAI 跑通后，Cohere、Voyage AI 等同类页面可以照搬。实施细节与验收见 [phase-1](./phase-1.md)。
+两篇样例的共享原文含有尚未合入 Milvus 的共同修订和语言补齐，内容与 SDK 适用性仍需审核。OpenAI 跑通后，Cohere、Voyage AI 等同类页面可以照搬。实施细节与验收见 [phase-1](../implementation/phase-1.md)。
 
 ## 7. 会议结论（2026-10-13）
 
@@ -231,7 +231,7 @@ Prod 用上次 Cloud 发布时的 commit，UAT 用最新批准的 commit；两�
 <details>
 <summary>展开查看现有工具链与各阶段对照</summary>
 
-![现有工具链：Milvus 从 milvus-docs 经 md2md、web-content、milvus.io 发布；Cloud 从飞书经 zdoc Fetch、zdoc dev 分支、Docusaurus 站点与外部 Jenkins 发布。两侧各有翻译支路。](./assets/current-publication-chains.png)
+![现有工具链：Milvus 从 milvus-docs 经 md2md、web-content、milvus.io 发布；Cloud 从飞书经 zdoc Fetch、zdoc dev 分支、Docusaurus 站点与外部 Jenkins 发布。两侧各有翻译支路。](../assets/current-publication-chains.png)
 
 图 A · 现有发布工具链。实线表示内容处理顺序，点线表示工作流触发
 | 阶段 | Milvus | Cloud |

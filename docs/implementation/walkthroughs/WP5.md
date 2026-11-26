@@ -10,7 +10,7 @@ Milvus 原文中的链接和图片是按 milvus.io 写的，原样放进 Cloud �
 - **锚点失效**：milvus.io 的锚点保留大小写（`#Delete-Entities-by-Primary-Keys`），Cloud 的是小写（`#delete-entities-by-primary-keys`），浏览器按大小写匹配；
 - **图片不受控**：图片地址指向 Milvus 的存储，被同名覆盖时 Cloud 页面会悄悄变样。
 
-WP5 把链接改成 Cloud 可用的地址，算出每张图片在 Cloud 存储中的新地址。处理不了的一律报错，不原样放过（[产品需求场景 5](../../prd.md#场景-5链接与图片)）。它只算地址、不上传，上传在正式发布时做（WP9）。
+WP5 把链接改成 Cloud 可用的地址，算出每张图片在 Cloud 存储中的新地址。处理不了的一律报错，不原样放过（[产品需求场景 5](../../prd/shared-guides.md#场景-5链接与图片)）。它只算地址、不上传，上传在正式发布时做（WP9）。
 
 它还提供两个站点的锚点算法。WP4 输出标题锚点时要用 Cloud 的算法，由 WP8 接入时传进去。
 

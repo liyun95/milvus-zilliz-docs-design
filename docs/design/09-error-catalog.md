@@ -1,6 +1,6 @@
 # 09 错误目录
 
-对应的产品需求见[产品需求](../prd.md#5-场景)各场景的“出错时”，以及[第 6 节](../prd.md#6-对现有能力的要求)中的“出错”：一律失败，说明原因与应改的文件，不静默跳过。本篇给每一种错误一个错误码，并约定报错的结构与给作者的提示。
+对应的产品需求见[产品需求](../prd/shared-guides.md#5-场景)各场景的“出错时”，以及[第 6 节](../prd/shared-guides.md#6-对现有能力的要求)中的“出错”：一律失败，说明原因与应改的文件，不静默跳过。本篇给每一种错误一个错误码，并约定报错的结构与给作者的提示。
 
 **参与方**：md2md、zdoc 生成、zdoc 新增工作流（报错方）；文档工程师（读提示）。
 
@@ -57,7 +57,7 @@ PR 检查的摘要与上游更新 PR 的报告，按页分组，每个错误一�
 | `CONFIG_SOURCE_NOT_FOUND` | `source.file` 在该版本中不存在，包括上游改名或删除了原文 | 改 `source.file`；原文被删除时考虑下线 |
 | `CONFIG_MANUAL_UNKNOWN` | `publish[].manual` 不是 zdoc 已有的手册 | 改手册 ID |
 | `CONFIG_PATH_UNKNOWN` | Phase 1 中，`publish[].path` 在该手册中没有飞书节点生成的页面，或飞书表格快照中没有这一页的记录 | 改 `publish[].path`；全新的页面先在飞书表格与目录中建好记录与节点 |
-| `CONFIG_BETA_INVALID` | `metadata.beta` 不是 zdoc 标签定义中的值，或写了 `BYOC` | 改为 zdoc 现有的值，见[产品需求场景 3](../prd.md#场景-3接入一页) |
+| `CONFIG_BETA_INVALID` | `metadata.beta` 不是 zdoc 标签定义中的值，或写了 `BYOC` | 改为 zdoc 现有的值，见[产品需求场景 3](../prd/shared-guides.md#场景-3接入一页) |
 
 **变换**（见 [02](./02-page-config.md#出错时)）
 

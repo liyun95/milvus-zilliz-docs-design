@@ -1,6 +1,6 @@
 # 技术设计
 
-本目录面向 [zdoc](https://github.com/zilliztech/zdoc) 与 [md2md](https://github.com/zilliztech/md2md) 的维护者，定义 Phase 1 的工具怎样实现。要交付什么行为、作者怎么写，以[Phase 1 产品需求](../prd.md)为准；本目录的设计必须满足它，两处不一致时先改本目录。为什么改见[方案总览](../proposal.md)；实施顺序、验收与各项状态见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)。
+本目录面向 [zdoc](https://github.com/zilliztech/zdoc) 与 [md2md](https://github.com/zilliztech/md2md) 的维护者，定义 Phase 1 的工具怎样实现。要交付什么行为、作者怎么写，以[Phase 1 产品需求](../prd/shared-guides.md)为准；本目录的设计必须满足它，两处不一致时先改本目录。为什么改见[方案总览](../prd/shared-guides-proposal.md)；实施顺序、验收与各项状态见[Phase 1 实施计划第 6.1 节](../implementation/phase-1.md#61-待确认的接口)。
 
 **状态**：01–06 由原“接口设计”迁入，待工程维护者完善；07–09 是新写的草稿，依据 zdoc 现有工作流与 milvus-docs 的统计，待工程维护者确认。生产实现与集成验收尚未完成。术语见[术语表](../glossary.md)。
 
@@ -16,7 +16,7 @@
 | zdoc 发布（Fetch） | zdoc | 接入生成结果；混源与激活；归属检查；翻译与恢复接入 | [05](./05-publish-handoff.md)、[05b](./05b-cutover-and-ownership.md) |
 | zdoc 新增工作流 | zdoc | 接入时写 lock、PR 校验、上游更新、提升、激活前的比较 | [04](./04-channels-and-lock.md)、[06](./06-upstream-changes.md)、[08](./08-workflows-and-permissions.md) |
 
-各仓库的分阶段改动见[Phase 1 实施计划第 3 节](../phase-1.md#3-各仓库改动)。
+各仓库的分阶段改动见[Phase 1 实施计划第 3 节](../implementation/phase-1.md#3-各仓库改动)。
 
 ### 代码位置
 
@@ -60,7 +60,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 - **顺序是约束，不是实现细节。** 命名块必须在变量展开之前定位，因为标记只存在于原文中；Cloud 内容文件在变换中插入后，与原文一起在展开变量与片段时展开。本地原型也按这个顺序实现。
 - **站点适配不承担业务差异。** 它只负责 Tabs、提示组件、链接、图片和元数据，不为某种业务差异增加专门的处理。
 
-一个共享页从接入到下线的生命周期见[产品需求第 4 节](../prd.md#4-一页的生命周期)。
+一个共享页从接入到下线的生命周期见[产品需求第 4 节](../prd/shared-guides.md#4-一页的生命周期)。
 
 ### 数据文件
 
@@ -71,7 +71,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | 链接映射表 `links.yaml` | zdoc master `shared-docs/guides/` | 文档工程师 | [02b](./02b-links-and-images.md#链接) |
 | 产品名检查规则 `product-names.yaml` | zdoc master `shared-docs/guides/` | 文档工程师 | [07](./07-site-adaptation.md#产品名检查) |
 | 代码 Tabs 规则 `cloud-sdk-tabs.yaml` | zdoc master `shared-docs/guides/presentation/` | zdoc 维护者 | [07](./07-site-adaptation.md#代码-tabs) |
-| 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/guides/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd.md#场景-3接入一页)、[02](./02-page-config.md) |
+| 页面配置 `page.yaml`、Cloud 内容文件 | zdoc master `shared-docs/guides/pages/<页面标识>/` | 文档工程师 | [产品需求场景 3、4](../prd/shared-guides.md#场景-3接入一页)、[02](./02-page-config.md) |
 | 版本记录 `lock.yaml` | zdoc master `shared-docs/guides/pages/<页面标识>/` | 工具 | [04](./04-channels-and-lock.md#每页一份-lockyaml) |
 | 生效配置 `active.json` | zdoc dev `generated/en/manifests/shared-pages/<组>/` | Fetch，按飞书表格生成 | [05b](./05b-cutover-and-ownership.md#生效配置activejson) |
 | `Docs` 链接、`Release Channel` | 飞书表格（DocsList）中每页的记录 | 文档负责人、文档工程师 | [05b](./05b-cutover-and-ownership.md#切换与激活) |
@@ -94,7 +94,7 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | 07 | [站点适配](./07-site-adaptation.md) | Milvus Markdown 怎样变成 Cloud MDX；Tabs 规则文件的格式 | 场景 3、4 | Phase 1a |
 | 08 | [工作流与权限](./08-workflows-and-permissions.md) | 各工作流的触发、身份、权限与失败通知 | 场景 3、7、8、9、10 | Phase 1a 起 |
 | 09 | [错误目录](./09-error-catalog.md) | 统一的错误码、提示与应改的文件 | 各场景的“出错时” | Phase 1a 起 |
-| 10 | [SDK Reference：从 web-content 生成（Rust 试点）](./10-sdk-reference.md) | 手册配置、整本手册的生成与 lock、Cloud 差异、接入 Fetch 与上线；草稿，待与文档负责人确认 | [SDK Reference 产品需求](../prd-sdk-reference.md)（草稿） | 待定 |
+| 10 | [SDK Reference：从 web-content 生成（Rust 试点）](./10-sdk-reference.md) | 手册配置、整本手册的生成与 lock、Cloud 差异、接入 Fetch 与上线；草稿，待与文档负责人确认 | [SDK Reference 产品需求](../prd/sdk-reference.md)（草稿） | 待定 |
 | 11 | [中文 Guides 翻译与发布](./11-zh-cn-translation-pipeline.md) | 人审门禁、英文基线、增量翻译、通道提升与逐页切流 | 中文 Guides 迁移与维护 | 试点设计 |
 
 ## 每篇的结构
@@ -106,4 +106,4 @@ packages/docs-tooling/src/lark/                                # 认得 Docs 指
 | 出错时 | 错误情形与结果 |
 | 例子 | Delete Entities 或 OpenAI，折叠 |
 | 设计理由 | 工程上为什么这样定、不采用哪些做法、依据的数据，折叠；产品上的取舍见产品需求 |
-| 验收 | 对应[Phase 1 实施计划](../phase-1.md)中的 T 编号 |
+| 验收 | 对应[Phase 1 实施计划](../implementation/phase-1.md)中的 T 编号 |

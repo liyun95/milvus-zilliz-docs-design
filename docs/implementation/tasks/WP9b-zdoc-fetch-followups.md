@@ -35,7 +35,7 @@ WP9b-1 改变已激活页面的生成结果（只少了空行），要单独合�
 | [技术设计 05b](../../design/05b-cutover-and-ownership.md) | `active.json`；指向已激活页面的链接 | 别名要改的格式 |
 | [技术设计 02b](../../design/02b-links-and-images.md) | 图片 | 已采用版本的图片以第一次转存为准 |
 | [技术设计 09](../../design/09-error-catalog.md) | 发布与切换 | `PUBLISH_REGEN_MISMATCH`、`IMAGE_SOURCE_CHANGED` |
-| [产品需求](../../prd.md) | 场景 4 的 4-3；场景 9；第 6 节“发布保护” | 行为 |
+| [产品需求](../../prd/shared-guides.md) | 场景 4 的 4-3；场景 9；第 6 节“发布保护” | 行为 |
 | [实现指南](../README.md) | 第 2.1、3 节 L4、第 5 节 | 需求清单、回放测试、规则 |
 
 ## 范围
@@ -72,7 +72,7 @@ WP9b-1 改变已激活页面的生成结果（只少了空行），要单独合�
 
 1. **别名的格式。** 在 `pages[]` 中增加 `feishu_aliases`（字符串数组），包括 `feishu_token` 本身；`feishu_token` 保留不变，旧的读取代码不受影响。格式已写入[技术设计 05b](../../design/05b-cutover-and-ownership.md)。不把 `feishu_token` 改成数组：那样所有读取 `active.json` 的地方都要同时改。
 2. **Fetch 侧测试怎样计入覆盖。** 扩展 `spec/coverage.ts`，同时扫描共享页相关的 `.js` 测试（`scripts/docs-workflow/` 与 `lark/` 中的），在这些测试的标题中写上编号，再把上面的编号从 `pending.json` 中删掉。扫描哪些文件在计划中列出。不只把归属从 WP14 改成 WP9：那样检查看不到它们是否真的有测试。
-3. **只剩一个三级标题时的警告：这次不做。** [产品需求场景 4](../../prd.md#场景-4写-cloud-的差异)已规定作者在删除时一起删掉单独剩下的三级标题，工具不自动删；等出现漏删再加提示。
+3. **只剩一个三级标题时的警告：这次不做。** [产品需求场景 4](../../prd/shared-guides.md#场景-4写-cloud-的差异)已规定作者在删除时一起删掉单独剩下的三级标题，工具不自动删；等出现漏删再加提示。
 
 ## 计划审阅的决定
 

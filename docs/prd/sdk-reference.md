@@ -1,6 +1,6 @@
 # SDK Reference 产品需求（Rust 试点）
 
-**状态**：方案已按 2026-11-02 会议及会后讨论对齐，待实现。Phase 1 包含页内 `add / replace / remove`、zdoc 本地 Cloud 独有页面，以及整本手册的 `current / next`。本文描述拟交付的行为；文末列出仍需验证的接入事项。工程约定见[技术设计 10](./design/10-sdk-reference.md)，调研见 [Rust SDK Reference 接入调研](../research/rust-sdk-reference.md)。
+**状态**：方案已按 2026-11-02 会议及会后讨论对齐，待实现。Phase 1 包含页内 `add / replace / remove`、zdoc 本地 Cloud 独有页面，以及整本手册的 `current / next`。本文描述拟交付的行为；文末列出仍需验证的接入事项。工程约定见[技术设计 10](../design/10-sdk-reference.md)，调研见 [Rust SDK Reference 接入调研](../../research/rust-sdk-reference.md)。
 
 **方案**：Milvus 原文从 web-content 读取，Cloud 独有页面和片段放在 zdoc，不经过飞书。一本手册用一份 `manual.yaml` 管理，配套来源配置、Cloud 变量表和检查规则。Fetch 读取已提交的文件，按整本手册生成；UAT 验收后按整本手册提升，中文由现有机器翻译从 dev 生成。
 
@@ -149,7 +149,7 @@ metadata:
     deprecate_since: v3.0.x
 ```
 
-标题取 H1 并加 `| Rust`；描述默认取 H1 下第一段并加相同后缀。接口的引入、变更与废弃信息以上游明确记录为主，本地只补充经过核实的信息；未知版本不填，不通过目录或文件是否存在推算。具体变更内容保留在接口正文中，不压缩成一个版本标签。`last_modified` 为 `FALSE`；`beta`、`deprecate_since` 默认 `false`。SDK 接口生命周期与 Cloud 是否已上线分别管理，后者见 R3。完整规则见[技术设计 10](./design/10-sdk-reference.md#地址路径与-front-matter)。
+标题取 H1 并加 `| Rust`；描述默认取 H1 下第一段并加相同后缀。接口的引入、变更与废弃信息以上游明确记录为主，本地只补充经过核实的信息；未知版本不填，不通过目录或文件是否存在推算。具体变更内容保留在接口正文中，不压缩成一个版本标签。`last_modified` 为 `FALSE`；`beta`、`deprecate_since` 默认 `false`。SDK 接口生命周期与 Cloud 是否已上线分别管理，后者见 R3。完整规则见[技术设计 10](../design/10-sdk-reference.md#地址路径与-front-matter)。
 
 Rust 页面的“最低 SDK 版本”只使用已确认的引入版本，废弃版本单独提示。例如 v3.0.0 引入、v3.1.0 废弃，最低版本仍为 v3.0.0；仅知道废弃时间时不显示最低版本。此展示需要 WP-R2 适配现有组件，不能仅靠写入元数据实现。
 
@@ -157,7 +157,7 @@ Rust 页面的“最低 SDK 版本”只使用已确认的引入版本，废弃�
 
 ### 页面内新增、删除与替换
 
-`transforms` 的键是相对于 `source.dir` 的上游页面路径，每页下面是一组规则。每条规则与 [Guides 的变换](./prd.md#场景-4写-cloud-的差异)一致，使用 `operation / target / content`，支持 `add / remove / replace`。
+`transforms` 的键是相对于 `source.dir` 的上游页面路径，每页下面是一组规则。每条规则与 [Guides 的变换](./shared-guides.md#场景-4写-cloud-的差异)一致，使用 `operation / target / content`，支持 `add / remove / replace`。
 
 | 要改的范围 | `target` | `replace` 的新内容 |
 |---|---|---|
@@ -288,9 +288,9 @@ cloud_pages:
 
 登记合并后的第一次正式 Fetch 前，必须先准备好 dev 初始内容。现有新手册流程要求侧边栏已存在，否则首次 Fetch 无法通过；不另设激活开关。配置、变量表、Cloud 源文件和着陆页在 master，生成页面、侧边栏由 dev 管理。UAT 与 Prod 使用同一份产物，按运行时通道显示；写入 dev 不等于提升。
 
-生成工具还需写出独立的手册级记录，逐页记录身份、来源、通道和输出摘要，并绑定整本页面集合及侧边栏。发布与恢复要携带同一份完整结果，缺页或记录不符就失败；不能直接把 Guides 单页记录的输出列表扩成整本手册。契约见[技术设计 10](./design/10-sdk-reference.md#手册级记录与恢复)。
+生成工具还需写出独立的手册级记录，逐页记录身份、来源、通道和输出摘要，并绑定整本页面集合及侧边栏。发布与恢复要携带同一份完整结果，缺页或记录不符就失败；不能直接把 Guides 单页记录的输出列表扩成整本手册。契约见[技术设计 10](../design/10-sdk-reference.md#手册级记录与恢复)。
 
-**提升按整本手册开一个 PR**：`current` 改为已验收的 `next`，删除 `channel: current` 的临时 Transform、去掉 `channel: next` 的规则限定；Cloud 独有页的 NEXT 转为 CURRENT，RETIRE-IN-NEXT 的页移除，并检查引用。PR 同时列出仍有手写 `NextChannel` 的 Cloud 文件，由审核人确认哪些段落随本次上线处理；不自动清除所有标记。整本校验通过后合并，下一次 Fetch 与发版使 Prod 跟上。具体契约见[技术设计 10](./design/10-sdk-reference.md#上游更新与提升)。
+**提升按整本手册开一个 PR**：`current` 改为已验收的 `next`，删除 `channel: current` 的临时 Transform、去掉 `channel: next` 的规则限定；Cloud 独有页的 NEXT 转为 CURRENT，RETIRE-IN-NEXT 的页移除，并检查引用。PR 同时列出仍有手写 `NextChannel` 的 Cloud 文件，由审核人确认哪些段落随本次上线处理；不自动清除所有标记。整本校验通过后合并，下一次 Fetch 与发版使 Prod 跟上。具体契约见[技术设计 10](../design/10-sdk-reference.md#上游更新与提升)。
 
 页面或模块在提升后彻底消失时，PR 还要列出并清理遗留的 `metadata / exclude / transforms` 及导航、正文引用；无效配置仍会阻止提升。验收之后若 next 或相关配置、内容变化，需要重新生成并确认新内容，不能沿用旧验收。单独维护的 Cloud 着陆页不受上游 lock 控制，但其改动也参与验收，延后上线段落须写通道标记。
 

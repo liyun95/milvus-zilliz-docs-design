@@ -1,6 +1,6 @@
 # 02 页面配置的读取与变换
 
-`page.yaml` 的字段、变换的写法与规则、Cloud 内容文件能写什么，见[产品需求场景 3](../prd.md#场景-3接入一页)、[场景 4](../prd.md#场景-4写-cloud-的差异) 与[写法速查](../authoring-spec.md#3-pageyaml-的全部字段)。本篇定义 `shared-docs/` 放在哪里、工具怎样匹配和执行变换，以及完整的校验规则。工具生成的 front matter 见 [07](./07-site-adaptation.md)，链接与图片见 [02b](./02b-links-and-images.md)。
+`page.yaml` 的字段、变换的写法与规则、Cloud 内容文件能写什么，见[产品需求场景 3](../prd/shared-guides.md#场景-3接入一页)、[场景 4](../prd/shared-guides.md#场景-4写-cloud-的差异) 与[写法速查](../prd/authoring-spec.md#3-pageyaml-的全部字段)。本篇定义 `shared-docs/` 放在哪里、工具怎样匹配和执行变换，以及完整的校验规则。工具生成的 front matter 见 [07](./07-site-adaptation.md)，链接与图片见 [02b](./02b-links-and-images.md)。
 
 **参与方**：zdoc 生成（读取、校验与执行）。
 
@@ -60,7 +60,7 @@ shared-docs/
 
 | 类别 | 生成失败的情况 |
 |---|---|
-| 页面与字段 | `page.yaml` 不是合法的 YAML；页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册；Phase 1 中 `publish[].path` 在该手册中没有飞书节点生成的页面；`metadata.beta` 不是[产品需求](../prd.md#场景-3接入一页)列出的可选值（zdoc 遇到不认识的值会不显示标签、也不报错，所以在生成前拦下） |
+| 页面与字段 | `page.yaml` 不是合法的 YAML；页面目录名不符合 slug 规则；缺少必填字段；未知的字段、动作或 `schema_version`；`source.file` 在 lock 记录的 commit 中不存在；`publish[].manual` 不是 zdoc 已有的手册；Phase 1 中 `publish[].path` 在该手册中没有飞书节点生成的页面；`metadata.beta` 不是[产品需求](../prd/shared-guides.md#场景-3接入一页)列出的可选值（zdoc 遇到不认识的值会不显示标签、也不报错，所以在生成前拦下） |
 | 变量表 | `Variables.json` 不是合法的 JSON、顶层不是对象，或同一层中有只差大小写的两个键；这时所有共享页都生成失败 |
 | 目标 | 目标命名块、语言或内容文件不存在；内容文件路径指向页面目录之外 |
 | `position` 与内容 | 在块旁或代码行旁 `add` 时没写 `position`；给代码组增加语言、`replace` 或 `remove` 时写了；`remove` 提供了内容 |
@@ -91,7 +91,7 @@ shared-docs/
 
 第三批接入（Lindera、Stop、Decompounder）中只有 Decompounder 的一句需要拆段。拆段的需求变多、或者拆段影响了 Milvus 页面的阅读时，再评估行内标记。
 
-产品上的取舍（页面标识、按手册发布、只开放三项元数据、代码行差异写在 zdoc、`channel`、Cloud 内容文件的写法）见[产品需求场景 3](../prd.md#场景-3接入一页)、[4](../prd.md#场景-4写-cloud-的差异)、[6](../prd.md#场景-6让内容先只在-uat-显示)。
+产品上的取舍（页面标识、按手册发布、只开放三项元数据、代码行差异写在 zdoc、`channel`、Cloud 内容文件的写法）见[产品需求场景 3](../prd/shared-guides.md#场景-3接入一页)、[4](../prd/shared-guides.md#场景-4写-cloud-的差异)、[6](../prd/shared-guides.md#场景-6让内容先只在-uat-显示)。
 
 </details>
 

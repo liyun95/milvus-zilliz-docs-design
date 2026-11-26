@@ -2,7 +2,7 @@
 
 调研日期：2026-10-21。回答 PRD 评审会上文档负责人提出的问题：链接映射表 `links.yaml` 靠人工维护难、容易出错，而 zdoc 一轮构建要一两个小时，出错代价高。本文只整理做法和数据，不做选择。
 
-数据：milvus-docs `v3.0.x` 的 [`9acdc99`](https://github.com/milvus-io/milvus-docs/tree/9acdc99959e188a54be1df512ea3806c3110ef59)（2026-10-20），User Guide 共 201 篇（`site/en/userGuide/`，含 Embeddings）；zdoc dev 的 [`10d6bd8`](https://github.com/zilliztech/zdoc/tree/10d6bd8)（2026-10-21），英文 Guides 共 390 篇。脚本见 [evidence/links-and-anchors](./evidence/links-and-anchors/)。
+数据：milvus-docs `v3.0.x` 的 [`9acdc99`](https://github.com/milvus-io/milvus-docs/tree/9acdc99959e188a54be1df512ea3806c3110ef59)（2026-10-20），User Guide 共 201 篇（`site/en/userGuide/`，含 Embeddings）；zdoc dev 的 [`10d6bd8`](https://github.com/zilliztech/zdoc/tree/10d6bd8)（2026-10-21），英文 Guides 共 390 篇。脚本见 [evidence/links-and-anchors](./evidence/links-and-anchors)。
 
 ## 1. 速览
 

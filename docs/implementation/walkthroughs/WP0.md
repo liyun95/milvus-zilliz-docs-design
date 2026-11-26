@@ -76,7 +76,7 @@ pnpm install --frozen-lockfile
 
    WP0 合并时是 124 条：WP3 16、WP4 8、WP5 16、WP6 4、WP8 4、WP10 23、WP11 9、WP12 11、WP13 6、WP14 23、WP15 4。
 
-3. 看三篇试点页的配置，与[产品需求场景 3](../../prd.md#场景-3接入一页)的例子对照：
+3. 看三篇试点页的配置，与[产品需求场景 3](../../prd/shared-guides.md#场景-3接入一页)的例子对照：
 
    ```bash
    cat packages/docs-tooling/src/shared-docs/fixtures/pilots/*/shared-docs/page.yaml
