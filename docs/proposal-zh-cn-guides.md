@@ -1,6 +1,6 @@
 # Zilliz Cloud 中文 Guides 翻译方案（对齐稿）
 
-**草案 · 供文档团队与工程团队评审对齐** · 详细目录样例、异常兜底、PR 模板与验收契约见[中文 Guides 技术设计](./design/11-zh-cn-translation-pipeline.md)
+**已对齐定稿（2026-11-26）· 进入工程实施** · 详细目录样例、异常兜底、PR 模板与验收契约见[中文 Guides 技术设计](./design/11-zh-cn-translation-pipeline.md)
 
 ## 1. 为什么改与目标体验
 
@@ -33,7 +33,7 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 
 - **未改动段落逐字保留**：程序先对新旧英文按标题、段落和代码块做确定性比对，只把真正变动的段落交给大模型起草，再由程序逐字节核验未涉及段落一字未动；遇到段落拆并、指代不清或中文独有说明，保留原中文文字不删改，列为待确认项交主审定。
 - **代码块不交 LLM 翻译，同时保护中国站定制**：英文侧优先使用地域无关占位符（如 `YOUR_CLUSTER_ENDPOINT`）；中文侧无定制的代码块（含英文注释）由程序原样同步，涉及域名/地域等固定差异按规则换算，已有页面级中国站定制绝不强行覆盖，给 diff 交主审决定。
-- **复用统一术语源，不维护两套表**：首期直接只读复用现有 `config/translation/zh-CN-reference.json` 作为基础术语与风格约束（统一用“您”及保留英文词），不在 `localized-docs/` 另建重复术语表；后续按需在 `config/translation/` 下演进为公共词库 + Guides 轻量补充。
+- **复用统一中文术语底座，不维护两套表**：在 `config/translation/` 抽出全站共享的 `zh-CN-common.json` 作为单一中文术语与通则源（统一用“您”、保留 `Collection` / `Entity` / `Schema` 等英文词及地域专有名词），Reference（`zh-CN-reference.json`）与 Guides（`zh-CN-guides.json`）作为极薄配置分别继承，日常增改术语只改这一个文件，不在 `localized-docs/` 另建重复术语表。
 - **控制台 UI 词与正文隔离**：开源 `milvus-docs` 无控制台界面，UI 词只出现在 `zdoc` 侧的 Cloud 定制内容中。作者在 **`master` 侧的 Cloud 独有英文片段**中用轻量语义标签（如 `<UI>Create Cluster</UI>`）标记（由英文 Fetch 自动透传到 `dev`，绝不手改 `dev`），翻译时不交 LLM 自由发挥，首期保留原词在 PR 中集中交主审对照中文控制台替换为实际文案（如 `<UI>创建集群</UI>`）。
 
 > 详细触发逻辑、代码块三档保护、术语与 UI 规则见[技术设计 §3](./design/11-zh-cn-translation-pipeline.md#3-英文基线增量起草代码块与术语规则)。
@@ -49,7 +49,7 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 3. **主审做决定：合入 or 两档暂缓**：待确认项清零、最新稿过检并获批准才可合入 `master`（只有合入才推进已审英文基线）。遇外部等待按周期分两档，**绝不阻塞其他页面和同页 Prod 急修**：
    - **短期等待（几天～2 周）**：留原 PR、贴 `deferred` 标签写明原因与跟进人（复核日期可选）；无新变化不催办，有新实质变化通知一次（同时列“自暂缓后新变化”和“自上次合入累计变化”）。
    - **长期时间差（如海外已上、中国站 1 个月以上暂不上）**：直接关闭 PR 并在本页 `page.yaml` 中标记为 `paused`（写明原因），基线停在旧版不丢账、不留僵尸 PR，待中国站就绪再手动重开。
-4. **人永远是最高编辑权威**：常规页随时可直接提 PR 修改或增补中文独有段（沿用原英文基线，下次增量不覆盖手写内容）；若整篇中英文差异极大，可在本页 `page.yaml` 中标为 **“手工维护模式（`manual`）”**，完全由文档工程师直接写 PR 发布。
+4. **人永远是最高编辑权威**：常规页随时可直接提 PR 修改或增补中文独有段（沿用原英文基线，下次增量不覆盖手写内容）；若整篇中英文差异极大（如 Region 差异页），可在本页 `page.yaml` 中标为 **“手工维护模式（`manual`）”**——工具不自动起草 PR，英文变动时合并进每日飞书汇总卡片提醒（按英文版本去重并附英文 diff 链接），由文档工程师按需直接写 PR 发布。
 
 > 完整 PR 结构示例（《删除 Entity》）见[技术设计 §5.3](./design/11-zh-cn-translation-pipeline.md#53-参考示例一份翻译-pr-的实际结构)；完整异常与并发处理规则（如英文再变、两人改到同一句、基线缺失阻塞）见[技术设计 §5.2](./design/11-zh-cn-translation-pipeline.md#52-异常与并发处理矩阵)。
 
@@ -57,29 +57,32 @@ Cloud 英文文档正在推进共享改造：共享正文在 `milvus-docs` 维�
 
 整体沿用上游英文生产和下游站点部署，只把中间“人工发现变化 → 飞书对照翻译”的环节升级为 Git 内的增量起草、PR 校验与人审。
 
-![目标工具链分为英文生产、翻译与审校、中文发布三层。上游沿用英文生成并读取 dev 上固定版本的 Guides 英文；橙色虚线内新增增量起草、PR 候选检查与人审，以及 master 上的已审中文目录；日常增量循环读 master 已审中文，飞书存量底稿仅用于首次一次性建仓；下游扩展中文 Fetch 读取已切换页的 Git 中文，沿用现有站点部署。](./assets/zh-guides-source-map.png)
+![目标工具链分为英文生产、翻译与审校、中文发布三层。上游沿用英文生成并读取 dev 上固定版本的 Guides 英文；橙色虚线内新增增量起草、PR 候选检查与人审，以及 master 上的 pre-md2md 中文源码目录；日常增量循环读 master 已审源码，飞书存量底稿仅用于首次一次性建仓；下游扩展中文 Fetch 经 md2md 预处理与站点组装输出 dev，沿用现有站点部署。](./assets/zh-guides-source-map.png)
 
-- **上游读 `dev` 英文产物**：直接消费已通过验证的 Cloud Guides 英文正文与生成记录，确保翻译对象与英文站一致。
-- **中间归 `master` 独立编辑源**：所有中文编辑资产按页收口在 `master` 的 `localized-docs/zh-CN/guides/` 下（与 `shared-docs/guides/pages/` 镜像对称，按页隔离避免多 PR 冲突，避开 `dev` 独占的发布目录）：
+- **上游读 `dev` 英文产物**：直接消费已通过验证的 Cloud Guides 英文正文（天然包含 Cloud 定制片段、`<UI>` 标签、双通道与 Cloud 链接，无需重跑英文共享编译链），翻译工具仅剥离导航 frontmatter 与顶部 `import` 再按节比对。
+- **中间归 `master` 的 pre-`md2md` 中文源码**：严守 `master` 只维护人工配置与 pre-`md2md` 源码、`dev` 只存自动生成发布产物的分支边界。中文资产收口在 `master` 的 `localized-docs/zh-CN/guides/`（与 `shared-docs/guides/` 1:1 镜像对称，按页隔离避免多 PR 冲突）：
 
 ```text
-localized-docs/zh-CN/guides/          # 位于 master（镜像英文 shared-docs/guides/pages/）
-└── <中文页面 ID>/                    # 飞书切链时 Docs 指向此目录（同 shared-docs 换链方式）
-    ├── page.yaml                     # [TW 维护] 本页配置：绑定英文源、维护模式（incremental / manual / paused）、发布策略
-    ├── index.md                      # [TW 审改 / 手写] 面向网站读者的中文正文（新页首译前暂不存在）
-    └── .baseline.json                # [工具自动维护] 上次已审英文锚点（类比 shared-docs 的 lock.yaml，人无需手改）
+localized-docs/zh-CN/guides/          # 位于 master（镜像英文 shared-docs/guides/）
+├── Variables.json                    # [TW 维护] 中文共享变量（中国站 endpoint、产品名、地域默认值等）
+├── fragments/                        # [可选] 中国站共用提示片段（供 Fetch 阶段 md2md 展开）
+└── pages/
+    └── <中文页面 ID>/                # 飞书切链时 Docs 指向此目录（同 shared-docs 换链方式）
+        ├── page.yaml                 # [TW 维护] 本页配置：绑定英文源、维护模式（incremental / manual / paused）、发布策略
+        ├── source.md                 # [TW 审改 / 手写] pre-md2md 干净中文源稿（无导航壳子与 import，支持变量/<UI>/<NextChannel>）
+        └── .baseline.json            # [工具自动维护] 上次已审英文锚点与通知去重记录（类比 lock.yaml，人无需手改）
 ```
 
-> `page.yaml` 与 `.baseline.json` 的具体字段样例见[技术设计 §2.2](./design/11-zh-cn-translation-pipeline.md#22-目录结构与配置样例)；术语首期直接复用 `config/translation/zh-CN-reference.json`，审校归属统一走文档团队 `CODEOWNERS`。
+> `page.yaml` 与 `.baseline.json` 的具体字段样例见[技术设计 §2.2](./design/11-zh-cn-translation-pipeline.md#22-目录结构与配置样例)；术语统一维护在 `config/translation/zh-CN-common.json`，审校归属统一走文档团队 `CODEOWNERS`。
 
-- **下游扩展中文 Fetch 写 `dev`**：已切换页由下一次定时或手动 Fetch 从固定 `master` 取稿，将正文、导航、旧链接映射和来源记录写入同一 `dev` 提交，沿用现有 UAT / Prod 构建部署。
+- **下游扩展中文 Fetch 经 `md2md` 组装写 `dev`**：已切换页由下一次定时或手动 Fetch 从固定 `master` 取中文 `source.md` 与 `Variables.json`，统一经 `@zilliz/mdtomd` 展开变量/片段并注入飞书导航 frontmatter、Docusaurus `import` 与旧链接映射，写入同一 `dev` 提交（路由绑定仅依页面 ID / `page url`，不强绑飞书 `record_id`），沿用现有 UAT / Prod 构建部署。
 
 | 改造分类 | 涉及范围 |
 |---|---|
-| **沿用** | Cloud 英文生成、现有站点构建与 UAT / Prod 部署、内容保护与 MDX 校验模块、以及现有日文与 SDK/CLI Reference 翻译底座。 |
-| **新增** | ① **翻译调度工作流**（新增 GitHub Actions 工作流 `translate-zh-guides.yml`，负责工作日 08:00 定时扫描、手动按页触发、自动开/更新 PR 及推送飞书群日报）<br/>② **中文 Guides 起草工具与 `<UI>` 组件**（在 `docs-tooling` 新增命令行脚本负责程序比对、代码块同步与受限 LLM 起草；在 `zdoc` 前端新增轻量 `<UI>` 界面词组件）<br/>③ **中文候选 PR 检查与审批保护**（新增 GitHub Actions 校验工作流负责双通道/MDX 检查与候选预览，并在 `master` 配置文档团队 CODEOWNERS 强制审批）<br/>④ **中文编辑目录与一次性导入脚本**（在 `master` 新建 `localized-docs/zh-CN/guides/`，以及首次从飞书导出建仓的导入脚本） |
-| **扩展** | 现有中文 Fetch（已切换页读固定 `master` 的 Git 中文，未切换页继续读飞书）。 |
-| **不动** | 不改日文/Reference 规则，不改 `milvus-docs` 和 `md2md`；翻译调度不持有生产发布锁，也不因单个翻译 PR 合入额外触发生产 Fetch。 |
+| **沿用** | Cloud 英文生成、现有站点构建与 UAT / Prod 部署、内容保护与 MDX 校验模块、`@zilliz/mdtomd` 预处理引擎、以及现有日文与 SDK/CLI Reference 翻译底座。 |
+| **新增** | ① **翻译调度工作流**（新增 GitHub Actions 工作流 `translate-zh-guides.yml`，负责工作日 08:00 定时扫描、手动按页触发、自动开/更新 PR 及推送飞书群汇总卡片）<br/>② **中文 Guides 起草工具与 `<UI>` 组件**（在 `docs-tooling` 新增命令行脚本负责程序比对、代码块同步与受限 LLM 起草；在 `zdoc` 前端新增轻量 `<UI>` 界面词组件并加白名单）<br/>③ **中文候选 PR 检查与审批保护**（新增 GitHub Actions 校验工作流负责 `md2md` 预处理、双通道/MDX 检查与候选预览，并在 `master` 配置文档团队 CODEOWNERS 强制审批）<br/>④ **中文源码目录、统一术语底座与一次性导入脚本**（在 `master` 新建 `localized-docs/zh-CN/guides/`、抽出 `config/translation/zh-CN-common.json`，以及首次从飞书导出建仓的导入脚本） |
+| **扩展** | 现有中文 Fetch（已切换页读固定 `master` 中文源码并经 `md2md` + 站点组装写 `dev`，路由仅绑定 `page url` 不强绑 `record_id`；未切换页继续读飞书）与 `localeContract.js`（轻量支持 `extends` 继承 `zh-CN-common.json`）。 |
+| **不动** | 不改日文/Reference 翻译行为，不改 `milvus-docs` 和 `md2md` 引擎本体；翻译调度不持有生产发布锁，也不因单个翻译 PR 合入额外触发生产 Fetch。 |
 
 > 各环节详细输入输出、同步队列与路径隔离契约见[技术设计 §2.3](./design/11-zh-cn-translation-pipeline.md#23-职责分工与研发边界)。
 
@@ -89,8 +92,8 @@ localized-docs/zh-CN/guides/          # 位于 master（镜像英文 shared-docs
 
 ![逐页交接。导入候选稿时仍在飞书编辑；短暂停改并换链接后等待 Fetch 确认，然后更新编辑入口，验收原网址。](./assets/zh-page-cutover.png)
 
-- **存量页逐页迁入（沿用英文 `shared-docs` 同一套换链方式）**：先用导入 PR 以飞书旧中文为底稿、对照最新英文（工具辅助补齐历史欠译）经人审建立第一个已审基线锚点（此时正文仍在飞书）；再短暂停改，在中文飞书表格中将该页的 `Docs` 链接替换为 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/<中文页面 ID>`（`Placement Type`、导航层级与通道字段照旧留在飞书），**只有 Fetch 确认已接管才将编辑入口改为 Git**，零停机、不断旧链接。
-- **新增共享页直接接入**：人工确认中国站需要后新建该页 `page.yaml` 提 PR 登记 → 工具发现尚无正文后自动起草首译 PR，审校合入即生成正文与基线 → 在中文飞书表格补一条导航记录，并将 `Docs` 直接指向 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/<中文页面 ID>` 即可发布。
+- **存量页逐页迁入（沿用英文 `shared-docs` 同一套换链方式）**：先用导入 PR 以飞书旧中文为底稿、对照最新英文（工具辅助补齐历史欠译）经人审建立第一个已审基线锚点（此时正文仍在飞书）；再短暂停改，在中文飞书表格中将该页的 `Docs` 链接替换为 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/pages/<中文页面 ID>`（`Placement Type`、导航层级与通道字段照旧留在飞书；路由仅绑定 `page url` 不强绑 `record_id`，后续调整目录位置不致断链），**只有 Fetch 确认已接管才将编辑入口改为 Git**，零停机、不断旧链接。
+- **新增共享页直接接入**：人工确认中国站需要后新建该页 `page.yaml` 提 PR 登记 → 工具发现尚无中文源稿后自动起草首译 PR，审校合入即生成 `source.md` 与基线 → 在中文飞书表格补一条导航记录，并将 `Docs` 直接指向 `https://github.com/zilliztech/zdoc/tree/master/localized-docs/zh-CN/guides/pages/<中文页面 ID>` 即可发布。
 
 **上线与发版原则：** 部署成功才算上线。发版窗口到来时，发布负责人能直接看到处于短期 `deferred` 或在 `page.yaml` 标为长期 `paused` 的页面原因与跟进人；标为 `manual` 的手工维护页按文档工程师合入 `master` 的节奏发布。公开 PR 和模型请求只接收可提前公开的内容，保密材料继续走受限渠道。
 

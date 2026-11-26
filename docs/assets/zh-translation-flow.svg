@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="458" viewBox="0 0 1100 458" role="img" aria-labelledby="title desc">
   <title id="title">中文 Guides 翻译与发布</title>
-  <desc id="desc">从有来源凭据的英文产物和 master 已审中文生成受限草稿。文档负责人批准当前 PR head，必需检查通过才合入。下一次 Fetch 根据中文归属发布到 dev，站点部署消费已验证的提交。</desc>
+  <desc id="desc">从有来源凭据的英文产物和 master 上的 pre-md2md 中文源码生成受限草稿。文档负责人批准当前 PR head，必需检查通过才合入。下一次 Fetch 按 page url 核对归属、经 md2md 展开变量并组装发布到 dev，站点部署消费已验证的提交。</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#61718a"/></marker>
     <style>
@@ -29,13 +29,13 @@
   <path class="edge" d="M713 137 H742"/>
   <path class="edge" d="M913 202 V237"/>
   <rect x="750" y="245" width="326" height="118" rx="12" fill="#fff7e8" stroke="#e7b56e"/>
-  <text class="head" x="768" y="278">master 审校源</text>
-  <text class="body" x="768" y="308">等待定时或获准手动 Fetch</text>
-  <text class="body" x="768" y="333">固定已合入的正文和基线</text>
+  <text class="head" x="768" y="278">master 源码（pre-md2md）</text>
+  <text class="body" x="768" y="308">source.md、Variables 与基线</text>
+  <text class="body" x="768" y="333">等待定时或获准手动 Fetch</text>
   <rect x="387" y="245" width="326" height="118" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
-  <text class="head" x="405" y="278">Fetch 检查点写入 dev</text>
-  <text class="body" x="405" y="308">核对中文归属、通道与来源</text>
-  <text class="body" x="405" y="333">同一提交更新发布产物与凭据</text>
+  <text class="head" x="405" y="278">Fetch 经 md2md 写入 dev</text>
+  <text class="body" x="405" y="308">按 page url 核归属与展开变量</text>
+  <text class="body" x="405" y="333">同一提交组装最终 MDX 与凭据</text>
   <rect x="24" y="245" width="326" height="118" rx="12" fill="#edf9f2" stroke="#8dc9a6"/>
   <text class="head" x="42" y="278">站点部署</text>
   <text class="body" x="42" y="308">消费已验证的 dev 提交</text>
