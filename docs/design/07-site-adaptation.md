@@ -1,6 +1,6 @@
 # 07 站点适配
 
-对应的产品需求见[产品需求场景 1](../prd.md#场景-1把产品名和连接值写成变量)（系统行为 1-6）、[场景 3](../prd.md#场景-3接入一页)（系统行为 3-4、3-5）与[场景 4](../prd.md#场景-4写-cloud-的差异)（系统行为 4-4、4-5）。本篇定义生成的最后一步：把完成变换、变量展开和产品过滤之后的 Milvus Markdown，转换成 Cloud 站点使用的 MDX（见[生成流水线](./README.md#生成流水线)），再检查其中有没有漏换的产品名。
+对应的产品需求见[产品需求场景 1](../prd/shared-guides.md#场景-1把产品名和连接值写成变量)（系统行为 1-6）、[场景 3](../prd/shared-guides.md#场景-3接入一页)（系统行为 3-4、3-5）与[场景 4](../prd/shared-guides.md#场景-4写-cloud-的差异)（系统行为 4-4、4-5）。本篇定义生成的最后一步：把完成变换、变量展开和产品过滤之后的 Milvus Markdown，转换成 Cloud 站点使用的 MDX（见[生成流水线](./README.md#生成流水线)），再检查其中有没有漏换的产品名。
 
 **参与方**：zdoc 生成（转换）、zdoc 维护者（维护 Tabs 规则）。
 
@@ -77,7 +77,7 @@ languages:                  # 顺序即标签页顺序
 | `languages[].aliases` | 否 | Milvus 原文中对应的语言名；变换中的 `language` 写原文的语言名，也可以写 `value` |
 | `languages[].required` | 否 | 默认 `false`；为 `true` 时，每个多语言代码组都必须有这种语言 |
 
-Phase 1 的取值是推动者的建议，待文档负责人确认（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。语言顺序与显示名沿用本地原型，加上 `aliases`。
+Phase 1 的取值是推动者的建议，待文档负责人确认（见[Phase 1 实施计划第 6.1 节](../implementation/phase-1.md#61-待确认的接口)）：只有 Python 必须有；其他语言原文有就显示、没有就不显示，包括 C++。语言顺序与显示名沿用本地原型，加上 `aliases`。
 
 ### 提示框
 
@@ -105,7 +105,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 ### front matter
 
-作者只写 `page.yaml` 中的 `metadata`（见[产品需求场景 3](../prd.md#场景-3接入一页)），其余由工具生成：
+作者只写 `page.yaml` 中的 `metadata`（见[产品需求场景 3](../prd/shared-guides.md#场景-3接入一页)），其余由工具生成：
 
 | front matter | 生成方式 |
 |---|---|
@@ -141,7 +141,7 @@ Milvus 原文按 Markdown 写，直接作为 MDX 编译可能出错。站点适�
 
 每个版本、每个手册的 MDX 生成后、两版合并前，按 `shared-docs/guides/product-names.yaml` 检查一遍：
 
-- **检查什么**：`check` 中的每一项，在正文与代码块中按整词匹配，区分大小写。`MilvusClient`、`pymilvus`、`milvus.yaml` 这类更长的词中出现的 Milvus 不算命中 `Milvus` 这一项；要查 `milvus.yaml` 本身，在 `check` 中单独列出。不写端口的 `localhost` 能查出任何端口。一处同时命中几项时（如 `root:Milvus` 中的 `Milvus`），只报最长的一项。链接与图片地址、front matter 不检查。Phase 1 的初始清单见[产品需求场景 1](../prd.md#场景-1把产品名和连接值写成变量)。
+- **检查什么**：`check` 中的每一项，在正文与代码块中按整词匹配，区分大小写。`MilvusClient`、`pymilvus`、`milvus.yaml` 这类更长的词中出现的 Milvus 不算命中 `Milvus` 这一项；要查 `milvus.yaml` 本身，在 `check` 中单独列出。不写端口的 `localhost` 能查出任何端口。一处同时命中几项时（如 `root:Milvus` 中的 `Milvus`），只报最长的一项。链接与图片地址、front matter 不检查。Phase 1 的初始清单见[产品需求场景 1](../prd/shared-guides.md#场景-1把产品名和连接值写成变量)。
 - **放过什么**：命中的位置落在 `allow` 中某个短语之内时放过。`allow` 只接受包含空格的短语，不接受单个词。
 - **报在哪里**：报错指出页面、版本和手册，并按变换前的位置映射回原文的文件与行号；命中在 Cloud 内容文件中时，指向内容文件。
 - **怎样找回位置**：是否失败只看生成的 MDX。对 MDX 中命中的每种写法，再到这一版本用到的输入中按同样的规则查找：Cloud 内容文件、原文、用到的片段、用到的变量的值；每处没被放过的位置报一条错，MDX 中的行号放在 `detail` 中。输入中都找不到时（写法来自站点适配），报在页面原文上，不给行号。变换接入后，原文中被替换或删除的范围不再查找。

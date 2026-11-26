@@ -2,10 +2,10 @@
   "schema_version": 1,
   "generated_by": "tools/export_requirements.py",
   "source": {
-    "prd": "docs/prd.md",
-    "plan": "docs/phase-1.md",
+    "prd": "docs/prd/shared-guides.md",
+    "plan": "docs/implementation/phase-1.md",
     "errors": "docs/design/09-error-catalog.md",
-    "prd_commit": "5b5d49a3276c64ed328b11762799a28749abaefe"
+    "prd_commit": "uncommitted"
   },
   "behaviours": [
     {
@@ -504,7 +504,7 @@
     },
     {
       "id": "T07",
-      "text": "混源与切换：覆盖[技术设计 05b 图 1](./design/05b-cutover-and-ownership.md#切换与激活) 中的每一种情况——接入后未激活时不写 dev；`Docs` 换成页面目录地址后检查不通过时保留现有版本；激活时 `active.json`、正文、导航、来源记录同批提交；`Docs` 被改回飞书链接时失败；其他飞书页面指向已激活页面的链接与锚点仍然正确；部署失败不恢复飞书写权；飞书全量抓取、旧缓存、删除清单与恢复任务都不能改变已迁移页，未迁移页照常更新；比较不写 dev；下线时 `RETIRE-IN-NEXT`、删除记录、目录残留与目录先删四种情况。",
+      "text": "混源与切换：覆盖[技术设计 05b 图 1](../design/05b-cutover-and-ownership.md#切换与激活) 中的每一种情况——接入后未激活时不写 dev；`Docs` 换成页面目录地址后检查不通过时保留现有版本；激活时 `active.json`、正文、导航、来源记录同批提交；`Docs` 被改回飞书链接时失败；其他飞书页面指向已激活页面的链接与锚点仍然正确；部署失败不恢复飞书写权；飞书全量抓取、旧缓存、删除清单与恢复任务都不能改变已迁移页，未迁移页照常更新；比较不写 dev；下线时 `RETIRE-IN-NEXT`、删除记录、目录残留与目录先删四种情况。",
       "blocking": true
     },
     {

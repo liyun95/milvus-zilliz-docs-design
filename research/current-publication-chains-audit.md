@@ -13,7 +13,7 @@
 | 触发与取内容 | web-content master.yml 向 milvus.io 发送 `prod-deploy`；[milvus.io .gitmodules](https://github.com/milvus-io/milvus.io/blob/1df6c2a9dbfb14a1aafbb1dd0563de3d51aad67c/.gitmodules) 将 web-content 映射到 src/docs；[master_aws.yml](https://github.com/milvus-io/milvus.io/blob/1df6c2a9dbfb14a1aafbb1dd0563de3d51aad67c/.github/workflows/master_aws.yml) 更新子模块 | “触发构建”和“读取内容”是两个动作，都在图中说明；未将 dispatch 载荷描述为内容 artifact |
 | 站点构建与部署 | master_aws.yml 构建、推送镜像并更新 Kubernetes deployment；[Builder.Dockerfile](https://github.com/milvus-io/milvus.io/blob/1df6c2a9dbfb14a1aafbb1dd0563de3d51aad67c/Builder.Dockerfile) 执行站点构建、打包 .next 与运行时文档 | 会议图合并成“Next.js → 镜像部署”，省略平台内部参数 |
 
-新增固定源码快照与 manifest 保存在 [publication-chain](./evidence/publication-chain/)。此前 md2md / milvus-docs 的固定快照见[复用审计](./md2md-zdoc-reuse-audit.md)。多个仓库修订是核验基线，不表示一次已完成发布的共同版本。
+新增固定源码快照与 manifest 保存在 [publication-chain](./evidence/publication-chain)。此前 md2md / milvus-docs 的固定快照见[复用审计](./md2md-zdoc-reuse-audit.md)。多个仓库修订是核验基线，不表示一次已完成发布的共同版本。
 
 ## Zilliz Cloud
 

@@ -107,7 +107,7 @@ Milvus 原文不变。zdoc 页面配置：
 
 ### 2.1 milvus-docs 实测
 
-范围：`v3.0.x`（`86a5df11`）的 `userGuide` 与 `embeddings`，共 214 页；改动统计为过去一年的 119 个 commit。[脚本与结果](./evidence/milvus-docs-structure/)
+范围：`v3.0.x`（`86a5df11`）的 `userGuide` 与 `embeddings`，共 214 页；改动统计为过去一年的 119 个 commit。[脚本与结果](./evidence/milvus-docs-structure)
 
 | 指标 | 结果 | 对 B 的影响 |
 |---|---|---|

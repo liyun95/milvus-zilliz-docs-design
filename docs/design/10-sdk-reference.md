@@ -1,6 +1,6 @@
 # 10 SDK Reference：从 web-content 生成（Rust 试点）
 
-本篇定义怎样把 web-content 中的 SDK Reference 生成到 zdoc，先以 Rust 试点。要交付什么行为、文档工程师怎样写，见 [SDK Reference 产品需求](../prd-sdk-reference.md)；调研与选项见 [Rust SDK Reference 接入调研](../../research/rust-sdk-reference.md)。本篇只写工程上选定的做法。
+本篇定义怎样把 web-content 中的 SDK Reference 生成到 zdoc，先以 Rust 试点。要交付什么行为、文档工程师怎样写，见 [SDK Reference 产品需求](../prd/sdk-reference.md)；调研与选项见 [Rust SDK Reference 接入调研](../../research/rust-sdk-reference.md)。本篇只写工程上选定的做法。
 
 **参与方**：zdoc 生成（shared-docs）、zdoc 发布（Fetch）。
 
@@ -35,7 +35,7 @@ shared-docs/rust/
 
 ### 配置契约
 
-四份作者配置的基本写法见 [PRD 场景 R1](../prd-sdk-reference.md#场景-r1接入一本手册)，差异与变换示例见 [R2](../prd-sdk-reference.md#场景-r2写-cloud-的差异)。这里只补充实现约束。
+四份作者配置的基本写法见 [PRD 场景 R1](../prd/sdk-reference.md#场景-r1接入一本手册)，差异与变换示例见 [R2](../prd/sdk-reference.md#场景-r2写-cloud-的差异)。这里只补充实现约束。
 
 | 输入 | 约定 |
 |---|---|

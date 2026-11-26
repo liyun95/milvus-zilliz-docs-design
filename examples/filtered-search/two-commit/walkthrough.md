@@ -8,12 +8,12 @@
 
 | 文件 | 作用 |
 |---|---|
-| [lock.yaml](lock.yaml) | 两个通道各自的 commit 与快照目录 |
+| [lock.yaml](./lock.yaml) | 两个通道各自的 commit 与快照目录 |
 | `current` 快照：[../milvus-docs](../milvus-docs/site/en/userGuide/search-query-get/filtered-search.md) | 即 Filtered Search 样例的共享原文 |
-| `next` 快照：[milvus-docs-next](milvus-docs-next/site/en/userGuide/search-query-get/filtered-search.md) | 在 current 上做了四处小改动（见第 2 节），是演示用的改动，不是上游内容 |
-| [build_channels.py](build_channels.py) | 调用现有 Filtered Search 生成器各生成一遍，再按块合并 |
-| [generated/filtered-search.mdx](generated/filtered-search.mdx) | 合并后的单份 MDX |
-| [generated/channel-receipt.json](generated/channel-receipt.json) | 两个通道的 commit、成对的块和警告 |
+| `next` 快照：[milvus-docs-next](./milvus-docs-next/site/en/userGuide/search-query-get/filtered-search.md) | 在 current 上做了四处小改动（见第 2 节），是演示用的改动，不是上游内容 |
+| [build_channels.py](./build_channels.py) | 调用现有 Filtered Search 生成器各生成一遍，再按块合并 |
+| [generated/filtered-search.mdx](./generated/filtered-search.mdx) | 合并后的单份 MDX |
+| [generated/channel-receipt.json](./generated/channel-receipt.json) | 两个通道的 commit、成对的块和警告 |
 
 Cloud 页面配置、Cloud 内容文件（CLI 示例）和变量与 Filtered Search 样例完全相同，没有为通道做任何修改。
 

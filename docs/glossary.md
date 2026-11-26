@@ -16,14 +16,14 @@
 
 - **片段（fragment）**：milvus-docs 中多篇文章共用的一段内容，放在 `site/en/fragments/`，正文用 `{{fragments/xxx.md}}` 引用，由 md2md 展开。本方案只在这个意义上使用“片段”。
 - **命名块（block ID）**：原文中用 `doc:block` 注释标出的一段 Markdown 或一个完整代码组，是 Cloud 做差异处理的定位点（见 [01](./design/01-named-blocks.md)）。
-- **代码组**：恰好包住一整组示例代码的命名块：多语言时是语言切换栏 `<div class="multipleCode">` 加紧跟其后的全部代码块，或者一个独立的代码块。可以按语言或代码行做变换；其他命名块只能整块变换（见 [01](./prd.md#场景-2在-milvus-原文中标出-cloud-要改的一段)）。
+- **代码组**：恰好包住一整组示例代码的命名块：多语言时是语言切换栏 `<div class="multipleCode">` 加紧跟其后的全部代码块，或者一个独立的代码块。可以按语言或代码行做变换；其他命名块只能整块变换（见 [01](./prd/shared-guides.md#场景-2在-milvus-原文中标出-cloud-要改的一段)）。
 - **命名块清单**：工具扫描各共享页的源文件后得到的命名块列表，包括类型、语言、位置和摘要；每次生成时重新扫描，不提交到仓库。
 
 ## 版本与生命周期
 
 - **Prod / UAT**：zdoc 的正式站点与预发布站点。两者由同一个 dev 提交构建，部署时才区分。
 - **lock（`lock.yaml`）**：每个共享页一份，放在页面目录中（`shared-docs/guides/pages/<页面标识>/lock.yaml`），记录 Prod 与 UAT 分别采用的 milvus-docs commit（`current` 与 `next`）。由接入、上游更新、提升三类 PR 写入，人不手改（见 [04](./design/04-channels-and-lock.md#lockyaml-怎样变化)）。
-- **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，Phase 1 由飞书表格的 `Release Channel` 决定，作者不在 zdoc 中写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
+- **通道**：Prod 与 UAT 各显示哪个版本。本方案中有三处用到：整页的 front matter `channel`（`next` / `retire-in-next`，Phase 1 由飞书表格的 `Release Channel` 决定，作者不在 zdoc 中写）；变换的可选字段 `channel`（`current` / `next`，规则只对一个版本生效，见 [02](./prd/shared-guides.md#场景-6让内容先只在-uat-显示)）；页面中的 `<NextChannel>` 组件（一段内容只在 UAT 显示）。
 - **接入**：文档工程师开 PR 新增页面目录（`page.yaml`，需要时加 Cloud 内容文件），工具在同一个 PR 中写入 `lock.yaml`。接入后只生成候选结果，不改变网站（见 [04](./design/04-channels-and-lock.md#接入一页)）。
 - **飞书表格（DocsList）**：zdoc 现有的飞书多维表格，Guides 的每一页一条记录，决定导航、发布目标与整页通道。Phase 1 共享页仍在其中保留记录。
 - **placement type**：飞书表格中每条记录的字段，说明这一行在导航中是什么，现有 `canonical`、`section`、`link`、`ref`。共享页的记录仍是 `canonical`。

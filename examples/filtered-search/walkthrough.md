@@ -2,7 +2,7 @@
 
 Filtered Search 介绍标准过滤与迭代过滤，并用多种 SDK/API 展示搜索方法。本例对照了固定版本的 [Milvus 原文](https://github.com/milvus-io/milvus-docs/blob/7d87b0bf26d7cbc713f40af6453ea2f925367901/site/en/userGuide/search-query-get/filtered-search.md)和 [Cloud 原文](https://github.com/zilliztech/zdoc/blob/05e31600f14326073a2c25c1a1eeda8e8d8fcc81/content/en/guides/tutorials/development/search-and-query/filtered-search.md)。
 
-**演示从已经整理过的共享原文开始。** 本地[拟议共享原文](milvus-docs/site/en/userGuide/search-query-get/filtered-search.md)保留 Milvus 的章节结构，吸收 Cloud 已有的共同代码修订，并补入 Rust/C++ 示例。这些修订尚未合入上游，仍需内容与 SDK 适用性审核；首次接入其他文章时，也要先核对共同内容和真实产品差异。
+**演示从已经整理过的共享原文开始。** 本地[拟议共享原文](./milvus-docs/site/en/userGuide/search-query-get/filtered-search.md)保留 Milvus 的章节结构，吸收 Cloud 已有的共同代码修订，并补入 Rust/C++ 示例。这些修订尚未合入上游，仍需内容与 SDK 适用性审核；首次接入其他文章时，也要先核对共同内容和真实产品差异。
 
 整理后，本页的共享与差异关系如下：
 
@@ -13,7 +13,7 @@ Filtered Search 介绍标准过滤与迭代过滤，并用多种 SDK/API 展示�
 | Cloud 独有的标准过滤、迭代过滤 CLI | 在 zdoc 各写一份 Cloud 内容文件，加入对应代码组 |
 | Cloud 站点标题、导航、链接和图片地址 | 在 Cloud 页面配置中维护 |
 
-下面按首次接入的顺序，以“标准过滤”走通一条完整引用关系，再说明迭代过滤如何复用同样做法。配置采用[消费配置草案](../../docs/authoring-spec.md)的 schema v1 样例格式，生产工具链接入仍待实现。
+下面按首次接入的顺序，以“标准过滤”走通一条完整引用关系，再说明迭代过滤如何复用同样做法。配置采用[消费配置草案](../../docs/prd/authoring-spec.md)的 schema v1 样例格式，生产工具链接入仍待实现。
 
 ## 1. 首次接入：哪些文件需要修改
 
@@ -21,12 +21,12 @@ Filtered Search 介绍标准过滤与迭代过滤，并用多种 SDK/API 展示�
 
 | 位置与文件 | 本次要做的事 | 后续页面能否复用 |
 |---|---|---|
-| Milvus：[filtered-search.md](milvus-docs/site/en/userGuide/search-query-get/filtered-search.md) | 将产品名与连接值写成变量，给两个代码组加命名标记 | 每篇原文按实际差异处理 |
-| zdoc：[shared-pages/filtered-search/page.yaml](zdoc/shared-pages/filtered-search/page.yaml) | 新增本页消费配置，引用整篇并补充两处 CLI | 每个共享页面维护自己的配置 |
+| Milvus：[filtered-search.md](./milvus-docs/site/en/userGuide/search-query-get/filtered-search.md) | 将产品名与连接值写成变量，给两个代码组加命名标记 | 每篇原文按实际差异处理 |
+| zdoc：[shared-pages/filtered-search/page.yaml](./zdoc/shared-pages/filtered-search/page.yaml) | 新增本页消费配置，引用整篇并补充两处 CLI | 每个共享页面维护自己的配置 |
 | zdoc：同一目录下的两份 CLI Markdown | 新增标准过滤与迭代过滤示例 | 属于本页的 Cloud 内容 |
-| zdoc：[shared/modules.yaml](zdoc/shared/modules.yaml) | 在共用注册规则里增加本页源文件条目 | 共用文件，每篇新增条目 |
+| zdoc：[shared/modules.yaml](./zdoc/shared/modules.yaml) | 在共用注册规则里增加本页源文件条目 | 共用文件，每篇新增条目 |
 | 两端的 `Variables.json`，以及注册规则中的变量导出声明 | 已有变量直接复用；新增变量时补默认值、导出声明与 Cloud 绑定 | 跨页面共用 |
-| zdoc：[presentation/cloud-sdk-tabs.yaml](zdoc/presentation/cloud-sdk-tabs.yaml) | 直接引用已有展示规则；需要变更时由工程维护者统一调整 | 站点共用 |
+| zdoc：[presentation/cloud-sdk-tabs.yaml](./zdoc/presentation/cloud-sdk-tabs.yaml) | 直接引用已有展示规则；需要变更时由工程维护者统一调整 | 站点共用 |
 
 本页在 zdoc 新增的专属文件是**一份页面 YAML 和两份 CLI Markdown**；另外在共用注册文件中增加一个条目。三个变量若已具备默认值、导出声明和 Cloud 绑定，就无需再添加。样例目录为独立演示保留了共用配置副本，正式接入按站点维护一份。
 
@@ -73,13 +73,13 @@ Java、Go、Rust、C++、NodeJS 和 cURL 使用同一组 endpoint/token，保留
 
 两端共用变量文件提供这些值：
 
-| 变量 | [Milvus Variables.json](milvus-docs/site/en/Variables.json) | [Cloud Variables.json](zdoc/Variables.json) |
+| 变量 | [Milvus Variables.json](./milvus-docs/site/en/Variables.json) | [Cloud Variables.json](./zdoc/Variables.json) |
 |---|---|---|
 | `product_name` | `Milvus` | `Zilliz Cloud` |
 | `example_endpoint` | `http://localhost:19530` | `YOUR_CLUSTER_ENDPOINT` |
 | `example_token` | `root:Milvus` | `YOUR_CLUSTER_TOKEN` |
 
-如果这三个变量是首次引入，还要在 zdoc 的 [shared/modules.yaml](zdoc/shared/modules.yaml) 中加入导出声明，允许消费方使用它们：
+如果这三个变量是首次引入，还要在 zdoc 的 [shared/modules.yaml](./zdoc/shared/modules.yaml) 中加入导出声明，允许消费方使用它们：
 
 ```yaml
 variables:
@@ -111,7 +111,7 @@ variables:
 
 ### 3.2 在 zdoc 登记这篇源文件
 
-在共用 [shared/modules.yaml](zdoc/shared/modules.yaml) 的 `modules` 下增加一个条目：
+在共用 [shared/modules.yaml](./zdoc/shared/modules.yaml) 的 `modules` 下增加一个条目：
 
 ```yaml
 modules:
@@ -125,7 +125,7 @@ modules:
 
 ### 3.3 在 zdoc 写标准过滤 CLI 内容文件
 
-在页面配置旁新增 [standard-filtering-cli.md](zdoc/shared-pages/filtered-search/standard-filtering-cli.md)。这是一个包含 `shell` 代码围栏的 Markdown 文件。下面保留完整命令，仅压缩请求体排版：
+在页面配置旁新增 [standard-filtering-cli.md](./zdoc/shared-pages/filtered-search/standard-filtering-cli.md)。这是一个包含 `shell` 代码围栏的 Markdown 文件。下面保留完整命令，仅压缩请求体排版：
 
 ````markdown
 ```shell
@@ -148,7 +148,7 @@ CLI 通过登录和集群 context 确定连接；endpoint/token 变量用于前�
 
 ### 3.4 在页面 YAML 中把原文、代码组和内容文件连起来
 
-新增 [page.yaml](zdoc/shared-pages/filtered-search/page.yaml)。以下节选展示整篇引用和标准过滤这一条补充关系：
+新增 [page.yaml](./zdoc/shared-pages/filtered-search/page.yaml)。以下节选展示整篇引用和标准过滤这一条补充关系：
 
 ```yaml
 schema_version: 1
@@ -172,7 +172,7 @@ transforms:
 
 沿配置读下来：先用 `source.module` 找到刚登记的整篇原文，绑定 Cloud 变量，再找到 `standard-filtering-code`，把 CLI 文件作为 `shell` 语言项加入该组。共用展示规则将 `shell` 显示为 `Zilliz CLI`。
 
-`content.file` 相对于页面配置所在目录解析，`variables.file` 和 `presentation.code_groups` 相对于 zdoc 消费配置根目录解析。实际页面 YAML 还维护 `metadata` 中的站点标题、导航和路由，以及 `links`、`assets` 中的链接与图片地址映射；首次接入时需核对这些页面信息。完整字段说明见[消费配置规范](../../docs/authoring-spec.md)。
+`content.file` 相对于页面配置所在目录解析，`variables.file` 和 `presentation.code_groups` 相对于 zdoc 消费配置根目录解析。实际页面 YAML 还维护 `metadata` 中的站点标题、导航和路由，以及 `links`、`assets` 中的链接与图片地址映射；首次接入时需核对这些页面信息。完整字段说明见[消费配置规范](../../docs/prd/authoring-spec.md)。
 
 ### 3.5 为迭代过滤增加第二条关系
 
@@ -180,14 +180,14 @@ transforms:
 
 | 引用位置 | 原文中的块 ID | zdoc 内容文件 |
 |---|---|---|
-| 标准过滤代码组 | `standard-filtering-code` | [standard-filtering-cli.md](zdoc/shared-pages/filtered-search/standard-filtering-cli.md) |
-| 迭代过滤代码组 | `iterative-filtering-code` | [iterative-filtering-cli.md](zdoc/shared-pages/filtered-search/iterative-filtering-cli.md) |
+| 标准过滤代码组 | `standard-filtering-code` | [standard-filtering-cli.md](./zdoc/shared-pages/filtered-search/standard-filtering-cli.md) |
+| 迭代过滤代码组 | `iterative-filtering-code` | [iterative-filtering-cli.md](./zdoc/shared-pages/filtered-search/iterative-filtering-cli.md) |
 
 迭代过滤 CLI 的请求体包含 `searchParams.hints: iterative_filter`。完整页面 YAML 已包含两条 `add`，两份内容文件分别进入对应代码组。
 
 ## 4. 检查生成的 Cloud 页面
 
-以上输入准备好后，工具生成 [Cloud Markdown/MDX](generated/filtered-search.mdx)。正文中的产品名已经变成：
+以上输入准备好后，工具生成 [Cloud Markdown/MDX](./generated/filtered-search.mdx)。正文中的产品名已经变成：
 
 > In Zilliz Cloud, filtered searches are categorized into two types — **standard filtering** and **iterative filtering** — depending on the stage at which the filtering is applied.
 
@@ -215,7 +215,7 @@ Python → Java → Go → Rust → C++ → NodeJS → cURL → Zilliz CLI
 | 两组多语言代码 | 每组七种共同语言加一份 CLI，确认 CLI 位于对应章节 |
 | 站点元数据、链接和图片 | 使用页面配置，确认导航、跳转和图片符合 Cloud 页面 |
 
-本地样例另外提供 [Milvus 变量展开结果](generated/milvus-filtered-search.md)用于对照，其中保留 Milvus 产品值和七种共同语言。正式 Milvus 发布仍走既有工具链。registry 和输入摘要由工具生成，工程记录的含义见[工程验证附件](../../docs/phase-1.md#7-当前证据本地样例)。
+本地样例另外提供 [Milvus 变量展开结果](./generated/milvus-filtered-search.md)用于对照，其中保留 Milvus 产品值和七种共同语言。正式 Milvus 发布仍走既有工具链。registry 和输入摘要由工具生成，工程记录的含义见[工程验证附件](../../docs/implementation/phase-1.md#7-当前证据本地样例)。
 
 ## 5. 从候选页面到审核发布，再到日常维护
 
@@ -237,12 +237,12 @@ Python → Java → Go → Rust → C++ → NodeJS → cURL → Zilliz CLI
 
 例如，上游 PR 改变了标准过滤条件，目标工具链应提示本页受影响，文档工程师需核对 CLI 的条件是否也要更新，再审核新候选；暂缓采用时继续使用已批准版本。块 ID 改名或删除导致引用失效时，应修正原文标记或消费配置后再更新。
 
-**生成文件不作为编辑源，手动修改不能进入正式发布。** 这一发布保护仍待工程接入，具体要求见[首期实施与验收](../../docs/phase-1.md)。
+**生成文件不作为编辑源，手动修改不能进入正式发布。** 这一发布保护仍待工程接入，具体要求见[首期实施与验收](../../docs/implementation/phase-1.md)。
 
 ## 6. 内容基线与适用边界
 
-本例的[共享原文修订对照](evidence/shared-source-changes.diff)记录了共同代码整理和语言补齐。SDK 版本与两产品适用性仍需审核。
+本例的[共享原文修订对照](./evidence/shared-source-changes.diff)记录了共同代码整理和语言补齐。SDK 版本与两产品适用性仍需审核。
 
 两产品的原有图片地址分别保留，图片内容是否一致尚待核对。JSON 输出中的全角逗号和尾逗号已修正，数据值未变；原文 top-K 3 与请求 limit 5、结果距离及各语言输出注释仍需内容和运行核验。
 
-生成结果供设计对照，尚不能替代生产页面。本地脚本检查、固定源记录、增删替换覆盖范围和代码行变换等待实现要求集中在[工程验证附件](../../docs/phase-1.md#7-当前证据本地样例)。
+生成结果供设计对照，尚不能替代生产页面。本地脚本检查、固定源记录、增删替换覆盖范围和代码行变换等待实现要求集中在[工程验证附件](../../docs/implementation/phase-1.md#7-当前证据本地样例)。

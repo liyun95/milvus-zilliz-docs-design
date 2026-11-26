@@ -14,17 +14,17 @@ Milvus 与 Zilliz Cloud 的功能文档有大量相同的内容，但现在各�
 
 | 相关文档 | 内容 |
 |---|---|
-| [方案总览](./proposal.md) | 为什么改、大方向（已冻结） |
+| [方案总览](./shared-guides-proposal.md) | 为什么改、大方向（已冻结） |
 | [写法速查](./authoring-spec.md) | 本文的附录：作者要写的文件、字段与出错情形的速查表 |
-| [术语表](./glossary.md) | 本方案用到的术语 |
-| [技术设计](./design/README.md) | 技术设计：工具怎样实现 |
-| [Phase 1 实施计划](./phase-1.md) | 排期、任务与各项状态 |
+| [术语表](../glossary.md) | 本方案用到的术语 |
+| [技术设计](../design/README.md) | 技术设计：工具怎样实现 |
+| [Phase 1 实施计划](../implementation/phase-1.md) | 排期、任务与各项状态 |
 
 ## 1. 目标与范围
 
 ### 1.1 要满足的五条要求
 
-[方案总览第 1.2 节](./proposal.md#12-改造需要满足的要求)提出五条改造要求，本文的场景逐条落实：
+[方案总览第 1.2 节](./shared-guides-proposal.md#12-改造需要满足的要求)提出五条改造要求，本文的场景逐条落实：
 
 | 要求 | 具体指什么 | 落实在 |
 |---|---|---|
@@ -118,7 +118,7 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版
 - 文档工程师不手改它，但接入、上游更新、提升的 PR 都改它，审核时会看到它的变化。
 - 整页只在 UAT 或只在 Prod 显示（功能还没上线的新页面、要下线的页面），Phase 1 沿用飞书表格的 `Release Channel`，不由 `lock.yaml` 表达（[场景 6](#场景-6让内容先只在-uat-显示)、[10](#场景-10下线一页)）。
 
-![一个共享页的生命周期。上半部分是 Git 中的生命周期，由 lock 决定版本：写 page.yaml 接入，工具写入 lock；上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线完成后用普通 PR 删除页面目录与 lock。下半部分是 Phase 1 过渡，由飞书表格决定来源与整页通道，飞书退出后不再需要：接入之后由文档负责人激活，即在表格中把这一页的 Docs 链接换成 Git 中的页面目录，网站从飞书版换成 Git 版；下线时文档工程师把 Release Channel 改为 RETIRE-IN-NEXT，UAT 不再显示；发版时删除表格记录，这一页从网站和导航中移除，之后再删除页面目录。](./assets/page-lifecycle.png)
+![一个共享页的生命周期。上半部分是 Git 中的生命周期，由 lock 决定版本：写 page.yaml 接入，工具写入 lock；上游更新让 next 前进、提升让 current 跟上 next，每次发版重复；下线完成后用普通 PR 删除页面目录与 lock。下半部分是 Phase 1 过渡，由飞书表格决定来源与整页通道，飞书退出后不再需要：接入之后由文档负责人激活，即在表格中把这一页的 Docs 链接换成 Git 中的页面目录，网站从飞书版换成 Git 版；下线时文档工程师把 Release Channel 改为 RETIRE-IN-NEXT，UAT 不再显示；发版时删除表格记录，这一页从网站和导航中移除，之后再删除页面目录。](../assets/page-lifecycle.png)
 
 图 1 · 一个共享页的生命周期
 
@@ -142,15 +142,15 @@ next: 1997ce96782b31f8628f22d31fad11007e4b924b      # UAT 用的 milvus-docs 版
 
 ## 5. 场景
 
-本节按文档工程师的日常工作组织，从写 Milvus 原文开始，到一页上线、更新和下线为止。每个场景开头列出阶段、谁来做和对应的技术设计；“系统行为”带编号，便于评审和验收时引用；错误码见[技术设计 09](./design/09-error-catalog.md)。
+本节按文档工程师的日常工作组织，从写 Milvus 原文开始，到一页上线、更新和下线为止。每个场景开头列出阶段、谁来做和对应的技术设计；“系统行为”带编号，便于评审和验收时引用；错误码见[技术设计 09](../design/09-error-catalog.md)。
 
-“技术设计”列出的是对应的篇目，不代表实现方案已经定稿；各篇的完成程度见[技术设计 README](./design/README.md)。
+“技术设计”列出的是对应的篇目，不代表实现方案已经定稿；各篇的完成程度见[技术设计 README](../design/README.md)。
 
 ### 场景 1：把产品名和连接值写成变量
 
 **阶段**：Phase 1a　**谁**：文档工程师
 
-**技术设计**：[03 预处理](./design/03-md2md-interfaces.md#预处理)
+**技术设计**：[03 预处理](../design/03-md2md-interfaces.md#预处理)
 
 **背景**：整篇复用的页面，两边常常只差产品名和示例中的连接地址、令牌。把这些值写成变量，两边各自给值，正文就能共用一份。
 
@@ -256,7 +256,7 @@ allow:                                  # 确实要保留的写法，报错时�
 
 **阶段**：Phase 1a 提供能力，Phase 1b 的试点页开始使用　**谁**：文档工程师
 
-**技术设计**：[01 命名块的解析](./design/01-named-blocks.md)、[03 解析与清除](./design/03-md2md-interfaces.md#命名块的解析与清除)
+**技术设计**：[01 命名块的解析](../design/01-named-blocks.md)、[03 解析与清除](../design/03-md2md-interfaces.md#命名块的解析与清除)
 
 **背景**：Cloud 要替换、删除或补充原文中的某一段，就要能稳定地指到这一段。按行号、标题或文档结构定位，上游一改就会失效，甚至悄悄指到错误的位置。所以在原文中给这一段起个名字，Cloud 按名字引用。这个有名字的一段叫**命名块**。
 
@@ -398,7 +398,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 **阶段**：Phase 1a　**谁**：文档工程师
 
-**技术设计**：[02 页面配置](./design/02-page-config.md)、[04 接入一页](./design/04-channels-and-lock.md#接入一页)、[07 front matter](./design/07-site-adaptation.md#front-matter)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[02 页面配置](../design/02-page-config.md)、[04 接入一页](../design/04-channels-and-lock.md#接入一页)、[07 front matter](../design/07-site-adaptation.md#front-matter)、[08 工作流](../design/08-workflows-and-permissions.md)
 
 **背景**：一页 Cloud 页面要从 Git 生成，先要告诉工具：它引用哪篇 Milvus 原文、发布到哪些手册、标题和描述是否要改写。
 
@@ -521,7 +521,7 @@ client.delete(collection_name="quick_setup", ids=[0, 1, 2])
 
 **阶段**：Phase 1b　**谁**：文档工程师
 
-**技术设计**：[02 变换的执行](./design/02-page-config.md#变换的执行)、[07 代码 Tabs](./design/07-site-adaptation.md#代码-tabs)
+**技术设计**：[02 变换的执行](../design/02-page-config.md#变换的执行)、[07 代码 Tabs](../design/07-site-adaptation.md#代码-tabs)
 
 **背景**：有的页面，Cloud 与 Milvus 不只差几个值。例如 OpenAI 页，Milvus 讲怎样在 `milvus.yaml` 中配置密钥，Cloud 讲在控制台创建集成；代码中 Milvus 用可选的 `credential`，Cloud 必须填 `integration_id`。这些差异写在 zdoc 中，原文不动，Milvus 作者也不需要照顾 Cloud 的写法。
 
@@ -807,7 +807,7 @@ transforms:
 
 **为什么 Cloud 内容文件用 Milvus 的写法。** 工具对内容文件和原文做同一套转换，作者不用学第二种写法。
 
-**为什么没有句子级的变换。** 一段中只有一句不同时，在原文中拆段即可，代价是 Milvus 页面多出一个段落。句子级的标记要让 md2md 和 Milvus 站点都支持段落中的注释，两版合并也要在句子中切分，Phase 1 不做，见[技术设计 02](./design/02-page-config.md#设计理由)。
+**为什么没有句子级的变换。** 一段中只有一句不同时，在原文中拆段即可，代价是 Milvus 页面多出一个段落。句子级的标记要让 md2md 和 Milvus 站点都支持段落中的注释，两版合并也要在句子中切分，Phase 1 不做，见[技术设计 02](../design/02-page-config.md#设计理由)。
 
 </details>
 
@@ -816,7 +816,7 @@ transforms:
 
 **阶段**：Phase 1a　**谁**：工具自动处理，文档工程师按提示补充
 
-**技术设计**：[02b 链接与图片](./design/02b-links-and-images.md)、[05 图片上传](./design/05-publish-handoff.md#图片上传)
+**技术设计**：[02b 链接与图片](../design/02b-links-and-images.md)、[05 图片上传](../design/05-publish-handoff.md#图片上传)
 
 **背景**：Milvus 原文中的链接和图片是按 milvus.io 写的。原样放进 Cloud 页面，站内链接会指向 Cloud 不存在的页面，锚点会因为大小写规则不同而失效，图片可能在没人审核的情况下被换掉。
 
@@ -959,7 +959,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 **为什么一组一份。** 同一个目标页会被很多共享页引用，登记一次即可。随着更多页面成为共享页，查找第 1 步覆盖得越来越多，映射表会越来越短。
 
-**为什么初始映射表由工具生成。** 只靠同名页面，User Guide 中 181 个被链接的页面要人登记 121 个。加上标题相同与 Cloud 现有页面中的链接，工具能给出 116 个的候选，三种来源两两比较没有一个不一致；剩下 65 个中，43 个是 Cloud 没有对应页的索引类型、自部署与配置页，可以按类别批量写成指向 milvus.io。人要做的变成审一遍候选、判断二十多个。从 Cloud 现有页面反推只能在飞书退出之前做，所以放在 Phase 1 开始时一次做完。数据见[链接映射表的维护方式调研](../research/link-mapping-maintenance.md)。
+**为什么初始映射表由工具生成。** 只靠同名页面，User Guide 中 181 个被链接的页面要人登记 121 个。加上标题相同与 Cloud 现有页面中的链接，工具能给出 116 个的候选，三种来源两两比较没有一个不一致；剩下 65 个中，43 个是 Cloud 没有对应页的索引类型、自部署与配置页，可以按类别批量写成指向 milvus.io。人要做的变成审一遍候选、判断二十多个。从 Cloud 现有页面反推只能在飞书退出之前做，所以放在 Phase 1 开始时一次做完。数据见[链接映射表的维护方式调研](../../research/link-mapping-maintenance.md)。
 
 **为什么生成时不按标题自动匹配。** 任一边改了标题，映射就可能悄悄变成另一页；写进映射表，改动都经过 PR。
 
@@ -980,7 +980,7 @@ Cloud 页面用到的每一张图片，都转存到 zdoc 现有的图片存储�
 
 **阶段**：Phase 1b　**谁**：文档工程师；原文的版本差异由工具处理
 
-**技术设计**：[04 两版合并](./design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02 两遍生成](./design/02-page-config.md#两遍生成与-channel)
+**技术设计**：[04 两版合并](../design/04-channels-and-lock.md#两个版本怎样合并成一页)、[02 两遍生成](../design/02-page-config.md#两遍生成与-channel)
 
 **背景**：Cloud 的功能往往晚于 Milvus 上线。Milvus 文档已经写了新参数，Cloud 下个月才支持；在此之前，Prod 要继续显示旧的内容，UAT 则要能提前审阅新内容。
 
@@ -1143,7 +1143,7 @@ transforms:
 
 **阶段**：Phase 1b　**谁**：工具发起，文档工程师审核
 
-**技术设计**：[06 上游更新](./design/06-upstream-changes.md)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[06 上游更新](../design/06-upstream-changes.md)、[08 工作流](../design/08-workflows-and-permissions.md)
 
 **背景**：milvus-docs 每天都可能有新的修改。Cloud 要能及时知道，又不能一合并就跟着变：有的修改 Cloud 也适用，有的写法只适合 Milvus，有的涉及 Cloud 还没上线的功能。
 
@@ -1263,7 +1263,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 **阶段**：Phase 1b　**谁**：文档工程师发起，工具开 PR
 
-**技术设计**：[04 提升](./design/04-channels-and-lock.md#提升)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[04 提升](../design/04-channels-and-lock.md#提升)、[08 工作流](../design/08-workflows-and-permissions.md)
 
 **背景**：功能上线时，Prod 要采用 UAT 已在显示的版本。现在这一步是在飞书多维表格中逐页把 `Release Channel` 从 `NEXT` 改为 `CURRENT`。共享页的正文版本由 `lock.yaml` 决定，所以迁移后，提升改的是每页 `lock.yaml` 中 Prod 用的版本；整页从 `NEXT` 改为 `CURRENT` 仍在表格中操作（[场景 6](#场景-6让内容先只在-uat-显示)）。
 
@@ -1348,7 +1348,7 @@ milvus-docs 在 `b2c3d4e` 中给 OpenAI 页 “Choose an embedding model” 一�
 
 **阶段**：Phase 1a 起：Fetch 中的激活随 1a 的试点页上线，比较运行与旧任务的归属规则在 Phase 1b；只在 Phase 1 过渡期存在　**谁**：文档负责人
 
-**技术设计**：[05b 切换与归属](./design/05b-cutover-and-ownership.md)、[05 交给发布](./design/05-publish-handoff.md)、[08 工作流](./design/08-workflows-and-permissions.md)
+**技术设计**：[05b 切换与归属](../design/05b-cutover-and-ownership.md)、[05 交给发布](../design/05-publish-handoff.md)、[08 工作流](../design/08-workflows-and-permissions.md)
 
 **背景**：Phase 1 飞书还不能退出。接入一页之后，网站上仍是飞书生成的版本；飞书上也可能还有人在改它。要有一个明确的时刻，把这一页交给 Git：从此网站上的这一页由 Git 生成，飞书不能再改它。这个时刻叫**激活**。
 
@@ -1356,7 +1356,7 @@ Phase 1 导航仍由飞书表格（DocsList）决定。表格中每个页面的�
 
 **用户故事**：作为文档负责人，我先看到 Git 版本与网站当前版本的差异，确认无误后再把这一页切换到 Git；切换要么完整完成，要么完全不发生。
 
-![一页从飞书切换到 Git 的三步，都由文档负责人进行。比较：在 GitHub Actions 中运行，生成 Git 版与网站当前飞书版的差异，同时检查能否生成、链接与图片能否解析、表格记录与页面配置是否一致，不改网站。确认：由人判断飞书最近的修改已在 Git 中，或飞书已暂时冻结。激活：在飞书表格中把 Docs 链接换成 Git 中的页面目录。下一次 Fetch 在同一个提交中写入正文、导航与 active.json，网站上换成 Git 版，飞书不能再改这一页，导航仍由飞书表格决定；Fetch 检查不通过时保留网站现有的版本并通知。比较或确认不通过时不激活，修正后重新比较。接入之后才能激活，一页只激活一次，不提供切回飞书。](./assets/page-activation.png)
+![一页从飞书切换到 Git 的三步，都由文档负责人进行。比较：在 GitHub Actions 中运行，生成 Git 版与网站当前飞书版的差异，同时检查能否生成、链接与图片能否解析、表格记录与页面配置是否一致，不改网站。确认：由人判断飞书最近的修改已在 Git 中，或飞书已暂时冻结。激活：在飞书表格中把 Docs 链接换成 Git 中的页面目录。下一次 Fetch 在同一个提交中写入正文、导航与 active.json，网站上换成 Git 版，飞书不能再改这一页，导航仍由飞书表格决定；Fetch 检查不通过时保留网站现有的版本并通知。比较或确认不通过时不激活，修正后重新比较。接入之后才能激活，一页只激活一次，不提供切回飞书。](../assets/page-activation.png)
 
 图 2 · 一页从飞书切换到 Git（激活）
 
@@ -1439,7 +1439,7 @@ Phase 1 导航仍由飞书表格（DocsList）决定。表格中每个页面的�
 
 **为什么在飞书表格中激活。** Phase 1 导航本来就由表格决定，文档负责人在同一处操作，与其他页面的维护方式一致；不用另建激活工作流和审批。
 
-**为什么换 `Docs` 链接，不新增 placement type。** `Docs` 本来就说明这一页的内容在哪里，换成 Git 的地址，一行只对应一个来源；placement type 说明这一行在导航中是什么，迁移后不变。新增 placement type `git` 同样要去掉飞书链接，代价相同，含义却不如前者清楚。比较见[技术设计 05b 的设计理由](./design/05b-cutover-and-ownership.md#设计理由)。
+**为什么换 `Docs` 链接，不新增 placement type。** `Docs` 本来就说明这一页的内容在哪里，换成 Git 的地址，一行只对应一个来源；placement type 说明这一行在导航中是什么，迁移后不变。新增 placement type `git` 同样要去掉飞书链接，代价相同，含义却不如前者清楚。比较见[技术设计 05b 的设计理由](../design/05b-cutover-and-ownership.md#设计理由)。
 
 **为什么还要 `active.json`。** 它由 Fetch 按表格生成，人不改，所以不会和表格不一致；它让 Git 中有一份可以追溯的记录。dev 上的检查不调用飞书，就能拦住改写已激活页面的提交；Fetch 也能据此发现 `Docs` 被误改回飞书链接；其他飞书页面指向这一页的链接也靠它换算。飞书退出时，它可以直接改为正式来源。
 
@@ -1456,7 +1456,7 @@ Phase 1 导航仍由飞书表格（DocsList）决定。表格中每个页面的�
 
 **阶段**：Phase 1b，按需　**谁**：文档工程师
 
-**技术设计**：[05b 下线完成](./design/05b-cutover-and-ownership.md#下线完成)、[04 删除页面目录](./design/04-channels-and-lock.md#删除页面目录)
+**技术设计**：[05b 下线完成](../design/05b-cutover-and-ownership.md#下线完成)、[04 删除页面目录](../design/04-channels-and-lock.md#删除页面目录)
 
 **背景**：功能下线或页面合并时，一页要从网站上移除。和上线一样，它要先从 UAT 消失，到发布时再从 Prod 消失。Phase 1 这两步都沿用飞书表格现有的做法，与其他页面相同；Git 中只需在最后删除页面目录。
 
@@ -1531,11 +1531,11 @@ Phase 1 导航仍由飞书表格（DocsList）决定。表格中每个页面的�
 | 未迁移的页面 | 飞书页面的行为不变 | T13 |
 | 出错 | 一律在 PR 校验或生成时失败，说明原因与应改的文件；不静默跳过，不静默使用 Milvus 的值 | — |
 
-实现见[技术设计 05](./design/05-publish-handoff.md)、[08](./design/08-workflows-and-permissions.md)、[09](./design/09-error-catalog.md)。各项的验收标准见[Phase 1 实施计划第 4、5 节](./phase-1.md#4-1a整篇复用跑通)；T05、T07、T08、T11、T12 是上线阻断项。
+实现见[技术设计 05](../design/05-publish-handoff.md)、[08](../design/08-workflows-and-permissions.md)、[09](../design/09-error-catalog.md)。各项的验收标准见[Phase 1 实施计划第 4、5 节](../implementation/phase-1.md#4-1a整篇复用跑通)；T05、T07、T08、T11、T12 是上线阻断项。
 
 ## 7. 待确认的问题
 
-状态统一在[Phase 1 实施计划第 6.1 节](./phase-1.md#61-待确认的接口)跟踪。工程侧的待核实事项（如 Fetch 的接入点）不在此列。
+状态统一在[Phase 1 实施计划第 6.1 节](../implementation/phase-1.md#61-待确认的接口)跟踪。工程侧的待核实事项（如 Fetch 的接入点）不在此列。
 
 | 问题 | 当前假设 | 影响的场景 |
 |---|---|---|

@@ -4,7 +4,7 @@
 
 ## 解决什么问题
 
-Milvus 作者会在原文中加这样的标记，让 Cloud 能说“替换这一节”（[产品需求场景 2](../../prd.md#场景-2在-milvus-原文中标出-cloud-要改的一段)）：
+Milvus 作者会在原文中加这样的标记，让 Cloud 能说“替换这一节”（[产品需求场景 2](../../prd/shared-guides.md#场景-2在-milvus-原文中标出-cloud-要改的一段)）：
 
 ```markdown
 <!-- doc:block:start id="before-you-start" -->

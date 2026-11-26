@@ -1,6 +1,6 @@
 # 08 工作流与权限
 
-对应的产品需求见[产品需求场景 3](../prd.md#场景-3接入一页)、[7](../prd.md#场景-7审核上游更新)、[8](../prd.md#场景-8功能上线时提升)、[9](../prd.md#场景-9从飞书切换到-git激活)，以及[第 6 节](../prd.md#6-对现有能力的要求)中的“发布保护”。本篇汇总 Phase 1 在 zdoc 中新增或改动的 GitHub 工作流：各自怎样触发、以什么身份运行、有哪些权限、怎样排队、失败时通知谁。各工作流的业务规则仍在对应的篇目中定义。
+对应的产品需求见[产品需求场景 3](../prd/shared-guides.md#场景-3接入一页)、[7](../prd/shared-guides.md#场景-7审核上游更新)、[8](../prd/shared-guides.md#场景-8功能上线时提升)、[9](../prd/shared-guides.md#场景-9从飞书切换到-git激活)，以及[第 6 节](../prd/shared-guides.md#6-对现有能力的要求)中的“发布保护”。本篇汇总 Phase 1 在 zdoc 中新增或改动的 GitHub 工作流：各自怎样触发、以什么身份运行、有哪些权限、怎样排队、失败时通知谁。各工作流的业务规则仍在对应的篇目中定义。
 
 **参与方**：zdoc 维护者（实现与仓库配置）。
 
@@ -33,7 +33,7 @@ Fetch 已有的手动参数中，`media_upload_mode`（`write` / `skip`）、`pu
 
 激活和下线不是工作流：都在飞书表格中操作，下一次 Fetch 生效（见 [05b](./05b-cutover-and-ownership.md)）。
 
-- **比较的形式**：做成 Fetch 的新参数，还是单独的工作流，由 zdoc 维护者确定（见[Phase 1 实施计划第 6.1 节](../phase-1.md#61-待确认的接口)）。
+- **比较的形式**：做成 Fetch 的新参数，还是单独的工作流，由 zdoc 维护者确定（见[Phase 1 实施计划第 6.1 节](../implementation/phase-1.md#61-待确认的接口)）。
 - **读飞书表格**：`shared-docs-validate` 不读 secret，需要表格中的 `Docs` 链接与 `Release Channel` 时，读 dev 中的 `packages/docs-tooling/src/lark/meta/snapshots/guides-uat-last-success.json`（Fetch 保存的表格快照，格式见 [04](./04-channels-and-lock.md#只在一个通道存在的页面)）与 `active.json`；上游更新与提升在仓库自己的上下文中运行，同样读快照即可，不必直接调用飞书。
 - **`shared-docs-master-pr` 并发组**：上游更新与提升都改 master 上的 `lock.yaml`，放进同一组排队，避免同时为同一页开出冲突的 PR。它们不写 dev，所以不进 `docs-production-dev`。
 - **用 `GITHUB_TOKEN` 推送的提交不会自动触发其他工作流**，凡是工具推送的提交，都用 `gh workflow run shared-docs-validate` 显式触发并等待结果，与 `sync-master-tooling-to-dev.yml` 相同。

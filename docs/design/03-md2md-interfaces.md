@@ -2,7 +2,7 @@
 
 zdoc 与 Milvus CI 处理命名块、展开变量与片段时，必须用同一套规则。本篇定义 md2md 为此新增的两组接口：命名块的解析与清除（标记规则见 [01](./01-named-blocks.md)），以及用 Cloud 的值展开变量与片段的预处理入口。
 
-对应的产品需求见[场景 1](../prd.md#场景-1把产品名和连接值写成变量)、[场景 2](../prd.md#场景-2在-milvus-原文中标出-cloud-要改的一段)。
+对应的产品需求见[场景 1](../prd/shared-guides.md#场景-1把产品名和连接值写成变量)、[场景 2](../prd/shared-guides.md#场景-2在-milvus-原文中标出-cloud-要改的一段)。
 
 **参与方**：md2md（提供方）、zdoc 生成与 Milvus CI（调用方）。
 
