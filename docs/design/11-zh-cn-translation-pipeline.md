@@ -46,7 +46,7 @@ localized-docs/zh-CN/guides/          # 位于 master，不在 devOwnedPaths 中
         └── .baseline.json            # [工具自动维护] 单页英文锚点与通知去重状态（类比 lock.yaml，人无需手改）
 ```
 
-> **为什么不在 `page.yaml` 写死个人 `owner` 或飞书 `record_id`？** 审校归属统一收口到 GitHub `CODEOWNERS`（绑定文档团队 GitHub Team，如 `@zilliztech/docs-team`），人员调整无需批量改配置；身份绑定统一对齐 `zdoc` 新架构，**仅依赖稳定 `page_id` 与目标发布路径（`page url`）**，不强绑易随飞书 Base 跨表移动或重建而变化的 `record_id`。
+> **为什么不在 `page.yaml` 写死个人 `owner` 或飞书 `record_id`？** 审校归属统一收口到 GitHub `CODEOWNERS`（绑定文档团队 GitHub Team `@zilliztech/techcomms`），人员调整无需批量改配置；身份绑定统一对齐 `zdoc` 新架构，**仅依赖稳定 `page_id` 与目标发布路径（`page url`）**，不强绑易随飞书 Base 跨表移动或重建而变化的 `record_id`。
 > **为什么不在目录下另建独立术语表？** 在 `config/translation/` 抽出全站共享的 `zh-CN-common.json`，Reference 与 Guides 共用单一中文术语真相，详见 §3.3。
 
 #### `page.yaml` 初步样例（每页一份，文档团队通过 PR 维护）
@@ -82,7 +82,7 @@ en_source:
   manual: guides
   shared_page: global-only-feature
 pause_reason: "中国站暂未上线该能力，待排期确认后恢复"
-follow_up: "@zilliztech/docs-team"    # 临时跟进团队或责任人（仅 paused 时选填）
+follow_up: "@zilliztech/techcomms"    # 临时跟进团队或责任人（仅 paused 时选填）
 ```
 
 #### `.baseline.json` 初步样例（存在 `master`，全由工具自动写入）
