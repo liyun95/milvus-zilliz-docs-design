@@ -59,7 +59,7 @@
   - 故意置入的 NEXT 哨兵在 CURRENT 视图中缺失、在 NEXT 视图中准确出现，且两视图均无残留 `<NextChannel>`；
   - 结合 `ZH-WP1` 合成 fixture 跑通 `localized-docs pr-check` 输出双通道预览与报告。
 - [ ] `scripts/validate-workflow-policy.test.js` 新增变异测试全绿（破坏权限、触发、锁边界或命令均被策略守卫拦住）。
-- [ ] `.github/CODEOWNERS` 已登记 `/localized-docs/zh-CN/guides/ @zilliztech/docs-team`（若仓库暂用其他团队 slug，先核对仓库现有 `.github/CODEOWNERS` 或在注释标明待在 GitHub 组织确认团队 slug）。
+- [ ] `.github/CODEOWNERS` 已登记 `/localized-docs/zh-CN/guides/ @zilliztech/techcomms`（已确认 `@zilliztech/techcomms` 对 `zilliztech/zdoc` 拥有 admin/write 权限）。
 - [ ] 运行并全绿：
   - `pnpm exec vitest run packages/docs-tooling/src/localized-docs --pool=forks --isolate --maxWorkers=1`
   - `pnpm test:for-change -- --base origin/master --head HEAD`（0 未映射路径，且跑完返回的所有命令）
